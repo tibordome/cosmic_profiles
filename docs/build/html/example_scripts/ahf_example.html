@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AHF Example &mdash; cosmic_shapes 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mock Halo Generator Example" href="mockhalo_example.html" />
+    <link rel="prev" title="Gadget HDF5 Example" href="gadgethdf5_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> cosmic_shapes
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_reference/index.html">Code Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Example Scripts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gadgethdf5_example.html">Gadget HDF5 Example</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AHF Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mockhalo_example.html">Mock Halo Generator Example</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cosmic_shapes</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Example Scripts</a> &raquo;</li>
+      <li>AHF Example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/example_scripts/ahf_example.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ahf-example">
+<h1>AHF Example<a class="headerlink" href="#ahf-example" title="Permalink to this headline"></a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Mar 16 18:23:43 2021</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+<span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+<span class="n">size</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">pynbody</span>
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="n">currentdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">())))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">currentdir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;cosmic_shapes&#39;</span><span class="p">))</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">cosmic_shapes</span> <span class="kn">import</span> <span class="n">CosmicShapesDirect</span><span class="p">,</span> <span class="n">createLogNormUni</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="c1">############## Parameters ####################################################################################</span>
+<span class="n">L_BOX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># cMpc/h</span>
+<span class="n">nbar</span> <span class="o">=</span> <span class="mf">8e+3</span> <span class="c1"># 5e+3, if too small: OSError: Corrupt header record</span>
+<span class="n">Nmesh</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">redshift</span> <span class="o">=</span> <span class="mf">5.5</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">0.6774</span>
+<span class="n">UNIT_MASS</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">10</span> <span class="c1"># in solar masses</span>
+<span class="n">SNAP</span> <span class="o">=</span> <span class="s1">&#39;025&#39;</span>
+<span class="n">D_LOGSTART</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+<span class="n">D_LOGEND</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">D_BINS</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1"># If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex</span>
+<span class="n">M_TOL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mf">1e-2</span><span class="p">)</span>
+<span class="n">N_WALL</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">N_MIN</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">SAFE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mf">6.0</span><span class="p">)</span> <span class="c1"># cMpc/h. The larger, the better.</span>
+<span class="n">MIN_NUMBER_DM_PTCS</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">CAT_DEST</span> <span class="o">=</span> <span class="s2">&quot;/home/tibor/Documents/PhD_in_Astronomy/Alignment_Ellipticity/cosmic_shapes/example_scripts/cat&quot;</span>
+<span class="n">VIZ_DEST</span> <span class="o">=</span> <span class="s2">&quot;/home/tibor/Documents/PhD_in_Astronomy/Alignment_Ellipticity/cosmic_shapes/example_scripts/viz&quot;</span>
+<span class="c1">#############################################################################################################</span>
+
+<span class="c1">############## Generate mock universe #######################################################################</span>
+<span class="n">N_tot</span><span class="p">,</span> <span class="n">dm_x</span><span class="p">,</span> <span class="n">dm_y</span><span class="p">,</span> <span class="n">dm_z</span><span class="p">,</span> <span class="n">vel_x</span><span class="p">,</span> <span class="n">vel_y</span><span class="p">,</span> <span class="n">vel_z</span><span class="p">,</span> <span class="n">mass_array</span> <span class="o">=</span> <span class="n">createLogNormUni</span><span class="p">(</span><span class="n">L_BOX</span><span class="p">,</span> <span class="n">nbar</span><span class="p">,</span> <span class="n">redshift</span><span class="p">,</span> <span class="n">Nmesh</span><span class="p">,</span> <span class="n">UNIT_MASS</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="c1"># mass_array in 10**10 solar masses * h^-1</span>
+<span class="c1">#############################################################################################################</span>
+
+
+<span class="c1">############## Save mock universe to Gadget 2 file #########################################################</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/snap_</span><span class="si">{}</span><span class="s1">.hdf5&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CAT_DEST</span><span class="p">,</span> <span class="n">SNAP</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;Config&#39;</span><span class="p">)</span>
+<span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;Header&#39;</span><span class="p">)</span>
+<span class="n">param</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;Parameters&#39;</span><span class="p">)</span>
+<span class="n">ptype1</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;PartType1&#39;</span><span class="p">)</span>
+<span class="c1"># Populate Config</span>
+<span class="n">config</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NTYPES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">6.0</span>
+<span class="c1"># Populate Header</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;MassTable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;Redshift&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">redshift</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">L_BOX</span> <span class="c1"># in Mpc/h</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;Omega0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3089</span> <span class="c1"># Planck 2015</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;OmegaBaryon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.048</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;OmegaLambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6911</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;UnitLength_in_cm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.085678e+24</span> <span class="c1"># 1 Mpc</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;UnitVelocity_in_cm_per_s&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100000.0</span> <span class="c1"># 1 km/s</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;UnitMass_in_g&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.989e+43</span> <span class="c1"># 10**10 M_sun</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;HubbleParam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">redshift</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NumFilesPerSnapshot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NumPart_ThisFile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_tot</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NumPart_Total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_tot</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">header</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;MassTable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">mass_array</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="c1"># Populate Parameters</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;MassTable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">mass_array</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;Redshift&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">redshift</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">L_BOX</span> <span class="c1"># in Mpc/h</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;Omega0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3089</span> <span class="c1"># Planck 2015</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;OmegaBaryon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.048</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;OmegaLambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6911</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;UnitLength_in_cm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.085678e+24</span> <span class="c1"># 1 Mpc</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;UnitVelocity_in_cm_per_s&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100000.0</span> <span class="c1"># 1 km/s</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;UnitMass_in_g&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.989e+43</span> <span class="c1"># 10**10 M_sun</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;HubbleParam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NumFilesPerSnapshot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;SofteningComovingType1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.19</span><span class="o">/</span><span class="mi">1000</span> <span class="c1"># Mpc</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;SofteningMaxPhysType1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.19</span><span class="o">/</span><span class="mi">1000</span>
+<span class="n">param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;SofteningTypeOfPartType1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># Populate PartType1</span>
+<span class="n">dm_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dm_x</span><span class="p">,</span> <span class="p">(</span><span class="n">dm_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dm_y</span><span class="p">,</span> <span class="p">(</span><span class="n">dm_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dm_z</span><span class="p">,</span> <span class="p">(</span><span class="n">dm_z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">))))</span>
+<span class="n">vel_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vel_x</span><span class="p">,</span> <span class="p">(</span><span class="n">vel_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vel_y</span><span class="p">,</span> <span class="p">(</span><span class="n">vel_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vel_z</span><span class="p">,</span> <span class="p">(</span><span class="n">vel_z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">))))</span>
+<span class="n">ptype1_coords</span> <span class="o">=</span> <span class="n">ptype1</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;Coordinates&#39;</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dm_xyz</span><span class="p">)</span> <span class="c1"># Mpc/h</span>
+<span class="n">ptype1_coords</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;a_scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">ptype1_coords</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;h_scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+<span class="n">ptype1_ids</span> <span class="o">=</span> <span class="n">ptype1</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ParticleIDs&#39;</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N_tot</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">))</span>
+<span class="n">ptype1_ids</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;a_scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">ptype1_ids</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;h_scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">ptype1_vels</span> <span class="o">=</span> <span class="n">ptype1</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;Velocities&#39;</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">vel_xyz</span><span class="p">)</span>
+<span class="n">ptype1_vels</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;a_scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">ptype1_vels</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;h_scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pynbody</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/snap_</span><span class="si">{}</span><span class="s1">.hdf5&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CAT_DEST</span><span class="p">,</span> <span class="n">SNAP</span><span class="p">))</span>
+<span class="n">s</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">];</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;mass&#39;</span><span class="p">];</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">];</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;iord&#39;</span><span class="p">]</span>
+<span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="n">pynbody</span><span class="o">.</span><span class="n">gadget</span><span class="o">.</span><span class="n">GadgetSnap</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/snap_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CAT_DEST</span><span class="p">,</span> <span class="n">SNAP</span><span class="p">))</span>
+<span class="c1">#############################################################################################################</span>
+
+<span class="c1">############## Load Gadget 2 file with pynbody ###############################################################</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pynbody</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/snap_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CAT_DEST</span><span class="p">,</span> <span class="n">SNAP</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The snaphost properties read&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+<span class="c1">#############################################################################################################</span>
+
+<span class="c1">############## Find halos with e.g. AHF #####################################################################</span>
+<span class="n">s</span><span class="p">[</span><span class="s1">&#39;eps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="c1"># The smaller, the larger AHF&#39;s LgridMax: SpatialResolution ≃ BoxSize/LgridMax</span>
+<span class="n">halos</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">halos</span><span class="p">()</span> <span class="c1"># Install e.g. AHF and place executable in ~/bin (or extend $PATH variable)</span>
+<span class="c1"># Modify /halo/ahf.py (Gadget, not Tipsy) and config.ini (Gadget, not Tipsy)</span>
+<span class="c1">#############################################################################################################</span>
+
+<span class="c1">############## Viz some halos and retrieve basic propertiesn ################################################</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The length of halo 1 and 2 are </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">, respectively.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">halos</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">halos</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The second halo has mass </span><span class="si">{}</span><span class="s2"> 1e12 Msol&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">halos</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;mass&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">in_units</span><span class="p">(</span><span class="s1">&#39;1e12 Msol&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The first 5 particles of halo 2 are located at (in kpc)&quot;</span><span class="p">,</span> <span class="n">halos</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">in_units</span><span class="p">(</span><span class="s1">&#39;kpc&#39;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="n">pynbody</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">halo</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="n">halos</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="c1"># Modify cen_size=&quot;1 kpc&quot; argument in analysis/halo.py&#39;s center() method to cen_size=&quot;10 kpc&quot; if resolution is too low (i.e. nbar too low)</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">pynbody</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">halos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="s1">&#39;500 kpc&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Greys</span><span class="p">,</span> <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;Msol kpc^-2&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/RhoHalo2.pdf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">VIZ_DEST</span><span class="p">))</span>
+<span class="c1">#############################################################################################################</span>
+
+<span class="c1">############## Extract R_vir, halo indices and halo sizes ###################################################</span>
+<span class="n">ahf_halos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/snap_</span><span class="si">{}</span><span class="s1">.z</span><span class="si">{}</span><span class="s1">.AHF_halos&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CAT_DEST</span><span class="p">,</span> <span class="n">SNAP</span><span class="p">,</span> <span class="nb">format</span><span class="p">(</span><span class="n">redshift</span><span class="p">,</span> <span class="s1">&#39;.3f&#39;</span><span class="p">)),</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">h_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">ahf_halos</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="c1"># 5th column</span>
+<span class="n">r_vir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">ahf_halos</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span> <span class="c1"># 12th column</span>
+<span class="n">ahf_ptcs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/snap_</span><span class="si">{}</span><span class="s1">.z</span><span class="si">{}</span><span class="s1">.AHF_particles&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CAT_DEST</span><span class="p">,</span> <span class="n">SNAP</span><span class="p">,</span> <span class="nb">format</span><span class="p">(</span><span class="n">redshift</span><span class="p">,</span> <span class="s1">&#39;.3f&#39;</span><span class="p">)),</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">unpack</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">h_indices</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_sizes</span><span class="p">))]</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">h_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_sizes</span><span class="p">)):</span>
+    <span class="n">h_indices</span><span class="p">[</span><span class="n">h_idx</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ahf_ptcs</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span><span class="o">+</span><span class="n">h_sizes</span><span class="p">[</span><span class="n">h_idx</span><span class="p">]])</span> <span class="c1"># True indices</span>
+    <span class="n">offset</span> <span class="o">+=</span> <span class="n">h_sizes</span><span class="p">[</span><span class="n">h_idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># Skip line containing number of particles in halo</span>
+<span class="c1">#############################################################################################################</span>
+
+<span class="c1">############## Run cosmic_shapes: define CosmicShapes object ################################################</span>
+<span class="n">cshapes</span> <span class="o">=</span> <span class="n">CosmicShapesDirect</span><span class="p">(</span><span class="n">dm_xyz</span><span class="p">,</span> <span class="n">mass_array</span><span class="p">,</span> <span class="n">h_indices</span><span class="p">,</span> <span class="n">r_vir</span><span class="p">,</span> <span class="n">CAT_DEST</span><span class="p">,</span> <span class="n">VIZ_DEST</span><span class="p">,</span> <span class="n">SNAP</span><span class="p">,</span> <span class="n">L_BOX</span><span class="p">,</span> <span class="n">MIN_NUMBER_DM_PTCS</span><span class="p">,</span> <span class="n">D_LOGSTART</span><span class="p">,</span> <span class="n">D_LOGEND</span><span class="p">,</span> <span class="n">D_BINS</span><span class="p">,</span> <span class="n">M_TOL</span><span class="p">,</span> <span class="n">N_WALL</span><span class="p">,</span> <span class="n">N_MIN</span><span class="p">,</span> <span class="n">SAFE</span><span class="p">,</span> <span class="n">start_time</span><span class="p">)</span>
+
+<span class="c1"># Create halo shape catalogue</span>
+<span class="n">cshapes</span><span class="o">.</span><span class="n">createCatMajorCOMDM</span><span class="p">()</span>
+<span class="c1">#############################################################################################################</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gadgethdf5_example.html" class="btn btn-neutral float-left" title="Gadget HDF5 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mockhalo_example.html" class="btn btn-neutral float-right" title="Mock Halo Generator Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Tibor Dome.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

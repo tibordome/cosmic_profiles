@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>python_helpers module &mdash; cosmic_shapes 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="get_hdf5 module" href="get_hdf5.html" />
+    <link rel="prev" title="gen_csh_gx_cat module" href="gen_csh_gx_cat.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> cosmic_shapes
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../support.html">Support</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Code Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cosmic_shapes.html">cosmic_shapes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cython_helpers.html">cython_helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gen_csh_gx_cat.html">gen_csh_gx_cat module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">python_helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="get_hdf5.html">get_hdf5 module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../example_scripts/index.html">Example Scripts</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cosmic_shapes</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Code Reference</a> &raquo;</li>
+      <li>python_helpers module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/code_reference/python_helpers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="python-helpers-module">
+<h1>python_helpers module<a class="headerlink" href="#python-helpers-module" title="Permalink to this headline"></a></h1>
+<p>Contains relevant Python helper functions</p>
+<span class="target" id="module-python_helpers"></span><p>Created on Sun Mar 13 17:39:15 2022</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.drawUniformFromEllipsoid">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">drawUniformFromEllipsoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N_reals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.drawUniformFromEllipsoid" title="Permalink to this definition"></a></dt>
+<dd><p>Draw points uniformly from an ellipsoid volume</p>
+<p>This function is primarily used to generate synthetic halos.
+The approach is taken from Rubinstein &amp; Kroese 2007:</p>
+<p>Part 1: Generating uniform random vectors inside the 3-ball</p>
+<p>Part 2: Lower Cholesky decomposition</p>
+<p>Part 3: Draw uniformly from ellipsoid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N_reals</strong> (<em>int</em>) – number of points to draw from ellipsoid volume</p></li>
+<li><p><strong>dims</strong> (<em>int</em>) – number of dimensions of ‘ellipsoid’, either 2,
+in which case c remains <cite>None</cite>, or 3</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – intermediate axis of ellipsoid surface</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – optional, minor axis of ellipsoid surface</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>points drawn uniformly from an ellipsoid volume</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(N_reals,3) floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.fibonacci_ellipsoid">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">fibonacci_ellipsoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.fibonacci_ellipsoid" title="Permalink to this definition"></a></dt>
+<dd><p>Creating “evenly” distributed points on an ellipsoid surface</p>
+<p>Here, this distribution of points on the ellipsoid surface is 
+called a Fibonacci ellipsoid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>float</em>) – major axis of ellipsoid surface</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – intermediate axis of ellipsoid surface</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – minor axis of ellipsoid surface</p></li>
+<li><p><strong>samples</strong> (<em>int</em>) – number of points to be put onto the unit sphere</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>N points on the unit sphere</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of N (3,) floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.fibonacci_sphere">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">fibonacci_sphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.fibonacci_sphere" title="Permalink to this definition"></a></dt>
+<dd><p>Creating “evenly” distributed points on a unit sphere</p>
+<p>This distribution of points on the unit sphere is called a Fibonacci sphere</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>samples</strong> (<em>int</em>) – number of points to be put onto the unit sphere</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>N points on the unit sphere</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of N (3,) floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.getDelta">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">getDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OMEGA_M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OMEGA_L</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.getDelta" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the overdensity required for spherical virialization 
+relative to the mean background of the universe</p>
+<p>The result is taken from Bryan, Norman, 1998, ApJ 
+(Vir. Theorem + Spher. Collapse). Note that this quantity is z-dependent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>float</em>) – redshift of interest</p></li>
+<li><p><strong>OMEGA_M</strong> (<em>float</em>) – fractional matter density of the universe</p></li>
+<li><p><strong>OMEGA_L</strong> (<em>float</em>) – fractional dark energy density of the universe</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>spherical virialization overdensity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.getMassDMParticle">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">getMassDMParticle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.getMassDMParticle" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the mass of each DM particle,
+assuming it is constant, given N and L</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<em>int</em>) – Simulation resolution parameter, usually power of 2</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – Simulation box size in cMpc/h</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mass of each DM particle in solar masses*h^-1</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.getRhoCrit">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">getRhoCrit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.getRhoCrit" title="Permalink to this definition"></a></dt>
+<dd><p>Returns critical comoving density of the universe</p>
+<p>Return value is in units of [solar masses/(cMpc)^3*h^2]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>h</strong> (<em>float</em>) – little H</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>critical comoving density</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.print_status">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">print_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rank</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.print_status" title="Permalink to this definition"></a></dt>
+<dd><p>Routine to print script status to command line, with elapsed time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rank</strong> (<em>int</em>) – rank of process</p></li>
+<li><p><strong>start_time</strong> (<em>float</em>) – time of start of script (or specific function)</p></li>
+<li><p><strong>message</strong> (<em>string</em>) – message to be printed</p></li>
+<li><p><strong>color</strong> (<em>string</em>) – for optional <code class="docutils literal notranslate"><span class="pre">color</span></code> argument, we allow for ‘green’, ‘blue’ and ‘red’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="python_helpers.set_axes_equal">
+<span class="sig-prename descclassname"><span class="pre">python_helpers.</span></span><span class="sig-name descname"><span class="pre">set_axes_equal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">matplotlib.axes._axes.Axes</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/python_helpers.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#python_helpers.set_axes_equal" title="Permalink to this definition"></a></dt>
+<dd><p>Set 3D plot axes to equal scale.</p>
+<p>Make axes of 3D plot have equal scale so that spheres appear as
+spheres and cubes as cubes.  Required since <cite>ax.axis(‘equal’)</cite>
+and <cite>ax.set_aspect(‘equal’)</cite> don’t work on 3D.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gen_csh_gx_cat.html" class="btn btn-neutral float-left" title="gen_csh_gx_cat module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="get_hdf5.html" class="btn btn-neutral float-right" title="get_hdf5 module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Tibor Dome.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

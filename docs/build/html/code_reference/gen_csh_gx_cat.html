@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gen_csh_gx_cat module &mdash; cosmic_shapes 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="python_helpers module" href="python_helpers.html" />
+    <link rel="prev" title="cython_helpers module" href="cython_helpers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> cosmic_shapes
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../support.html">Support</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Code Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cosmic_shapes.html">cosmic_shapes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cython_helpers.html">cython_helpers module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">gen_csh_gx_cat module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python_helpers.html">python_helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="get_hdf5.html">get_hdf5 module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../example_scripts/index.html">Example Scripts</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cosmic_shapes</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Code Reference</a> &raquo;</li>
+      <li>gen_csh_gx_cat module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/code_reference/gen_csh_gx_cat.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="gen-csh-gx-cat-module">
+<h1>gen_csh_gx_cat module<a class="headerlink" href="#gen-csh-gx-cat-module" title="Permalink to this headline"></a></h1>
+<p>Contains Cython functions to generate central subhalo (CSH) and galaxy catalogues from HDF5 Gadget-type output</p>
+<span class="target" id="module-gen_csh_gx_cat"></span><p>Created on Mon Mar 28 12:24:04 2022</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_csh_gx_cat.createGxs">
+<span class="sig-prename descclassname"><span class="pre">gen_csh_gx_cat.</span></span><span class="sig-name descname"><span class="pre">createGxs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">float[:]</span> <span class="pre">star_xyz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float[:</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">:]</span> <span class="pre">fof_com</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int[:]</span> <span class="pre">nb_shs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float[:</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">:]</span> <span class="pre">sh_com</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float</span> <span class="pre">L_BOX</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/gen_csh_gx_cat.pyx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_csh_gx_cat.createGxs" title="Permalink to this definition"></a></dt>
+<dd><p>Find closest FoF-halo for star particle at position <cite>star_xyz</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>star_xyz</strong> (<em>(</em><em>3</em><em>,</em><em>) </em><em>float</em>) – position of star particle</p></li>
+<li><p><strong>fof_com</strong> (<em>(</em><em>N1</em><em>, </em><em>3</em><em>) </em><em>floats</em>) – COMs of FoF-halos</p></li>
+<li><p><strong>nb_shs</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>ints</em>) – number of SHs in each FoF-halo</p></li>
+<li><p><strong>sh_com</strong> (<em>(</em><em>N2</em><em>, </em><em>3</em><em>) </em><em>floats</em>) – COMs of the SHs</p></li>
+<li><p><strong>L_BOX</strong> (<em>float</em>) – side length of simulation box, in cMpc/h</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>index of FoF-halo to which star particle is closest, -1
+if star particle is to be discarded (since closer to some SH other than the CSH)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_csh_gx_cat.getCSHCat">
+<span class="sig-prename descclassname"><span class="pre">gen_csh_gx_cat.</span></span><span class="sig-name descname"><span class="pre">getCSHCat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int[:]</span> <span class="pre">nb_shs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int[:]</span> <span class="pre">sh_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int[:]</span> <span class="pre">fof_dm_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float[:]</span> <span class="pre">group_r200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float[:]</span> <span class="pre">halo_masses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">MIN_NUMBER_DM_PTCS</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/gen_csh_gx_cat.pyx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_csh_gx_cat.getCSHCat" title="Permalink to this definition"></a></dt>
+<dd><p>Construct central subhalo (CSH) catalogue from FoF/SH info</p>
+<p>Note that the indices returned in each CSH are ‘true index + 1’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_shs</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>ints</em>) – number of SHs in each FoF-halo</p></li>
+<li><p><strong>fof_dm_size</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>ints</em>) – number of particles in the FoF-halos</p></li>
+<li><p><strong>group_r200</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>floats</em>) – R200-radius of FoF-halos</p></li>
+<li><p><strong>halo_masses</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>floats</em>) – masses of FoF-halos</p></li>
+<li><p><strong>MIN_NUMBER_DM_PTCS</strong> (<em>int</em>) – minimum number of DM particles for CSH to be valid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>h_cat: indices (+1, to allow 0 to be interpreted as no index),
+h_r200: R200-radii, h_pass: passed <cite>MIN_NUMBER_DM_PTCS</cite>-threshold or not</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int array, float array, int array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_csh_gx_cat.getCSHIdxs">
+<span class="sig-prename descclassname"><span class="pre">gen_csh_gx_cat.</span></span><span class="sig-name descname"><span class="pre">getCSHIdxs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int[:]</span> <span class="pre">h_idxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">start_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">fof_dm_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">nb_shs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">csh_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">MIN_NUMBER_DM_PTCS</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/gen_csh_gx_cat.pyx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_csh_gx_cat.getCSHIdxs" title="Permalink to this definition"></a></dt>
+<dd><p>Return the indices of the DM particles that belong to the CSH</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h_idxs</strong> (<em>int array</em>) – array to store the indices</p></li>
+<li><p><strong>start_idx</strong> (<em>int</em>) – first index that belongs to this CSH</p></li>
+<li><p><strong>fof_dm_size</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>ints</em>) – number of particles in the FoF-halos</p></li>
+<li><p><strong>nb_shs</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>ints</em>) – number of SHs in each FoF-halo</p></li>
+<li><p><strong>csh_size</strong> (<em>(</em><em>N2</em><em>,</em><em>) </em><em>ints</em>) – number of particles in the SHs</p></li>
+<li><p><strong>MIN_NUMBER_DM_PTCS</strong> (<em>int</em>) – minimum number of DM particles for CSH to be valid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>h_idxs filled partially with indices (+1, to allow 0 to be interpreted as no index)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_csh_gx_cat.getGxCat">
+<span class="sig-prename descclassname"><span class="pre">gen_csh_gx_cat.</span></span><span class="sig-name descname"><span class="pre">getGxCat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">float[:</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">:]</span> <span class="pre">star_xyz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float[:</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">:]</span> <span class="pre">fof_com</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int[:]</span> <span class="pre">nb_shs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float[:</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">:]</span> <span class="pre">sh_com</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float</span> <span class="pre">L_BOX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">MIN_NUMBER_STAR_PTCS</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/tibordome/cosmic_shapes/gen_csh_gx_cat.pyx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_csh_gx_cat.getGxCat" title="Permalink to this definition"></a></dt>
+<dd><p>Construct galaxy catalogue</p>
+<p>The approach is very simple: Assign each star particle to its nearest FoF-halo, 
+and bundle the star particles into newly obtained ‘galaxies’. If the star particle
+is closer to a subhalo (SH) that is not the central subhalo (CSH), discard the star particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>star_xyz</strong> (<em>(</em><em>N</em><em>, </em><em>3</em><em>,</em><em>) </em><em>floats</em>) – position of star particles</p></li>
+<li><p><strong>fof_com</strong> (<em>(</em><em>N1</em><em>, </em><em>3</em><em>) </em><em>floats</em>) – COMs of FoF-halos</p></li>
+<li><p><strong>nb_shs</strong> (<em>(</em><em>N1</em><em>,</em><em>) </em><em>ints</em>) – number of SHs in each FoF-halo</p></li>
+<li><p><strong>sh_com</strong> (<em>(</em><em>N2</em><em>, </em><em>3</em><em>) </em><em>floats</em>) – COMs of the SHs</p></li>
+<li><p><strong>L_BOX</strong> (<em>float</em>) – side length of simulation box, in cMpc/h</p></li>
+<li><p><strong>MIN_NUMBER_STAR_PTCS</strong> (<em>int</em>) – minimum number of star particles for galaxy to be valid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>galaxy catalogue, containing indices of star particles belong to each galaxy</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of N1 int lists containing indices</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cython_helpers.html" class="btn btn-neutral float-left" title="cython_helpers module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="python_helpers.html" class="btn btn-neutral float-right" title="python_helpers module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Tibor Dome.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
