@@ -12,4 +12,4 @@ This repository provides shape analysis tools for cosmological simulations. Its 
 
 The documentation can be found [here](https://cosmic-shapes.readthedocs.io/en/latest/index.html).
 
-Contributions are welcome. Please raise a PR. Comments/recommendations/complaints can be sent to [here](mailto:tibor.doeme@gmail.com).
+Contributions are welcome. Please raise a PR. Comments/recommendations/complaints can be sent [here](mailto:tibor.doeme@gmail.com).
