@@ -3,16 +3,32 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 28 12:24:04 2022
-
-@author: tibor
 """
 
 from cython_helpers cimport cython_abs
 import numpy as np
+cimport cython
 cimport openmp
 from cython.parallel import prange
 
+@cython.embedsignature(True)
 cdef int createGxs(float[:] star_xyz, float[:,:] fof_com, int[:] nb_shs, float[:,:] sh_com, float L_BOX) nogil:
+    """ Find closest FoF-halo for star particle at position `star_xyz`
+    
+    :param star_xyz: position of star particle
+    :type star_xyz: (3,) float
+    :param fof_com: COMs of FoF-halos
+    :type fof_com: (N1, 3) floats
+    :param nb_shs: number of SHs in each FoF-halo
+    :type nb_shs: (N1,) ints
+    :param sh_com: COMs of the SHs
+    :type sh_com: (N2, 3) floats
+    :param L_BOX: side length of simulation box, in cMpc/h
+    :type L_BOX: float
+    :return: index of FoF-halo to which star particle is closest, -1
+        if star particle is to be discarded (since closer to some SH other than the CSH)
+    :rtype: int"""
+    
     cdef bint discard = False
     cdef int argmin = 0
     cdef int argmin_2 = 0
@@ -26,7 +42,7 @@ cdef int createGxs(float[:] star_xyz, float[:,:] fof_com, int[:] nb_shs, float[:
     cdef int idx_base = 0
     cdef int run
         
-    # Find closest FoF halo
+    # Find closest FoF-halo
     for run in range(fof_com.shape[0]):
         dist_x = cython_abs(star_xyz[0]-fof_com[run,0])
         if dist_x > L_BOX/2:
@@ -75,7 +91,28 @@ cdef int createGxs(float[:] star_xyz, float[:,:] fof_com, int[:] nb_shs, float[:
     else:
         return -1
     
+@cython.embedsignature(True)
 def getGxCat(float[:,:] star_xyz, float[:,:] fof_com, int[:] nb_shs, float[:,:] sh_com, float L_BOX, int MIN_NUMBER_STAR_PTCS):
+    """ Construct galaxy catalogue
+    
+    The approach is very simple: Assign each star particle to its nearest FoF-halo, 
+    and bundle the star particles into newly obtained 'galaxies'. If the star particle
+    is closer to a subhalo (SH) that is not the central subhalo (CSH), discard the star particle.
+    
+    :param star_xyz: position of star particles
+    :type star_xyz: (N, 3,) floats
+    :param fof_com: COMs of FoF-halos
+    :type fof_com: (N1, 3) floats
+    :param nb_shs: number of SHs in each FoF-halo
+    :type nb_shs: (N1,) ints
+    :param sh_com: COMs of the SHs
+    :type sh_com: (N2, 3) floats
+    :param L_BOX: side length of simulation box, in cMpc/h
+    :type L_BOX: float
+    :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for galaxy to be valid
+    :type MIN_NUMBER_STAR_PTCS: int
+    :return: galaxy catalogue, containing indices of star particles belong to each galaxy
+    :rtype: list of N1 int lists containing indices"""
     cdef int nb_halos = fof_com.shape[0]
     cdef int nb_stars = star_xyz.shape[0]
     cdef int[:] gx_pass = np.zeros((nb_halos,), dtype = np.int32)
@@ -97,8 +134,26 @@ def getGxCat(float[:,:] star_xyz, float[:,:] fof_com, int[:] nb_shs, float[:,:] 
         if belongs_to[p] != -1 and gx_pass[belongs_to[p]] == 1:
             gx_cat[belongs_to[p]].append(p)
     return gx_cat
-              
+  
+@cython.embedsignature(True)       
 cdef int[:] getCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS) nogil:
+    """ Return the indices of the DM particles that belong to the CSH
+    
+    :param h_idxs: array to store the indices
+    :type h_idxs: int array
+    :param start_idx: first index that belongs to this CSH
+    :type start_idx: int
+    :param fof_dm_size: number of particles in the FoF-halos
+    :type fof_dm_size: (N1,) ints
+    :param nb_shs: number of SHs in each FoF-halo
+    :type nb_shs: (N1,) ints
+    :param csh_size: number of particles in the SHs
+    :type csh_size: (N2,) ints
+    :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
+    :type MIN_NUMBER_DM_PTCS: int
+    :return: h_idxs filled partially with indices (+1, to allow 0 to be interpreted as no index)
+    :rtype: int array"""
+    
     cdef int l
     if nb_shs == 0: # There is no Halo, so add all the "inner fuzz" to the catalogue
         if fof_dm_size != 0: # If there is not even any "inner fuzz", return nothing
@@ -115,8 +170,25 @@ cdef int[:] getCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs
                 l += 1
     return h_idxs
 
+@cython.embedsignature(True)
 def getCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
-    """ Note that the indices returned are 'true index + 1'"""
+    """ Construct central subhalo (CSH) catalogue from FoF/SH info
+    
+    Note that the indices returned in each CSH are 'true index + 1'
+    
+    :param nb_shs: number of SHs in each FoF-halo
+    :type nb_shs: (N1,) ints
+    :param fof_dm_size: number of particles in the FoF-halos
+    :type fof_dm_size: (N1,) ints
+    :param group_r200: R200-radius of FoF-halos
+    :type group_r200: (N1,) floats
+    :param halo_masses: masses of FoF-halos
+    :type halo_masses: (N1,) floats
+    :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
+    :type MIN_NUMBER_DM_PTCS: int
+    :return: h_cat: indices (+1, to allow 0 to be interpreted as no index),
+        h_r200: R200-radii, h_pass: passed `MIN_NUMBER_DM_PTCS`-threshold or not
+    :rtype: int array, float array, int array"""
     cdef int nb_halos = len(nb_shs)
     cdef int[:] h_pass = np.zeros((nb_halos,), dtype = np.int32)
     cdef int[:] h_size = np.zeros((nb_halos,), dtype = np.int32) # Either CSH or halo size (if no SHs exist)

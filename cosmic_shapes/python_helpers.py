@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Mar 13 17:39:15 2022
-
-@author: tibor
 """
 
 import time
@@ -16,7 +14,14 @@ from numpy.linalg import inv
 def print_status(rank,start_time,message,**kwargs):
     """ Routine to print script status to command line, with elapsed time
     
-    For optional ``color`` argument, we allow for 'green', 'blue' and 'red'."""
+    :param rank: rank of process
+    :type rank: int
+    :param start_time: time of start of script (or specific function)
+    :type start_time: float
+    :param message: message to be printed
+    :type message: string
+    :param color: for optional ``color`` argument, we allow for 'green', 'blue' and 'red'
+    :type color: string"""
     if rank == 0 or ("allowed_any" in kwargs and kwargs['allowed_any'] == True):
         elapsed_time = time.time() - start_time
         CEND = ' \033[0m'
@@ -35,7 +40,13 @@ def print_status(rank,start_time,message,**kwargs):
             
 def getRhoCrit(h):
     """ Returns critical comoving density of the universe
-    in [solar masses/(cMpc)^3*h^2] units"""
+    
+    Return value is in units of [solar masses/(cMpc)^3*h^2]
+    
+    :param h: little H
+    :type h: float
+    :return: critical comoving density
+    :rtype: float"""
     G = 6.674*10**(-29)/(3.086*10**16)**3*h**3 # in (cMpc/h)^3/(kg*s^2)
     H_z = 100*h/(3.086*10**19) # in 1/s
     solar_mass = 2*10**30 # in kg
@@ -44,19 +55,30 @@ def getRhoCrit(h):
 def getMassDMParticle(N, L, h):
     """Returns the mass of each DM particle,
     assuming it is constant, given N and L
-    Arguments:
-    -------------
-    N: Simulation resolution parameter, power of 2
-    L: Simulation box size in cMpc/h
-    Returns:
-    -------------
-    Mass of each DM particle in solar masses*h^-1"""
+    
+    :param N: Simulation resolution parameter, usually power of 2
+    :type N: int
+    :param L: Simulation box size in cMpc/h
+    :type L: float
+    :return: Mass of each DM particle in solar masses*h^-1
+    :rtype: float"""
     return getRhoCrit(h)*(L/N)**3
 
 def getDelta(z, OMEGA_M, OMEGA_L):
-    """ Calculates the overdensity required for spherical virialization relative to the mean BG of the universe
+    """ Calculates the overdensity required for spherical virialization 
+    relative to the mean background of the universe
     
-    From Bryan, Norman, 1998, ApJ (Vir. Theorem + Spher. Collapse). Note that this quantity is z-dependent."""
+    The result is taken from Bryan, Norman, 1998, ApJ 
+    (Vir. Theorem + Spher. Collapse). Note that this quantity is z-dependent.
+    
+    :param z: redshift of interest
+    :type z: float
+    :param OMEGA_M: fractional matter density of the universe
+    :type OMEGA_M: float
+    :param OMEGA_L: fractional dark energy density of the universe
+    :type OMEGA_L: float
+    :return: spherical virialization overdensity
+    :rtype: float"""
     x = (OMEGA_M*(1+z)**3)/(OMEGA_M*(1+z)**3+OMEGA_L)-1
     DELTA = (18*np.pi**2 + 82*x - 39*x**2)/(x+1) - 1
     return np.float32(DELTA)
@@ -84,7 +106,14 @@ def _set_axes_radius(ax, origin, radius):
     ax.set_zlim3d([z - radius, z + radius])
 
 def fibonacci_sphere(samples=1):
-    """ Creating "evenly" distributed points on a unit sphere"""
+    """ Creating "evenly" distributed points on a unit sphere
+    
+    This distribution of points on the unit sphere is called a Fibonacci sphere
+    
+    :param samples: number of points to be put onto the unit sphere
+    :type samples: int
+    :return: N points on the unit sphere
+    :rtype: list of N (3,) floats"""
 
     points = []
     phi = math.pi * (3. - math.sqrt(5.))  # golden angle in radians
@@ -103,7 +132,21 @@ def fibonacci_sphere(samples=1):
     return points
         
 def fibonacci_ellipsoid(a, b, c, samples=1):
-    """ Creating "evenly" distributed points on an ellipsoid's surface"""
+    """ Creating "evenly" distributed points on an ellipsoid surface
+    
+    Here, this distribution of points on the ellipsoid surface is 
+    called a Fibonacci ellipsoid
+    
+    :param a: major axis of ellipsoid surface
+    :type a: float
+    :param b: intermediate axis of ellipsoid surface
+    :type b: float
+    :param c: minor axis of ellipsoid surface
+    :type c: float
+    :param samples: number of points to be put onto the unit sphere
+    :type samples: int
+    :return: N points on the unit sphere
+    :rtype: list of N (3,) floats"""
 
     points = []
     phi = math.pi * (3. - math.sqrt(5.))  # golden angle in radians
@@ -122,10 +165,28 @@ def fibonacci_ellipsoid(a, b, c, samples=1):
     return points
 
 def drawUniformFromEllipsoid(N_reals, dims, a, b, c=None):
-    # Step 2: Rubinstein & Kroese 2007
-    # Part 1: Generating Uniform Random Vectors inside the 3-ball
+    """ Draw points uniformly from an ellipsoid volume
     
-    print("The major axis is", a, "the intermediate one is", b, "and the minor axis is", c)
+    This function is primarily used to generate synthetic halos.
+    The approach is taken from Rubinstein & Kroese 2007:\n
+    Part 1: Generating uniform random vectors inside the 3-ball\n
+    Part 2: Lower Cholesky decomposition\n
+    Part 3: Draw uniformly from ellipsoid
+    
+    :param N_reals: number of points to draw from ellipsoid volume
+    :type N_reals: int
+    :param dims: number of dimensions of 'ellipsoid', either 2,
+        in which case c remains `None`, or 3
+    :type dims: int
+    :type a: float
+    :param b: intermediate axis of ellipsoid surface
+    :type b: float
+    :param c: optional, minor axis of ellipsoid surface
+    :type c: float
+    :return: points drawn uniformly from an ellipsoid volume
+    :rtype: (N_reals,3) floats"""
+    
+    # Part 1: Generating uniform random vectors inside the 3-ball
     X_tmp = np.zeros((N_reals, dims))
     Z = np.zeros((N_reals, dims))
     for i in range(N_reals):
@@ -134,7 +195,6 @@ def drawUniformFromEllipsoid(N_reals, dims, a, b, c=None):
         Z[i] = R*X_tmp[i]/np.linalg.norm(X_tmp[i])
     
     # Part 2: lower Cholesky decomposition
-    
     if c == None:
         Sigma = np.array([[1/a**2, 0],[0,1/b**2]])
     else:
@@ -142,35 +202,7 @@ def drawUniformFromEllipsoid(N_reals, dims, a, b, c=None):
     L = cholesky(Sigma, lower=True)
     
     # Part 3: Uniform from Ellipsoid
-    
     X = np.zeros((N_reals, dims))
     for i in range(N_reals):
         X[i] = np.dot(inv(L.T),Z[i])
     return X
-
-def projectIntoOuterShell3D_biased(X, a, b, c, delta_r):
-    Y = np.zeros((X.shape[0], X.shape[1]))
-    for i in range(X.shape[0]):
-        Y[i,0] = delta_r/a*X[i,0]+(a-delta_r)*X[i,0]/np.linalg.norm(X[i,:])
-        Y[i,1] = delta_r/a*X[i,1]+(a-delta_r)*X[i,1]/np.linalg.norm(X[i,:])*b/a
-        Y[i,2] = delta_r/a*X[i,2]+(a-delta_r)*X[i,2]/np.linalg.norm(X[i,:])*c/a
-    return Y
-
-
-def projectIntoOuterShell3D(X, a, b, c, delta_a):
-    Y = np.zeros((X.shape[0], X.shape[1]))
-    for i in range(X.shape[0]):
-        uni = np.random.uniform(0.0,1.0)
-        Y[i,0] = (a-delta_a)*X[i,0]/np.linalg.norm(X[i,:])+delta_a*uni*X[i,0]/np.linalg.norm(X[i,:])
-        Y[i,1] = (a-delta_a)*X[i,1]/np.linalg.norm(X[i,:])*b/a+delta_a*uni*X[i,1]/np.linalg.norm(X[i,:])*b/a # delta_r introduces some level of error here
-        Y[i,2] = (a-delta_a)*X[i,2]/np.linalg.norm(X[i,:])*c/a+delta_a*uni*X[i,2]/np.linalg.norm(X[i,:])*c/a # delta_r introduces some level of error here
-    return Y
-
-def projectIntoOuterShell2D(X, a, b, delta_r):
-    Y = np.zeros((X.shape[0], X.shape[1]))
-    for i in range(X.shape[0]):
-        Y[i,0] = delta_r/a*X[i,0]+(a-delta_r)*X[i,0]/np.linalg.norm(X[i,:])
-        Y[i,1] = delta_r/a*X[i,1]+(a-delta_r)*X[i,1]/np.linalg.norm(X[i,:])*b/a
-    return Y
- 
-

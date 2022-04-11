@@ -3,8 +3,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Mar 13 17:28:18 2022
-
-@author: tibor
 """
 
 cdef complex[::1,:] getShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] com, int nb_pts) nogil

@@ -60,11 +60,13 @@ def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS, h):
     return N_tot, x_vec, y_vec, z_vec, x_vel, y_vel, z_vel, np.ones((len(x_vec),),dtype = np.float32)*dm_mass
 
 @cython.embedsignature(True)
-def createHaloFixedAxisRatioRhoAlphaBetaGamma(N_min, alpha, beta, gamma, rho_0, r_s, a, b, c, a_min, a_max, delta_a, CDF_prec):
-    """
-    a, b, c: vectors
-    a[0] = delta_a
-    """
+def createHaloFixedAxisRatioRhoAlphaBetaGamma(N_min, alpha, beta, gamma, rho_0, r_s, a, b, c):
+    
+    a_min = a[0]
+    delta_a = a[0]
+    a_max = a[-1]
+    CDF_prec = 100
+    
     # Rho density profile
     def integrand(r, alpha, beta, gamma, rho_0, r_s):
         return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
@@ -738,18 +740,25 @@ cdef class CosmicShapes:
                             break
                     printf("Purpose: overall. Dealing with object number %d. The number of ptcs is %d. Overall shape determination successful: %d\n", p, obj_size[p], success)
             
-        minor = np.hstack((np.reshape(minor_x.base, (minor_x.shape[0],1)), np.reshape(minor_y.base, (minor_y.shape[0],1)), np.reshape(minor_z.base, (minor_z.shape[0],1))))
-        inter = np.hstack((np.reshape(inter_x.base, (inter_x.shape[0],1)), np.reshape(inter_y.base, (inter_y.shape[0],1)), np.reshape(inter_z.base, (inter_z.shape[0],1))))
-        major = np.hstack((np.reshape(major_x.base, (major_x.shape[0],1)), np.reshape(major_y.base, (major_y.shape[0],1)), np.reshape(major_z.base, (major_z.shape[0],1))))
-        d.base[d.base==0.0] = np.nan
-        s.base[s.base==0.0] = np.nan
-        q.base[q.base==0.0] = np.nan
+        l_succeed = []
+        for p in range(nb_objs):
+            if obj_pass[p] == 1:
+                l_succeed += [p]
+        succeed = np.array(l_succeed)
+        if succeed.shape[0] == 0:
+            return np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
+        minor = np.hstack((np.reshape(minor_x.base[succeed], (minor_x.base[succeed].shape[0],1)), np.reshape(minor_y.base[succeed], (minor_y.base[succeed].shape[0],1)), np.reshape(minor_z.base[succeed], (minor_z.base[succeed].shape[0],1))))
+        inter = np.hstack((np.reshape(inter_x.base[succeed], (inter_x.base[succeed].shape[0],1)), np.reshape(inter_y.base[succeed], (inter_y.base[succeed].shape[0],1)), np.reshape(inter_z.base[succeed], (inter_z.base[succeed].shape[0],1))))
+        major = np.hstack((np.reshape(major_x.base[succeed], (major_x.base[succeed].shape[0],1)), np.reshape(major_y.base[succeed], (major_y.base[succeed].shape[0],1)), np.reshape(major_z.base[succeed], (major_z.base[succeed].shape[0],1))))
+        d.base[succeed][d.base[succeed]==0.0] = np.nan
+        s.base[succeed][s.base[succeed]==0.0] = np.nan
+        q.base[succeed][q.base[succeed]==0.0] = np.nan
         minor[minor==0.0] = np.nan
         inter[inter==0.0] = np.nan
         major[major==0.0] = np.nan
-        coms.base[coms.base==0.0] = np.nan
-        m.base[m.base==0.0] = np.nan
-        return d.base, q.base, s.base, minor, inter, major, coms.base, m.base # Only rank = 0 content matters
+        coms.base[succeed][coms.base[succeed]==0.0] = np.nan
+        m.base[succeed][m.base[succeed]==0.0] = np.nan
+        return d.base[succeed], q.base[succeed], s.base[succeed], minor, inter, major, coms.base[succeed], m.base[succeed] # Only rank = 0 content matters
     
     def getMorphOvrlVDisp(self, float[:,:] xyz, float[:,:] vxyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN):
         """ Calls getMorphology in an mpi4py-parallelized manner 
@@ -855,11 +864,18 @@ cdef class CosmicShapes:
                             break
                     printf("Purpose: vdisp. Dealing with object number %d. The number of ptcs is %d. VelDisp shape determination at R200 successful: %d\n", p, obj_size[p], success)
             
-        major = np.hstack((np.reshape(major_x.base, (major_x.shape[0],1)), np.reshape(major_y.base, (major_y.shape[0],1)), np.reshape(major_z.base, (major_z.shape[0],1))))
-        s.base[s.base==0.0] = np.nan
-        q.base[q.base==0.0] = np.nan
+        l_succeed = []
+        for p in range(nb_objs):
+            if obj_pass[p] == 1:
+                l_succeed += [p]
+        succeed = np.array(l_succeed)
+        if succeed.shape[0] == 0:
+            return np.array([]), np.array([]), np.array([])
+        major = np.hstack((np.reshape(major_x.base[succeed], (major_x.base[succeed].shape[0],1)), np.reshape(major_y.base[succeed], (major_y.base[succeed].shape[0],1)), np.reshape(major_z.base[succeed], (major_z.base[succeed].shape[0],1))))
+        s.base[succeed][s.base[succeed]==0.0] = np.nan
+        q.base[succeed][q.base[succeed]==0.0] = np.nan
         major[major==0.0] = np.nan
-        return q.base, s.base, major # Only rank = 0 content matters
+        return q.base[succeed], s.base[succeed], major # Only rank = 0 content matters
     
 cdef class CosmicShapesDirect(CosmicShapes):
     

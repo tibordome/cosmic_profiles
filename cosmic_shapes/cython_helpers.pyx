@@ -3,8 +3,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 28 12:16:48 2022
-
-@author: tibor
 """
 
 cimport cython
@@ -16,6 +14,22 @@ include "array_defs.pxi"
 @cython.boundscheck(False)
 @cython.wraparound(False) 
 cdef complex[::1,:] getShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] com, int nb_pts) nogil:
+    """ Calculate shape tensor for point cloud
+    
+    :param nns: positions of cloud particles
+    :type nns: (N,3) floats
+    :param select: indices of cloud particles to consider
+    :type select: (N1,3) ints
+    :param shape_tensor: shape tensor array to be filled
+    :type shape_tensor: (3,3) complex
+    :param masses: masses of cloud particles
+    :type masses: (N,) floats
+    :param com: COM of point cloud
+    :type com: (3,) floats
+    :param nb_pts: number of points in `select` to consider
+    :type nb_pts: int
+    :return: shape tensor
+    :rtype: (3,3) complex"""
     shape_tensor[:,:] = 0.0
     cdef float mass_tot = 0.0
     cdef int run
@@ -36,6 +50,12 @@ cdef complex[::1,:] getShapeTensor(float[:,:] nns, int[:] select, complex[::1,:]
 @cython.boundscheck(False)
 @cython.wraparound(False) 
 cdef float getLocalSpread(float[:,:] nns) nogil:
+    """ Calculate local spread (2nd moment) around center of volume of point cloud
+    
+    :param nns: positions of cloud particles
+    :type nns: (N,3) floats
+    :return: local spread
+    :rtype: float"""
     cdef float loc_spread = 0
     cdef float nns_mean_x = 0
     cdef float nns_mean_y = 0
@@ -53,10 +73,16 @@ cdef float getLocalSpread(float[:,:] nns) nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False) 
 cdef float[:] getCoM(float[:,:] nns, float[:] masses, float[:] com) nogil:
-    """ Function that is fed to map() to accelerate array creation
+    """ Return center of mass (COM)
     
-    The array that is created is the one containing the center of volume (CoVol)
-    of the R-neighbors of all non-converged points in the spine network"""
+    :param nns: positions of cloud particles
+    :type nns: (N,3) floats
+    :param masses: masses of cloud particles
+    :type masses: (N,) floats
+    :param com: COM array to be filled
+    :type com: (3,) floats
+    :return: COM
+    :rtype: (3,) floats"""
     com[:] = 0.0
     cdef int run
     cdef float mass_total = 0.0
@@ -72,6 +98,12 @@ cdef float[:] getCoM(float[:,:] nns, float[:] masses, float[:] com) nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False) 
 cdef float cython_abs(float x) nogil:
+    """ Absolute value of float
+    
+    :param x: float value of interest
+    :type x: float
+    :return: absolute value
+    :rtype: float"""
     if x >= 0.0:
         return x
     if x < 0.0:
