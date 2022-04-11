@@ -1,3 +1,5 @@
+.. _Cosmic Shapes Code Reference:
+
 cosmic_shapes module
 ========================
 

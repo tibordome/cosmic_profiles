@@ -11,6 +11,9 @@ The `cosmic_shapes` project: Shape analysis
    :caption: Contents:
 
    support
+   shape_estimation/index
+   ahf_interface/index
+   mock_halo_generator/index
    code_reference/index
    example_scripts/index
 
