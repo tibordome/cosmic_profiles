@@ -9,3 +9,7 @@ This repository provides shape analysis tools for cosmological simulations. Its 
 - mock point cloud generator
 - mock log-normal universe generator
 - example scripts.
+
+The documentation can be found [here](https://cosmic-shapes.readthedocs.io/en/latest/index.html).
+
+Contributions are welcome. Please raise a PR. Comments/recommendations/complaints can be sent to [here](mailto:tibor.doeme@gmail.com).
