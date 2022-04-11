@@ -1,0 +1,6 @@
+scipy==1.2.3
+h5py==2.10.0
+mpi4py==3.0.3
+cython==0.29.21
+matplotlib==3.4.2
+
