@@ -23,3 +23,5 @@ dependencies:
   - rdp
   - twine
   - pip>=20.1
+  - pip:
+    - pynverse==0.1.4.4
