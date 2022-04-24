@@ -5,7 +5,7 @@ AHF Interface
 
 We mentioned that identifying halos and galaxies for a simulation box is a challenging task. Most state-of-the-art halo finders have no direct Python wrappers, yet `pynbody <https://pynbody.github.io/pynbody/>`_ allows to overcome this limitation by wrapping to **most** major halo finders, including the Amiga Halo Finder (AHF), Rockstar and SubFind.
 
-For this reason we demonstrate in :ref:`an example script<AHF example>` how one can use the `s.halos()` command of `pynbody` to identify halos in a simulation box. For `pynbody`'s AHF-invoking `s.halos()` command to work with a Gadget output, one needs to install AHF and place the executable into ~/bin (or extend $PATH variable), modify `_run_ahf(self, sim)` in `/path/to/pynbody/halo/ahf.py` to::
+For this reason we demonstrate in :ref:`an example script<AHF example>` how one can use the ``s.halos()`` command of ``pynbody`` to identify halos in a simulation box. For ``pynbody``'s AHF-invoking ``s.halos()`` command to work with a Gadget output, one needs to install AHF and place the executable into ~/bin (or extend $PATH variable), modify ``_run_ahf(self, sim)`` in ``/path/to/pynbody/halo/ahf.py`` to::
 
     def _run_ahf(self, sim):
         typecode = '60' # '61'
@@ -86,7 +86,7 @@ For this reason we demonstrate in :ref:`an example script<AHF example>` how one 
             os.system(groupfinder + " AHF.in")
             return
 
-and the [AHFCatalogue] section in `/path/to/pynbody/config.ini` to::
+and the [AHFCatalogue] section in ``/path/to/pynbody/config.ini`` to::
 
     [AHFCatalogue]
     # settings for the AHF Catalogue reader

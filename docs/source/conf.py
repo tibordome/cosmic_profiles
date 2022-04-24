@@ -33,13 +33,9 @@ release = '1.0.0'
 # ones.
 extensions = [
     'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
     'sphinx.ext.autodoc',
     'sphinx_rtd_theme',
-    'sphinx.ext.inheritance_diagram',
-    'sphinx.ext.linkcode', # Use .viewcode for links to source in local folder, .linkcode for external source code links (e.g. GitHub).
-    'sphinx.ext.graphviz',
-    'sphinx.ext.inheritance_diagram'
+    'sphinx.ext.linkcode' # Use .viewcode for links to source in local folder, .linkcode for external source code links (e.g. GitHub).
 ]
 
 # -- Inheritance graphs options --
@@ -53,6 +49,8 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['code_reference/setup.rst']
 
+# -- To generate constructor docstrings
+autoclass_content = 'both'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -94,7 +92,7 @@ def linkcode_resolve(domain, info):
             extension = '.py'
         filename = info['module'].replace('.', '/') + extension
     tag = 'master' if 'dev' in release else ('v' + release)
-    return "https://github.com/tibordome/cosmic_shapes/%s" % (filename)
+    return "https://github.com/tibordome/cosmic_shapes/tree/master/cosmic_shapes/%s" % (filename)
 
 # -- Making sure __init__ of classes show up --
 def skip(app, what, name, obj, would_skip, options):
