@@ -1,5 +1,6 @@
 import pathlib
 from setuptools import find_packages, setup
+from distutils.core import Extension
 
 import numpy as np
 from Cython.Build import cythonize
@@ -13,7 +14,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="cosmic_shapes",
-    version="1.5.0",
+    version="1.6.0",
     description="Implements various ellipsoidal shape identification algorithms for 3D particle data",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -28,6 +29,15 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
+    ],
+    ext_modules=[
+        Extension(
+            "cosmic_shapes.cosmic_shapes",
+            ["cosmic_shapes/cosmic_shapes.pyx"],
+            extra_compile_args=["-fopenmp"],
+            extra_link_args=["-fopenmp"],
+            include_dirs=[np.get_include()]
+        )
     ],
     packages=["cosmic_shapes"],
     include_package_data=True,
