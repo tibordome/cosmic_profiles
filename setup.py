@@ -29,6 +29,6 @@ setup(
     packages=["cosmic_shapes"],
     include_package_data=True,
     include_dirs=np.get_include(),
-    install_requires=["cython", "numpy>=1.19.2"]
+    install_requires=["cython", "numpy>=1.19.2", "scikit-learn", "mpi4py", "h5py", "matplotlib"]
 )
 

@@ -112,7 +112,7 @@ cdef float cython_abs(float x) nogil:
 @cython.embedsignature(True)
 cdef void ZHEEVR(complex[::1,:] H, double * eigvals, complex[::1,:] Z, int nrows) nogil:
     """
-    Computes the eigenvalues and vectors of a dense Hermitian matrix.
+    Computes the eigenvalues and eigenvectors of a dense Hermitian matrix.
     
     Eigenvectors are returned in Z.
     

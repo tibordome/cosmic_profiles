@@ -112,7 +112,7 @@ def cython_abs(float x):
 @cython.embedsignature(True)
 def ZHEEVR(complex[::1,:] H, double[::1] eigvals, complex[::1,:] Z, int nrows):
     """
-    Computes the eigenvalues and vectors of a dense Hermitian matrix.
+    Computes the eigenvalues and eigenvectors of a dense Hermitian matrix.
     
     Eigenvectors are returned in Z.
     

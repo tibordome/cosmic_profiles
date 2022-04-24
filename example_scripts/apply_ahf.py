@@ -17,7 +17,7 @@ import sys
 import h5py
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..', 'cosmic_shapes'))
+sys.path.append(os.path.join(currentdir, '..', 'cosmic_shapes')) # Only needed if cosmic_shapes is not installed
 import numpy as np
 from cosmic_shapes import CosmicShapesDirect, createLogNormUni
 import time
@@ -25,7 +25,7 @@ start_time = time.time()
 
 ############## Parameters ####################################################################################
 L_BOX = np.float32(10) # cMpc/h
-nbar = 8e+3 # 5e+3, if too small: OSError: Corrupt header record
+nbar = 8e+3 # If too small, e.g. 5e+3: pynbody later yields OSError: Corrupt header record
 Nmesh = 256
 redshift = 5.5
 h = 0.6774
@@ -37,14 +37,13 @@ D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width o
 M_TOL = np.float32(1e-2)
 N_WALL = 100
 N_MIN = 10
-SAFE = np.float32(6.0) # cMpc/h. The larger, the better.
 MIN_NUMBER_DM_PTCS = 200
-CAT_DEST = "/home/tibor/Documents/PhD_in_Astronomy/Alignment_Ellipticity/cosmic_shapes/example_scripts/cat"
-VIZ_DEST = "/home/tibor/Documents/PhD_in_Astronomy/Alignment_Ellipticity/cosmic_shapes/example_scripts/viz"
+CAT_DEST = "./cat"
+VIZ_DEST = "./viz"
 #############################################################################################################
 
 ############## Generate mock universe #######################################################################
-N_tot, dm_x, dm_y, dm_z, vel_x, vel_y, vel_z, mass_array = createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS, h) # mass_array in 10**10 solar masses * h^-1
+N_tot, dm_x, dm_y, dm_z, vel_x, vel_y, vel_z, mass_array = createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS) # mass_array in 10**10 solar masses * h^-1
 #############################################################################################################
 
 
@@ -117,7 +116,7 @@ halos = s.halos() # Install e.g. AHF and place executable in ~/bin (or extend $P
 # Modify /halo/ahf.py (Gadget, not Tipsy) and config.ini (Gadget, not Tipsy)
 #############################################################################################################
 
-############## Viz some halos and retrieve basic propertiesn ################################################
+############## Viz some halos and retrieve basic properties #################################################
 print("The length of halo 1 and 2 are {} and {}, respectively.".format(len(halos[1]), len(halos[2])))
 print("The second halo has mass {} 1e12 Msol".format(halos[2]['mass'].sum().in_units('1e12 Msol')))
 print("The first 5 particles of halo 2 are located at (in kpc)", halos[2]['pos'].in_units('kpc')[:5])
@@ -139,8 +138,12 @@ for h_idx in range(len(h_sizes)):
 #############################################################################################################
 
 ############## Run cosmic_shapes: define CosmicShapes object ################################################
-cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, SAFE, start_time)
+cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, start_time)
 
-# Create halo shape catalogue
-cshapes.createCatMajorCOMDM()
+############## Create local halo shape catalogue ############################################################
+cshapes.calcLocalShapes()
+#############################################################################################################
+
+############## Viz first halo ###############################################################################
+cshapes.vizLocalShapes([0])
 #############################################################################################################

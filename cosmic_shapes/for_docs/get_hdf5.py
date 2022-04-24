@@ -161,7 +161,7 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     nb_fofs = np.sum(np.array(count_new_fof))
     count_new_sh = comm.gather(count_sh, root=0)
     count_new_sh = comm.bcast(count_new_sh, root = 0)
-    nb_shs = np.sum(np.array(count_new_sh))
+    nb_shs_ = np.sum(np.array(count_new_sh))
     count_new_sh_l = comm.gather(count_sh_l, root=0)
     nb_shs = comm.gather(nb_shs, root=0)
     comm.Barrier()
@@ -181,9 +181,9 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     fof_x_total = np.empty(nb_fofs, dtype = np.float32)
     fof_y_total = np.empty(nb_fofs, dtype = np.float32)
     fof_z_total = np.empty(nb_fofs, dtype = np.float32)
-    sh_x_total = np.empty(nb_shs, dtype = np.float32)
-    sh_y_total = np.empty(nb_shs, dtype = np.float32)
-    sh_z_total = np.empty(nb_shs, dtype = np.float32)
+    sh_x_total = np.empty(nb_shs_, dtype = np.float32)
+    sh_y_total = np.empty(nb_shs_, dtype = np.float32)
+    sh_z_total = np.empty(nb_shs_, dtype = np.float32)
     star_x_total = np.empty(nb_star_ptcs, dtype = np.float32)
     star_y_total = np.empty(nb_star_ptcs, dtype = np.float32)
     star_z_total = np.empty(nb_star_ptcs, dtype = np.float32)
@@ -220,19 +220,19 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
         to_bcast = fof_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fofs-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         fof_z = np.hstack((fof_z, to_bcast))
-    pieces = 1 + (nb_shs>=3*10**8)*nb_shs//(3*10**8) # Not too high since this is a slow-down!
-    chunk = nb_shs//pieces
+    pieces = 1 + (nb_shs_>=3*10**8)*nb_shs_//(3*10**8) # Not too high since this is a slow-down!
+    chunk = nb_shs_//pieces
     sh_x = np.empty(0, dtype = np.float32)
     sh_y = np.empty(0, dtype = np.float32)
     sh_z = np.empty(0, dtype = np.float32)
     for i in range(pieces):
-        to_bcast = sh_x_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs-pieces*chunk)]
+        to_bcast = sh_x_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs_-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         sh_x = np.hstack((sh_x, to_bcast))
-        to_bcast = sh_y_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs-pieces*chunk)]
+        to_bcast = sh_y_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs_-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         sh_y = np.hstack((sh_y, to_bcast))
-        to_bcast = sh_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs-pieces*chunk)]
+        to_bcast = sh_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs_-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         sh_z = np.hstack((sh_z, to_bcast))
     pieces = 1 + (nb_star_ptcs>=3*10**8)*nb_star_ptcs//(3*10**8) # Not too high since this is a slow-down!
