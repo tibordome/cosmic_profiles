@@ -17,7 +17,10 @@ setup(
     description="Implements various ellipsoidal shape identification algorithms for 3D particle data",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/tibordome/cosmic_shapes",
+    project_urls={
+    'Documentation': 'https://cosmic-shapes.readthedocs.io/en/latest/',
+    'Source': "https://github.com/tibordome/cosmic_shapes"
+    },
     author="Tibor Dome",
     author_email="tibor.doeme@gmail.com",
     license="MIT",
