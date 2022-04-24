@@ -14,7 +14,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="cosmic_shapes",
-    version="1.6.0",
+    version="1.7.0",
     description="Implements various ellipsoidal shape identification algorithms for 3D particle data",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -33,7 +33,7 @@ setup(
     ext_modules=[
         Extension(
             "cosmic_shapes.cosmic_shapes",
-            ["cosmic_shapes/cosmic_shapes.pyx"],
+            ["cosmic_shapes/cosmic_shapes.c"],
             extra_compile_args=["-fopenmp"],
             extra_link_args=["-fopenmp"],
             include_dirs=[np.get_include()]
