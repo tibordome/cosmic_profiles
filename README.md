@@ -1,6 +1,6 @@
 # The cosmic_shapes project
 
-This repository provides shape analysis tools for cosmological simulations. Its features include
+This repository provides shape analysis tools for cosmological simulations (and beyond). Its features include
 
 - iterative shell-based shape determination algorithm for high-resolution halos/galaxies
 - iterative ellipsoid-based shape determination algorithm for low-resolution halos/galaxies
