@@ -1,4 +1,4 @@
-# The cosmic_shapes project: Shape Analysis Tools
+# The cosmic_shapes project
 
 This repository provides shape analysis tools for cosmological simulations. Its features include
 
