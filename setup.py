@@ -58,7 +58,7 @@ ext_modules=[Extension(
 # This call to setup() does all the work
 setup(
     name="cosmic_shapes",
-    version="1.10.0",
+    version="1.11.0",
     description="Implements various ellipsoidal shape identification algorithms for 3D particle data",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -79,6 +79,6 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
-    install_requires=["cython", "numpy>=1.19.2", "scikit-learn", "mpi4py", "h5py", "matplotlib", "pynbody", "nbodykit"]
+    install_requires=["cython", "numpy>=1.19.2", "scikit-learn", "mpi4py", "h5py", "matplotlib", "pynbody", "nbodykit", "pynverse"]
 )
 
