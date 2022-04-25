@@ -22,12 +22,12 @@ import h5py
 from matplotlib import pyplot
 cimport cython
 import os
-from python_helpers import print_status, set_axes_equal, fibonacci_ellipsoid, drawUniformFromEllipsoid, getMassDMParticle
-from shape_analysis import getGlobalEpsHisto, getLocalTHisto, getShapeCurves
+from cosmic_shapes.python_helpers import print_status, set_axes_equal, fibonacci_ellipsoid, drawUniformFromEllipsoid, getMassDMParticle
+from cosmic_shapes.shape_analysis import getGlobalEpsHisto, getLocalTHisto, getShapeCurves
 from mpl_toolkits.mplot3d import Axes3D
-from get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHData, getHDF5DMData
-from cython_helpers cimport getShapeTensor, getLocalSpread, getCoM, cython_abs, ZHEEVR, respectPBCNoRef
-from gen_csh_gx_cat import getCSHCat, getGxCat
+from cosmic_shapes.get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHData, getHDF5DMData
+from cosmic_shapes.gen_csh_gx_cat import getCSHCat, getGxCat
+from cosmic_shapes.cython_helpers cimport CythonHelpers
 from nbodykit.lab import cosmology, LogNormalCatalog
 from pynverse import inversefunc
 from scipy.integrate import quad
@@ -180,15 +180,15 @@ cdef class CosmicShapes:
                 morph_info[:] = 0.0
                 return morph_info
             # Get shape tensor
-            shape_tensor = getShapeTensor(xyz, shell, shape_tensor, masses, com, pts_in_shell)
+            shape_tensor = CythonHelpers.getShapeTensor(xyz, shell, shape_tensor, masses, com, pts_in_shell)
             # Diagonalize shape_tensor
             eigvec[:,:] = 0.0
             eigval[:] = 0.0
-            ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
+            CythonHelpers.ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
             q_old = q_new; s_old = s_new
             q_new = sqrt(eigval[1]/eigval[2])
             s_new = sqrt(eigval[0]/eigval[2]) # It is assumed that eigenvalues are approximately proportional to a^2 etc. (true for uniform ellipsoid or uniform shell), though I have never seen any proof..
-            err = max(cython_abs(q_new - q_old)/q_old, cython_abs(s_new - s_old)/s_old) # Fractional differences
+            err = max(CythonHelpers.cython_abs(q_new - q_old)/q_old, CythonHelpers.cython_abs(s_new - s_old)/s_old) # Fractional differences
             vec2_norm = sqrt(eigvec[0,2].real**2+eigvec[1,2].real**2+eigvec[2,2].real**2)
             vec1_norm = sqrt(eigvec[0,1].real**2+eigvec[1,1].real**2+eigvec[2,1].real**2)
             vec0_norm = sqrt(eigvec[0,0].real**2+eigvec[1,0].real**2+eigvec[2,0].real**2)
@@ -261,15 +261,15 @@ cdef class CosmicShapes:
                 morph_info[:] = 0.0
                 return morph_info
             # Get shape tensor
-            shape_tensor = getShapeTensor(xyz, ellipsoid, shape_tensor, masses, com, pts_in_ell)
+            shape_tensor = CythonHelpers.getShapeTensor(xyz, ellipsoid, shape_tensor, masses, com, pts_in_ell)
             # Diagonalize shape_tensor
             eigvec[:,:] = 0.0
             eigval[:] = 0.0
-            ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
+            CythonHelpers.ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
             q_old = q_new; s_old = s_new
             q_new = sqrt(eigval[1]/eigval[2])
             s_new = sqrt(eigval[0]/eigval[2]) # It is assumed that eigenvalues are approximately proportional to a^2 etc. (true for uniform ellipsoid or uniform shell), though I have never seen any proof..
-            err = max(cython_abs(q_new - q_old)/q_old, cython_abs(s_new - s_old)/s_old) # Fractional differences
+            err = max(CythonHelpers.cython_abs(q_new - q_old)/q_old, CythonHelpers.cython_abs(s_new - s_old)/s_old) # Fractional differences
             vec2_norm = sqrt(eigvec[0,2].real**2+eigvec[1,2].real**2+eigvec[2,2].real**2)
             vec1_norm = sqrt(eigvec[0,1].real**2+eigvec[1,1].real**2+eigvec[2,1].real**2)
             vec0_norm = sqrt(eigvec[0,0].real**2+eigvec[1,0].real**2+eigvec[2,0].real**2)
@@ -333,15 +333,15 @@ cdef class CosmicShapes:
                 morph_info[:] = 0.0
                 return morph_info
             # Get shape tensor
-            shape_tensor = getShapeTensor(vxyz, ellipsoid, shape_tensor, masses, vcom, pts_in_ell)
+            shape_tensor = CythonHelpers.getShapeTensor(vxyz, ellipsoid, shape_tensor, masses, vcom, pts_in_ell)
             # Diagonalize shape_tensor
             eigvec[:,:] = 0.0
             eigval[:] = 0.0
-            ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
+            CythonHelpers.ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
             q_old = q_new; s_old = s_new
             q_new = sqrt(eigval[1]/eigval[2])
             s_new = sqrt(eigval[0]/eigval[2]) # It is assumed that eigenvalues are approximately proportional to a^2 etc. (true for uniform ellipsoid or uniform shell), though I have never seen any proof..
-            err = max(cython_abs(q_new - q_old)/q_old, cython_abs(s_new - s_old)/s_old) # Fractional differences
+            err = max(CythonHelpers.cython_abs(q_new - q_old)/q_old, CythonHelpers.cython_abs(s_new - s_old)/s_old) # Fractional differences
             vec2_norm = sqrt(eigvec[0,2].real**2+eigvec[1,2].real**2+eigvec[2,2].real**2)
             vec1_norm = sqrt(eigvec[0,1].real**2+eigvec[1,1].real**2+eigvec[2,1].real**2)
             vec0_norm = sqrt(eigvec[0,0].real**2+eigvec[1,0].real**2+eigvec[2,0].real**2)
@@ -379,7 +379,7 @@ cdef class CosmicShapes:
         
         # Return if problematic
         morph_info[:,:] = 0.0
-        if getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+        if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
             morph_info[:,:] = 0.0
             return morph_info
         if r200 == 0.0: # We are dealing with a halo which does not have any SHs, so R_200 = 0.0 according to AREPO
@@ -408,7 +408,7 @@ cdef class CosmicShapes:
     
         # Return if problematic
         morph_info[:] = 0.0
-        if getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+        if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
             morph_info[:] = 0.0
             return morph_info
         morph_info[0] = r200+self.SAFE
@@ -421,7 +421,7 @@ cdef class CosmicShapes:
         
         # Return if problematic
         morph_info[:,:] = 0.0
-        if getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+        if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
             morph_info[:,:] = 0.0
             return morph_info
         if r200 == 0.0: # We are dealing with a halo which does not have any SHs, so R_200 = 0.0 according to AREPO
@@ -450,7 +450,7 @@ cdef class CosmicShapes:
         
         # Return if problematic
         morph_info[:] = 0.0
-        if getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+        if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
             morph_info[:] = 0.0
             return morph_info
         morph_info[0] = r200+self.SAFE
@@ -512,8 +512,8 @@ cdef class CosmicShapes:
                     xyz_obj[openmp.omp_get_thread_num(),n,2] = xyz[cat_arr[idxs_compr[p],n],2]
                     m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                     m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
-                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-                coms[p] = getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
+                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
+                coms[p] = CythonHelpers.getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
                 morph_info[openmp.omp_get_thread_num(),:,:] = self.getObjMorphLocal(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d, xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], coms[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
                 d[p] = morph_info[openmp.omp_get_thread_num(),0]
                 q[p] = morph_info[openmp.omp_get_thread_num(),1]
@@ -606,8 +606,8 @@ cdef class CosmicShapes:
                     xyz_obj[openmp.omp_get_thread_num(),n] = xyz[cat_arr[idxs_compr[p],n]]
                     m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                     m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
-                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-                coms[p] = getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
+                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
+                coms[p] = CythonHelpers.getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
                 morph_info[openmp.omp_get_thread_num(),:] = self.getObjMorphGlobal(morph_info[openmp.omp_get_thread_num(),:], r200[p], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], ellipsoid[openmp.omp_get_thread_num()], coms[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
                 d[p] = morph_info[openmp.omp_get_thread_num(),0]
                 q[p] = morph_info[openmp.omp_get_thread_num(),1]
@@ -704,8 +704,8 @@ cdef class CosmicShapes:
                     xyz_obj[openmp.omp_get_thread_num(),n,2] = xyz[cat_arr[idxs_compr[p],n],2]
                     m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                     m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
-                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-                coms[p] = getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
+                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
+                coms[p] = CythonHelpers.getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
                 morph_info[openmp.omp_get_thread_num(),:,:] = self.getObjMorphLocalVelDisp(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d, xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], coms[p], vcoms[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
                 d[p] = morph_info[openmp.omp_get_thread_num(),0]
                 q[p] = morph_info[openmp.omp_get_thread_num(),1]
@@ -801,9 +801,9 @@ cdef class CosmicShapes:
                     vxyz_obj[openmp.omp_get_thread_num(),n] = vxyz[cat_arr[idxs_compr[p],n]]
                     m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                     m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
-                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-                coms[p] = getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
-                vcoms[p] = getCoM(vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], vcoms[p])
+                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
+                coms[p] = CythonHelpers.getCoM(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], coms[p])
+                vcoms[p] = CythonHelpers.getCoM(vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], vcoms[p])
                 morph_info[openmp.omp_get_thread_num(),:] = self.getObjMorphGlobalVelDisp(morph_info[openmp.omp_get_thread_num(),:], r200[p], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], ellipsoid[openmp.omp_get_thread_num()], coms[p], vcoms[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
                 d[p] = morph_info[openmp.omp_get_thread_num(),0]
                 q[p] = morph_info[openmp.omp_get_thread_num(),1]
@@ -1006,7 +1006,7 @@ cdef class CosmicShapesDirect(CosmicShapes):
                     for idx, ptc in enumerate(obj_cat_local[obj_number]):
                         obj[idx] = self.xyz[ptc]
                         masses_obj[idx] = self.masses[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
+                    obj = CythonHelpers.respectPBCNoRef(obj, self.L_BOX)
                     # Plotting
                     fig = pyplot.figure()
                     ax = Axes3D(fig, auto_add_to_figure = False)
@@ -1098,7 +1098,7 @@ cdef class CosmicShapesDirect(CosmicShapes):
                     for idx, ptc in enumerate(obj_cat_global[obj_number]):
                         obj[idx] = self.xyz[ptc]
                         masses_obj[idx] = self.masses[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
+                    obj = CythonHelpers.respectPBCNoRef(obj, self.L_BOX)
                     # Plotting
                     fig = pyplot.figure()
                     ax = Axes3D(fig, auto_add_to_figure = False)
@@ -1220,7 +1220,7 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
                     for idx, ptc in enumerate(obj_cat_local[obj_number]):
                         obj[idx] = xyz[ptc]
                         masses_obj[idx] = masses[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
+                    obj = CythonHelpers.respectPBCNoRef(obj, self.L_BOX)
                     # Plotting
                     fig = pyplot.figure()
                     ax = Axes3D(fig, auto_add_to_figure = False)
@@ -1316,7 +1316,7 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
                     for idx, ptc in enumerate(obj_cat_global[obj_number]):
                         obj[idx] = xyz[ptc]
                         masses_obj[idx] = masses[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
+                    obj = CythonHelpers.respectPBCNoRef(obj, self.L_BOX)
                     # Plotting
                     fig = pyplot.figure()
                     ax = Axes3D(fig, auto_add_to_figure = False)

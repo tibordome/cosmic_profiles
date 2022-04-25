@@ -11,7 +11,7 @@ from math import isnan
 from sklearn.utils import resample
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
-from python_helpers import eTo10, print_status
+from cosmic_shapes.python_helpers import eTo10, print_status
 from scipy.spatial.transform import Rotation as R
 from mpi4py import MPI
 comm = MPI.COMM_WORLD

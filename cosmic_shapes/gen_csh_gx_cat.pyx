@@ -5,7 +5,7 @@
 Created on Mon Mar 28 12:24:04 2022
 """
 
-from cython_helpers cimport cython_abs
+from cython_helpers cimport CythonHelpers
 import numpy as np
 cimport cython
 cimport openmp
@@ -44,13 +44,13 @@ cdef int createGxs(float[:] star_xyz, float[:,:] fof_com, int[:] nb_shs, float[:
         
     # Find closest FoF-halo
     for run in range(fof_com.shape[0]):
-        dist_x = cython_abs(star_xyz[0]-fof_com[run,0])
+        dist_x = CythonHelpers.cython_abs(star_xyz[0]-fof_com[run,0])
         if dist_x > L_BOX/2:
             dist_x = L_BOX-dist_x
-        dist_y = cython_abs(star_xyz[1]-fof_com[run,1])
+        dist_y = CythonHelpers.cython_abs(star_xyz[1]-fof_com[run,1])
         if dist_y > L_BOX/2:
             dist_y = L_BOX-dist_y
-        dist_z = cython_abs(star_xyz[2]-fof_com[run,2])
+        dist_z = CythonHelpers.cython_abs(star_xyz[2]-fof_com[run,2])
         if dist_z > L_BOX/2:
             dist_z = L_BOX-dist_z
         if run == 0:
@@ -67,15 +67,15 @@ cdef int createGxs(float[:] star_xyz, float[:,:] fof_com, int[:] nb_shs, float[:
             idx_base = idx_base + nb_shs[run]
         for run in range(nb_shs[argmin]):
             sh_com_x = sh_com[idx_base+run,0]
-            dist_x = cython_abs(star_xyz[0]-sh_com_x)
+            dist_x = CythonHelpers.cython_abs(star_xyz[0]-sh_com_x)
             if dist_x > L_BOX/2:
                 dist_x = L_BOX-dist_x
             sh_com_y = sh_com[idx_base+run,1]
-            dist_y = cython_abs(star_xyz[1]-sh_com_y)
+            dist_y = CythonHelpers.cython_abs(star_xyz[1]-sh_com_y)
             if dist_y > L_BOX/2:
                 dist_y = L_BOX-dist_y
             sh_com_z = sh_com[idx_base+run,2]
-            dist_z = cython_abs(star_xyz[2]-sh_com_z)
+            dist_z = CythonHelpers.cython_abs(star_xyz[2]-sh_com_z)
             if dist_z > L_BOX/2:
                 dist_z = L_BOX-dist_z
             if run == 0:
