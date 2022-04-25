@@ -58,7 +58,7 @@ ext_modules=[Extension(
 # This call to setup() does all the work
 setup(
     name="cosmic_shapes",
-    version="1.11.0",
+    version="1.12.0",
     description="Implements various ellipsoidal shape identification algorithms for 3D particle data",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -73,6 +73,10 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
+        "Intended Audience :: Science/Research",
+        "Operating System :: POSIX",
+        "Topic :: Scientific/Engineering :: Astronomy",
+        "Topic :: Scientific/Engineering :: Visualization",
     ],
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     ext_modules = cythonize(ext_modules),
