@@ -1,5 +1,7 @@
 [![Documentation Status](https://readthedocs.org/projects/cosmic-shapes/badge/?version=latest)](https://cosmic-shapes.readthedocs.io/en/latest/?badge=latest)
 
+[![PyPI version](https://badge.fury.io/py/cosmic-shapes.svg)](https://badge.fury.io/py/cosmic-shapes)
+
 # The cosmic_shapes project
 
 This repository provides shape analysis tools for cosmological simulations (and beyond). Its features include
