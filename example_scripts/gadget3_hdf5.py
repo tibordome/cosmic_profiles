@@ -15,7 +15,7 @@ import sys
 import inspect
 import numpy as np
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..', 'cosmic_shapes')) # Only needed if cosmic_shapes is not installed
+sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_shapes is not installed
 from cosmic_shapes import CosmicShapesGadgetHDF5
 import time
 start_time = time.time()
@@ -34,11 +34,12 @@ M_TOL = np.float32(1e-2)
 N_WALL = 100
 N_MIN = 10
 SNAP = '035'
+CENTER = 'mode'
 MIN_NUMBER_DM_PTCS = 200
 MIN_NUMBER_STAR_PTCS = 100
 
 # Define CosmicShapes object
-cshapes = CosmicShapesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, start_time)
+cshapes = CosmicShapesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
 ########################## Calculating Morphological Properties ###############################
 # Retrieve HDF5 halo catalogue, extract CSHs

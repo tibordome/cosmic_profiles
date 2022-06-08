@@ -6,7 +6,7 @@ Created on Mon Mar 28 12:16:48 2022
 """
 
 cimport cython
-from libc.math cimport sqrt
+from libc.math cimport sqrt, pi
 from scipy.linalg.cython_lapack cimport zheevr
 include "array_defs.pxi"
 
@@ -16,7 +16,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef complex[::1,:] getShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] com, int nb_pts) nogil:
+    cdef complex[::1,:] getShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts) nogil:
         """ Calculate shape tensor for point cloud
         
         :param nns: positions of cloud particles
@@ -27,8 +27,8 @@ cdef class CythonHelpers:
         :type shape_tensor: (3,3) complex
         :param masses: masses of cloud particles
         :type masses: (N,) floats
-        :param com: COM of point cloud
-        :type com: (3,) floats
+        :param center: COM of point cloud
+        :type center: (3,) floats
         :param nb_pts: number of points in `select` to consider
         :type nb_pts: int
         :return: shape tensor
@@ -44,7 +44,7 @@ cdef class CythonHelpers:
             for j in range(3):
                 if i >= j:
                     for run in range(nb_pts):
-                        shape_tensor[i,j] = shape_tensor[i,j] + <complex>(masses[select[run]]*(nns[select[run],i]-com[i])*(nns[select[run],j]-com[j])/mass_tot)
+                        shape_tensor[i,j] = shape_tensor[i,j] + <complex>(masses[select[run]]*(nns[select[run],i]-center[i])*(nns[select[run],j]-center[j])/mass_tot)
                     if i > j:
                         shape_tensor[j,i] = shape_tensor[i,j]
         return shape_tensor
@@ -159,15 +159,15 @@ cdef class CythonHelpers:
     @staticmethod
     cdef float[:,:] respectPBCNoRef(float[:,:] xyz, float L_BOX) nogil:
         """
-        Modify xyz inplace so that it respects the box periodicity
+        Modify xyz inplace so that it respects the box periodicity.
         
         If point distro xyz has particles separated in any Cartesian direction
         by more than L_BOX/2, reflect those particles along L_BOX/2
         
         :param xyz: coordinates of particles of type 1 or type 4
         :type xyz: (N^3x3) floats
-        :param ref: reference particle, which does matter in this case 
-        (unlike halo morphology analysis), e.g. Covol
+        :param ref: reference particle, which does not matter in the case of
+            halo morphology analysis
         :type ref: int
         :return: updated coordinates of particles of type 1 or type 4
         :rtype: (N^3x3) floats"""
@@ -187,3 +187,98 @@ cdef class CythonHelpers:
             if dist_z > L_BOX/2:
                 xyz[i,2] = L_BOX-xyz[i,2] # Reflect z-distances along L_BOX/2
         return xyz
+    
+    @cython.boundscheck(False)
+    @cython.wraparound(False) 
+    @staticmethod
+    cdef float[:] getDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] dens_prof, int[:] shell) nogil:
+        """ Calculates density profile for one object with coordinates `xyz` and masses `masses`
+        
+        :param xyz: positions of cloud particles
+        :type xyz: (N,3) floats
+        :param masses: masses of cloud particles
+        :type masses: (N,) floats
+        :param center: center of the object
+        :type center: (3) floats
+        :param r_200: R200 value of the object
+        :type r_200: float
+        :param ROverR200: radii at which the density profiles should be calculated,
+            normalized by R200
+        :type ROverR200: float array
+        :param dens_prof: array to store result in
+        :type dens_prof: float array
+        :param shell: array used for the calculation
+        :type shell: int array
+        :return: density profile
+        :rtype: float array"""
+        cdef int corr_s = 0
+        cdef int pts_in_shell = 0
+        cdef int r_i
+        cdef int n
+        cdef int i
+        for r_i in range(ROverR200.shape[0]):
+            corr_s = 0
+            pts_in_shell = 0
+            if r_i == 0:
+                for i in range(xyz.shape[0]):
+                    if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (ROverR200[r_i]*r_200)**2:
+                        shell[i-corr_s] = i
+                        pts_in_shell += 1
+                    else:
+                        corr_s += 1
+                if pts_in_shell != 0:
+                    for n in range(pts_in_shell):
+                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*(ROverR200[r_i]*r_200)**3)
+            else:
+                for i in range(xyz.shape[0]):
+                    if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (ROverR200[r_i]*r_200)**2 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (ROverR200[r_i-1]*r_200)**2:
+                        shell[i-corr_s] = i
+                        pts_in_shell += 1
+                    else:
+                        corr_s += 1
+                if pts_in_shell != 0:
+                    for n in range(pts_in_shell):
+                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*((ROverR200[r_i]*r_200)**3-(ROverR200[r_i-1]*r_200)**3))
+        return dens_prof
+    
+    @cython.boundscheck(False)
+    @cython.wraparound(False) 
+    @staticmethod
+    cdef float[:] getMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil:
+        """ Calculates enclosed mass profile for one object with coordinates `xyz` and masses `masses`
+        
+        :param xyz: positions of cloud particles
+        :type xyz: (N,3) floats
+        :param masses: masses of cloud particles
+        :type masses: (N,) floats
+        :param center: center of the object
+        :type center: (3) floats
+        :param r_200: R200 value of the object
+        :type r_200: float
+        :param ROverR200: radii at which the density profiles should be calculated,
+            normalized by R200
+        :type ROverR200: float array
+        :param Mencl: array to store result in
+        :type Mencl: float array
+        :param ellipsoid: array used for the calculation
+        :type ellipsoid: int array
+        :return: enclosed mass profile
+        :rtype: float array"""
+        cdef int corr_ell = 0
+        cdef int pts_in_ell = 0
+        cdef int r_i
+        cdef int n
+        cdef int i
+        for r_i in range(ROverR200.shape[0]):
+            corr_ell = 0
+            pts_in_ell = 0
+            for i in range(xyz.shape[0]):
+                if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (ROverR200[r_i]*r_200)**2:
+                    ellipsoid[i-corr_ell] = i
+                    pts_in_ell += 1
+                else:
+                    corr_ell += 1
+            if pts_in_ell != 0:
+                for n in range(pts_in_ell):
+                    Mencl[r_i] = Mencl[r_i] + masses[ellipsoid[n]]
+        return Mencl

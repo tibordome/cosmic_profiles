@@ -5,4 +5,5 @@ Example Scripts
 
    gadgethdf5_example
    ahf_example
-   mockhalo_example
+   mockhalo_example_shape
+   mockhalo_example_density

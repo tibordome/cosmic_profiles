@@ -299,15 +299,15 @@ def getBlocks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT = 9, NB_BINS = 2):
-    """Mass-splitting of quantities com, v
+def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT = 9, NB_BINS = 2):
+    """Mass-splitting of quantities center, v
     
     Mass units are determined by ``m``
     
     :param m: total mass of objects
     :type m: list of floats
-    :param com: COMs of objects
-    :type com: list of (3,) float arrays
+    :param center: centers of objects
+    :type center: list of (3,) float arrays
     :param start_time: time of start of shape analysis
     :type start_time: float
     :param M_SPLIT_TYPE: either "log_slice", where masses in log space are split, 
@@ -321,7 +321,7 @@ def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT 
     :type NB_BINS: float
     :param v: major axis of objects (optional) or any other vectorial quantity
     :type v: list of (3,) float arrays
-    :return: max_min_m (mass bin edges), m_groups (total mass in bins), com_groups (COM average in each bin), 
+    :return: max_min_m (mass bin edges), m_groups (total mass in bins), center_groups (center average in each bin), 
         v_groups (v average in each bin), idx_groups (indices of all objects in each bin)
     :rtype: (N,) floats, (N-1,) floats, (N-1,) floats, (N-1,) floats, list of lists (for each bin) of ints
     """
@@ -333,7 +333,7 @@ def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT 
     max_min_m = []
     max_min_mlog = []
     m_groups = []
-    gx_com_groups = []
+    gx_center_groups = []
     v_groups = []
     if len(m) % NB_BINS == 0:
         chunk_size = len(m)//NB_BINS
@@ -343,20 +343,18 @@ def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT 
         if chunk_size == 0:
             idx_groups = []
             if v == None:
-                return max_min_m, m_groups, gx_com_groups, idx_groups
-            return max_min_m, m_groups, gx_com_groups, v_groups, idx_groups 
+                return max_min_m, m_groups, gx_center_groups, idx_groups
+            return max_min_m, m_groups, gx_center_groups, v_groups, idx_groups 
         m_groups = list(getBlocks(list(m_ordered), chunk_size)) # List of lists
-        gx_com_groups = list(getBlocks(com[args_sort], chunk_size)) # List of arrays
+        gx_center_groups = list(getBlocks(center[args_sort], chunk_size)) # List of arrays
         if v is not None:
             v_groups = list(getBlocks(v[args_sort], chunk_size)) # List of arrays
-        print_status(rank, start_time, "The groups (except maybe last) have size {0}".format(chunk_size))
-        print_status(rank, start_time, "The group number is {0}".format(len(m_groups)))
+        print_status(rank, start_time, "The mass bins (except maybe last) have size {0}".format(chunk_size))
+        print_status(rank, start_time, "The number of mass bins is {0}".format(len(m_groups)))
         for i in range(len(m_groups)+1):
             if i == len(m_groups):
-                print_status(rank, start_time, "Masses are the following: {0}".format(m_ordered[-1]))
                 max_min_m.append(np.float32(m_ordered[-1]))
             else:
-                print_status(rank, start_time, "Masses are the following: {0}".format(m_ordered[i*chunk_size]))
                 max_min_m.append(np.float32(m_ordered[i*chunk_size]))
     elif M_SPLIT_TYPE == "log_slice":
         log_m_min = np.log10(m.min())
@@ -376,8 +374,8 @@ def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT 
                     split_occ[split] += 1
         for split in range(NB_BINS):
             m_groups.append([np.float32(m_ordered[i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
-            com_add = np.array([np.float32(com[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
-            gx_com_groups.append(np.float32(np.reshape(com_add, (com_add.shape[0], 3))))
+            center_add = np.array([np.float32(center[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
+            gx_center_groups.append(np.float32(np.reshape(center_add, (center_add.shape[0], 3))))
             if v is not None:
                 v_add = np.array([np.float32(v[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
                 if vdim == 1:
@@ -404,8 +402,8 @@ def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT 
                     split_occ[split] += 1
         for split in range(8):
             m_groups.append([np.float32(m_ordered[i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
-            com_add = np.array([np.float32(com[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
-            gx_com_groups.append(np.float32(np.reshape(com_add, (com_add.shape[0], 3))))
+            center_add = np.array([np.float32(center[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
+            gx_center_groups.append(np.float32(np.reshape(center_add, (center_add.shape[0], 3))))
             if v is not None:
                 v_add = np.array([np.float32(v[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
                 if vdim == 1:
@@ -429,8 +427,8 @@ def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT 
                     split_occ[split] += 1
         for split in range(2):
             m_groups.append([np.float32(m_ordered[i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
-            com_add = np.array([np.float32(com[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
-            gx_com_groups.append(np.float32(np.reshape(com_add, (com_add.shape[0], 3))))
+            center_add = np.array([np.float32(center[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
+            gx_center_groups.append(np.float32(np.reshape(center_add, (center_add.shape[0], 3))))
             if v is not None:
                 v_add = np.array([np.float32(v[args_sort][i]) for i in np.arange(int(np.array([split_occ[j] for j in range(split)]).sum()), int(np.array([split_occ[j] for j in range(split+1)]).sum()))])
                 if vdim == 1:
@@ -443,8 +441,8 @@ def M_split(m, com, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT 
     idx_groups = [[args_sort[i] for i in np.arange(int(np.array([len(m_groups[k]) for k in range(j)]).sum()), int(np.array([len(m_groups[k]) for k in range(j)]).sum())+len(m_groups[j]))] for j in range(len(m_groups))]
     if v_groups == []:
         assert v == None
-        return max_min_m, m_groups, gx_com_groups, idx_groups
-    return max_min_m, m_groups, gx_com_groups, v_groups, idx_groups
+        return max_min_m, m_groups, gx_center_groups, idx_groups
+    return max_min_m, m_groups, gx_center_groups, v_groups, idx_groups
 
 def readShapeData(CAT_DEST, SNAP, D_BINS, local, suffix):
     """ Read in all relevant shape-related data
@@ -459,11 +457,11 @@ def readShapeData(CAT_DEST, SNAP, D_BINS, local, suffix):
     :type local: boolean
     :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicShapesDirect)
     :type suffix: string
-    :return: h_masses, h_coms, d, q, s, major_full
+    :return: obj_masses, obj_centers, d, q, s, major_full
     :rtype: 1D float array, 1D float array, 1D float array, 3x ((number_of_objs,) float array or (number_of_objs, D_BINS+1) float array), 
         (number_of_objs,3) float array or (number_of_objs, D_BINS+1, 3) float array"""
     
-    d = np.loadtxt('{0}/d_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_halos, D_BINS+1)
+    d = np.loadtxt('{0}/d_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_objs, D_BINS+1)
     q = np.loadtxt('{0}/q_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP))
     s = np.loadtxt('{0}/s_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP))
     if local == False:
@@ -474,14 +472,14 @@ def readShapeData(CAT_DEST, SNAP, D_BINS, local, suffix):
         s = np.array(s, ndmin=1)
         s = s.reshape(s.shape[0], 1) # Has shape (number_of_objs, 1)
     else:
-        # Dealing with the case of 1 halo
+        # Dealing with the case of 1 obj
         if d.ndim == 1 and d.shape[0] == D_BINS+1:
             d = d.reshape(1, D_BINS+1)
             q = q.reshape(1, D_BINS+1)
             s = s.reshape(1, D_BINS+1)
     major_full = np.loadtxt('{0}/major_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP))
     if major_full.ndim == 2:
-        major_full = major_full.reshape(major_full.shape[0], major_full.shape[1]//3, 3) # Has shape (number_of_halos, D_BINS+1, 3)
+        major_full = major_full.reshape(major_full.shape[0], major_full.shape[1]//3, 3) # Has shape (number_of_objs, D_BINS+1, 3)
     else:
         if local == True:
             if major_full.shape[0] == (D_BINS+1)*3:
@@ -489,13 +487,13 @@ def readShapeData(CAT_DEST, SNAP, D_BINS, local, suffix):
         else:
             if major_full.shape[0] == 3:
                 major_full = major_full.reshape(1, 1, 3)
-    h_masses = np.loadtxt('{0}/m_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_hs,)
-    h_coms = np.loadtxt('{0}/coms_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_hs,3)
-    return h_masses, h_coms, d, q, s, major_full
+    obj_masses = np.loadtxt('{0}/m_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_hs,)
+    obj_centers = np.loadtxt('{0}/centers_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_hs,3)
+    return obj_masses, obj_centers, d, q, s, major_full
 
 def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, MASS_UNIT=1e10, suffix = '_'):
     """
-    Create a series of plots to analyze halo shapes
+    Create a series of plots to analyze object shapes
     
     Plot intertial tensor axis ratios, triaxialities and ellipticity histograms.
     
@@ -523,14 +521,14 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
     if rank == 0:
         # Reading
         try:
-            h_masses, h_coms, d, q, s, major_full = readShapeData(CAT_DEST, SNAP, D_BINS, True, suffix)
+            obj_masses, obj_centers, d, q, s, major_full = readShapeData(CAT_DEST, SNAP, D_BINS, True, suffix)
         except OSError: # Components for snap are not available 
             print_status(rank,start_time,'Calling readShapeData() for snap {0} threw OSError. Skip rest'.format(SNAP))
             return None
         print_status(rank, start_time, "The number of objects considered is {0}".format(d.shape[0]))
         
         # Mass splitting
-        max_min_m, halo_m_groups, halo_com_groups, idx_groups = M_split(MASS_UNIT*h_masses, h_coms, start_time)
+        max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time)
             
         # Maximal elliptical radii
         R = np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1)
@@ -562,8 +560,8 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
         plt.figure()
         if q.ndim == 2:
             T = np.zeros((q.shape[0], q.shape[1]))
-            for halo in range(q.shape[0]):
-                T[halo] = (1-q[halo]**2)/(1-s[halo]**2) # Triaxiality
+            for obj in range(q.shape[0]):
+                T[obj] = (1-q[obj]**2)/(1-s[obj]**2) # Triaxiality
         else:
             T = np.empty(0)
         mean_median, err_low, err_high = getShape(R, d, T, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
@@ -579,7 +577,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
         plt.savefig("{0}/T{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
         
         # Q: M-splitting
-        for group in range(len(halo_m_groups)):
+        for group in range(len(obj_m_groups)):
             plt.figure()
             mean_median, err_low, err_high = getShapeMs(R, d, idx_groups, group, q, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
             if len(idx_groups[group]) != 0:
@@ -592,7 +590,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
             plt.savefig("{0}/qM{1}{2}{3}.pdf".format(VIZ_DEST, int(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # S: M-splitting
-        for group in range(len(halo_m_groups)):
+        for group in range(len(obj_m_groups)):
             plt.figure()
             mean_median, err_low, err_high = getShapeMs(R, d, idx_groups, group, s, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
             if len(idx_groups[group]) != 0:
@@ -605,7 +603,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
             plt.savefig("{0}/sM{1}{2}{3}.pdf".format(VIZ_DEST, int(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # T: M-splitting
-        for group in range(len(halo_m_groups)):
+        for group in range(len(obj_m_groups)):
             plt.figure()
             mean_median, err_low, err_high = getShapeMs(R, d, idx_groups, group, T, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
             if len(idx_groups[group]) != 0:
@@ -650,22 +648,22 @@ def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
     if rank == 0:
         # Read & Assemble
         try:
-            h_masses, h_coms, d, q, s, major_full = readShapeData(CAT_DEST, SNAP, D_BINS, True, suffix)
+            obj_masses, obj_centers, d, q, s, major_full = readShapeData(CAT_DEST, SNAP, D_BINS, True, suffix)
         except OSError: # Components for snap are not available 
             print_status(rank,start_time,'Calling readShapeData() for snap {0} threw OSError. Skip rest'.format(SNAP))
             return None
         print_status(rank, start_time, "The number of objects considered is {0}".format(d.shape[0]))
         
         idx = np.zeros((d.shape[0],), dtype = np.int32)
-        for halo in range(idx.shape[0]):
+        for obj in range(idx.shape[0]):
             if inner == True:
-                idx[halo] = np.argmin(abs(d[halo] - d[halo,-int(D_LOGEND/((D_LOGEND-D_LOGSTART)/D_BINS))-1]*0.15))
+                idx[obj] = np.argmin(abs(d[obj] - d[obj,-int(D_LOGEND/((D_LOGEND-D_LOGSTART)/D_BINS))-1]*0.15))
             else:
                 idx = np.array([np.int32(x) for x in list(np.ones((d.shape[0],))*(-1))])
         
         t = np.zeros((d.shape[0],))
-        for halo in range(d.shape[0]):
-            t[halo] = (1-q[halo,idx[halo]]**2)/(1-s[halo,idx[halo]]**2) # Triaxiality
+        for obj in range(d.shape[0]):
+            t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
         t = np.nan_to_num(t)
             
         # T counting
@@ -687,7 +685,7 @@ def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
 def getGlobalEpsHisto(cat, xyz, masses, L_BOX, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
-    :param cat: catalogue of objects (halos/gxs)
+    :param cat: catalogue of objects (objs/gxs)
     :type cat: list of lists of ints
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats

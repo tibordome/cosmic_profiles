@@ -10,6 +10,7 @@ Installation and Support
 - scikit-learn
 - mpi4py
 - h5py
+- pathos
 - matplotlib
 
 We recommend installing all packages, with the exception of ``openmp``, with `anaconda <https://www.anaconda.com/products/distribution>`_.

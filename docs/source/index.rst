@@ -12,6 +12,7 @@ The cosmic_shapes project
 
    support
    shape_estimation/index
+   density_profiles/index
    ahf_interface/index
    mock_halo_generator/index
    code_reference/index

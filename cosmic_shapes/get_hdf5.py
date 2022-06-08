@@ -112,12 +112,13 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     sh_x = np.empty(0, dtype = np.float32)
     sh_y = np.empty(0, dtype = np.float32)
     sh_z = np.empty(0, dtype = np.float32)
+    is_star = np.empty(0, dtype = bool)
     star_masses = np.empty(0, dtype = np.float32)
     star_smoothing = np.empty(0, dtype = np.float32)
     star_x = np.empty(0, dtype = np.float32)
     star_y = np.empty(0, dtype = np.float32)
     star_z = np.empty(0, dtype = np.float32)
-    nb_shs = []
+    nb_shs_l = []
     nb_jobs_to_do = SNAP_MAX
     perrank = nb_jobs_to_do//size + (nb_jobs_to_do//size == 0)*1
     do_sth = rank <= nb_jobs_to_do-1
@@ -136,17 +137,17 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
             fof_x = np.hstack((fof_x, np.float32(g['Group/GroupCM'][:,0]/1000)))
             fof_y = np.hstack((fof_y, np.float32(g['Group/GroupCM'][:,1]/1000)))
             fof_z = np.hstack((fof_z, np.float32(g['Group/GroupCM'][:,2]/1000)))
-            nb_shs.append([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])
+            nb_shs_l.append([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])
             count_sh_l += 1
             count_fof += g['Group/GroupCM'][:].shape[0]
         if 'PartType4/Coordinates' in f:
-            is_star = np.where(f['PartType4/GFM_StellarFormationTime'][:]>0)[0] # Discard wind particles
-            star_x = np.hstack((star_x, np.float32(f['PartType4/Coordinates'][is_star][:,0]/1000))) # in Mpc = 3.085678e+27 cm
-            star_y = np.hstack((star_y, np.float32(f['PartType4/Coordinates'][is_star][:,1]/1000))) 
-            star_z = np.hstack((star_z, np.float32(f['PartType4/Coordinates'][is_star][:,2]/1000))) 
-            star_smoothing = np.hstack((star_smoothing, np.float32(f['PartType4/SubfindHsml'][is_star][:]/1000))) # in Mpc = 3.085678e+27 cm
-            star_masses = np.hstack((star_masses, np.float32(f['PartType4/Masses'][is_star][:]))) # in 1.989e+43 g
-            count += f['PartType4/Coordinates'][is_star][:].shape[0]
+            is_star = np.hstack((is_star, f['PartType4/GFM_StellarFormationTime'][:] > 0)) # Discard wind particles
+            star_x = np.hstack((star_x, np.float32(f['PartType4/Coordinates'][:,0]/1000))) # in Mpc = 3.085678e+27 cm
+            star_y = np.hstack((star_y, np.float32(f['PartType4/Coordinates'][:,1]/1000))) 
+            star_z = np.hstack((star_z, np.float32(f['PartType4/Coordinates'][:,2]/1000))) 
+            star_smoothing = np.hstack((star_smoothing, np.float32(f['PartType4/SubfindHsml'][:]/1000))) # in Mpc = 3.085678e+27 cm
+            star_masses = np.hstack((star_masses, np.float32(f['PartType4/Masses'][:]))) # in 1.989e+43 g
+            count += f['PartType4/Coordinates'][:].shape[0]
         if 'Subhalo/SubhaloCM' in g:
             sh_x = np.hstack((sh_x, np.float32(g['Subhalo/SubhaloCM'][:,0]/1000))) 
             sh_y = np.hstack((sh_y, np.float32(g['Subhalo/SubhaloCM'][:,1]/1000))) 
@@ -161,9 +162,9 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     nb_fofs = np.sum(np.array(count_new_fof))
     count_new_sh = comm.gather(count_sh, root=0)
     count_new_sh = comm.bcast(count_new_sh, root = 0)
-    nb_shs_ = np.sum(np.array(count_new_sh))
+    nb_shs = np.sum(np.array(count_new_sh))
     count_new_sh_l = comm.gather(count_sh_l, root=0)
-    nb_shs = comm.gather(nb_shs, root=0)
+    nb_shs_l = comm.gather(nb_shs_l, root=0)
     comm.Barrier()
     
     recvcounts = np.array(count_new)
@@ -181,12 +182,13 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     fof_x_total = np.empty(nb_fofs, dtype = np.float32)
     fof_y_total = np.empty(nb_fofs, dtype = np.float32)
     fof_z_total = np.empty(nb_fofs, dtype = np.float32)
-    sh_x_total = np.empty(nb_shs_, dtype = np.float32)
-    sh_y_total = np.empty(nb_shs_, dtype = np.float32)
-    sh_z_total = np.empty(nb_shs_, dtype = np.float32)
+    sh_x_total = np.empty(nb_shs, dtype = np.float32)
+    sh_y_total = np.empty(nb_shs, dtype = np.float32)
+    sh_z_total = np.empty(nb_shs, dtype = np.float32)
     star_x_total = np.empty(nb_star_ptcs, dtype = np.float32)
     star_y_total = np.empty(nb_star_ptcs, dtype = np.float32)
     star_z_total = np.empty(nb_star_ptcs, dtype = np.float32)
+    is_star_total = np.empty(nb_star_ptcs, dtype = np.float32)
     star_smoothing_total = np.empty(nb_star_ptcs, dtype = np.float32)
     star_masses_total = np.empty(nb_star_ptcs, dtype = np.float32)
 
@@ -199,7 +201,8 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     comm.Gatherv(star_x, [star_x_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
     comm.Gatherv(star_y, [star_y_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
     comm.Gatherv(star_z, [star_z_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
-    comm.Gatherv(star_smoothing, [star_smoothing_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+    comm.Gatherv(star_z, [star_z_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+    comm.Gatherv(is_star, [is_star_total, recvcounts, rdispls, MPI.BOOL], root = 0)
     comm.Gatherv(star_masses, [star_masses_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
     
     pieces = 1 + (nb_fofs>=3*10**8)*nb_fofs//(3*10**8) # Not too high since this is a slow-down!
@@ -220,19 +223,19 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
         to_bcast = fof_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fofs-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         fof_z = np.hstack((fof_z, to_bcast))
-    pieces = 1 + (nb_shs_>=3*10**8)*nb_shs_//(3*10**8) # Not too high since this is a slow-down!
-    chunk = nb_shs_//pieces
+    pieces = 1 + (nb_shs>=3*10**8)*nb_shs//(3*10**8) # Not too high since this is a slow-down!
+    chunk = nb_shs//pieces
     sh_x = np.empty(0, dtype = np.float32)
     sh_y = np.empty(0, dtype = np.float32)
     sh_z = np.empty(0, dtype = np.float32)
     for i in range(pieces):
-        to_bcast = sh_x_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs_-pieces*chunk)]
+        to_bcast = sh_x_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         sh_x = np.hstack((sh_x, to_bcast))
-        to_bcast = sh_y_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs_-pieces*chunk)]
+        to_bcast = sh_y_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         sh_y = np.hstack((sh_y, to_bcast))
-        to_bcast = sh_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs_-pieces*chunk)]
+        to_bcast = sh_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_shs-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         sh_z = np.hstack((sh_z, to_bcast))
     pieces = 1 + (nb_star_ptcs>=3*10**8)*nb_star_ptcs//(3*10**8) # Not too high since this is a slow-down!
@@ -240,6 +243,7 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     star_x = np.empty(0, dtype = np.float32)
     star_y = np.empty(0, dtype = np.float32)
     star_z = np.empty(0, dtype = np.float32)
+    is_star = np.empty(0, dtype = bool)
     star_masses = np.empty(0, dtype = np.float32)
     star_smoothing = np.empty(0, dtype = np.float32)
     for i in range(pieces):
@@ -252,6 +256,9 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
         to_bcast = star_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_star_ptcs-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         star_z = np.hstack((star_z, to_bcast))
+        to_bcast = is_star_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_star_ptcs-pieces*chunk)]
+        comm.Bcast(to_bcast, root=0)
+        is_star = np.hstack((is_star, to_bcast))
         to_bcast = star_masses_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_star_ptcs-pieces*chunk)]
         comm.Bcast(to_bcast, root=0)
         star_masses = np.hstack((star_masses, to_bcast))
@@ -260,18 +267,18 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
         star_smoothing = np.hstack((star_smoothing, to_bcast))
     
     if rank == 0:
-        nb_shs = [nb_shs[i][j] for i in range(size) for j in range(count_new_sh_l[i])]
-    nb_shs = comm.bcast(nb_shs, root = 0)
+        nb_shs_l = [nb_shs_l[i][j] for i in range(size) for j in range(count_new_sh_l[i])]
+    nb_shs_l = comm.bcast(nb_shs_l, root = 0)
 
     fof_com = np.hstack((np.reshape(fof_x, (fof_x.shape[0],1)), np.reshape(fof_y, (fof_y.shape[0],1)), np.reshape(fof_z, (fof_z.shape[0],1))))
     sh_com = np.hstack((np.reshape(sh_x, (sh_x.shape[0],1)), np.reshape(sh_y, (sh_y.shape[0],1)), np.reshape(sh_z, (sh_z.shape[0],1))))
     star_xyz = np.hstack((np.reshape(star_x, (star_x.shape[0],1)), np.reshape(star_y, (star_y.shape[0],1)), np.reshape(star_z, (star_z.shape[0],1))))
-    nb_shs = list(itertools.chain.from_iterable(nb_shs))
+    nb_shs_l = list(itertools.chain.from_iterable(nb_shs_l))
 
-    return star_xyz, fof_com, sh_com, nb_shs, star_masses, star_smoothing
+    return star_xyz, fof_com, sh_com, nb_shs_l, star_masses, star_smoothing, is_star
 
     
-def getHDF5SHData(HDF5_GROUP_DEST, SNAP_MAX, SNAP):
+def getHDF5SHDMData(HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     """ Retrieve FoF/SH-related HDF5 data from the simulation box
         
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
@@ -309,6 +316,38 @@ def getHDF5SHData(HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     sh_len = list(itertools.chain.from_iterable(sh_len))
 
     return nb_shs, sh_len, fof_dm_sizes, group_r200, fof_masses, fof_com
+
+def getHDF5SHGxData(HDF5_GROUP_DEST, SNAP_MAX, SNAP):
+    """ Retrieve FoF/SH-related HDF5 data from the simulation box
+        
+    :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
+    :type HDF5_GROUP_DEST: string
+    :param SNAP_MAX: number of files per snapshot
+    :type SNAP_MAX: int
+    :param SNAP: snap number of interest, e.g. '000' or '038'
+    :type SNAP: string
+    :return: nb_shs (# subhalos in each FoF-halo), sh_len (star particle size of each SH), 
+        fof_gx_sizes (star particle size of each FoF-halo)
+    :rtype: int arrays"""
+    
+    nb_shs = []
+    fof_gx_sizes = []
+    sh_len_gx = []
+    for snap_run in range(SNAP_MAX):
+        g = h5py.File(r'{0}/fof_subhalo_tab_{1}.{2}.hdf5'.format(HDF5_GROUP_DEST, SNAP, snap_run), 'r')
+        if 'Group/GroupLenType' in g:
+            nb_shs.append([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])
+            to_be_appended = [np.int32(g['Group/GroupLenType'][i,4]) for i in range(g['Group/GroupLenType'].shape[0])]
+        else:
+            to_be_appended = []
+        if 'Subhalo/SubhaloLenType' in g:
+            sh_len_gx.append([np.int32(g['Subhalo/SubhaloLenType'][i,4]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])
+        fof_gx_sizes.append(to_be_appended)
+    nb_shs = list(itertools.chain.from_iterable(nb_shs))
+    fof_gx_sizes = list(itertools.chain.from_iterable(fof_gx_sizes)) # Simple list, not nested list
+    sh_len_gx = list(itertools.chain.from_iterable(sh_len_gx))
+
+    return nb_shs, sh_len_gx, fof_gx_sizes
 
 def getHDF5DMData(HDF5_SNAP_DEST, SNAP_MAX, SNAP):
     """ Retrieve FoF/SH-related HDF5 data from the simulation box

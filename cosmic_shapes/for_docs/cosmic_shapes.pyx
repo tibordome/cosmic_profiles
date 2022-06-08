@@ -24,7 +24,7 @@ cimport cython
 import os
 from python_helpers import print_status, set_axes_equal, fibonacci_ellipsoid, drawUniformFromEllipsoid, getMassDMParticle
 from mpl_toolkits.mplot3d import Axes3D
-from get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHData, getHDF5DMData
+from get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHDMData, getHDF5DMData
 from gen_csh_gx_cat import getCSHCat, getGxCat
 from nbodykit.lab import cosmology, LogNormalCatalog
 from pynverse import inversefunc
@@ -61,16 +61,11 @@ def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
     return
 
 @cython.embedsignature(True)
-def genAlphaBetaGammaHalo(N_min, alpha, beta, gamma, rho_0, r_s, a, b, c):
-    """ Mock halo generator
+def getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s):
+    """ Get alpha-beta-gamma profile
     
-    Create mock halo consisting of ``N_min`` particles in 1st shell. The alpha-beta-gamma 
-    density profile is a generalization of the Navarro-Frank-White (NFW) profile. Its definition
-    can be looked up in Zemp et al 2011, https://arxiv.org/abs/1107.5582.
-    
-    :param N_min: number of particles in 1st shell. Will be scaled appropriately 
-        in each shell to satisfy alpha-beta-gamma profile
-    :type N_min: int
+    :param r: radii at which profile should be returned
+    :type r: float array, units of Mpc/h
     :param alpha: ``alpha`` parameter in alpha-beta-gamma density profile
     :type alpha: float
     :param beta: ``beta`` parameter in alpha-beta-gamma density profile 
@@ -78,17 +73,45 @@ def genAlphaBetaGammaHalo(N_min, alpha, beta, gamma, rho_0, r_s, a, b, c):
     :param gamma: ``gamma`` parameter in alpha-beta-gamma density profile 
     :type gamma: float
     :param rho_0: ``rho_0`` parameter in alpha-beta-gamma density profile (density at the center)
-    :type rho_0: float
+    :type rho_0: float, units are M_sun*h^2/Mpc^3
+    :param r_s: ``r_s`` parameter in alpha-beta-gamma density profile (scale radius)
+    :type r_s: float
+    :return: profile values
+    :rtype: float array
+    """
+    
+    return
+
+@cython.embedsignature(True)
+def genAlphaBetaGammaHalo(N0, alpha, beta, gamma, rho_0, r_s, a, b, c):
+    """ Mock halo generator
+    
+    Create mock halo consisting of ``N0`` particles in 1st shell. The alpha-beta-gamma 
+    density profile is a generalization of the Navarro-Frank-White (NFW) profile. Its definition
+    can be looked up in Zemp et al 2011, https://arxiv.org/abs/1107.5582.
+    
+    :param N0: number of particles in 1st shell. Will be scaled appropriately 
+        in each shell to satisfy alpha-beta-gamma profile
+    :type N0: int
+    :param alpha: ``alpha`` parameter in alpha-beta-gamma density profile
+    :type alpha: float
+    :param beta: ``beta`` parameter in alpha-beta-gamma density profile 
+    :type beta: float
+    :param gamma: ``gamma`` parameter in alpha-beta-gamma density profile 
+    :type gamma: float
+    :param rho_0: ``rho_0`` parameter in alpha-beta-gamma density profile (density at the center)
+    :type rho_0: float, units are M_sun*h^2/Mpc^3
     :param r_s: ``r_s`` parameter in alpha-beta-gamma density profile (scale radius)
     :type r_s: float
     :param a: major axis array
-    :type a: float array
+    :type a: float array, units are Mpc/h
     :param b: intermediate axis array
-    :type b: float array
+    :type b: float array, units are Mpc/h
     :param c: minor axis array
-    :type c: float array
-    :return: halo_x, halo_y, halo_z: arrays containing positions of halo particles
-    :rtype: 3 (N,) float arrays
+    :type c: float array, units are Mpc/h
+    :return: halo_x, halo_y, halo_z: arrays containing positions of halo particles, 
+        mass_dm: mass of each DM ptc in units of M_sun/h
+    :rtype: 3 (Nreals,) float arrays, 1 float
     """
     return
 
@@ -109,10 +132,11 @@ cdef class CosmicShapes:
     cdef float M_TOL
     cdef int N_WALL
     cdef int N_MIN
+    cdef str CENTER
     cdef float SAFE # Units: cMpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
-    cdef float start_time
+    cdef double start_time
     
-    def __init__(self, str CAT_DEST, str VIZ_DEST, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, float start_time):
+    def __init__(self, str CAT_DEST, str VIZ_DEST, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
         """        
         :param CAT_DEST: catalogue destination
         :type CAT_DEST: string
@@ -136,6 +160,9 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :param start_time: time of start of object initialization
         :type start_time: float"""
         
@@ -149,15 +176,51 @@ cdef class CosmicShapes:
         self.M_TOL = M_TOL
         self.N_WALL = N_WALL
         self.N_MIN = N_MIN
+        self.CENTER = CENTER
         self.SAFE = 6
         self.start_time = start_time
+        
+    def getDensProfs(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+        """ Calculates density profiles for objects defined by indices found in `cat`
+        
+        
+        The number of enclosed particles calculation assumes masses are identical,
+        though easy to update.
+        
+        :param cat: list of indices defining the objects
+        :type cat: list of length N1, each consisting of a list of int indices
+        :param xyz: positions of all simulation particles
+        :type xyz: (N2,3) floats, N2 >> N1
+        :param obj_keep: which objects among the N1 different ones to consider. 1: keep, 0: ignore
+            This can be used to select objects within a certain mass range, for instance. Having
+            a 1 where `cat` has an empty list entry is not permitted.
+        :type obj_keep: (N1,) ints
+        :param masses: masses of all simulation particles
+        :type masses: (N2,) floats
+        :param centers: centers of the objects
+        :type centers: (N1,3) floats
+        :param r200s: R200 values of the objects
+        :type r200s: (N1,) floats
+        :param ROverR200: radii at which the density profiles should be calculated,
+            normalized by R200
+        :type ROverR200: (N3,) float array
+        :param L_BOX: box size
+        :type L_BOX: float
+        :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: ROverR200 array, enclosed mass profiles, enclosed average density profiles, 
+            enclosed number of particles profiles, density profiles
+        :rtype: (N3,) float array, (nb_keep, N3) float and int arrays"""
+        
+        return
     
-    def runS1(self, float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] com, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN):
+    def runS1(self, float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
         
-        Calculates the axis ratios at a distance ``d`` from the COM of the entire particle distro.\n
-        Note that before and during the iteration, ``d`` is defined with respect to the COM of 
-        the entire particle distro, not the COM of the initial spherical volume as in Katz 1991.\n
+        Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
+        Note that before and during the iteration, ``d`` is defined with respect to the center of 
+        the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n
         Differential version of E1.\n
         Shells can cross (except 2nd shell with 1st), and a shell is assumed to be equally thick everywhere.\n
         Whether we adopt the last assumption or let the thickness float (Tomassetti et al 2016) barely makes 
@@ -176,15 +239,15 @@ cdef class CosmicShapes:
         :type masses: (N x 1) floats
         :param shell: indices of points that fall into shell (varies from iteration to iteration)
         :type shell: (N,) ints, zeros
-        :param com: COM of point cloud
-        :type com: (3,) floats
+        :param center: center of point cloud
+        :type center: (3,) floats
         :param shape_tensor: shape tensor array to be filled
         :type shape_tensor: (3,3) complex, zeros
         :param eigval: eigenvalue array to be filled
         :type eigval: (3,) double, zeros
         :param eigvec: eigenvector array to be filled
         :type eigvec: (3,3) double, zeros
-        :param d: Distance from the COM, kept fixed during iterative procedure
+        :param d: distance from the center, kept fixed during iterative procedure
         :type d: float
         :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)
         :type delta_d: float
@@ -196,18 +259,21 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :return: ``morph_info`` containing d, q, s, eigframe info
         :rtype: (12,) float array"""
         
         return
     
     
-    def runE1(self, float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] com, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN):
+    def runE1(self, float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ E1 algorithm for halos/galaxies at elliptical radius ``d``
         
-        Calculates the axis ratios at a distance ``d`` from the COM of the entire particle distro.\n
-        Note that before and during the iteration, ``d`` is defined with respect to the COM of 
-        the entire particle distro, not the COM of the initial spherical volume as in Katz 1991.\n
+        Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
+        Note that before and during the iteration, ``d`` is defined with respect to the center of 
+        the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n
         
         :param morph_info: Array to be filled with morphological info. 1st entry: d,
             2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
@@ -221,15 +287,15 @@ cdef class CosmicShapes:
         :type masses: (N x 1) floats
         :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
         :type ellipsoid: (N,) ints, zeros
-        :param com: COM of point cloud
-        :type com: (3,) floats
+        :param center: center of point cloud
+        :type center: (3,) floats
         :param shape_tensor: shape tensor array to be filled
         :type shape_tensor: (3,3) complex, zeros
         :param eigval: eigenvalue array to be filled
         :type eigval: (3,) double, zeros
         :param eigvec: eigenvector array to be filled
         :type eigvec: (3,3) double, zeros
-        :param d: Distance from the COM, kept fixed during iterative procedure
+        :param d: distance from the center, kept fixed during iterative procedure
         :type d: float
         :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
             for iteration to stop
@@ -239,17 +305,20 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :return: ``morph_info`` containing d, q, s, eigframe info
         :rtype: (12,) float array"""
         
         return
     
-    def runE1VelDisp(self, float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] com, float[:] vcom, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN):
+    def runE1VelDisp(self, float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Similar to ``E1_obj`` algorithm for halos/galaxies but for velocity dispersion tensor
         
-        Calculates the axis ratios at a distance ``d`` from the COM of the entire particle distro.\n
-        Note that before and during the iteration, ``d`` is defined with respect to the COM of 
-        the entire particle distro, not the COM of the initial spherical volume as in Katz 1991.\n
+        Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
+        Note that before and during the iteration, ``d`` is defined with respect to the center of 
+        the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n
         
         :param morph_info: Array to be filled with morphological info. 1st entry: d,
             2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
@@ -265,17 +334,17 @@ cdef class CosmicShapes:
         :type masses: (N x 1) floats
         :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
         :type ellipsoid: (N,) ints, zeros
-        :param com: COM of point cloud
-        :type com: (3,) floats
-        :param vcom: velocity-COM of point cloud
-        :type vcom: (3,) floats
+        :param center: center of point cloud
+        :type center: (3,) floats
+        :param vcenter: velocity-center of point cloud
+        :type vcenter: (3,) floats
         :param shape_tensor: shape tensor array to be filled
         :type shape_tensor: (3,3) complex, zeros
         :param eigval: eigenvalue array to be filled
         :type eigval: (3,) double, zeros
         :param eigvec: eigenvector array to be filled
         :type eigvec: (3,3) double, zeros
-        :param d: Distance from the COM, kept fixed during iterative procedure
+        :param d: distance from the center, kept fixed during iterative procedure
         :type d: float
         :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
             for iteration to stop
@@ -285,16 +354,19 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :return: ``morph_info`` containing d, q, s, eigframe info
         :rtype: (12,) float array"""
         
         return
     
-    def getObjMorphLocal(self, float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] com, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN):
+    def getObjMorphLocal(self, float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the local axis ratios
         
         The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
-        from the COM of the point cloud
+        from the center of the point cloud
         
         :param morph_info: Array to be filled with morphological info. For each column, 1st entry: d,
             2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
@@ -313,8 +385,8 @@ cdef class CosmicShapes:
         :type masses: (N1 x 1) floats
         :param shell: indices of points that fall into shell (varies from iteration to iteration)
         :type shell: (N,) ints, zeros
-        :param com: COM of point cloud
-        :type com: (3,) floats
+        :param center: center of point cloud
+        :type center: (3,) floats
         :param shape_tensor: shape tensor array to be filled
         :type shape_tensor: (3,3) complex, zeros
         :param eigval: eigenvalue array to be filled
@@ -329,12 +401,15 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius
         :rtype: (12,N) float array"""
         
         return
     
-    def getObjMorphGlobal(self, float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] com, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN):
+    def getObjMorphGlobal(self, float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the global axis ratios and eigenframe of the point cloud
         
         :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -351,8 +426,8 @@ cdef class CosmicShapes:
         :type masses: (N1 x 1) floats
         :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
         :type ellipsoid: (N,) ints, zeros
-        :param com: COM of point cloud
-        :type com: (3,) floats
+        :param center: center of point cloud
+        :type center: (3,) floats
         :param shape_tensor: shape tensor array to be filled
         :type shape_tensor: (3,3) complex, zeros
         :param eigval: eigenvalue array to be filled
@@ -367,18 +442,19 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
-        :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud
-        :type SAFE: float, units: cMpc/h
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :return: ``morph_info`` containing d, q, s, eigframe info
         :rtype: (12,) float array"""
         
         return
     
-    def getObjMorphLocalVelDisp(self, float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] com, float[:] vcom, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN):
+    def getObjMorphLocalVelDisp(self, float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the local axis ratios of the velocity dispersion tensor 
         
         The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
-        from the COM of the point cloud
+        from the center of the point cloud
         
         :param morph_info: Array to be filled with morphological info. For each column, 1st entry: d,
             2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
@@ -399,10 +475,10 @@ cdef class CosmicShapes:
         :type masses: (N1 x 1) floats
         :param shell: indices of points that fall into shell (varies from iteration to iteration)
         :type shell: (N,) ints, zeros
-        :param com: COM of point cloud
-        :type com: (3,) floats
-        :param vcom: velocity-COM of point cloud
-        :type vcom: (3,) floats
+        :param center: center of point cloud
+        :type center: (3,) floats
+        :param vcenter: velocity-center of point cloud
+        :type vcenter: (3,) floats
         :param shape_tensor: shape tensor array to be filled
         :type shape_tensor: (3,3) complex, zeros
         :param eigval: eigenvalue array to be filled
@@ -417,12 +493,15 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
         :rtype: (12,) float array"""
         
         return
     
-    def getObjMorphGlobalVelDisp(self, float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] com, float[:] vcom, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN):
+    def getObjMorphGlobalVelDisp(self, float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
         
         :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -441,17 +520,17 @@ cdef class CosmicShapes:
         :type masses: (N1 x 1) floats
         :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
         :type ellipsoid: (N,) ints, zeros
-        :param com: COM of point cloud
-        :type com: (3,) floats
-        :param vcom: velocity-COM of point cloud
-        :type vcom: (3,) floats
+        :param center: center of point cloud
+        :type center: (3,) floats
+        :param vcenter: velocity-center of point cloud
+        :type vcenter: (3,) floats
         :param shape_tensor: shape tensor array to be filled
         :type shape_tensor: (3,3) complex, zeros
         :param eigval: eigenvalue array to be filled
         :type eigval: (3,) double, zeros
         :param eigvec: eigenvector array to be filled
         :type eigvec: (3,3) double, zeros
-        :param d: Distance from the COM, kept fixed during iterative procedure
+        :param d: distance from the center, kept fixed during iterative procedure
         :type d: float
         :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)
         :type delta_d: float
@@ -463,16 +542,19 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
         :rtype: (12,) float array"""
         
         return
     
-    def getMorphLocal(self, float[:,:] xyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN):
+    def getMorphLocal(self, float[:,:] xyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the local shape catalogue
         
         Calls ``getObjMorphLocal()`` in a parallelized manner.\n
-        Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the COMs, for each object.
+        Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the centers, for each object.
         
         :param xyz: positions of all (DM or star) particles in simulation box
         :type xyz: (N1 x 3) floats
@@ -500,13 +582,16 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
-        :return: d, q, s, eigframe, COMs, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)
-        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for COMs), (N3,) floats (for masses), N3-list of ints for l_succeed
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)
+        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed
         """
                         
         return
     
-    def getMorphGlobal(self, float[:,:] xyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN):
+    def getMorphGlobal(self, float[:,:] xyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the overall shape catalogue
         
         Calls ``getObjMorphGlobal()`` in a parallelized manner.\n
@@ -532,15 +617,16 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
-        :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud
-        :type SAFE: float, units: cMpc/h
-        :return: d, q, s, eigframe, COMs, masses
-        :rtype: (N3,) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for COMs), (N3,) floats (for masses)
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses
+        :rtype: (N3,) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)
         """
         
         return
     
-    def getMorphLocalVelDisp(self, float[:,:] xyz, float[:,:] vxyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN):
+    def getMorphLocalVelDisp(self, float[:,:] xyz, float[:,:] vxyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the local velocity dispersion shape catalogue
         
         Calls ``getObjMorphLocalVelDisp()`` in a parallelized manner.\n
@@ -573,13 +659,16 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
-        :return: d, q, s, eigframe, COMs, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)
-        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for COMs), (N3,) floats (for masses), N3-list of ints for l_succeed
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)
+        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed
         """
         
         return
     
-    def getMorphGlobalVelDisp(self, float[:,:] xyz, float[:,:] vxyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN):
+    def getMorphGlobalVelDisp(self, float[:,:] xyz, float[:,:] vxyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
         """ Calculates the global velocity dipsersion shape catalogue
         
         Calls ``getObjMorphGlobalVelDisp()`` in a parallelized manner.\n
@@ -607,8 +696,11 @@ cdef class CosmicShapes:
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
-        :return: d, q, s, eigframe, COMs, masses
-        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for COMs), (N3,) floats (for masses)
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses
+        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)
         """
         
         return
@@ -642,7 +734,7 @@ cdef class CosmicShapesDirect(CosmicShapes):
     cdef str SNAP
     cdef object cat
 
-    def __init__(self, float[:,:] xyz, float[:] masses, cat, float[:] r200, str CAT_DEST, str VIZ_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, float start_time):
+    def __init__(self, float[:,:] xyz, float[:] masses, cat, float[:] r200, str CAT_DEST, str VIZ_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
         """      
         :param xyz: positions of all (DM or star) particles in simulation box
         :type xyz: (N1 x 3) floats
@@ -676,9 +768,12 @@ cdef class CosmicShapesDirect(CosmicShapes):
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :param start_time: time of start of object initialization
         :type start_time: float"""
-        super().__init__(CAT_DEST, VIZ_DEST, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, start_time)
+        super().__init__(CAT_DEST, VIZ_DEST, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
         self.xyz = xyz
         self.masses = masses
@@ -710,6 +805,14 @@ cdef class CosmicShapesDirect(CosmicShapes):
 
     def plotGlobalEpsHisto(self):
         """ Plot ellipticity histogram"""
+        return
+    
+    def calcDensProfs(self, ROverR200):
+        """ Calculate density profiles
+        
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array"""
+        return
         
 cdef class CosmicShapesGadgetHDF5(CosmicShapes):
     """ Subclass to calculate morphology for yet to-be-identified objects in Gadget HDF5 simulation
@@ -726,7 +829,7 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
     cdef int SNAP_MAX
     cdef float[:] r200
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str CAT_DEST, str VIZ_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, float start_time):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str CAT_DEST, str VIZ_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
         """ 
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -760,9 +863,12 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
         :param start_time: time of start of object initialization
         :type start_time: float"""
-        super().__init__(CAT_DEST, VIZ_DEST, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, start_time)
+        super().__init__(CAT_DEST, VIZ_DEST, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
         self.MIN_NUMBER_STAR_PTCS = MIN_NUMBER_STAR_PTCS
@@ -781,6 +887,14 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         """ Loads halo (more precisely: CSH) catalogues from FOF data
         
         Stores R200 as self.r200"""
+        return
+    
+    def loadGxCat(self):
+        """ Loads galaxy catalogues from HDF5 data
+        
+        To discard wind particles, add the line
+        `gx_cat_l = [[x for x in gx if is_star[x]] for gx in gx_cat_l]` before
+        saving the catalogue."""
         return
     
     def calcLocalShapesGx(self):
@@ -807,9 +921,22 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         """ Calculates and saves global velocity dispersion tensor shape catalogues"""      
         return
     
+    def calcDensProfs(self, ROverR200, obj_type = ''):
+        """ Calculate density profiles
+        
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array
+        :param obj_type: either 'dm' or 'gx', depending on what catalogue 
+            the ellipticity histogram should be plotted for
+        :type obj_type: string
+        :return: density profiles
+        :rtype: (N,ROverR200.shape) float array"""
+        return
+    
     def plotGlobalEpsHisto(self, obj_type = ''):
         """ Plot ellipticity histogram
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue 
             the ellipticity histogram should be plotted for
         :type obj_type: string"""
+        return

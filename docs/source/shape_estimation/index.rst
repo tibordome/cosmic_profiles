@@ -1,3 +1,5 @@
+.. _Shape Estimation:
+
 Shape Estimation
 =================
 
@@ -25,9 +27,9 @@ The shape as a function of ellipsoidal radius can be described by the axis ratio
 
 where :math:`b` and :math:`c` are the eigenvalues corresponding to the intermediate and minor axes, respectively. The ratio of the minor-to-major axis :math:`s` has traditionally been used as a canonical measure of the distribution's sphericity. The axis ratios can be computed from the shape tensor :math:`S_{ij}`, which is the second moment of the mass distribution divided by the total mass:
 
-.. math:: S_{ij} = \frac{1}{\sum_k m_k} \sum_k m_k r^{\text{COM}}_{k,i}r^{\text{COM}}_{k,j}.
+.. math:: S_{ij} = \frac{1}{\sum_k m_k} \sum_k m_k r^{\text{center}}_{k,i}r^{\text{center}}_{k,j}.
 
-Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r^{\text{COM}}_{k,i}` is the :math:`i`-th component of its position vector with respect to the distribution's center of mass (COM).
+Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r^{\text{center}}_{k,i}` is the :math:`i`-th centerponent of its position vector with respect to the distribution's center (either mode or center of mass).
 
 To calculate shape profiles with ``cosmic_shapes``, we first instantiate a ``CosmicShapes`` object. Let us assume we are dealing with
 
@@ -50,12 +52,13 @@ To calculate shape profiles with ``cosmic_shapes``, we first instantiate a ``Cos
     N_WALL = 100
     N_MIN = 10
     SNAP = '035'
+    CENTER = 'mode'
     MIN_NUMBER_DM_PTCS = 200
     MIN_NUMBER_STAR_PTCS = 100
     start_time = time.time()
 
     # Instantiate object
-    cshapes = CosmicShapesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, start_time)
+    cshapes = CosmicShapesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
 with arguments explained in :ref:`the code reference<Cosmic Shapes Code Reference>`.
 
@@ -80,11 +83,12 @@ with arguments explained in :ref:`the code reference<Cosmic Shapes Code Referenc
     N_WALL = 100
     N_MIN = 10
     SNAP = '035'
+    CENTER = 'mode'
     MIN_NUMBER_PTCS = 200
     start_time = time.time()
 
     # Instantiate object
-    cshapes = CosmicShapesDirect(xyz, mass_array, obj_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, start_time)
+    cshapes = CosmicShapesDirect(xyz, mass_array, obj_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
 .. note:: In case of a Gadget-style HDF5 snapshot output, we have to invoke ``cshapes.loadDMCat()`` before calculating the shape catalogue! This ensures that we extract the halo catalogue from the FoF/SH data.
 
@@ -102,7 +106,7 @@ which will calculate and store the morphological information in ``CAT_DEST``. We
 * ``major_local_x.txt`` of shape (:math:`N_{\text{conv}}`, ``D_BINS`` + 1, 3): major axes vs :math:`r_{\text{ell}}`
 * ``cat_local_x.txt`` of length :math:`N_{\text{conv}}`: list of lists of indices of converged shape profiles, empty list entry [] for each non-converged halo
 * ``m_x.txt`` of shape (:math:`N_{\text{conv}}`,): masses of halos
-* ``coms_x.txt`` of shape (:math:`N_{\text{conv}}`,3): CoMs of halos
+* ``centers_x.txt`` of shape (:math:`N_{\text{conv}}`,3): centers of halos
 
 .. note:: In case of a Gadget-style HDF5 snapshot output, specify ``cshapes.calcLocalShapesDM()`` to calculate local halo shapes and ``cshapes.calcLocalShapesGx()`` to calculate local galaxy shapes. The suffix of the output files will be modified accordingly to e.g. ``d_local_dm_x.txt`` or ``d_local_gx_x.txt``, respectively.
 
@@ -120,7 +124,7 @@ Instead of shape profiles one might also be interested in obtaining the shape pa
 * ``major_global_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): major axis
 * ``cat_global_x.txt`` of length :math:`N_{\text{pass}}`: list of lists of indices of converged shape profiles, empty list entry [] if halo resolution is too low
 * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
-* ``coms_x.txt`` of shape (:math:`N_{\text{pass}}`,3): CoMs of halos
+* ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
 .. note:: :math:`N_{\text{pass}}` denotes the number of halos that pass the ``MIN_NUMBER_PTCS``-threshold (or ``MIN_NUMBER_STAR_PTCS``-threshold in case of ``cshapes.calcGlobalShapesGx()``). If the global shape determination does not converge, it will appear as NaNs in the output.
 
@@ -138,7 +142,7 @@ For Gadget-style HDF5 snapshot outputs one can calculate the velocity dispersion
 * ``major_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): major axis
 * ``cat_global_vdm_x.txt`` of length :math:`N_{\text{pass}}`: list of lists of indices of converged shape profiles, empty list entry [] if halo resolution is too low
 * ``m_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
-* ``coms_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): CoMs of halos
+* ``centers_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
 The ``cshapes.calcLocalVelShapesDM()`` command will dump files named ``d_local_vdm_x.txt`` etc.
 

@@ -5,6 +5,7 @@ Created on Sun Mar 13 17:39:15 2022
 """
 
 import time
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -283,6 +284,27 @@ def fibonacci_sphere(samples=1):
         points.append((x, y, z))
 
     return points
+
+def findMode(xyz, masses, rad):
+    """ Find mode (point of highest local density) of point distribution xyz
+    
+    :param xyz: coordinates of particles of type 1 or type 4
+    :type xyz: (N^3x3) floats
+    :param masses: masses of the particles
+    :type masses: (N^3) floats
+    :param rad: initial radius to consider from CoM of object
+    :type rad: float
+    :return: mode of distro
+    :rtype: (3,) floats"""
+    com = np.sum(xyz*np.reshape(masses, (masses.shape[0],1)), axis = 0)/masses.sum()
+    distances_all = np.linalg.norm(xyz-com,axis=1)
+    xyz_constrain = xyz[distances_all < rad]
+    masses_constrain = masses[distances_all < rad]
+    if xyz_constrain.shape[0] < 5: # If only < 5 particles left, return
+        return com
+    else:
+        rad *= 0.83 # Reduce radius by 17 %
+        return findMode(xyz_constrain, masses_constrain, rad)
         
 def fibonacci_ellipsoid(a, b, c, samples=1):
     """ Creating "evenly" distributed points on an ellipsoid surface
@@ -317,8 +339,8 @@ def fibonacci_ellipsoid(a, b, c, samples=1):
 
     return points
 
-def drawUniformFromEllipsoid(N_reals, dims, a, b, c=None):
-    """ Draw points uniformly from an ellipsoid volume
+def drawUniformFromEllipsoid(dims, a_vec, b_vec, c_vec, Nptc, ell_nb):
+    """ Draw points uniformly from an ellipsoid volume, centered at the origin
     
     This function is primarily used to generate synthetic halos.
     The approach is taken from Rubinstein & Kroese 2007:\n
@@ -326,22 +348,30 @@ def drawUniformFromEllipsoid(N_reals, dims, a, b, c=None):
     Part 2: Lower Cholesky decomposition\n
     Part 3: Draw uniformly from ellipsoid
     
-    :param N_reals: number of points to draw from ellipsoid volume
-    :type N_reals: int
     :param dims: number of dimensions of 'ellipsoid', either 2,
         in which case c remains 'None', or 3
     :type dims: int
-    :type a: float
-    :param b: intermediate axis of ellipsoid surface
-    :type b: float
-    :param c: optional, minor axis of ellipsoid surface
-    :type c: float
-    :return: points drawn uniformly from an ellipsoid volume
-    :rtype: (N_reals,3) floats"""
+    :param a: major axis array
+    :type a: float array, units are Mpc/h
+    :param b: intermediate axis array
+    :type b: float array, units are Mpc/h
+    :param c: minor axis array
+    :type c: float array, units are Mpc/h
+    :param Nptc: number of particles in each ellipsoid Ell(a[idx], b[idx], c[idx]).
+    :type Nptc: int array
+    :param ell_nb: ellipsoid number of interest
+    :type ell_nb: int
+    :return: points drawn uniformly from an ellipsoid volume, ellipsoid number
+    :rtype: (N_reals,3) floats, 1 int"""
     
     # Part 1: Generating uniform random vectors inside the 3-ball
+    a = a_vec[ell_nb]
+    b = b_vec[ell_nb]
+    c = c_vec[ell_nb]
+    N_reals = Nptc[ell_nb]
     X_tmp = np.zeros((N_reals, dims))
     Z = np.zeros((N_reals, dims))
+    np.random.seed(ell_nb)
     for i in range(N_reals):
         X_tmp[i] = np.random.normal(0,1,dims)
         R = (np.random.uniform(0,1,1))**(1/dims)
@@ -358,4 +388,153 @@ def drawUniformFromEllipsoid(N_reals, dims, a, b, c=None):
     X = np.zeros((N_reals, dims))
     for i in range(N_reals):
         X[i] = np.dot(inv(L.T),Z[i])
-    return X
+    return X, ell_nb
+
+def inShell(X, a, b, c, shell_nb):
+    """ Determine whether point `X` is in Shell(a[shell_nb], b[shell_nb], c[shell_nb])
+    
+    :param X: point of interest
+    :type X: (3,) float array
+    :param a: major axis array
+    :type a: float array, units are Mpc/h
+    :param b: intermediate axis array
+    :type b: float array, units are Mpc/h
+    :param c: minor axis array
+    :type c: float array, units are Mpc/h
+    :param Nptc: number of particles in each shell Shell(a[idx], b[idx], c[idx]).
+    :type Nptc: int array
+    :param shell_nb: ellipsoid number of interest
+    :type shell_nb: int
+    :return: True if `X` is in Shell(a[shell_nb], b[shell_nb], c[shell_nb]), False otherwise
+    :rtype: boolean
+    """
+    if shell_nb > 0: # The principal frame coincides with the Cartesian xyz-frame, so no need to rotate
+        if (X[0]/a[shell_nb])**2 + (X[1]/b[shell_nb])**2 + (X[2]/c[shell_nb])**2 <= 1 and (X[0]/a[shell_nb-1])**2 + (X[1]/b[shell_nb-1])**2 + (X[2]/c[shell_nb-1])**2 > 1:
+            return True
+        else:
+            return False
+    else:
+        if (X[0]/a[shell_nb])**2 + (X[1]/b[shell_nb])**2 + (X[2]/c[shell_nb])**2 <= 1:
+            return True
+        else:
+            return False
+
+def drawUniformFromShell(dims, a_vec, b_vec, c_vec, Nptc, shell_nb):
+    """ Draw points uniformly from an ellipsoidal shell volume, centered at the origin
+    
+    This function is primarily used to generate synthetic halos.
+    The approach is taken from Rubinstein & Kroese 2007:\n
+    Part 1: Generating uniform random vectors inside the 3-ball\n
+    Part 2: Lower Cholesky decomposition\n
+    Part 3: Draw uniformly from 
+    Part 4: Move ptcs from ellipsoid Ell(a[shell_nb], b[shell_nb], c[shell_nb]) 
+    into shell Shell(a[shell_nb], b[shell_nb], c[shell_nb])
+    
+    :param dims: number of dimensions of 'ellipsoid', either 2,
+        in which case c remains 'None', or 3
+    :type dims: int
+    :param a: major axis array
+    :type a: float array, units are Mpc/h
+    :param b: intermediate axis array
+    :type b: float array, units are Mpc/h
+    :param c: minor axis array
+    :type c: float array, units are Mpc/h
+    :param Nptc: number of particles in each shell Shell(a[shell_nb], b[shell_nb], c[shell_nb]).
+    :type Nptc: int array
+    :param shell_nb: shell number of interest
+    :type shell_nb: int
+    :return: points drawn uniformly from an ellipsoidal shell volume, shell number
+    :rtype: (N_reals,3) floats, 1 int"""
+    
+    # Part 0: Interpolation functions for deformation parameters
+    x = np.arange(a_vec.shape[0]+1)/(a_vec.shape[0])
+    a_inter = interp1d(x, np.hstack((0.0, a_vec)))
+    b_inter = interp1d(x, np.hstack((0.0, b_vec)))
+    c_inter = interp1d(x, np.hstack((0.0, c_vec)))
+
+    # Part 1: Generating uniform random vectors inside the 3-ball
+    a = a_vec[shell_nb]
+    b = b_vec[shell_nb]
+    c = c_vec[shell_nb]
+    N_reals = Nptc[shell_nb]
+    X_tmp = np.zeros((N_reals, dims))
+    Z = np.zeros((N_reals, dims))
+    np.random.seed(shell_nb)
+    for i in range(N_reals):
+        X_tmp[i] = np.random.normal(0,1,dims)
+        R = (np.random.uniform(0,1,1))**(1/dims)
+        Z[i] = R*X_tmp[i]/np.linalg.norm(X_tmp[i])
+    
+    # Part 2: lower Cholesky decomposition
+    if c == None:
+        Sigma = np.array([[1/a**2, 0],[0,1/b**2]])
+    else:
+        Sigma = np.array([[1/a**2, 0,0],[0,1/b**2,0],[0,0,1/c**2]])
+    L = cholesky(Sigma, lower=True)
+    
+    # Part 3: Draw uniform random vectors from Ellipsoid
+    X = np.zeros((N_reals, dims))
+    inv_ = inv(L.T)
+    for pt in range(N_reals):
+        X[pt] = np.dot(inv_,Z[pt])
+        
+    # Part 4: Move particles from Ellipsoid into Shell
+    def transformCartToSpher(xyz):
+        ptsnew = np.zeros(xyz.shape)
+        xy = xyz[:,0]**2 + xyz[:,1]**2
+        ptsnew[:,0] = np.sqrt(xy + xyz[:,2]**2)
+        ptsnew[:,1] = np.arctan2(np.sqrt(xy), xyz[:,2]) # for elevation angle defined from Z-axis down
+        ptsnew[:,2] = np.arctan2(xyz[:,1], xyz[:,0])
+        return ptsnew
+    
+    X_sph = transformCartToSpher(X)
+    rand = np.random.uniform(x[shell_nb], x[shell_nb+1], size = X.shape[0])
+    a_target = a_inter(rand)
+    b_target = b_inter(rand)
+    c_target = c_inter(rand)
+    x_new = np.sin(X_sph[:,1])*np.cos(X_sph[:,2])*a_target
+    y_new = np.sin(X_sph[:,1])*np.sin(X_sph[:,2])*b_target
+    z_new = np.cos(X_sph[:,1])*c_target
+    Y = np.hstack((np.reshape(x_new, (x_new.shape[0],1)), np.reshape(y_new, (y_new.shape[0],1)), np.reshape(z_new, (z_new.shape[0],1))))
+    # All ptcs in Y fulfill inShell(Y[pt], a_vec, b_vec, c_vec, shell_nb) == True.
+    return Y
+
+def respectPBCNoRef(xyz, L_BOX):
+    """
+    Return positions xyz that respect the box periodicity
+    
+    If point distro xyz has particles separated in any Cartesian direction
+    by more than L_BOX/2, reflect those particles along L_BOX/2
+    
+    :param xyz: coordinates of particles of type 1 or type 4
+    :type xyz: (N^3x3) floats
+    :return: updated coordinates of particles of type 1 or type 4
+    :rtype: (N^3x3) floats"""
+    xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
+    ref = 0 # Reference particle does not matter
+    dist_x = abs(xyz_out[ref, 0]-xyz_out[:,0])
+    xyz_out[:,0][dist_x > L_BOX/2] = L_BOX-xyz_out[:,0][dist_x > L_BOX/2] # Reflect x-xyz_outition along L_BOX/2
+    dist_y = abs(xyz_out[ref, 1]-xyz_out[:,1])
+    xyz_out[:,1][dist_y > L_BOX/2] = L_BOX-xyz_out[:,1][dist_y > L_BOX/2] # Reflect y-xyz_outition along L_BOX/2
+    dist_z = abs(xyz_out[ref, 2]-xyz_out[:,2])
+    xyz_out[:,2][dist_z > L_BOX/2] = L_BOX-xyz_out[:,2][dist_z > L_BOX/2] # Reflect z-xyz_outition along L_BOX/2
+    return xyz_out
+
+def getCoM(xyz, masses):
+    """ Calculate center of mass of point distribution
+    
+    :param xyz: coordinates of particles of type 1 or type 4
+    :type xyz: (N^3x3) floats
+    :param masses: masses of the particles
+    :type masses: (N^3) floats
+    :return: com, center of mass
+    :rtype: (3,) floats"""
+    com = np.zeros((3,), dtype = np.float32)
+    mass_total = 0.0
+    for run in range(xyz.shape[0]):
+        mass_total += masses[run]
+    for run in range(xyz.shape[0]):
+        com[0] += masses[run]*xyz[run,0]/mass_total
+        com[1] += masses[run]*xyz[run,1]/mass_total
+        com[2] += masses[run]*xyz[run,2]/mass_total
+    return com

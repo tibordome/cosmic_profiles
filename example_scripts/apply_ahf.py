@@ -17,7 +17,7 @@ import sys
 import h5py
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..', 'cosmic_shapes')) # Only needed if cosmic_shapes is not installed
+sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_shapes is not installed
 import numpy as np
 from cosmic_shapes import CosmicShapesDirect, createLogNormUni
 import time
@@ -25,11 +25,11 @@ start_time = time.time()
 
 ############## Parameters ####################################################################################
 L_BOX = np.float32(10) # cMpc/h
-nbar = 8e+3 # If too small, e.g. 5e+3: pynbody later yields OSError: Corrupt header record
+nbar = 8e+3 # If too small, e.g. 5e+3: pynbody later yields OSError: Corrupt header record. If too large, need many GBs of RAM.
 Nmesh = 256
 redshift = 5.5
 h = 0.6774
-UNIT_MASS = 10**10 # in solar masses
+UNIT_MASS = 10**10 # in M_sun
 SNAP = '025'
 D_LOGSTART = -2
 D_LOGEND = 1
@@ -38,6 +38,7 @@ M_TOL = np.float32(1e-2)
 N_WALL = 100
 N_MIN = 10
 MIN_NUMBER_DM_PTCS = 200
+CENTER = 'mode'
 CAT_DEST = "./cat"
 VIZ_DEST = "./viz"
 #############################################################################################################
@@ -125,20 +126,20 @@ im = pynbody.plot.image(halos[2].d, width = '500 kpc', cmap=plt.cm.Greys, units 
 plt.savefig('{}/RhoHalo2.pdf'.format(VIZ_DEST))
 #############################################################################################################
 
-############## Extract R_vir, halo indices and halo sizes ###################################################
+############## Extract R_vir, halo indices and halo sizes for e.g. first 5 halos ############################
 ahf_halos = np.loadtxt('{}/snap_{}.z{}.AHF_halos'.format(CAT_DEST, SNAP, format(redshift, '.3f')), unpack=True)
-h_sizes = np.int32(ahf_halos[4]) # 5th column
-r_vir = np.float32(ahf_halos[11]) # 12th column
-ahf_ptcs = np.loadtxt('{}/snap_{}.z{}.AHF_particles'.format(CAT_DEST, SNAP, format(redshift, '.3f')), skiprows=2, unpack = True)[0]
+h_sizes = np.int32(ahf_halos[4])[:5] # 5th column
+r_vir = np.float32(ahf_halos[11])[:5] # 12th column
+ahf_ptcs = np.loadtxt('{}/snap_{}.z{}.AHF_particles'.format(CAT_DEST, SNAP, format(redshift, '.3f')), skiprows=2, unpack = True, dtype = int)[0]
 h_indices = [[] for i in range(len(h_sizes))]
 offset = 0
 for h_idx in range(len(h_sizes)):
-    h_indices[h_idx].extend(ahf_ptcs[offset:offset+h_sizes[h_idx]]) # True indices
+    h_indices[h_idx].extend(ahf_ptcs[offset:offset+h_sizes[h_idx]]) # True indices, no plus 1 etc
     offset += h_sizes[h_idx] + 1 # Skip line containing number of particles in halo
 #############################################################################################################
 
 ############## Run cosmic_shapes: define CosmicShapes object ################################################
-cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, start_time)
+cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
 ############## Create local halo shape catalogue ############################################################
 cshapes.calcLocalShapes()

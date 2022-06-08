@@ -24,3 +24,9 @@ cdef class CythonHelpers:
 
     @staticmethod
     cdef float[:,:] respectPBCNoRef(float[:,:] xyz, float L_BOX) nogil
+    
+    @staticmethod
+    cdef float[:] getDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] dens_prof, int[:] shell) nogil
+    
+    @staticmethod
+    cdef float[:] getMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil

@@ -14,6 +14,7 @@ from .python_helpers import (
 from .cosmic_shapes import (
     createLogNormUni,
     genAlphaBetaGammaHalo,
+    getAlphaBetaGammaProf,
     CosmicShapes,
     CosmicShapesGadgetHDF5,
     CosmicShapesDirect,
