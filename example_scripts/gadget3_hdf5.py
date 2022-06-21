@@ -48,6 +48,9 @@ cshapes.loadDMCat()
 # Create local halo shape catalogue
 cshapes.calcLocalShapesDM()
 
+# Create local halo density catalogue
+cshapes.calcDensProfsDirectBinning()
+
 # Create global halo shape catalogue
 cshapes.calcGlobalShapesDM()
 
@@ -70,5 +73,8 @@ cshapes.plotGlobalEpsHisto(obj_type = 'dm')
 # Plot halo triaxiality histogram
 cshapes.plotLocalTHisto(obj_type = 'dm')
 
-# Draw halo shape curves (averaging over halos' shape curves)
-cshapes.drawShapeCurves(obj_type = 'dm')
+# Draw halo shape profile (averaging over halos' shape profiles)
+cshapes.drawShapeProfile(obj_type = 'dm')
+
+# Draw halo density profile (averaging over halos' density profiles)
+cshapes.drawDensityProfile(obj_type = 'dm')

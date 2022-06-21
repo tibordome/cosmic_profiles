@@ -19,7 +19,7 @@ import sys
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_shapes is not installed
-from cosmic_shapes import CosmicShapesDirect, genAlphaBetaGammaHalo, getAlphaBetaGammaProf
+from cosmic_shapes import CosmicShapesDirect, genHalo, getEinastoProf
 import time
 start_time = time.time()
 
@@ -42,43 +42,52 @@ CENTER = 'com'
 tot_mass = 10**(12) # M_sun/h
 halo_res = 500000
 r_s = 0.5 # Units are Mpc/h
-alpha = 10
-beta = 3
-gamma = 1.1
+alpha = 0.18
 N_bin = 100
-a_max = 1 # Units are Mpc/h
-a = np.logspace(-1.5,0.2,N_bin)*a_max # Units are Mpc/h
+r_vir = np.array([1.0], dtype = np.float32) # Units are Mpc/h
+a = np.logspace(-2,0.2,N_bin)*r_vir[0] # Units are Mpc/h
 b = a # Units are Mpc/h. The more b differs from a, the more biased the spherically averaged density profile.
 c = a # Units are Mpc/h
 rho_res = 50
-r_over_rvir = np.logspace(-1.5,0,rho_res) # Estimate density profile out to the virial radius.
+r_over_rvir = np.logspace(-2,0,rho_res) # Estimate density profile out to the virial radius.
 
-halo_x, halo_y, halo_z, mass_dm, rho_0 = genAlphaBetaGammaHalo(tot_mass, halo_res, alpha, beta, gamma, r_s, a, b, c)
+model_pars = np.array([r_s, alpha])
+halo_x, halo_y, halo_z, mass_dm, rho_0 = genHalo(tot_mass, halo_res, model_pars, 'einasto', a, b, c)
 halo_x += L_BOX/2 # Move mock halo into the middle of the simulation box
 halo_y += L_BOX/2
 halo_z += L_BOX/2
-print("Number of particles in the halo is {}. Mass of each DM ptc is {:.2e} M_sun/h, the average halo mass density is {:.2e} M_sun*h^2/(Mpc^3).".format(halo_x.shape[0], mass_dm, mass_dm*halo_x.shape[0]/(4/3*np.pi*a_max**3)))
+print("Number of particles in the halo is {}. Mass of each DM ptc is {:.2e} M_sun/h, the average halo mass density is {:.2e} M_sun*h^2/(Mpc^3).".format(halo_x.shape[0], mass_dm, mass_dm*halo_x.shape[0]/(4/3*np.pi*r_vir[0]**3)))
 dm_xyz = np.float32(np.hstack((np.reshape(halo_x, (halo_x.shape[0],1)), np.reshape(halo_y, (halo_y.shape[0],1)), np.reshape(halo_z, (halo_z.shape[0],1)))))
 
-######################### Extract R_vir, halo indices and halo sizes ##########################
-r_vir = np.array([a_max], dtype = np.float32)
+######################### Extract halo indices and halo sizes ##########################
 mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm
 h_indices = [np.arange(len(halo_x), dtype = np.int32).tolist()]
 
 ########################### Define CosmicShapesDirect object ###################################
 cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
-############################## Calculate Density Profile #######################################
+############################## Estimate Density Profile ########################################
 # Visualize density profile: A sample output is shown above!
 dens_profs_db = cshapes.calcDensProfsDirectBinning(r_over_rvir)
 dens_profs_kb = cshapes.calcDensProfsKernelBased(r_over_rvir)
-dens_prof_db = dens_profs_db[0]
-dens_prof_kb = dens_profs_kb[0]
 plt.figure()
-plt.loglog(r_over_rvir, dens_prof_db, 'o--', label='direct binning', markersize = 3)
-plt.loglog(r_over_rvir, dens_prof_kb, 'o--', label='kernel-based', markersize = 3)
-plt.loglog(r_over_rvir, getAlphaBetaGammaProf(r_over_rvir*r_vir[0], alpha, beta, gamma, rho_0, r_s), lw = 1.0, label=r'target: $\alpha$ = {:.1f}, $\beta$ = {:.1f}, $\gamma$ = {:.1f}'.format(alpha, beta, gamma))
+plt.loglog(r_over_rvir, dens_profs_db[0], 'o--', label='direct binning', markersize = 3)
+plt.loglog(r_over_rvir, dens_profs_kb[0], 'o--', label='kernel-based', markersize = 3)
+plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], rho_0, r_s, alpha), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} cMpc/h'.format(alpha, r_s))
+plt.xlabel(r'r/$R_{\mathrm{vir}}$')
+plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+plt.legend(fontsize="small", loc='lower left')
+plt.savefig('{}/RhoProfObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')
+
+############################## Fit Density Profile #############################################
+r_over_rvir = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
+dens_profs_db = dens_profs_db[0][10:]
+best_fits = cshapes.fitDensProfs(dens_profs_db.reshape((1,dens_profs_db.shape[0])), r_over_rvir, r_vir, method = 'einasto')
+best_fit = best_fits[0]
+plt.figure()
+plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='density profile', markersize = 4)
+plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], best_fit[0], best_fit[1], best_fit[2]), '--', color = 'r', label=r'Einasto-fit')
 plt.xlabel(r'r/$R_{\mathrm{vir}}$')
 plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
 plt.legend(fontsize="small", bbox_to_anchor=(0.95, 1), loc='upper right')
-plt.savefig('{}/RhoProfObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')
+plt.savefig('{}/RhoProfFitObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')

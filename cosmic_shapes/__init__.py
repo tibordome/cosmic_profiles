@@ -13,8 +13,11 @@ from .python_helpers import (
 
 from .cosmic_shapes import (
     createLogNormUni,
-    genAlphaBetaGammaHalo,
+    genHalo,
     getAlphaBetaGammaProf,
+    getEinastoProf,
+    getHernquistProf,
+    getNFWProf,
     CosmicShapes,
     CosmicShapesGadgetHDF5,
     CosmicShapesDirect,

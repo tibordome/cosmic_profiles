@@ -1,6 +1,11 @@
 Density Profiles
 =================
 
+|pic1|
+
+.. |pic1| image:: RhoProfFitObj0_015.png
+   :width: 60%
+
 We have added density profile estimation capabilities even though the focus of this package is on shapes of halos and galaxies. We contend ourselves with spherically averaged density profiles, which are thus defined with respect to the halocentric radius
 
 .. math:: r = \sqrt{x^2+y^2+z^2},

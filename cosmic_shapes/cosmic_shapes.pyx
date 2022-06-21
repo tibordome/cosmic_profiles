@@ -27,7 +27,7 @@ cimport cython
 import os
 from mpl_toolkits.mplot3d import Axes3D
 from cosmic_shapes.python_helpers import print_status, set_axes_equal, fibonacci_ellipsoid, drawUniformFromShell, getMassDMParticle, respectPBCNoRef, getCoM, findMode
-from cosmic_shapes.shape_analysis import getGlobalEpsHisto, getLocalTHisto, getShapeCurves
+from cosmic_shapes.shape_analysis import getGlobalEpsHisto, getLocalTHisto, getShapeProfiles, getDensityProfiles, fitDensProfHelper
 from cosmic_shapes.get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData
 from cosmic_shapes.gen_csh_gx_cat import getCSHCat, getGxCat
 from cosmic_shapes.cython_helpers cimport CythonHelpers
@@ -64,24 +64,62 @@ def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
     return N_tot, x_vec, y_vec, z_vec, x_vel, y_vel, z_vel, np.ones((len(x_vec),),dtype = np.float32)*dm_mass
 
 @cython.embedsignature(True)
-def getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s):
+def getAlphaBetaGammaProf(r, rho_0, alpha, beta, gamma, r_s):
     
     return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+
+@cython.embedsignature(True)
+def getEinastoProf(r, rho_2, r_2, alpha):
+    
+    return rho_2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+
+@cython.embedsignature(True)
+def getNFWProf(r, rho_s, r_s):
+    
+    return rho_s/((r/r_s)*(1+r/r_s)**2)
+
+@cython.embedsignature(True)
+def getHernquistProf(r, rho_s, r_s):
+    
+    return rho_s/((r/r_s)*(1+r/r_s)**3)
     
 @cython.embedsignature(True)
-def genAlphaBetaGammaHalo(tot_mass, res, alpha, beta, gamma, r_s, a, b, c):
+def genHalo(tot_mass, res, model_pars, method, a, b, c):
     
     # Determine rho_0 in units of M_sun*h^2/Mpc^3
-    def getMassIntegrand0(r, alpha, beta, gamma, r_s):
-        return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
-    rho_0 = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(alpha, beta, gamma, r_s))[0]
+    def getMassIntegrand0(r, method, model_pars):
+        if method == 'einasto':
+            r_2, alpha = model_pars
+            return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+        if method == 'alpha_beta_gamma':
+            alpha, beta, gamma, r_s = model_pars
+            return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+        if method == 'hernquist':
+            r_s = model_pars
+            return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**3)
+        else:
+            r_s = model_pars
+            return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**2)
+    rho_0 = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(method, model_pars))[0]
+    model_pars = np.hstack((np.array([rho_0]),model_pars))
     
     # Determine number of particles in second shell (first proper shell)
-    def getMassIntegrand(r, alpha, beta, gamma, rho_0, r_s):
-        return 4*np.pi*r**2*getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s)
+    def getMassIntegrand(r, model_pars):
+        if method == 'einasto':
+            rho_2, r_2, alpha = model_pars
+            return 4*np.pi*r**2*getEinastoProf(r, rho_2, r_2, alpha)
+        if method == 'alpha_beta_gamma':
+            rho_0, alpha, beta, gamma, r_s = model_pars
+            return 4*np.pi*r**2*getAlphaBetaGammaProf(r, rho_0, alpha, beta, gamma, r_s)
+        if method == 'hernquist':
+            rho_s, r_s = model_pars
+            return 4*np.pi*r**2*getHernquistProf(r, rho_s, r_s)
+        else:
+            rho_s, r_s = model_pars
+            return 4*np.pi*r**2*getNFWProf(r, rho_s, r_s)
     
-    # Determine radial bins
-    mass_1 = quad(getMassIntegrand, a[0], a[1], args=(alpha, beta, gamma, rho_0, r_s))[0] # Mass in shell 1 in units of M_sun/h
+    # Determine number of particles in second shell
+    mass_1 = quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0] # Mass in shell 1 in units of M_sun/h
     N1 = int(round(res*mass_1/tot_mass)) # Number of particles in shell 1. Rounding error is unavoidable.
     
     # Build up halo successively in onion-like fashion
@@ -91,16 +129,16 @@ def genAlphaBetaGammaHalo(tot_mass, res, alpha, beta, gamma, r_s, a, b, c):
     Nptc = np.zeros((a.shape[0],), dtype = np.int32) # Note: Number of ptcs in shell Shell(0,a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
     for shell in range(a.shape[0]):
         if shell != 0:
-            Nptc[shell] = int(round(N1*quad(getMassIntegrand, a[shell-1], a[shell], args=(alpha, beta, gamma, rho_0, r_s))[0]/quad(getMassIntegrand, a[0], a[1], args=(alpha, beta, gamma, rho_0, r_s))[0]))
+            Nptc[shell] = int(round(N1*quad(getMassIntegrand, a[shell-1], a[shell], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
         else:
-            Nptc[shell] = int(round(N1*quad(getMassIntegrand, 1e-8, a[0], args=(alpha, beta, gamma, rho_0, r_s))[0]/quad(getMassIntegrand, a[0], a[1], args=(alpha, beta, gamma, rho_0, r_s))[0]))
-    with Pool(processes=1) as pool:
+            Nptc[shell] = int(round(N1*quad(getMassIntegrand, 1e-8, a[0], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
+    with Pool(processes=openmp.omp_get_max_threads()) as pool:
         results = pool.map(partial(drawUniformFromShell, 3, a, b, c, Nptc), [idx for idx in range(Nptc.shape[0])]) # Draws from Shell(0,a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
     for result in results:
         halo_x = np.hstack((halo_x, result[:,0]))
         halo_y = np.hstack((halo_y, result[:,1]))
         halo_z = np.hstack((halo_z, result[:,2]))
-    mass_dm = quad(getMassIntegrand, 1e-8, a[-1], args=(alpha, beta, gamma, rho_0, r_s))[0]/halo_z.shape[0]    
+    mass_dm = quad(getMassIntegrand, 1e-8, a[-1], args=(model_pars))[0]/halo_z.shape[0]    
     return halo_x, halo_y, halo_z, mass_dm, rho_0
 
 @cython.embedsignature(True)
@@ -970,7 +1008,7 @@ cdef class CosmicShapes:
         m.base[succeed][m.base[succeed]==0.0] = np.nan
         return d.base[succeed], q.base[succeed], s.base[succeed], minor, inter, major, centers.base[succeed], m.base[succeed] # Only rank = 0 content matters
     
-    def drawShapeCurves(self, obj_type = ''):
+    def drawShapeProfiles(self, obj_type = ''):
         if obj_type == 'dm':
             suffix = '_dm_'
         elif obj_type == 'gx':
@@ -978,8 +1016,18 @@ cdef class CosmicShapes:
         else:
             assert obj_type == ''
             suffix = '_'
-        getShapeCurves(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, MASS_UNIT=1e10, suffix = suffix)
+        getShapeProfiles(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, MASS_UNIT=1e10, suffix = suffix)
         
+    def drawDensityProfiles(self, obj_type = ''):
+        if obj_type == 'dm':
+            suffix = '_dm_'
+        elif obj_type == 'gx':
+            suffix = '_gx_'
+        else:
+            assert obj_type == ''
+            suffix = '_'
+        getDensityProfiles(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, MASS_UNIT=1e10, suffix = suffix)
+    
     def plotLocalTHisto(self, obj_type = ''):
         if obj_type == 'dm':
             suffix = '_dm_'
@@ -989,6 +1037,24 @@ cdef class CosmicShapes:
             assert obj_type == ''
             suffix = '_'
         getLocalTHisto(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, HIST_NB_BINS=11, MASS_UNIT=1e10, suffix = suffix, inner = False)
+        
+    def fitDensProfs(self, dens_profs, ROverR200, r200s, method = 'einasto'):
+        # dens_profs are defined at ROverR200
+        
+        if method == 'einasto':
+            best_fits = np.zeros((dens_profs.shape[0], 3))
+        elif method == 'alpha_beta_gamma':
+            best_fits = np.zeros((dens_profs.shape[0], 5))
+        else:
+            best_fits = np.zeros((dens_profs.shape[0], 2))
+        dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs, r200s]
+        dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs_plus_r200_plus_obj_number, np.arange(dens_profs.shape[0])]
+        with Pool(processes=openmp.omp_get_max_threads()) as pool:
+            results = pool.map(partial(fitDensProfHelper, ROverR200, method), [dens_profs_plus_r200_plus_obj_number[obj] for obj in range(dens_profs.shape[0])])
+        for result in results:
+            x, obj = tuple(result)
+            best_fits[int(obj)] = x
+        return best_fits
 
 cdef class CosmicShapesDirect(CosmicShapes):
     
@@ -1304,6 +1370,7 @@ cdef class CosmicShapesDirect(CosmicShapes):
         obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
         ROverR200, dens_profs = self.getDensProfsKernelBased(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
         return dens_profs
+        
 
 cdef class CosmicShapesGadgetHDF5(CosmicShapes):
     

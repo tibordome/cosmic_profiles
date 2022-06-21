@@ -7,6 +7,7 @@ Created on Sun Mar 13 17:39:15 2022
 from scipy import stats
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import optimize
 from math import isnan
 from sklearn.utils import resample
 import matplotlib
@@ -491,7 +492,7 @@ def readShapeData(CAT_DEST, SNAP, D_BINS, local, suffix):
     obj_centers = np.loadtxt('{0}/centers_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_hs,3)
     return obj_masses, obj_centers, d, q, s, major_full
 
-def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, MASS_UNIT=1e10, suffix = '_'):
+def getShapeProfiles(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, MASS_UNIT=1e10, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -617,6 +618,103 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
             plt.savefig("{0}/TM{1}{2}{3}.pdf".format(VIZ_DEST, int(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
     
     
+def getDensityProfiles(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, MASS_UNIT=1e10, suffix = '_'):
+    """
+    Create a series of plots to analyze object shapes
+    
+    Plot intertial tensor axis ratios, triaxialities and ellipticity histograms.
+    
+    :param CAT_DEST: catalogue destination
+    :type CAT_DEST: string
+    :param VIZ_DEST: visualisation folder destination
+    :type VIZ_DEST: string
+    :param SNAP: e.g. '024'
+    :type SNAP: string
+    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+    :type D_LOGSTART: int
+    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+    :type D_LOGEND: int
+    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
+    :type D_BINS: int
+    :param start_time: time of start of shape analysis
+    :type start_time: float
+    :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
+    :type MASS_UNIT: float
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicShapesDirect)
+    :type suffix: string"""
+    
+    """plt.figure()
+    plt.loglog(ROverR200, mean_median_cdm_ov, color = 'blue')
+    plt.loglog(RForMinOv/R200AvOv, getEinasto(RForMinOv, einasto_fit_cdm_ov[0], einasto_fit_cdm_ov[1], einasto_fit_cdm_ov[2]), 'o--', linewidth=2, markersize=7, color = 'blue', label = r'CDM, Einasto fit')
+    plt.loglog(R_plot_to_min_fdm/np.average(r200_fdm[np.arange(r200_fdm.shape[0])[h_pass_fdm.nonzero()[0]]]), getEinasto(R_plot_to_min_fdm, best_fit_einasto_fdm[0], best_fit_einasto_fdm[1], best_fit_einasto_fdm[2]), 'o--', linewidth=2, markersize=7, color = 'r', label = r'c{}, Einasto fit'.format(config.DM_TYPE.upper()))
+    plt.fill_between(ROverR200, mean_median_cdm_ov-err_low_cdm_ov, mean_median_cdm_ov+err_high_cdm_ov, label="CDM", facecolor = 'blue', edgecolor='g', alpha = 0.5)
+    plt.loglog(ROverR200, mean_median_fdm, color = 'r')
+    plt.fill_between(ROverR200, mean_median_fdm-err_low_fdm, mean_median_fdm+err_high_fdm, label="c{}".format(config.DM_TYPE.upper()), facecolor = 'r', edgecolor='g', alpha = 0.5)
+    plt.xlabel(r"$r/R_{200}$")
+    plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+    plt.axvline(x=kappa_cdm_line_ov, color='blue', linestyle='--', alpha = 0.5)
+    plt.axvline(x=kappa_fdm_line, color='r', linestyle='--', alpha = 0.5)
+    plt.legend(loc="upper right", fontsize="x-small")
+    plt.savefig("{}/dm/{}SHRhoprof9eps{}M{:.2f}{}_{}.pdf".format(config.SHAPE_DEST, config.DM_TYPE.upper(), use_9eps, np.float32(DELTA_LOGM), config.HALO_REGION, config.SNAP), bbox_inches="tight")
+    np.savetxt('{}/best_fit_einasto_ov_9eps{}_{}_{}_{}.txt'.format(config.CAT_DEST, use_9eps, config.HALO_REGION, config.DM_TYPE, config.SNAP), best_fit_einasto_fdm, fmt='%1.7e')
+        """
+    return
+
+def getEinastoProf(r, model_pars):
+    rho_2, r_2, alpha = model_pars
+    return rho_2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+
+def getAlphaBetaGammaProf(r, model_pars):
+    rho_0, alpha, beta, gamma, r_s = model_pars
+    return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+
+def getNFWProf(r, model_pars):
+    rho_s, r_s = model_pars
+    return rho_s/((r/r_s)*(1+r/r_s)**2)
+
+def getHernquistProf(r, model_pars):
+    rho_s, r_s = model_pars
+    return rho_s/((r/r_s)*(1+r/r_s)**3)
+
+def fitDensProf(median, ROverR200, r200, method):
+    # median must be in units of M_sun/(cMpc/h)**3
+    # eps_9 must have units of cMpc/h
+                
+    # Fit profile to median density profile
+    def toMinimize(model_pars, median, rbin_centers, method):
+        if method == 'einasto':
+            psi_2 = np.sum(np.array([(np.log(median[i])-np.log(getEinastoProf(rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
+        elif method == 'alpha_beta_gamma':
+            psi_2 = np.sum(np.array([(np.log(median[i])-np.log(getAlphaBetaGammaProf(rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
+        elif method == 'hernquist':
+            psi_2 = np.sum(np.array([(np.log(median[i])-np.log(getHernquistProf(rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
+        else:
+            psi_2 = np.sum(np.array([(np.log(median[i])-np.log(getNFWProf(rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
+        return psi_2
+    R_to_min = ROverR200*r200 # cMpc/h
+    # Discard nan values in median
+    R_to_min = R_to_min[~np.isnan(median)] # np.isnan returns a boolean
+    median = median[~np.isnan(median)]
+    # Initial guess and minimize scalar function
+    if method == 'einasto':
+        iguess = np.array([0.1, r200/5, 0.18]) # alpha = 0.18 gives ~ NFW
+        res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf), (-np.inf, np.inf)]) # Only hand over rescaled median!
+    elif method == 'alpha_beta_gamma':
+        iguess = np.array([0.1, 1.0, 1.0, 1.0, r200/5])
+        res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf), (1e-5, np.inf), (1e-5, np.inf), (1e-5, np.inf)]) # Only hand over rescaled median!
+    elif method == 'hernquist':
+        iguess = np.array([0.1, r200/5])
+        res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf)]) # Only hand over rescaled median!
+    else:
+        iguess = np.array([0.1, r200/5])
+        res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf)]) # Only hand over rescaled median!
+    res.x[0] *= np.average(median)
+    return res.x
+        
+def fitDensProfHelper(ROverR200, method, dens_profs_plus_r200_plus_obj_number):
+    res = fitDensProf(dens_profs_plus_r200_plus_obj_number[:-2], ROverR200, dens_profs_plus_r200_plus_obj_number[-2], method)
+    return res, dens_profs_plus_r200_plus_obj_number[-1]
+        
 def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, HIST_NB_BINS, MASS_UNIT=1e10, suffix = '_', inner = False):
     """ Plot triaxiality T histogram
     
