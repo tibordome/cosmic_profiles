@@ -30,3 +30,6 @@ cdef class CythonHelpers:
     
     @staticmethod
     cdef float[:] getMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil
+    
+    @staticmethod
+    cdef float getKTilde(float r, float r_i, float h_i) nogil

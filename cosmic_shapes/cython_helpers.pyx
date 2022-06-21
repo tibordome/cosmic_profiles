@@ -6,7 +6,7 @@ Created on Mon Mar 28 12:16:48 2022
 """
 
 cimport cython
-from libc.math cimport sqrt, pi
+from libc.math cimport sqrt, pi, exp
 from scipy.linalg.cython_lapack cimport zheevr
 include "array_defs.pxi"
 
@@ -191,7 +191,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] getDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] dens_prof, int[:] shell) nogil:
+    cdef float[:] getDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
         """ Calculates density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -202,9 +202,9 @@ cdef class CythonHelpers:
         :type center: (3) floats
         :param r_200: R200 value of the object
         :type r_200: float
-        :param ROverR200: radii at which the density profiles should be calculated,
-            normalized by R200
-        :type ROverR200: float array
+        :param rad_bins: radial bins (bin edges) at whose centers the density profiles
+            should be calculated, normalized by R200
+        :type rad_bins: float array
         :param dens_prof: array to store result in
         :type dens_prof: float array
         :param shell: array used for the calculation
@@ -216,29 +216,18 @@ cdef class CythonHelpers:
         cdef int r_i
         cdef int n
         cdef int i
-        for r_i in range(ROverR200.shape[0]):
+        for r_i in range(rad_bins.shape[0]-1):
             corr_s = 0
             pts_in_shell = 0
-            if r_i == 0:
-                for i in range(xyz.shape[0]):
-                    if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (ROverR200[r_i]*r_200)**2:
-                        shell[i-corr_s] = i
-                        pts_in_shell += 1
-                    else:
-                        corr_s += 1
-                if pts_in_shell != 0:
-                    for n in range(pts_in_shell):
-                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*(ROverR200[r_i]*r_200)**3)
-            else:
-                for i in range(xyz.shape[0]):
-                    if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (ROverR200[r_i]*r_200)**2 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (ROverR200[r_i-1]*r_200)**2:
-                        shell[i-corr_s] = i
-                        pts_in_shell += 1
-                    else:
-                        corr_s += 1
-                if pts_in_shell != 0:
-                    for n in range(pts_in_shell):
-                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*((ROverR200[r_i]*r_200)**3-(ROverR200[r_i-1]*r_200)**3))
+            for i in range(xyz.shape[0]):
+                if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (rad_bins[r_i+1]*r_200)**2 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (rad_bins[r_i]*r_200)**2:
+                    shell[i-corr_s] = i
+                    pts_in_shell += 1
+                else:
+                    corr_s += 1
+            if pts_in_shell != 0:
+                for n in range(pts_in_shell):
+                    dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*((rad_bins[r_i+1]*r_200)**3-(rad_bins[r_i]*r_200)**3))
         return dens_prof
     
     @cython.boundscheck(False)
@@ -282,3 +271,19 @@ cdef class CythonHelpers:
                 for n in range(pts_in_ell):
                     Mencl[r_i] = Mencl[r_i] + masses[ellipsoid[n]]
         return Mencl
+    
+    @cython.boundscheck(False)
+    @cython.wraparound(False) 
+    @staticmethod
+    cdef float getKTilde(float r, float r_i, float h_i) nogil:
+        """ Angle-averaged normalized Gaussian kernel for kernel-based density profile estimation
+        
+        :param r: radius in Mpc/h at which to calculate the local, spherically-averaged density
+        :type r: float
+        :param r_i: radius of point i whose contribution to the local, spherically-averaged density shall be determined
+        :type r_i: float
+        :param h_i: width of Gaussian kernel for point i
+        :type h_i: float
+        :return: angle-averaged normalized Gaussian kernel
+        :rtype: float"""
+        return 1/(2*(2*pi)**(3/2))*(r*r_i/(h_i**2))**(-1)*(exp(-(r_i-r)**2/(2*h_i**2))-exp(-(r_i+r)**2/(2*h_i**2)))

@@ -83,24 +83,23 @@ def getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s):
     return
 
 @cython.embedsignature(True)
-def genAlphaBetaGammaHalo(N0, alpha, beta, gamma, rho_0, r_s, a, b, c):
+def genAlphaBetaGammaHalo(tot_mass, res, alpha, beta, gamma, r_s, a, b, c):
     """ Mock halo generator
     
-    Create mock halo consisting of ``N0`` particles in 1st shell. The alpha-beta-gamma 
+    Create mock halo consisting of ``N_min`` particles in 1st shell. The alpha-beta-gamma 
     density profile is a generalization of the Navarro-Frank-White (NFW) profile. Its definition
     can be looked up in Zemp et al 2011, https://arxiv.org/abs/1107.5582.
     
-    :param N0: number of particles in 1st shell. Will be scaled appropriately 
-        in each shell to satisfy alpha-beta-gamma profile
-    :type N0: int
+    :param tot_mass: total target mass of halo, in units of M_sun*h^2/Mpc^3
+    :type tot_mass: float
+    :param res: halo resolution
+    :type res: int
     :param alpha: ``alpha`` parameter in alpha-beta-gamma density profile
     :type alpha: float
     :param beta: ``beta`` parameter in alpha-beta-gamma density profile 
     :type beta: float
     :param gamma: ``gamma`` parameter in alpha-beta-gamma density profile 
     :type gamma: float
-    :param rho_0: ``rho_0`` parameter in alpha-beta-gamma density profile (density at the center)
-    :type rho_0: float, units are M_sun*h^2/Mpc^3
     :param r_s: ``r_s`` parameter in alpha-beta-gamma density profile (scale radius)
     :type r_s: float
     :param a: major axis array
@@ -110,8 +109,8 @@ def genAlphaBetaGammaHalo(N0, alpha, beta, gamma, rho_0, r_s, a, b, c):
     :param c: minor axis array
     :type c: float array, units are Mpc/h
     :return: halo_x, halo_y, halo_z: arrays containing positions of halo particles, 
-        mass_dm: mass of each DM ptc in units of M_sun/h
-    :rtype: 3 (Nreals,) float arrays, 1 float
+        mass_ptc: mass of each DM ptc in units of M_sun/h
+    :rtype: 3 (N,) float arrays, 2 floats
     """
     return
 
@@ -180,12 +179,11 @@ cdef class CosmicShapes:
         self.SAFE = 6
         self.start_time = start_time
         
-    def getDensProfs(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
-        """ Calculates density profiles for objects defined by indices found in `cat`
+    def getDensProfsDirectBinning(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+        """ Calculates density profiles for objects defined by indices found in `cat`    
         
-        
-        The number of enclosed particles calculation assumes masses are identical,
-        though easy to update.
+        Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.getMenclsBruteForce()`` instead of
+            ``CythonHelpers.getDensProfBruteForce()``
         
         :param cat: list of indices defining the objects
         :type cat: list of length N1, each consisting of a list of int indices
@@ -209,9 +207,41 @@ cdef class CosmicShapes:
         :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
         :type CENTER: str
-        :return: ROverR200 array, enclosed mass profiles, enclosed average density profiles, 
-            enclosed number of particles profiles, density profiles
-        :rtype: (N3,) float array, (nb_keep, N3) float and int arrays"""
+        :return: ROverR200 array, density profiles
+        :rtype: (N3,) float array, (nb_keep, N3) float array"""
+        
+        return
+    
+    def getDensProfsKernelBased(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+        """ Calculates kernel-based density profiles for objects defined by indices found in `cat`
+        
+        Note: For background on this kernel-based method consult Reed et al. 2003, 
+            https://arxiv.org/abs/astro-ph/0312544.
+        
+        :param cat: list of indices defining the objects
+        :type cat: list of length N1, each consisting of a list of int indices
+        :param xyz: positions of all simulation particles
+        :type xyz: (N2,3) floats, N2 >> N1
+        :param obj_keep: which objects among the N1 different ones to consider. 1: keep, 0: ignore
+            This can be used to select objects within a certain mass range, for instance. Having
+            a 1 where `cat` has an empty list entry is not permitted.
+        :type obj_keep: (N1,) ints
+        :param masses: masses of all simulation particles
+        :type masses: (N2,) floats
+        :param centers: centers of the objects
+        :type centers: (N1,3) floats
+        :param r200s: R200 values of the objects
+        :type r200s: (N1,) floats
+        :param ROverR200: radii at which the density profiles should be calculated,
+            normalized by R200
+        :type ROverR200: (N3,) float array
+        :param L_BOX: box size
+        :type L_BOX: float
+        :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: ROverR200 array, density profiles
+        :rtype: (N3,) float array, (nb_keep, N3) float array"""
         
         return
     

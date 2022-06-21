@@ -39,20 +39,21 @@ MIN_NUMBER_DM_PTCS = 200
 CENTER = 'com'
 
 #################################### Generate 1 mock halo ######################################
-rho_0 = 10**(13) # Units are M_sun*h^2/Mpc^3
+tot_mass = 10**(12) # M_sun/h
+halo_res = 500000
 r_s = 0.5 # Units are Mpc/h
 alpha = 10
 beta = 3
 gamma = 1.1
 N_bin = 100
 a_max = 1 # Units are Mpc/h
-a = np.logspace(-1.5,0,N_bin)*a_max # Units are Mpc/h
+a = np.logspace(-1.5,0.2,N_bin)*a_max # Units are Mpc/h
 b = a # Units are Mpc/h. The more b differs from a, the more biased the spherically averaged density profile.
 c = a # Units are Mpc/h
-rho_res = 100
-r_over_rvir = np.logspace(-1.5,0,rho_res)
+rho_res = 50
+r_over_rvir = np.logspace(-1.5,0,rho_res) # Estimate density profile out to the virial radius.
 
-halo_x, halo_y, halo_z, mass_dm = genAlphaBetaGammaHalo(N0, alpha, beta, gamma, rho_0, r_s, a, b, c)
+halo_x, halo_y, halo_z, mass_dm, rho_0 = genAlphaBetaGammaHalo(tot_mass, halo_res, alpha, beta, gamma, r_s, a, b, c)
 halo_x += L_BOX/2 # Move mock halo into the middle of the simulation box
 halo_y += L_BOX/2
 halo_z += L_BOX/2
@@ -69,12 +70,15 @@ cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ
 
 ############################## Calculate Density Profile #######################################
 # Visualize density profile: A sample output is shown above!
-dens_profs = cshapes.calcDensProfs(r_over_rvir)
-dens_prof = dens_profs[0]
+dens_profs_db = cshapes.calcDensProfsDirectBinning(r_over_rvir)
+dens_profs_kb = cshapes.calcDensProfsKernelBased(r_over_rvir)
+dens_prof_db = dens_profs_db[0]
+dens_prof_kb = dens_profs_kb[0]
 plt.figure()
-plt.loglog(r_over_rvir, dens_prof, label='inferred')
-plt.loglog(r_over_rvir, getAlphaBetaGammaProf(r_over_rvir*r_vir[0], alpha, beta, gamma, rho_0, r_s), label=r'target: $\alpha$ = {:.1f}, $\beta$ = {:.1f}, $\gamma$ = {:.1f}'.format(alpha, beta, gamma))
+plt.loglog(r_over_rvir, dens_prof_db, 'o--', label='direct binning', markersize = 3)
+plt.loglog(r_over_rvir, dens_prof_kb, 'o--', label='kernel-based', markersize = 3)
+plt.loglog(r_over_rvir, getAlphaBetaGammaProf(r_over_rvir*r_vir[0], alpha, beta, gamma, rho_0, r_s), lw = 1.0, label=r'target: $\alpha$ = {:.1f}, $\beta$ = {:.1f}, $\gamma$ = {:.1f}'.format(alpha, beta, gamma))
 plt.xlabel(r'r/$R_{\mathrm{vir}}$')
 plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
-plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right')
+plt.legend(fontsize="small", bbox_to_anchor=(0.95, 1), loc='upper right')
 plt.savefig('{}/RhoProfObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')

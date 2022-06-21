@@ -69,33 +69,39 @@ def getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s):
     return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
     
 @cython.embedsignature(True)
-def genAlphaBetaGammaHalo(N0, alpha, beta, gamma, rho_0, r_s, a, b, c):
+def genAlphaBetaGammaHalo(tot_mass, res, alpha, beta, gamma, r_s, a, b, c):
     
-    # For particle mass determination
-    def MassIntegrand(r, alpha, beta, gamma, rho_0, r_s):
-        return 4*np.pi*getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s)*r**2
-        
+    # Determine rho_0 in units of M_sun*h^2/Mpc^3
+    def getMassIntegrand0(r, alpha, beta, gamma, r_s):
+        return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+    rho_0 = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(alpha, beta, gamma, r_s))[0]
+    
+    # Determine number of particles in second shell (first proper shell)
+    def getMassIntegrand(r, alpha, beta, gamma, rho_0, r_s):
+        return 4*np.pi*r**2*getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s)
+    
+    # Determine radial bins
+    mass_1 = quad(getMassIntegrand, a[0], a[1], args=(alpha, beta, gamma, rho_0, r_s))[0] # Mass in shell 1 in units of M_sun/h
+    N1 = int(round(res*mass_1/tot_mass)) # Number of particles in shell 1. Rounding error is unavoidable.
+    
+    # Build up halo successively in onion-like fashion
     halo_x = np.empty(0)
     halo_y = np.empty(0)
     halo_z = np.empty(0)
-    
-    Nptc = np.zeros((a.shape[0],), dtype = np.int32)
-    # Note: Number of ptcs in shell Shell(0,a[idx],b[idx],c[idx])
-    for idx in range(a.shape[0]):
-        if idx > 0:
-            Nptc[idx] = int(round(N0*quad(MassIntegrand, a[idx-1], a[idx], args=(alpha, beta, gamma, rho_0, r_s))[0]/quad(MassIntegrand, 1e-8, a[0], args=(alpha, beta, gamma, rho_0, r_s))[0]))
+    Nptc = np.zeros((a.shape[0],), dtype = np.int32) # Note: Number of ptcs in shell Shell(0,a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
+    for shell in range(a.shape[0]):
+        if shell != 0:
+            Nptc[shell] = int(round(N1*quad(getMassIntegrand, a[shell-1], a[shell], args=(alpha, beta, gamma, rho_0, r_s))[0]/quad(getMassIntegrand, a[0], a[1], args=(alpha, beta, gamma, rho_0, r_s))[0]))
         else:
-            Nptc[idx] = N0
-    
-    with Pool(processes=openmp.omp_get_max_threads()) as pool:
-        results = pool.map(partial(drawUniformFromShell, 3, a, b, c, Nptc), [i for i in range(Nptc.shape[0])])
+            Nptc[shell] = int(round(N1*quad(getMassIntegrand, 1e-8, a[0], args=(alpha, beta, gamma, rho_0, r_s))[0]/quad(getMassIntegrand, a[0], a[1], args=(alpha, beta, gamma, rho_0, r_s))[0]))
+    with Pool(processes=1) as pool:
+        results = pool.map(partial(drawUniformFromShell, 3, a, b, c, Nptc), [idx for idx in range(Nptc.shape[0])]) # Draws from Shell(0,a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
     for result in results:
         halo_x = np.hstack((halo_x, result[:,0]))
         halo_y = np.hstack((halo_y, result[:,1]))
         halo_z = np.hstack((halo_z, result[:,2]))
-    mass_dm = quad(MassIntegrand, 1e-8, a[-1], args=(alpha, beta, gamma, rho_0, r_s))[0]/halo_z.shape[0]    
-    
-    return halo_x, halo_y, halo_z, mass_dm
+    mass_dm = quad(getMassIntegrand, 1e-8, a[-1], args=(alpha, beta, gamma, rho_0, r_s))[0]/halo_z.shape[0]    
+    return halo_x, halo_y, halo_z, mass_dm, rho_0
 
 @cython.embedsignature(True)
 cdef class CosmicShapes:
@@ -131,9 +137,11 @@ cdef class CosmicShapes:
         self.SAFE = 6
         self.start_time = start_time
     
-    def getDensProfs(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+    def getDensProfsDirectBinning(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
         
         cdef int nb_objs = len(cat)
+        # Determine endpoints of radial bins
+        cdef float[:] rad_bins = np.hstack(([np.float32(1e-8), (ROverR200.base[:-1] + ROverR200.base[1:])/2., ROverR200.base[-1]])) # Length = ROverR200.shape[0]+1
         cdef int r_res = ROverR200.shape[0]
         cdef int p
         cdef int n
@@ -162,7 +170,7 @@ cdef class CosmicShapes:
         idxs_keep.base[obj_keep.base.nonzero()[0]] = np.arange(np.sum(obj_keep.base))
         cdef float[:,:] dens_profs = np.zeros((nb_keep, r_res), dtype = np.float32)
         cdef float[:,:] Mencls = np.zeros((nb_keep, r_res), dtype = np.float32)
-        cdef float[:,:] ROverR200_tiled = np.reshape(np.tile(ROverR200.base, reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), r_res))
+        cdef float[:,:] rad_bins_tiled = np.reshape(np.tile(rad_bins.base, reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), r_res+1))
         cdef int[:,:] shell = np.zeros((openmp.omp_get_max_threads(), cat_arr.shape[1]), dtype = np.int32)
         cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), cat_arr.shape[1], 3), dtype = np.float32)
         cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), cat_arr.shape[1]), dtype = np.float32)
@@ -180,15 +188,67 @@ cdef class CosmicShapes:
                     xyz_obj[openmp.omp_get_thread_num(),n] = xyz[cat_arr[idxs_compr[p],n]]
                     m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                 xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-                dens_profs[idxs_keep[p]] = CythonHelpers.getDensProfBruteForce(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], centers[idxs_compr[p]], r200s[p], ROverR200_tiled[openmp.omp_get_thread_num()], dens_profs[idxs_keep[p]], shell[openmp.omp_get_thread_num()])
-                Mencls[idxs_keep[p]] = CythonHelpers.getMenclsBruteForce(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], centers[idxs_compr[p]], r200s[p], ROverR200_tiled[openmp.omp_get_thread_num()], Mencls[idxs_keep[p]], shell[openmp.omp_get_thread_num()])
-        rho_encls = np.zeros_like(Mencls.base, dtype = np.float32)
-        for p in range(nb_keep):
-            rho_encls[p] = np.divide(Mencls.base[p], 4/3*pi*(ROverR200.base*r200s[p])**3)
-        N_encls = np.zeros_like(Mencls.base, dtype = np.float32)
-        for p in range(nb_keep):
-            N_encls[p] = Mencls.base[p]/masses[0]
-        return ROverR200.base, Mencls.base, rho_encls, N_encls, dens_profs.base
+                dens_profs[idxs_keep[p]] = CythonHelpers.getDensProfBruteForce(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], centers[idxs_compr[p]], r200s[p], rad_bins_tiled[openmp.omp_get_thread_num()], dens_profs[idxs_keep[p]], shell[openmp.omp_get_thread_num()])
+        
+        return ROverR200.base, dens_profs.base
+    
+    def getDensProfsKernelBased(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+        
+        cdef int nb_objs = len(cat)
+        cdef int r_res = ROverR200.shape[0]
+        cdef int p
+        cdef int r_idx
+        cdef int n
+        cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
+        cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
+        for p in range(nb_objs):
+            if cat[p] != []: # Only add objects that have sufficient resolution
+                obj_size[p] = len(cat[p])
+                obj_pass[p] = 1
+            else:
+                if obj_keep[p] == 1:
+                    raise ValueError("Having a 1 in obj_keep for an object for which cat is empty is not allowed.")
+        cdef int nb_pass = np.sum(obj_pass.base)
+        cdef int nb_keep = np.sum(obj_keep.base)
+        if nb_objs == 0:
+            return ROverR200.base, np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32)
+        # Transform cat to int[:,:]
+        cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(cat[p]) for p in range(nb_objs)])), dtype = np.int32)
+        cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
+        idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
+        for p in range(nb_objs):
+            if obj_pass[p] == 1:
+                cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(cat[p])
+        # Define memoryviews
+        cdef int[:] idxs_keep = np.zeros((nb_objs,), dtype = np.int32)
+        idxs_keep.base[obj_keep.base.nonzero()[0]] = np.arange(np.sum(obj_keep.base))
+        cdef float[:,:] dens_profs = np.zeros((nb_keep, r_res), dtype = np.float32)
+        cdef float[:,:] Mencls = np.zeros((nb_keep, r_res), dtype = np.float32)
+        cdef int[:] shell = np.zeros((cat_arr.shape[1]), dtype = np.int32)
+        cdef float[:,:] xyz_obj = np.zeros((cat_arr.shape[1], 3), dtype = np.float32)
+        cdef float[:] m_obj = np.zeros((cat_arr.shape[1]), dtype = np.float32)
+        cdef float[:,:] centers = np.zeros((nb_pass,3), dtype = np.float32)
+        cdef float[:] dists = np.zeros((cat_arr.shape[1],), dtype = np.float32) # Distances from center of halo
+        cdef float[:] hs = np.zeros((cat_arr.shape[1],), dtype = np.float32) # Kernel widths
+        for p in range(nb_objs): # Calculate centers of objects
+            if obj_pass[p] == 1:
+                xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
+                if CENTER == 'mode':
+                    centers.base[p] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                else:
+                    centers.base[p] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+            if obj_keep[p] == 1:
+                for n in range(obj_size[p]):
+                    xyz_obj[n] = xyz[cat_arr[idxs_compr[p],n]]
+                    m_obj[n] = masses[cat_arr[idxs_compr[p],n]]
+                xyz_obj[:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[:obj_size[p]], L_BOX)
+                dists = np.linalg.norm(xyz_obj.base[:obj_size[p]]-centers.base[idxs_compr[p]], axis = 1)
+                hs = 0.005*ROverR200[-1]*r200s[p]*(dists.base/(ROverR200[-1]*r200s[p]))**(0.5)
+                for r_idx in prange(r_res, schedule = 'dynamic', nogil = True):
+                    for n in range(obj_size[p]):
+                        dens_profs[idxs_keep[p]][r_idx] += m_obj[n]*CythonHelpers.getKTilde(ROverR200[r_idx]*r200s[p], dists[n], hs[n])/(hs[n]**3)
+        
+        return ROverR200.base, dens_profs.base
     
     cdef float[:] runS1(self, float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN) nogil:
         
@@ -1219,7 +1279,7 @@ cdef class CosmicShapesDirect(CosmicShapes):
                       
                     fontP = FontProperties()
                     fontP.set_size('xx-small')
-                    plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)   
+                    plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
                     plt.xlabel(r"x (cMpc/h)")
                     plt.ylabel(r"y (cMpc/h)")
                     ax.set_zlabel(r"z (cMpc/h)")
@@ -1233,10 +1293,16 @@ cdef class CosmicShapesDirect(CosmicShapes):
         suffix = '_'
         getGlobalEpsHisto(cat, self.xyz, self.masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
 
-    def calcDensProfs(self, ROverR200):
+    def calcDensProfsDirectBinning(self, ROverR200):
         
         obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
-        ROverR200, Mencls, rho_encls, N_encls, dens_profs = self.getDensProfs(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
+        ROverR200, dens_profs = self.getDensProfsDirectBinning(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
+        return dens_profs
+    
+    def calcDensProfsKernelBased(self, ROverR200):
+        
+        obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
+        ROverR200, dens_profs = self.getDensProfsKernelBased(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
         return dens_profs
 
 cdef class CosmicShapesGadgetHDF5(CosmicShapes):
@@ -1831,7 +1897,7 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
             del d; del q; del s; del minor; del inter; del major; del halos_center; del halo_m
             del dm_xyz; del dm_masses; del dm_velxyz
             
-    def calcDensProfs(self, ROverR200, obj_type = ''):
+    def calcDensProfsDirectBinning(self, ROverR200, obj_type = ''):
         
         if obj_type == 'dm':
             with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
@@ -1846,7 +1912,25 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         else:
             raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
         obj_keep = np.int32([1 if x != [] else 0 for x in cat])
-        ROverR200, Mencls, rho_encls, N_encls, dens_profs = self.getDensProfs(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
+        ROverR200, dens_profs = self.getDensProfsDirectBinning(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
+        return dens_profs
+    
+    def calcDensProfsKernelBased(self, ROverR200, obj_type = ''):
+        
+        if obj_type == 'dm':
+            with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                cat = json.load(filehandle)
+            xyz, masses, smoothing, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
+            del smoothing; del velxyz
+        elif obj_type == 'gx':
+            with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                cat = json.load(filehandle)
+            xyz, fof_com, sh_com, nb_shs, masses, smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
+            del smoothing; del fof_com; del sh_com; del nb_shs; del is_star
+        else:
+            raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
+        obj_keep = np.int32([1 if x != [] else 0 for x in cat])
+        ROverR200, dens_profs = self.getDensProfsKernelBased(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
         return dens_profs
     
     def plotGlobalEpsHisto(self, obj_type = ''):
