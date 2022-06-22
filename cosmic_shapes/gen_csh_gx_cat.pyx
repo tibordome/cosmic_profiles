@@ -70,19 +70,19 @@ def getGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER
     for p in prange(nb_halos, schedule = 'dynamic', nogil = True):
         if nb_shs[p] == 0: # There is no Halo, so add all the "inner fuzz" to the catalogue
             if fof_gx_size[p] != 0: # If there is not even any "inner fuzz", return nothing
-                if fof_gx_size[p] >= MIN_NUMBER_STAR_PTCS: # Only add halos that have sufficient resolution
+                if fof_gx_size[p] >= MIN_NUMBER_STAR_PTCS: # Only add gxs that have sufficient resolution
                     gx_pass[p] = 1
                     gx_size[p] = fof_gx_size[p]
         else:
             idx_sum = 0
             for q in range(p):
                 idx_sum = idx_sum+nb_shs[q]
-            if sh_len_gx[idx_sum] >= MIN_NUMBER_STAR_PTCS: # Only add halos that have sufficient resolution
+            if sh_len_gx[idx_sum] >= MIN_NUMBER_STAR_PTCS: # Only add gxs that have sufficient resolution
                 gx_pass[p] = 1
                 gx_size[p] = sh_len_gx[idx_sum]
     if nb_halos == 0:
         return np.zeros((0,0), dtype = np.int32), np.zeros((0,), dtype = np.float32)
-    cdef int[:,:] gx_cat = np.zeros((np.sum(gx_pass.base),np.max(gx_size.base)), dtype = np.int32) # Halo catalogue (1 halo ~ Halo is the unit), DM particle indices in each Halo, empty list entry [] if Halo is empty 
+    cdef int[:,:] gx_cat = np.zeros((np.sum(gx_pass.base),np.max(gx_size.base)), dtype = np.int32) # Gx catalogue, empty list entry [] if gx has too low resolution
     cdef int[:] idxs_compr = np.zeros((nb_halos,), dtype = np.int32)
     idxs_compr.base[gx_pass.base.nonzero()[0]] = np.arange(np.sum(gx_pass.base))
     for p in prange(nb_halos, schedule = 'dynamic', nogil = True):

@@ -426,9 +426,9 @@ def drawUniformFromShell(dims, a_vec, b_vec, c_vec, Nptc, shell_nb):
     The approach is taken from Rubinstein & Kroese 2007:\n
     Part 1: Generating uniform random vectors inside the 3-ball\n
     Part 2: Lower Cholesky decomposition\n
-    Part 3: Draw uniformly from 
-    Part 4: Move ptcs from ellipsoid Ell(a[shell_nb], b[shell_nb], c[shell_nb]) 
-    into shell Shell(a[shell_nb], b[shell_nb], c[shell_nb])
+    Part 3: Draw uniformly from Ball(a[shell_nb])
+    Part 4: Move ptcs from ball Ball(a[shell_nb]) into ellipsoidal
+    shell Shell(a[shell_nb-1],b[shell_nb-1],c[shell_nb-1],a[shell_nb],b[shell_nb],c[shell_nb])
     
     :param dims: number of dimensions of 'ellipsoid', either 2,
         in which case c remains 'None', or 3
@@ -439,7 +439,8 @@ def drawUniformFromShell(dims, a_vec, b_vec, c_vec, Nptc, shell_nb):
     :type b: float array, units are Mpc/h
     :param c: minor axis array
     :type c: float array, units are Mpc/h
-    :param Nptc: number of particles in each shell Shell(a[shell_nb], b[shell_nb], c[shell_nb]).
+    :param Nptc: number of particles in each shell 
+        Shell(a[shell_nb-1],b[shell_nb-1],c[shell_nb-1],a[shell_nb],b[shell_nb],c[shell_nb]).
     :type Nptc: int array
     :param shell_nb: shell number of interest
     :type shell_nb: int
@@ -454,7 +455,6 @@ def drawUniformFromShell(dims, a_vec, b_vec, c_vec, Nptc, shell_nb):
 
     # Part 1: Generating uniform random vectors inside the 3-ball
     a = a_vec[shell_nb]
-    b = b_vec[shell_nb]
     c = c_vec[shell_nb]
     N_reals = Nptc[shell_nb]
     X_tmp = np.zeros((N_reals, dims))
@@ -465,25 +465,25 @@ def drawUniformFromShell(dims, a_vec, b_vec, c_vec, Nptc, shell_nb):
         R = (np.random.uniform(0,1,1))**(1/dims)
         Z[i] = R*X_tmp[i]/np.linalg.norm(X_tmp[i])
     
-    # Part 2: lower Cholesky decomposition
+    # Part 2: Lower Cholesky decomposition
     if c == None:
-        Sigma = np.array([[1/a**2, 0],[0,1/b**2]])
+        Sigma = np.array([[1/a**2, 0],[0,1/a**2]])
     else:
-        Sigma = np.array([[1/a**2, 0,0],[0,1/b**2,0],[0,0,1/c**2]])
+        Sigma = np.array([[1/a**2, 0,0],[0,1/a**2,0],[0,0,1/a**2]])
     L = cholesky(Sigma, lower=True)
     
-    # Part 3: Draw uniform random vectors from Ellipsoid
+    # Part 3: Draw uniform random vectors from Ball
     X = np.zeros((N_reals, dims))
     inv_ = inv(L.T)
     for pt in range(N_reals):
         X[pt] = np.dot(inv_,Z[pt])
         
-    # Part 4: Move particles from Ellipsoid into Shell
+    # Part 4: Move particles from Ball into Ellipsoidal Shell
     def transformCartToSpher(xyz):
         ptsnew = np.zeros(xyz.shape)
         xy = xyz[:,0]**2 + xyz[:,1]**2
         ptsnew[:,0] = np.sqrt(xy + xyz[:,2]**2)
-        ptsnew[:,1] = np.arctan2(np.sqrt(xy), xyz[:,2]) # for elevation angle defined from Z-axis down
+        ptsnew[:,1] = np.arctan2(np.sqrt(xy), xyz[:,2]) # For elevation angle defined from Z-axis down
         ptsnew[:,2] = np.arctan2(xyz[:,1], xyz[:,0])
         return ptsnew
     
@@ -496,7 +496,7 @@ def drawUniformFromShell(dims, a_vec, b_vec, c_vec, Nptc, shell_nb):
     y_new = np.sin(X_sph[:,1])*np.sin(X_sph[:,2])*b_target
     z_new = np.cos(X_sph[:,1])*c_target
     Y = np.hstack((np.reshape(x_new, (x_new.shape[0],1)), np.reshape(y_new, (y_new.shape[0],1)), np.reshape(z_new, (z_new.shape[0],1))))
-    # All ptcs in Y fulfill inShell(Y[pt], a_vec, b_vec, c_vec, shell_nb) == True.
+    # All ptcs pt in Y fulfill inShell(Y[pt], a_vec, b_vec, c_vec, shell_nb) == True.
     return Y
 
 def respectPBCNoRef(xyz, L_BOX):

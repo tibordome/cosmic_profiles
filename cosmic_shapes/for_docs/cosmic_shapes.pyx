@@ -45,7 +45,7 @@ def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
     
     :param BoxSize: size of to-be-obtained simulation box
     :type BoxSize: float
-    :param nbar: number density of points (i.e. sampling density / resolution) in box, units: 1/(cMpc/h)**3
+    :param nbar: number density of points (i.e. sampling density / resolution) in box, units: 1/(Mpc/h)**3
         Note: ``nbar`` is assumed to be constant across the box
     :type nbar: float
     :param redshift: redshift of interest
@@ -83,25 +83,66 @@ def getAlphaBetaGammaProf(r, alpha, beta, gamma, rho_0, r_s):
     return
 
 @cython.embedsignature(True)
-def genAlphaBetaGammaHalo(tot_mass, res, alpha, beta, gamma, r_s, a, b, c):
+def getEinastoProf(r, rho_2, r_2, alpha):
+    """ Get Einasto profile
+    
+    :param r: radii at which profile should be returned
+    :type r: float array, units of Mpc/h
+    :param rho_2: ``rho_2`` parameter in Einasto density profile (density at the center)
+    :type rho_2: float, units are M_sun*h^2/Mpc^3
+    :param r_2: ``r_2`` parameter in Einasto density profile (scale radius)
+    :type r_2: float
+    :param alpha: ``alpha`` parameter in Einasto density profile
+    :type alpha: float
+    :return: profile values
+    :rtype: float array
+    """
+    return
+
+@cython.embedsignature(True)
+def getNFWProf(r, rho_s, r_s):
+    """ Get NFW profile
+    
+    :param r: radii at which profile should be returned
+    :type r: float array, units of Mpc/h
+    :param rho_s: ``rho_s`` parameter in NFW density profile (density at the center)
+    :type rho_s: float, units are M_sun*h^2/Mpc^3
+    :param r_s: ``r_s`` parameter in NFW density profile (scale radius)
+    :type r_s: float
+    :return: profile values
+    :rtype: float array
+    """
+    return
+
+@cython.embedsignature(True)
+def getHernquistProf(r, rho_s, r_s):
+    """ Get Hernquist profile
+    
+    :param r: radii at which profile should be returned
+    :type r: float array, units of Mpc/h
+    :param rho_s: ``rho_s`` parameter in Hernquist density profile (density at the center)
+    :type rho_s: float, units are M_sun*h^2/Mpc^3
+    :param r_s: ``r_s`` parameter in Hernquist density profile (scale radius)
+    :type r_s: float
+    :return: profile values
+    :rtype: float array
+    """
+    return    
+
+@cython.embedsignature(True)
+def genHalo(tot_mass, res, model_pars, method, a, b, c):
     """ Mock halo generator
     
-    Create mock halo consisting of ``N_min`` particles in 1st shell. The alpha-beta-gamma 
-    density profile is a generalization of the Navarro-Frank-White (NFW) profile. Its definition
-    can be looked up in Zemp et al 2011, https://arxiv.org/abs/1107.5582.
+    Create mock halo of mass ``tot_mass`` consisting of approximately ``res`` particles. The ``model_pars``
+    array contains the parameters for the profile model given in ``method``. 
     
     :param tot_mass: total target mass of halo, in units of M_sun*h^2/Mpc^3
     :type tot_mass: float
     :param res: halo resolution
     :type res: int
-    :param alpha: ``alpha`` parameter in alpha-beta-gamma density profile
-    :type alpha: float
-    :param beta: ``beta`` parameter in alpha-beta-gamma density profile 
-    :type beta: float
-    :param gamma: ``gamma`` parameter in alpha-beta-gamma density profile 
-    :type gamma: float
-    :param r_s: ``r_s`` parameter in alpha-beta-gamma density profile (scale radius)
-    :type r_s: float
+    :param model_pars: parameters (except for ``rho_0`` which will be deduced from ``tot_mass``)
+        in density profile model
+    :type model_pars: float array (of length 4, 2 or 1)
     :param a: major axis array
     :type a: float array, units are Mpc/h
     :param b: intermediate axis array
@@ -109,7 +150,7 @@ def genAlphaBetaGammaHalo(tot_mass, res, alpha, beta, gamma, r_s, a, b, c):
     :param c: minor axis array
     :type c: float array, units are Mpc/h
     :return: halo_x, halo_y, halo_z: arrays containing positions of halo particles, 
-        mass_ptc: mass of each DM ptc in units of M_sun/h
+        mass_ptc: mass of each DM ptc in units of M_sun/h, rho_0: ``rho_0`` parameter in profile model
     :rtype: 3 (N,) float arrays, 2 floats
     """
     return
@@ -118,9 +159,12 @@ def genAlphaBetaGammaHalo(tot_mass, res, alpha, beta, gamma, r_s, a, b, c):
 cdef class CosmicShapes:
     """ Parent class governing low-level cosmic shape calculations
     
-    Its public methods are ``runS1()``, ``runE1()``, ``runE1VelDisp()``, ``getObjMorphLocal()``, ``getObjMorphGlobal()``, 
+    Its public methods are ``fetchCatLocal()``, ``fetchCatGlobal()``, ``getDensProfsDirectBinning()``,
+    ``getDensProfsKernelBased()``, ``runS1()``, ``runE1()``, ``runE1VelDisp()``, ``getObjMorphLocal()``, ``getObjMorphGlobal()``, 
     ``getObjMorphLocalVelDisp()``, ``getObjMorphGlobalVelDisp()``, ``getMorphLocal()``, ``getMorphGlobal()``, 
-    ``getMorphLocalVelDisp()``, ``getMorphGlobalVelDisp()``, ``drawShapeCurves()``, ``plotLocalTHisto()``"""
+    ``getMorphLocalVelDisp()``, ``getMorphGlobalVelDisp()``, ``drawShapeProfiles()``, ``plotLocalTHisto()``, 
+    ``fitDensProfs()``, ``fetchDensProfsBestFits()``, ``fetchDensProfsDirectBinning()``,
+    ``fetchDensProfsKernelBased()`` and ``fetchShapeCat()``."""
     cdef str CAT_DEST
     cdef str VIZ_DEST
     cdef float L_BOX
@@ -132,7 +176,7 @@ cdef class CosmicShapes:
     cdef int N_WALL
     cdef int N_MIN
     cdef str CENTER
-    cdef float SAFE # Units: cMpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
+    cdef float SAFE # Units: Mpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
     cdef double start_time
     
     def __init__(self, str CAT_DEST, str VIZ_DEST, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
@@ -142,7 +186,7 @@ cdef class CosmicShapes:
         :param VIZ_DEST: visualisation folder destination
         :type VIZ_DEST: string
         :param L_BOX: simulation box side length
-        :type L_BOX: float, units: cMpc/h
+        :type L_BOX: float, units: Mpc/h
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -178,12 +222,60 @@ cdef class CosmicShapes:
         self.CENTER = CENTER
         self.SAFE = 6
         self.start_time = start_time
+    
+    def calcMassesCenters(self, cat, float[:,:] xyz, float[:] masses, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
+        """ Calculate total mass and centers of objects
         
-    def getDensProfsDirectBinning(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+        :param cat: list of indices defining the objects
+        :type cat: list of length N1, each consisting of a list of int indices
+        :param xyz: positions of all simulation particles
+        :type xyz: (N2,3) floats, N2 >> N1
+        :param masses: masses of all simulation particles
+        :type masses: (N2,) floats
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param L_BOX: box size
+        :type L_BOX: float
+        :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return centers, m: centers and masses
+        :rtype: (N,3) and (N,) floats"""
+        return
+    
+    def fetchMassesCenters(self, obj_type):
+        """ Calculate total mass and centers of objects
+        
+        :param obj_type: either 'dm' or 'gx' for CosmicShapesGadgetHDF5 or '' for CosmicShapesDirect
+        :type obj_type: string
+        :return centers, m: centers and masses
+        :rtype: (N,3) and (N,) floats"""
+        return
+    
+    def fetchCatLocal(self, obj_type = 'dm'):
+        """ Fetch local halo/gx catalogue
+        
+        :param obj_type: either 'dm' or 'gx' for CosmicShapesGadgetHDF5 or '' for CosmicShapesDirect
+        :type obj_type: string
+        :return cat_local: list of indices defining the objects
+        :type cat_local: list of length N1, each consisting of a list of int indices"""
+        
+        return
+    
+    def fetchCatGlobal(self, obj_type = 'dm'):
+        """ Fetch global halo/gx catalogue
+        
+        :param obj_type: either 'dm' or 'gx' for CosmicShapesGadgetHDF5 or '' for CosmicShapesDirect
+        :type obj_type: string
+        :return cat_global: list of indices defining the objects
+        :type cat_global: list of length N1, each consisting of a list of int indices"""
+        
+        return
+    
+    def getDensProfsDirectBinning(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
         """ Calculates density profiles for objects defined by indices found in `cat`    
         
-        Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.getMenclsBruteForce()`` instead of
-            ``CythonHelpers.getDensProfBruteForce()``
+        Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.getMenclsBruteForce()`` instead of ``CythonHelpers.getDensProfBruteForce()``
         
         :param cat: list of indices defining the objects
         :type cat: list of length N1, each consisting of a list of int indices
@@ -202,6 +294,8 @@ cdef class CosmicShapes:
         :param ROverR200: radii at which the density profiles should be calculated,
             normalized by R200
         :type ROverR200: (N3,) float array
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for density profile calculation
+        :type MIN_NUMBER_PTCS: int
         :param L_BOX: box size
         :type L_BOX: float
         :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -212,11 +306,10 @@ cdef class CosmicShapes:
         
         return
     
-    def getDensProfsKernelBased(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+    def getDensProfsKernelBased(cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:,:] centers, float[:] r200s, float[:] ROverR200, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
         """ Calculates kernel-based density profiles for objects defined by indices found in `cat`
         
-        Note: For background on this kernel-based method consult Reed et al. 2003, 
-            https://arxiv.org/abs/astro-ph/0312544.
+        Note: For background on this kernel-based method consult Reed et al. 2003, https://arxiv.org/abs/astro-ph/0312544.
         
         :param cat: list of indices defining the objects
         :type cat: list of length N1, each consisting of a list of int indices
@@ -235,6 +328,8 @@ cdef class CosmicShapes:
         :param ROverR200: radii at which the density profiles should be calculated,
             normalized by R200
         :type ROverR200: (N3,) float array
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for density profile calculation
+        :type MIN_NUMBER_PTCS: int
         :param L_BOX: box size
         :type L_BOX: float
         :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -595,7 +690,7 @@ cdef class CosmicShapes:
         :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
         :type r200: list of length N2
         :param L_BOX: simulation box side length
-        :type L_BOX: float, units: cMpc/h
+        :type L_BOX: float, units: Mpc/h
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -636,7 +731,7 @@ cdef class CosmicShapes:
         :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
         :type r200: list of length N2
         :param L_BOX: simulation box side length
-        :type L_BOX: float, units: cMpc/h
+        :type L_BOX: float, units: Mpc/h
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
@@ -673,7 +768,7 @@ cdef class CosmicShapes:
         :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
         :type r200: list of length N2
         :param L_BOX: simulation box side length
-        :type L_BOX: float, units: cMpc/h
+        :type L_BOX: float, units: Mpc/h
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -712,10 +807,10 @@ cdef class CosmicShapes:
         :type cat: list of length N2
         :param masses: masses of the particles expressed in unit mass
         :type masses: (N1 x 1) floats
-        :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
-        :type r200: list of length N2
+        :param r200: R_200 (mean not critical) radii of the parent halos
+        :type r200: (N2,) floats
         :param L_BOX: simulation box side length
-        :type L_BOX: float, units: cMpc/h
+        :type L_BOX: float, units: Mpc/h
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
@@ -735,8 +830,8 @@ cdef class CosmicShapes:
         
         return
     
-    def drawShapeCurves(self, obj_type = ''):
-        """ Draws some simplistic shape curves
+    def drawShapeProfiles(self, obj_type = ''):
+        """ Draws some simplistic shape profiles
         
         :param obj_type: either 'dm' or 'gx' for CosmicShapesGadgetHDF5 or '' for CosmicShapesDirect
         :type obj_type: string"""
@@ -749,13 +844,79 @@ cdef class CosmicShapes:
         :type obj_type: string"""
         return
     
+    def fitDensProfs(self, dens_profs, ROverR200, cat, r200s, method = 'einasto'):
+        """ Fit the density profiles ``dens_profs``, defined at ``ROverR200``
+        
+        The fit assumes a density profile model specified in ``method``
+        
+        :param dens_profs: density profiles to be fit, units are irrelevant since fitting
+            will be done on normalized profiles
+        :type dens_profs: (N2, r_res) floats
+        :param ROverR200: radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object,
+            list is non-entry for an object only if ``dens_profs`` has a corresponding row
+        :type cat: list of length N
+        :param r200s: R_200 (mean not critical) radii of the parent halos
+        :type r200s: (N,) floats, N > N2
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        """
+        return
+    
+    def fetchDensProfsBestFits(self, method):
+        """ Fetch best-fit results for density profile fitting
+        
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :return: best-fits for each object, and normalized radii used to calculate best-fits
+        :rtype: (N2, n) floats, where n is the number of free parameters in the model ``method``,
+            and (N3,) floats"""
+    
+    def fetchDensProfsDirectBinning(self):
+        """ Fetch direct-binning-based density profiles
+        
+        For this method to succeed, the density profiles must have been calculated
+        and stored beforehand, preferably via calcDensProfsDirectBinning.
+        
+        :return: density profiles, and normalized radii at which these are defined
+        :rtype: (N2, n) floats, where n is the number of free parameters in the model,
+            and (N3,) floats"""
+        
+    def fetchDensProfsKernelBased(self):
+        """ Fetch kernel-based density profiles
+        
+        For this method to succeed, the density profiles must have been calculated
+        and stored beforehand, preferably via calcDensProfsKernelBased.
+        
+        :return: density profiles, and normalized radii at which these are defined
+        :rtype: (N2, n) floats, where n is the number of free parameters in the model,
+            and (N3,) floats"""
+    
+    def fetchShapeCat(self, local, obj_type):
+        """ Fetch all relevant shape-related data
+        
+        :param local: whether to read in local or global shape data
+        :type local: boolean
+        :param obj_type: either 'dm' or 'gx' or '' (latter in case of CosmicShapesDirect 
+            instance), depending on what object type we are interested in
+        :type obj_type: string
+        :return: obj_masses, obj_centers, d, q, s, major_full
+        :rtype: (number_of_objs,) float array, (number_of_objs, 3) float array, 3 x (number_of_objs, D_BINS+1) 
+            float arrays, (number_of_objs, D_BINS+1, 3) float array; D_BINS = self.D_BINS if 
+            local == True or D_BINS = 0
+        :raises:
+            ValueError: if some data is not yet available for loading"""
+        return
+    
 cdef class CosmicShapesDirect(CosmicShapes):
     """ Subclass to calculate morphology for already identified objects
     
     The particle indices of the objects identified are stored in ``cat``.\n
     
-    The public methods are ``calcGlobalShapes()``, ``calcLocalShapes()``,
-    ``plotGlobalEpsHisto()``, ``vizGlobalShapes()``, ``vizLocalShapes()``."""
+    The public methods are ``fetchCat()``, ``calcGlobalShapes()``, ``calcLocalShapes()``,
+    ``plotGlobalEpsHisto()``, ``vizGlobalShapes()``, ``vizLocalShapes()``, 
+    ``calcDensProfsDirectBinning()``, ``calcDensProfsKernelBased()`` and ``drawDensityProfiles()``."""
     
     cdef float[:,:] xyz
     cdef float[:] masses
@@ -768,7 +929,7 @@ cdef class CosmicShapesDirect(CosmicShapes):
         """      
         :param xyz: positions of all (DM or star) particles in simulation box
         :type xyz: (N1 x 3) floats
-        :param masses: masses of the particles expressed in unit mass
+        :param masses: masses of the particles expressed in unit mass (= 10^10 M_sun/h)
         :type masses: (N1 x 1) floats
         :param cat: each entry of the list is a list containing indices of particles belonging to an object
         :type cat: list of length N2
@@ -781,7 +942,7 @@ cdef class CosmicShapesDirect(CosmicShapes):
         :param SNAP: e.g. '024'
         :type SNAP: string
         :param L_BOX: simulation box side length
-        :type L_BOX: float, units: cMpc/h
+        :type L_BOX: float, units: Mpc/h
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -811,6 +972,13 @@ cdef class CosmicShapesDirect(CosmicShapes):
         self.r200 = r200
         self.SNAP = SNAP
         
+    def fetchCat(self):
+        """ Fetch catalogue
+        
+        :return cat: list of indices defining the objects
+        :type cat: list of length N1, each consisting of a list of int indices"""
+        return
+    
     def calcLocalShapes(self):   
         """ Calculates and saves local object shape catalogues"""       
         return
@@ -837,20 +1005,45 @@ cdef class CosmicShapesDirect(CosmicShapes):
         """ Plot ellipticity histogram"""
         return
     
-    def calcDensProfs(self, ROverR200):
-        """ Calculate density profiles
+    def calcDensProfsDirectBinning(self, ROverR200):
+        """ Calculate direct-binning-based density profiles
         
         :param ROverR200: At which unitless radial values to calculate density profiles
         :type ROverR200: float array"""
         return
         
+    def calcDensProfsKernelBased(self, ROverR200):
+        """ Calculate kernel-based density profiles
+        
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array"""
+        return
+    
+    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method):
+        """ Draws some simplistic density profiles
+        
+        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
+        :type dens_profs: (N2, r_res) floats
+        :param ROverR200: radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object,
+            list is non-entry for an object only if ``dens_profs`` has a corresponding row
+        :type cat: list of length N
+        :param r200s: R_200 (mean not critical) radii of the parent halos
+        :type r200s: (N,) floats, N > N2
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        """
+        return
+        
 cdef class CosmicShapesGadgetHDF5(CosmicShapes):
     """ Subclass to calculate morphology for yet to-be-identified objects in Gadget HDF5 simulation
     
-    The public methods are ``calcGlobalShapesDM()``, ``calcLocalShapesDM()``,
-    ``calcGlobalShapesGx()``, ``calcLocalShapesGx()``, ``calcGlobalVelShapesDM()``, 
+    The public methods are ``fetchR200s()``, ``fetchHaloCat()``, ``fetchGxCat()``, ``calcGlobalShapesDM()``, 
+    ``calcLocalShapesDM()``, ``calcGlobalShapesGx()``, ``calcLocalShapesGx()``, ``calcGlobalVelShapesDM()``, 
     ``calcLocalVelShapesDM()``, ``loadDMCat()``, ``plotGlobalEpsHisto()``, 
-    ``vizGlobalShapes()``, ``vizLocalShapes()``."""
+    ``vizGlobalShapes()``, ``vizLocalShapes()``, ``calcDensProfsDirectBinning()``,
+    ``calcDensProfsKernelBased()`` and ``drawDensityProfiles()``."""
     
     cdef str HDF5_SNAP_DEST
     cdef str HDF5_GROUP_DEST
@@ -874,7 +1067,7 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         :param SNAP_MAX: e.g. '024'
         :type SNAP_MAX: string
         :param L_BOX: simulation box side length
-        :type L_BOX: float, units: cMpc/h
+        :type L_BOX: float, units: Mpc/h
         :param MIN_NUMBER_PTCS: minimum number of particles for halo to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param MIN_NUMBER_STAR_PTCS: minimum number of particles for galaxy (to-be-identified) to qualify for morphology calculation
@@ -905,6 +1098,18 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         self.SNAP = SNAP
         self.SNAP_MAX = SNAP_MAX
                 
+    def fetchR200s(self):
+        """ Fetch the virial radii"""
+        return
+    
+    def fetchHaloCat(self):
+        """ Fetch halo catalogue"""
+        return
+    
+    def fetchGxCat(self):
+        """ Fetch gx catalogue"""
+        return
+    
     def vizLocalShapes(self, obj_numbers, obj_type = 'dm'):
         """ Visualize local shape of objects with numbers ``obj_numbers``"""
         return
@@ -944,23 +1149,33 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         return
     
     def calcLocalVelShapesDM(self):
-        """ Calculates and saves local velocity dispersion tensor shape catalogues"""      
+        """ Calculates and saves local velocity dispersion tensor shape catalogues"""
         return
     
     def calcGlobalVelShapesDM(self):
         """ Calculates and saves global velocity dispersion tensor shape catalogues"""      
         return
     
-    def calcDensProfs(self, ROverR200, obj_type = ''):
-        """ Calculate density profiles
+    def calcDensProfsDirectBinning(self, ROverR200, obj_type = ''):
+        """ Calculate direct-binning-based density profiles
         
         :param ROverR200: At which unitless radial values to calculate density profiles
         :type ROverR200: float array
         :param obj_type: either 'dm' or 'gx', depending on what catalogue 
             the ellipticity histogram should be plotted for
         :type obj_type: string
-        :return: density profiles
-        :rtype: (N,ROverR200.shape) float array"""
+        """
+        return
+        
+    def calcDensProfsKernelBased(self, ROverR200, obj_type = ''):
+        """ Calculate kernel-based density profiles
+        
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array
+        :param obj_type: either 'dm' or 'gx', depending on what catalogue 
+            the ellipticity histogram should be plotted for
+        :type obj_type: string
+        """
         return
     
     def plotGlobalEpsHisto(self, obj_type = ''):
@@ -968,5 +1183,23 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue 
             the ellipticity histogram should be plotted for
+        :type obj_type: string"""
+        return
+    
+    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method, obj_type = ''):
+        """ Draws some simplistic density profiles
+        
+        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
+        :type dens_profs: (N2, r_res) floats
+        :param ROverR200: radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object,
+            list is non-entry for an object only if ``dens_profs`` has a corresponding row
+        :type cat: list of length N
+        :param r200s: R_200 (mean not critical) radii of the parent halos
+        :type r200s: (N,) floats, N > N2
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param obj_type: either 'dm' or 'gx' for CosmicShapesGadgetHDF5 or '' for CosmicShapesDirect
         :type obj_type: string"""
         return

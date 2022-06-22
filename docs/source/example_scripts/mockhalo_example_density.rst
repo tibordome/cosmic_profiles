@@ -1,4 +1,4 @@
-Mock Halo Density Example
+Mock Halo, Density Profile
 ============================
 
 |pic1|

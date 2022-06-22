@@ -1,7 +1,7 @@
 .. _Shape Estimation:
 
-Shape Estimation
-=================
+Local and Global Shape Estimation
+=================================
 
 |pic1| |pic2|
 
@@ -25,11 +25,15 @@ The shape as a function of ellipsoidal radius can be described by the axis ratio
 
 .. math:: q = \frac{b}{r_{\text{ell}}}, \ \ s = \frac{c}{r_{\text{ell}}},
 
-where :math:`b` and :math:`c` are the eigenvalues corresponding to the intermediate and minor axes, respectively. The ratio of the minor-to-major axis :math:`s` has traditionally been used as a canonical measure of the distribution's sphericity. The axis ratios can be computed from the shape tensor :math:`S_{ij}`, which is the second moment of the mass distribution divided by the total mass:
+where :math:`b` and :math:`c` are the eigenvalues corresponding to the intermediate and minor axes, respectively. The ratio of the minor-to-major axis :math:`s` has traditionally been used as a canonical measure of the distribution's sphericity. A frequently quoted shape parameter is the triaxiality
+
+.. math:: T = \frac{1-q^2}{1-s^2},
+
+which measures the prolateness/oblateness of a halo. :math:`T = 1` describes a completely prolate halo, while :math:`T = 0` describes a completely oblate halo. Halos with :math:`0.33 < T < 0.67` are said to be triaxial. The axis ratios can be computed from the shape tensor :math:`S_{ij}`, which is the second moment of the mass distribution divided by the total mass:
 
 .. math:: S_{ij} = \frac{1}{\sum_k m_k} \sum_k m_k r^{\text{center}}_{k,i}r^{\text{center}}_{k,j}.
 
-Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r^{\text{center}}_{k,i}` is the :math:`i`-th centerponent of its position vector with respect to the distribution's center (either mode or center of mass).
+Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r^{\text{center}}_{k,i}` is the :math:`i`-th component of its position vector with respect to the distribution's center (either mode or center of mass).
 
 To calculate shape profiles with ``cosmic_shapes``, we first instantiate a ``CosmicShapes`` object. Let us assume we are dealing with
 
@@ -114,7 +118,11 @@ which will calculate and store the morphological information in ``CAT_DEST``. We
 Global Shapes
 ***************
 
-Instead of shape profiles one might also be interested in obtaining the shape parameters and principal axes of the point clouds as a whole. This information is dumped on request by calling ``cshapes.calcGlobalShapes()``. Again, invoke ``cshapes.calcGlobalShapesDM()`` to calculate global halo shapes and ``cshapes.calcGlobalShapesGx()`` to calculate global galaxy shapes, with suffixes adapted accordingly. In that case, additional output will be added to ``CAT_DEST``:
+Instead of shape profiles one might also be interested in obtaining the shape parameters and principal axes of the point clouds as a whole. This information is dumped on request by calling::
+
+    cshapes.calcGlobalShapes(). 
+
+In that case, additional output will be added to ``CAT_DEST``:
 
 * ``d_global_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
 * ``q_global_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter
@@ -126,13 +134,19 @@ Instead of shape profiles one might also be interested in obtaining the shape pa
 * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
 * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
+Again, invoke ``cshapes.calcGlobalShapesDM()`` to calculate global halo shapes and ``cshapes.calcGlobalShapesGx()`` to calculate global galaxy shapes, with suffixes adapted accordingly.
+
 .. note:: :math:`N_{\text{pass}}` denotes the number of halos that pass the ``MIN_NUMBER_PTCS``-threshold (or ``MIN_NUMBER_STAR_PTCS``-threshold in case of ``cshapes.calcGlobalShapesGx()``). If the global shape determination does not converge, it will appear as NaNs in the output.
 
 *************************************
 Velocity Dispersion Tensor Eigenaxes
 *************************************
 
-For Gadget-style HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling ``cshapes.calcGlobalVelShapesDM()`` for global velocity shapes or ``cshapes.calcLocalVelShapesDM()`` for local velocity shapes. In that case, additional output will be added to ``CAT_DEST``, reflecting the velocity-related morphological information:
+For Gadget-style HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling::
+
+    cshapes.calcGlobalVelShapesDM()
+
+for global velocity shapes or ``cshapes.calcLocalVelShapesDM()`` for local velocity shapes. In that case, additional output will be added to ``CAT_DEST``, reflecting the velocity-related morphological information:
 
 * ``d_global_vdm_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
 * ``q_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter

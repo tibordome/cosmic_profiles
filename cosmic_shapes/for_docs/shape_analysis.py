@@ -7,11 +7,12 @@ Created on Sun Mar 13 17:39:15 2022
 from scipy import stats
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import optimize
 from math import isnan
 from sklearn.utils import resample
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
-from python_helpers import eTo10, print_status
+from cosmic_shapes.python_helpers import eTo10, print_status
 from scipy.spatial.transform import Rotation as R
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -49,7 +50,7 @@ def respectPBC(xyz, L_BOX):
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats
     :param L_BOX: simulation box side length
-    :type L_BOX: float, units: cMpc/h
+    :type L_BOX: float, units: Mpc/h
     :return: updated coordinates of particles of type 1 or type 4
     :rtype: (N^3x3) floats"""
     xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
@@ -74,7 +75,7 @@ def getEpsilon(cat, xyz, masses, L_BOX, angle=0.0):
     :param masses: masses of particles of type 1 or type 4
     :type masses: (N^3x1) floats
     :param L_BOX: simulation box side length
-    :type L_BOX: float, units: cMpc/h
+    :type L_BOX: float, units: Mpc/h
     :param angle: rotation of objects around z-axis before ellipticity is calculated (z-projected)
     :type angle: float
     :return: complex ellipticity
@@ -259,8 +260,8 @@ def getShape(R, d, param_interest, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS):
     :type R: (N,) floats
     :param d: param_interest is defined at all elliptical radii d
     :type d: (N2,) floats
-    :param_interest: the quantity of interest defined at all elliptical radii d
-    :param param_interest: (N2,) floats
+    :param param_interest: the quantity of interest defined at all elliptical radii d
+    :type param_interest: (N2,) floats
     :return: mean, err_low, err_high
     :rtype: float, float, float"""
     y = [[] for i in range(D_BINS+1)]
@@ -444,61 +445,12 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
         return max_min_m, m_groups, gx_center_groups, idx_groups
     return max_min_m, m_groups, gx_center_groups, v_groups, idx_groups
 
-def readShapeData(CAT_DEST, SNAP, D_BINS, local, suffix):
-    """ Read in all relevant shape-related data
-    
-    :param CAT_DEST: catalogue destination
-    :type CAT_DEST: string
-    :param SNAP: e.g. '024'
-    :type SNAP: string
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
-    :param local: whether to read in local or global shape data
-    :type local: boolean
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicShapesDirect)
-    :type suffix: string
-    :return: obj_masses, obj_centers, d, q, s, major_full
-    :rtype: 1D float array, 1D float array, 1D float array, 3x ((number_of_objs,) float array or (number_of_objs, D_BINS+1) float array), 
-        (number_of_objs,3) float array or (number_of_objs, D_BINS+1, 3) float array"""
-    
-    d = np.loadtxt('{0}/d_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_objs, D_BINS+1)
-    q = np.loadtxt('{0}/q_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP))
-    s = np.loadtxt('{0}/s_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP))
-    if local == False:
-        d = np.array(d, ndmin=1)
-        d = d.reshape(d.shape[0], 1) # Has shape (number_of_objs, 1)
-        q = np.array(q, ndmin=1)
-        q = q.reshape(q.shape[0], 1) # Has shape (number_of_objs, 1)
-        s = np.array(s, ndmin=1)
-        s = s.reshape(s.shape[0], 1) # Has shape (number_of_objs, 1)
-    else:
-        # Dealing with the case of 1 obj
-        if d.ndim == 1 and d.shape[0] == D_BINS+1:
-            d = d.reshape(1, D_BINS+1)
-            q = q.reshape(1, D_BINS+1)
-            s = s.reshape(1, D_BINS+1)
-    major_full = np.loadtxt('{0}/major_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP))
-    if major_full.ndim == 2:
-        major_full = major_full.reshape(major_full.shape[0], major_full.shape[1]//3, 3) # Has shape (number_of_objs, D_BINS+1, 3)
-    else:
-        if local == True:
-            if major_full.shape[0] == (D_BINS+1)*3:
-                major_full = major_full.reshape(1, D_BINS+1, 3)
-        else:
-            if major_full.shape[0] == 3:
-                major_full = major_full.reshape(1, 1, 3)
-    obj_masses = np.loadtxt('{0}/m_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_hs,)
-    obj_centers = np.loadtxt('{0}/centers_{1}{2}{3}.txt'.format(CAT_DEST, "local" if local == True else "global", suffix, SNAP)) # Has shape (number_of_hs,3)
-    return obj_masses, obj_centers, d, q, s, major_full
-
-def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, MASS_UNIT=1e10, suffix = '_'):
+def getShapeProfiles(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, MASS_UNIT=1e10, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
     Plot intertial tensor axis ratios, triaxialities and ellipticity histograms.
     
-    :param CAT_DEST: catalogue destination
-    :type CAT_DEST: string
     :param VIZ_DEST: visualisation folder destination
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
@@ -516,15 +468,9 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
     :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicShapesDirect)
     :type suffix: string"""
     
-    print_status(rank,start_time,'Starting getShapeCurves() with snap {0}'.format(SNAP))
+    print_status(rank,start_time,'Starting getShapeProfiles() with snap {0}'.format(SNAP))
     
     if rank == 0:
-        # Reading
-        try:
-            obj_masses, obj_centers, d, q, s, major_full = readShapeData(CAT_DEST, SNAP, D_BINS, True, suffix)
-        except OSError: # Components for snap are not available 
-            print_status(rank,start_time,'Calling readShapeData() for snap {0} threw OSError. Skip rest'.format(SNAP))
-            return None
         print_status(rank, start_time, "The number of objects considered is {0}".format(d.shape[0]))
         
         # Mass splitting
@@ -538,7 +484,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
         plt.figure()
         mean_median, err_low, err_high = getShape(R, d, q, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
         plt.semilogx(R, mean_median)
-        plt.fill_between(R, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5)
+        plt.fill_between(R, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
         # Formatting
         plt.xlabel(r"$r/R_{200}$")
         plt.ylabel(r"q")
@@ -549,7 +495,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
         plt.figure()
         mean_median, err_low, err_high = getShape(R, d, s, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
         plt.semilogx(R, mean_median)
-        plt.fill_between(R, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5)
+        plt.fill_between(R, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
         # Formatting
         plt.xlabel(r"$r/R_{200}$")
         plt.ylabel(r"s")
@@ -566,7 +512,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
             T = np.empty(0)
         mean_median, err_low, err_high = getShape(R, d, T, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
         plt.semilogx(R, mean_median)
-        plt.fill_between(R, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5)
+        plt.fill_between(R, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
         
         # Formatting
         plt.xlabel(r"$r/R_{200}$")
@@ -587,7 +533,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"q")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{0}/qM{1}{2}{3}.pdf".format(VIZ_DEST, int(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/qM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # S: M-splitting
         for group in range(len(obj_m_groups)):
@@ -600,7 +546,7 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"s")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{0}/sM{1}{2}{3}.pdf".format(VIZ_DEST, int(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/sM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # T: M-splitting
         for group in range(len(obj_m_groups)):
@@ -614,10 +560,219 @@ def getShapeCurves(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"T")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{0}/TM{1}{2}{3}.pdf".format(VIZ_DEST, int(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/TM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
     
+def getEinastoProf(r, model_pars):
+    """
+    Get Einasto density profile at radius ``r``
     
-def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, HIST_NB_BINS, MASS_UNIT=1e10, suffix = '_', inner = False):
+    :param r: radius of interest
+    :type r: float
+    :param model_pars: model parameters
+    :type model_pars: (n,) float array
+    :return: profile value at ``r``
+    :rtype: float"""
+    rho_2, r_2, alpha = model_pars
+    return rho_2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+
+def getAlphaBetaGammaProf(r, model_pars):
+    """
+    Get alpha-beta-gamma density profile at radius ``r``
+    
+    :param r: radius of interest
+    :type r: float
+    :param model_pars: model parameters
+    :type model_pars: (n,) float array
+    :return: profile value at ``r``
+    :rtype: float"""
+    rho_0, alpha, beta, gamma, r_s = model_pars
+    return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+
+def getNFWProf(r, model_pars):
+    """
+    Get NFW density profile at radius ``r``
+    
+    :param r: radius of interest
+    :type r: float
+    :param model_pars: model parameters
+    :type model_pars: (n,) float array
+    :return: profile value at ``r``
+    :rtype: float"""
+    rho_s, r_s = model_pars
+    return rho_s/((r/r_s)*(1+r/r_s)**2)
+
+def getHernquistProf(r, model_pars):
+    """
+    Get Hernquist density profile at radius ``r``
+    
+    :param r: radius of interest
+    :type r: float
+    :param model_pars: model parameters
+    :type model_pars: (n,) float array
+    :return: profile value at ``r``
+    :rtype: float"""
+    rho_s, r_s = model_pars
+    return rho_s/((r/r_s)*(1+r/r_s)**3)
+
+def getDensityProfiles(VIZ_DEST, SNAP, cat, r200s, fits_ROverR200, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT=1e10, suffix = '_'):
+    """
+    Create a series of plots to analyze object shapes
+    
+    Plot intertial tensor axis ratios, triaxialities and ellipticity histograms.
+    
+    :param VIZ_DEST: visualisation folder destination
+    :type VIZ_DEST: string
+    :param SNAP: e.g. '024'
+    :type SNAP: string
+    :param cat: catalogue of objects (halos/gxs)
+    :type cat: N2-long list of lists of ints, N2 > N
+    :param r200s: catalogue of virial radii (of parent halos in case of gxs)
+    :type r200s: N2-long float array
+    :param fits_ROverR200: normalized radii at which the mass-decomposed density
+        profile fits shall be calculated
+    :type fits_ROverR200: (N3,) floats
+    :param dens_profs: density profiles, defined at ``ROverR200``, in M_sun*h^2/(Mpc)**3
+    :type dens_profs: (N, n) floats
+    :param ROverR200: normalized radii at which ``dens_profs`` are defined
+    :type ROverR200: (N4,) floats
+    :param obj_masses: masses of objects in M_sun/h
+    :type obj_masses: (N,) floats
+    :param obj_centers: centers of objects, each coordinate in Mpc/h
+    :type obj_centers: (N,3) floats
+    :param method: string describing density profile model assumed for fitting
+    :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :param start_time: time of start of shape analysis
+    :type start_time: float
+    :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
+    :type MASS_UNIT: float
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicShapesDirect)
+    :type suffix: string"""
+    
+    print_status(rank,start_time,'Starting getDensityProfiles() with snap {0}'.format(SNAP))
+    
+    if rank == 0:
+        print_status(rank, start_time, "The number of objects considered is {0}".format(obj_masses.shape[0]))
+        
+        # Mass splitting
+        max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time)
+        
+        obj_pass = np.int32(np.array([1 if x != [] else 0 for x in cat]))
+        idxs_compr = np.zeros((len(cat),), dtype = np.int32)
+        idxs_compr[obj_pass.nonzero()[0]] = np.arange(np.sum(obj_pass)) 
+        prof_models = {'einasto': getEinastoProf, 'alpha_beta_gamma': getAlphaBetaGammaProf, 'nfw': getNFWProf, 'hernquist': getHernquistProf}
+        model_name = {'einasto': 'Einasto', 'alpha_beta_gamma': r'\alpha \beta \gamma', 'nfw': 'NFW', 'hernquist': 'Hernquist'}
+        
+        # Average over all objects' density profiles
+        if np.sum(obj_pass) > 0:
+            dens_prof_ = dens_profs[idxs_compr[np.nonzero(obj_pass > 0)[0]]]
+        else:
+            dens_prof_ = np.zeros((0,ROverR200.shape[0]), dtype = np.float32)
+        y = [list(dens_prof_[:,i]) for i in range(ROverR200.shape[0])]
+        prof_median = np.array([np.median(z) if z != [] else np.nan for z in y])
+        err_low = np.array([np.quantile(np.array(z), 0.25)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
+        err_high = np.array([np.quantile(np.array(z), 0.75)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
+        r200 = np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]])
+        best_fit = fitDensProf(prof_median, ROverR200, r200, method) # Fit median
+        plt.figure()
+        plt.loglog(fits_ROverR200, prof_models[method](fits_ROverR200*np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]]), best_fit), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
+        plt.loglog(ROverR200, prof_median, color = 'blue')
+        plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"All objects")
+        plt.xlabel(r"$r/R_{200}$")
+        plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+        plt.legend(loc="upper right", fontsize="x-small")
+        plt.savefig("{}/RhoProf_{}.pdf".format(VIZ_DEST, SNAP), bbox_inches="tight")
+        
+        for group in range(len(obj_m_groups)):
+            obj_pass_m = np.int32([1 if (obj_pass[i] == 1 and obj_masses[idxs_compr[i]]*MASS_UNIT > max_min_m[group] and obj_masses[idxs_compr[i]]*MASS_UNIT < max_min_m[group+1]) else 0 for i in range(len(cat))])
+            # Fit median
+            y = [list(dens_prof_[idxs_compr[np.nonzero(obj_pass_m > 0)[0]],i]) for i in range(ROverR200.shape[0])]
+            prof_median = np.array([np.median(z) if z != [] else np.nan for z in y])
+            err_low = np.array([np.quantile(np.array(z), 0.25)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
+            err_high = np.array([np.quantile(np.array(z), 0.75)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
+            r200_m = np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]])
+            best_fit_m = fitDensProf(prof_median, fits_ROverR200, r200_m, method)
+            # Plotting
+            plt.figure()
+            plt.loglog(fits_ROverR200, prof_models[method](fits_ROverR200*np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]]), best_fit_m), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
+            plt.loglog(ROverR200, prof_median, color = 'blue')
+            plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))))
+            plt.xlabel(r"$r/R_{200}$")
+            plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+            plt.legend(loc="upper right", fontsize="x-small")
+            plt.savefig("{}/RhoProfM{:.2f}_{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), SNAP), bbox_inches="tight")
+        return
+
+def fitDensProf(median, ROverR200, r200, method):
+    """
+    Fit density profile according to model provided
+    
+    Note that ``median`` which is defined at ``ROverR200``
+    must be in units of UnitMass/(Mpc/h)**3.
+    
+    :param median: density profile (often a median of many profiles combined)
+    :type median: (N,) floats
+    :param ROverR200: normalized radii where ``median`` is defined and 
+        fitting should be carried out
+    :type ROverR200: (N,) floats
+    :param r200: virial raiuds (of parent halo in case of gx)
+    :type r200: float
+    :param method: string describing density profile model assumed for fitting
+    :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :return res.x: best-fit results
+    :rtype: (n,) floats"""
+    
+    prof_models = {'einasto': getEinastoProf, 'alpha_beta_gamma': getAlphaBetaGammaProf, 'nfw': getNFWProf, 'hernquist': getHernquistProf}
+    def toMinimize(model_pars, median, rbin_centers, method):
+        psi_2 = np.sum(np.array([(np.log(median[i])-np.log(prof_models[method](rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
+        return psi_2
+    R_to_min = ROverR200*r200 # Mpc/h
+    # Discard nan values in median
+    R_to_min = R_to_min[~np.isnan(median)] # Note: np.isnan returns a boolean
+    median = median[~np.isnan(median)]
+    # Set initial guess and minimize scalar function
+    try:
+        if method == 'einasto':
+            iguess = np.array([0.1, r200/5, 0.18]) # Note: alpha = 0.18 gives ~ NFW
+            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf), (-np.inf, np.inf)]) # Only hand over rescaled median!
+            best_fit = res.x
+        elif method == 'alpha_beta_gamma':
+            iguess = np.array([0.1, 1.0, 1.0, 1.0, r200/5])
+            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf), (1e-5, np.inf), (1e-5, np.inf), (1e-5, np.inf)]) # Only hand over rescaled median!
+            best_fit = res.x
+        elif method == 'hernquist':
+            iguess = np.array([0.1, r200/5])
+            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf)]) # Only hand over rescaled median!
+            best_fit = res.x
+        else:
+            iguess = np.array([0.1, r200/5])
+            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf)]) # Only hand over rescaled median!
+            best_fit = res.x
+        best_fit[0] *= np.average(median)
+    except ValueError: # For poor density profiles one might encounter "ValueError: `x0` violates bound constraints."
+        best_fit = iguess*np.nan
+    return best_fit
+        
+def fitDensProfHelper(ROverR200, method, dens_prof_plus_r200_plus_obj_number):
+    """ Helper function to carry out density profile fitting
+    
+    :param ROverR200: normalized radii where density profile is defined
+        and fitting should be carried out
+    :type ROverR200: (N2,) floats
+    :param method: string describing density profile model assumed for fitting
+    :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :param dens_prof_plus_r200_plus_obj_number: array containing density profile,
+        (in units of UnitMass/(Mpc/h)**3), r200-value and object number
+    :type dens_prof_plus_r200_plus_obj_number: (N,) float
+    :return res, object_number: best-fit results and object number
+    :rtype: (n,) floats, int"""
+        
+    if rank == 0:
+        res = fitDensProf(dens_prof_plus_r200_plus_obj_number[:-2], ROverR200, dens_prof_plus_r200_plus_obj_number[-2], method)
+        return res, dens_prof_plus_r200_plus_obj_number[-1]
+    else:
+        return None, None
+        
+def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, MASS_UNIT=1e10, suffix = '_', inner = False):
     """ Plot triaxiality T histogram
     
     :param CAT_DEST: catalogue destination
@@ -634,6 +789,18 @@ def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
     :type D_BINS: int
     :param start_time: time of start of shape analysis
     :type start_time: float
+    :param obj_masses: masses of objects in M_sun/h
+    :type obj_masses: (N,) floats
+    :param obj_centers: centers of objects, each coordinate in Mpc/h
+    :type obj_centers: (N,3) floats
+    :param d: ellipsoidal radii at which shape profiles have been calculated
+    :type d: (N, D_BINS+1) floats
+    :param q: q-values
+    :type q: (N, D_BINS+1) floats
+    :param s: s-values
+    :type s: (N, D_BINS+1) floats
+    :param major_full: major axes at each radii
+    :type major_full: (N, D_BINS+1, 3) floats
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
@@ -644,16 +811,9 @@ def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
         Milky Way radius is about R200*0.15)
     :type inner: boolean
     """
+    print_status(rank, start_time, "Starting getLocalTHisto(). The number of objects considered is {0}".format(d.shape[0]))
     
     if rank == 0:
-        # Read & Assemble
-        try:
-            obj_masses, obj_centers, d, q, s, major_full = readShapeData(CAT_DEST, SNAP, D_BINS, True, suffix)
-        except OSError: # Components for snap are not available 
-            print_status(rank,start_time,'Calling readShapeData() for snap {0} threw OSError. Skip rest'.format(SNAP))
-            return None
-        print_status(rank, start_time, "The number of objects considered is {0}".format(d.shape[0]))
-        
         idx = np.zeros((d.shape[0],), dtype = np.int32)
         for obj in range(idx.shape[0]):
             if inner == True:
@@ -665,7 +825,7 @@ def getLocalTHisto(CAT_DEST, VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start
         for obj in range(d.shape[0]):
             t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
         t = np.nan_to_num(t)
-            
+        
         # T counting
         plt.figure()
         t[t == 0.] = np.nan
@@ -692,7 +852,7 @@ def getGlobalEpsHisto(cat, xyz, masses, L_BOX, VIZ_DEST, SNAP, suffix = '_', HIS
     :param masses: masses of particles of type 1 or type 4
     :type masses: (N^3x1) floats
     :param L_BOX: simulation box side length
-    :type L_BOX: float, units: cMpc/h
+    :type L_BOX: float, units: Mpc/h
     :param VIZ_DEST: visualisation folder destination
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'

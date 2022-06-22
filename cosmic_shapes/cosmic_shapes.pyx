@@ -44,25 +44,30 @@ size = comm.Get_size()
 @cython.embedsignature(True)
 def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
     
-    # Generating LogNormal Catalog
-    redshift = redshift
-    cosmo = cosmology.Planck15
-    Plin = cosmology.LinearPower(cosmo, redshift, transfer='EisensteinHu')
+    print('Starting createLogNormUni()')
+        
+    if rank == 0:
+        # Generating LogNormal Catalog
+        redshift = redshift
+        cosmo = cosmology.Planck15
+        Plin = cosmology.LinearPower(cosmo, redshift, transfer='EisensteinHu')
+        
+        cat = LogNormalCatalog(Plin=Plin, nbar=nbar, BoxSize=BoxSize, Nmesh=Nmesh, bias=2.0, seed=42)
+        x_vec = np.float32(np.array(cat['Position'][:,0])) # Mpc/h
+        y_vec = np.float32(np.array(cat['Position'][:,1]))
+        z_vec = np.float32(np.array(cat['Position'][:,2]))
+        
+        x_vel = np.float32(np.array(cat['Velocity'][:,0]))
+        y_vel = np.float32(np.array(cat['Velocity'][:,1]))
+        z_vel = np.float32(np.array(cat['Velocity'][:,2]))
+        
+        N = int(round(len(x_vec)**(1/3)))
+        N_tot = len(x_vec)
+        dm_mass = getMassDMParticle(N, BoxSize)/UNIT_MASS
+        return N_tot, x_vec, y_vec, z_vec, x_vel, y_vel, z_vel, np.ones((len(x_vec),),dtype = np.float32)*dm_mass
+    else:
+        return None, None, None, None, None, None, None, None
     
-    cat = LogNormalCatalog(Plin=Plin, nbar=nbar, BoxSize=BoxSize, Nmesh=Nmesh, bias=2.0, seed=42)
-    x_vec = np.float32(np.array(cat['Position'][:,0])) # Mpc/h
-    y_vec = np.float32(np.array(cat['Position'][:,1]))
-    z_vec = np.float32(np.array(cat['Position'][:,2]))
-    
-    x_vel = np.float32(np.array(cat['Velocity'][:,0]))
-    y_vel = np.float32(np.array(cat['Velocity'][:,1]))
-    z_vel = np.float32(np.array(cat['Velocity'][:,2]))
-    
-    N = int(round(len(x_vec)**(1/3)))
-    N_tot = len(x_vec)
-    dm_mass = getMassDMParticle(N, BoxSize)/UNIT_MASS
-    return N_tot, x_vec, y_vec, z_vec, x_vel, y_vel, z_vel, np.ones((len(x_vec),),dtype = np.float32)*dm_mass
-
 @cython.embedsignature(True)
 def getAlphaBetaGammaProf(r, rho_0, alpha, beta, gamma, r_s):
     
@@ -86,60 +91,65 @@ def getHernquistProf(r, rho_s, r_s):
 @cython.embedsignature(True)
 def genHalo(tot_mass, res, model_pars, method, a, b, c):
     
-    # Determine rho_0 in units of M_sun*h^2/Mpc^3
-    def getMassIntegrand0(r, method, model_pars):
-        if method == 'einasto':
-            r_2, alpha = model_pars
-            return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_2)**alpha-1))
-        if method == 'alpha_beta_gamma':
-            alpha, beta, gamma, r_s = model_pars
-            return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
-        if method == 'hernquist':
-            r_s = model_pars
-            return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**3)
-        else:
-            r_s = model_pars
-            return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**2)
-    rho_0 = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(method, model_pars))[0]
-    model_pars = np.hstack((np.array([rho_0]),model_pars))
-    
-    # Determine number of particles in second shell (first proper shell)
-    def getMassIntegrand(r, model_pars):
-        if method == 'einasto':
-            rho_2, r_2, alpha = model_pars
-            return 4*np.pi*r**2*getEinastoProf(r, rho_2, r_2, alpha)
-        if method == 'alpha_beta_gamma':
-            rho_0, alpha, beta, gamma, r_s = model_pars
-            return 4*np.pi*r**2*getAlphaBetaGammaProf(r, rho_0, alpha, beta, gamma, r_s)
-        if method == 'hernquist':
-            rho_s, r_s = model_pars
-            return 4*np.pi*r**2*getHernquistProf(r, rho_s, r_s)
-        else:
-            rho_s, r_s = model_pars
-            return 4*np.pi*r**2*getNFWProf(r, rho_s, r_s)
-    
-    # Determine number of particles in second shell
-    mass_1 = quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0] # Mass in shell 1 in units of M_sun/h
-    N1 = int(round(res*mass_1/tot_mass)) # Number of particles in shell 1. Rounding error is unavoidable.
-    
-    # Build up halo successively in onion-like fashion
-    halo_x = np.empty(0)
-    halo_y = np.empty(0)
-    halo_z = np.empty(0)
-    Nptc = np.zeros((a.shape[0],), dtype = np.int32) # Note: Number of ptcs in shell Shell(0,a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
-    for shell in range(a.shape[0]):
-        if shell != 0:
-            Nptc[shell] = int(round(N1*quad(getMassIntegrand, a[shell-1], a[shell], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
-        else:
-            Nptc[shell] = int(round(N1*quad(getMassIntegrand, 1e-8, a[0], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
-    with Pool(processes=openmp.omp_get_max_threads()) as pool:
-        results = pool.map(partial(drawUniformFromShell, 3, a, b, c, Nptc), [idx for idx in range(Nptc.shape[0])]) # Draws from Shell(0,a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
-    for result in results:
-        halo_x = np.hstack((halo_x, result[:,0]))
-        halo_y = np.hstack((halo_y, result[:,1]))
-        halo_z = np.hstack((halo_z, result[:,2]))
-    mass_dm = quad(getMassIntegrand, 1e-8, a[-1], args=(model_pars))[0]/halo_z.shape[0]    
-    return halo_x, halo_y, halo_z, mass_dm, rho_0
+    print('Starting genHalo()')
+        
+    if rank == 0:
+        # Determine rho_0 in units of M_sun*h^2/Mpc^3
+        def getMassIntegrand0(r, method, model_pars):
+            if method == 'einasto':
+                r_2, alpha = model_pars
+                return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+            if method == 'alpha_beta_gamma':
+                alpha, beta, gamma, r_s = model_pars
+                return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+            if method == 'hernquist':
+                r_s = model_pars
+                return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**3)
+            else:
+                r_s = model_pars
+                return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**2)
+        rho_0 = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(method, model_pars))[0]
+        model_pars = np.hstack((np.array([rho_0]),model_pars))
+        
+        # Determine number of particles in second shell (first proper shell)
+        def getMassIntegrand(r, model_pars):
+            if method == 'einasto':
+                rho_2, r_2, alpha = model_pars
+                return 4*np.pi*r**2*getEinastoProf(r, rho_2, r_2, alpha)
+            if method == 'alpha_beta_gamma':
+                rho_0, alpha, beta, gamma, r_s = model_pars
+                return 4*np.pi*r**2*getAlphaBetaGammaProf(r, rho_0, alpha, beta, gamma, r_s)
+            if method == 'hernquist':
+                rho_s, r_s = model_pars
+                return 4*np.pi*r**2*getHernquistProf(r, rho_s, r_s)
+            else:
+                rho_s, r_s = model_pars
+                return 4*np.pi*r**2*getNFWProf(r, rho_s, r_s)
+        
+        # Determine number of particles in second shell
+        mass_1 = quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0] # Mass in shell 1 in units of M_sun/h
+        N1 = int(round(res*mass_1/tot_mass)) # Number of particles in shell 1. Rounding error is unavoidable.
+        
+        # Build up halo successively in onion-like fashion
+        halo_x = np.empty(0)
+        halo_y = np.empty(0)
+        halo_z = np.empty(0)
+        Nptc = np.zeros((a.shape[0],), dtype = np.int32) # Note: Number of ptcs in shell Shell(a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
+        for shell in range(a.shape[0]):
+            if shell != 0:
+                Nptc[shell] = int(round(N1*quad(getMassIntegrand, a[shell-1], a[shell], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
+            else:
+                Nptc[shell] = int(round(N1*quad(getMassIntegrand, 1e-8, a[0], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
+        with Pool(processes=openmp.omp_get_max_threads()) as pool:
+            results = pool.map(partial(drawUniformFromShell, 3, a, b, c, Nptc), [idx for idx in range(Nptc.shape[0])]) # Draws from Shell(a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
+        for result in results:
+            halo_x = np.hstack((halo_x, result[:,0]))
+            halo_y = np.hstack((halo_y, result[:,1]))
+            halo_z = np.hstack((halo_z, result[:,2]))
+        mass_dm = quad(getMassIntegrand, 1e-8, a[-1], args=(model_pars))[0]/halo_z.shape[0]    
+        return halo_x, halo_y, halo_z, mass_dm, rho_0
+    else:
+        return None, None, None, None, None
 
 @cython.embedsignature(True)
 cdef class CosmicShapes:
@@ -155,7 +165,7 @@ cdef class CosmicShapes:
     cdef int N_WALL
     cdef int N_MIN
     cdef str CENTER
-    cdef float SAFE # Units: cMpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
+    cdef float SAFE # Units: Mpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
     cdef double start_time
     
     def __init__(self, str CAT_DEST, str VIZ_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
@@ -174,8 +184,94 @@ cdef class CosmicShapes:
         self.CENTER = CENTER
         self.SAFE = 6
         self.start_time = start_time
+        
+    def calcMassesCenters(self, cat, float[:,:] xyz, float[:] masses, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
+        
+        # Transform cat to int[:,:]
+        cdef int nb_objs = len(cat)
+        cdef int p
+        cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
+        cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
+        for p in range(nb_objs):
+            if len(cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
+                obj_size[p] = len(cat[p]) 
+                obj_pass[p] = 1
+        cdef int nb_pass = np.sum(obj_pass.base)
+        cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
+        idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
+        cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(cat[p]) for p in range(nb_objs)])), dtype = np.int32)
+        for p in range(nb_objs):
+            if obj_pass[p] == 1:
+                cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(cat[p])
     
-    def getDensProfsDirectBinning(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+        # Calculate centers and total masses of objects
+        cdef float[:] m = np.zeros((nb_pass,), dtype = np.float32)
+        cdef int n
+        cdef float[:,:] centers = np.zeros((nb_pass,3), dtype = np.float32)
+        for p in range(nb_objs): # Calculate centers of objects
+            if obj_pass[p] == 1:
+                xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
+                if CENTER == 'mode':
+                    centers.base[idxs_compr[p]] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                else:
+                    centers.base[idxs_compr[p]] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+        for p in prange(nb_objs, schedule = 'dynamic', nogil = True): # Calculate total mass of objects
+            if obj_pass[p] == 1:
+                for n in range(obj_size[p]):
+                    m[idxs_compr[p]] = m[idxs_compr[p]] + masses[cat_arr[idxs_compr[p],n]]
+        
+        return centers.base, m.base # Only rank = 0 content matters
+    
+    def fetchMassesCenters(self, obj_type):
+        
+        if obj_type == 'dm':
+            suffix = '_dm_'
+        elif obj_type == 'gx':
+            suffix = '_gx_'
+        else:
+            assert obj_type == ''
+            suffix = '_'
+        ms = np.loadtxt('{0}/m{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+        centers = np.loadtxt('{0}/centers{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+        return centers, ms
+    
+    def fetchCatLocal(self, obj_type = 'dm'):
+        
+        print_status(rank,self.start_time,'Starting fetchCatLocal() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            if obj_type == 'dm':
+                suffix = '_dm_'
+            elif obj_type == 'gx':
+                suffix = '_gx_'
+            else:
+                assert obj_type == ''
+                suffix = '_'
+            with open('{0}/cat_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), 'r') as filehandle:
+                cat_local = json.load(filehandle)
+            return cat_local
+        else:
+            return None
+    
+    def fetchCatGlobal(self, obj_type = 'dm'):
+        
+        print_status(rank,self.start_time,'Starting fetchCatGlobal() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            if obj_type == 'dm':
+                suffix = '_dm_'
+            elif obj_type == 'gx':
+                suffix = '_gx_'
+            else:
+                assert obj_type == ''
+                suffix = '_'
+            with open('{0}/cat_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), 'r') as filehandle:
+                cat_global = json.load(filehandle)
+            return cat_global
+        else:
+            return None
+    
+    def getDensProfsDirectBinning(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
         
         cdef int nb_objs = len(cat)
         # Determine endpoints of radial bins
@@ -186,7 +282,7 @@ cdef class CosmicShapes:
         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
         for p in range(nb_objs):
-            if cat[p] != []: # Only add objects that have sufficient resolution
+            if len(cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
                 obj_size[p] = len(cat[p])
                 obj_pass[p] = 1
             else:
@@ -217,9 +313,9 @@ cdef class CosmicShapes:
             if obj_pass[p] == 1:
                 xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
                 if CENTER == 'mode':
-                    centers.base[p] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                    centers.base[idxs_compr[p]] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
                 else:
-                    centers.base[p] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+                    centers.base[idxs_compr[p]] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
         for p in prange(nb_objs, schedule = 'dynamic', nogil = True):
             if obj_keep[p] == 1:
                 for n in range(obj_size[p]):
@@ -230,7 +326,7 @@ cdef class CosmicShapes:
         
         return ROverR200.base, dens_profs.base
     
-    def getDensProfsKernelBased(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float L_BOX, str CENTER):
+    def getDensProfsKernelBased(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
         
         cdef int nb_objs = len(cat)
         cdef int r_res = ROverR200.shape[0]
@@ -240,7 +336,7 @@ cdef class CosmicShapes:
         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
         for p in range(nb_objs):
-            if cat[p] != []: # Only add objects that have sufficient resolution
+            if len(cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
                 obj_size[p] = len(cat[p])
                 obj_pass[p] = 1
             else:
@@ -272,9 +368,9 @@ cdef class CosmicShapes:
             if obj_pass[p] == 1:
                 xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
                 if CENTER == 'mode':
-                    centers.base[p] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                    centers.base[idxs_compr[p]] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
                 else:
-                    centers.base[p] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+                    centers.base[idxs_compr[p]] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
             if obj_keep[p] == 1:
                 for n in range(obj_size[p]):
                     xyz_obj[n] = xyz[cat_arr[idxs_compr[p],n]]
@@ -598,7 +694,7 @@ cdef class CosmicShapes:
         return morph_info
     
     def getMorphLocal(self, float[:,:] xyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
-                        
+        
         # Transform cat to int[:,:]
         cdef int nb_objs = len(cat)
         cdef int p
@@ -1009,52 +1105,144 @@ cdef class CosmicShapes:
         return d.base[succeed], q.base[succeed], s.base[succeed], minor, inter, major, centers.base[succeed], m.base[succeed] # Only rank = 0 content matters
     
     def drawShapeProfiles(self, obj_type = ''):
-        if obj_type == 'dm':
-            suffix = '_dm_'
-        elif obj_type == 'gx':
-            suffix = '_gx_'
-        else:
-            assert obj_type == ''
-            suffix = '_'
-        getShapeProfiles(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, MASS_UNIT=1e10, suffix = suffix)
         
-    def drawDensityProfiles(self, obj_type = ''):
-        if obj_type == 'dm':
-            suffix = '_dm_'
-        elif obj_type == 'gx':
-            suffix = '_gx_'
-        else:
-            assert obj_type == ''
-            suffix = '_'
-        getDensityProfiles(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, MASS_UNIT=1e10, suffix = suffix)
-    
+        print_status(rank,self.start_time,'Starting drawShapeProfiles() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            if obj_type == 'dm':
+                suffix = '_dm_'
+            elif obj_type == 'gx':
+                suffix = '_gx_'
+            else:
+                assert obj_type == ''
+                suffix = '_'
+            obj_masses, obj_centers, d, q, s, major_full = self.fetchShapeCat(True, obj_type)
+            getShapeProfiles(self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major_full, MASS_UNIT=1e10, suffix = suffix)
+            
     def plotLocalTHisto(self, obj_type = ''):
-        if obj_type == 'dm':
-            suffix = '_dm_'
-        elif obj_type == 'gx':
-            suffix = '_gx_'
-        else:
-            assert obj_type == ''
-            suffix = '_'
-        getLocalTHisto(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, HIST_NB_BINS=11, MASS_UNIT=1e10, suffix = suffix, inner = False)
         
-    def fitDensProfs(self, dens_profs, ROverR200, r200s, method = 'einasto'):
-        # dens_profs are defined at ROverR200
+        print_status(rank,self.start_time,'Starting plotLocalTHisto() with snap {0}'.format(self.SNAP))
         
-        if method == 'einasto':
-            best_fits = np.zeros((dens_profs.shape[0], 3))
-        elif method == 'alpha_beta_gamma':
-            best_fits = np.zeros((dens_profs.shape[0], 5))
+        if rank == 0:
+            if obj_type == 'dm':
+                suffix = '_dm_'
+            elif obj_type == 'gx':
+                suffix = '_gx_'
+            else:
+                assert obj_type == ''
+                suffix = '_'
+            obj_masses, obj_centers, d, q, s, major_full = self.fetchShapeCat(True, obj_type)
+            getLocalTHisto(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS=11, MASS_UNIT=1e10, suffix = suffix, inner = False)
+        
+    def fitDensProfs(self, dens_profs, ROverR200, cat, r200s, method = 'einasto'):
+        
+        print_status(rank,self.start_time,'Starting fitDensProfs() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            r200s = np.int32([r200s[i] for i in range(len(cat)) if cat[i] != []])
+            if method == 'einasto':
+                best_fits = np.zeros((dens_profs.shape[0], 3))
+            elif method == 'alpha_beta_gamma':
+                best_fits = np.zeros((dens_profs.shape[0], 5))
+            else:
+                best_fits = np.zeros((dens_profs.shape[0], 2))
+            dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs, r200s]
+            dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs_plus_r200_plus_obj_number, np.arange(dens_profs.shape[0])]
+            with Pool(processes=openmp.omp_get_max_threads()) as pool:
+                results = pool.map(partial(fitDensProfHelper, ROverR200, method), [dens_profs_plus_r200_plus_obj_number[obj] for obj in range(dens_profs.shape[0])])
+            for result in results:
+                x, obj = tuple(result)
+                best_fits[int(obj)] = x
+            np.savetxt('{0}/dens_prof_best_fits_{1}_{2}.txt'.format(self.CAT_DEST, method, self.SNAP), best_fits, fmt='%1.7e')
+            np.savetxt('{0}/best_fits_r_over_r200_{1}_{2}.txt'.format(self.CAT_DEST, method, self.SNAP), ROverR200, fmt='%1.7e')
+    
+    def fetchDensProfsBestFits(self, method):
+        
+        print_status(rank,self.start_time,'Starting fetchDensProfsBestFits() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            try:
+                best_fits = np.loadtxt('{0}/dens_prof_best_fits_{1}_{2}.txt'.format(self.CAT_DEST, method, self.SNAP))
+                ROverR200 = np.loadtxt('{0}/best_fits_r_over_r200_{1}_{2}.txt'.format(self.CAT_DEST, method, self.SNAP))
+            except OSError as e:
+                raise ValueError("{0} Need to perform density profile fitting first.".format(e))
+            return best_fits, ROverR200
         else:
-            best_fits = np.zeros((dens_profs.shape[0], 2))
-        dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs, r200s]
-        dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs_plus_r200_plus_obj_number, np.arange(dens_profs.shape[0])]
-        with Pool(processes=openmp.omp_get_max_threads()) as pool:
-            results = pool.map(partial(fitDensProfHelper, ROverR200, method), [dens_profs_plus_r200_plus_obj_number[obj] for obj in range(dens_profs.shape[0])])
-        for result in results:
-            x, obj = tuple(result)
-            best_fits[int(obj)] = x
-        return best_fits
+            return None, None
+    
+    def fetchDensProfsDirectBinning(self):
+        
+        print_status(rank,self.start_time,'Starting fetchDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            try:
+                dens_profs = np.loadtxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP))
+                ROverR200 = np.loadtxt('{0}/r_over_r200_db_{1}.txt'.format(self.CAT_DEST, self.SNAP))
+            except OSError as e:
+                raise ValueError("{0} Need to perform direct-binning-based density profile estimation first.".format(e))
+            return dens_profs, ROverR200
+        else:
+            return None, None
+    
+    def fetchDensProfsKernelBased(self):
+        
+        print_status(rank,self.start_time,'Starting fetchDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            try:
+                dens_profs = np.loadtxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP))
+                ROverR200 = np.loadtxt('{0}/r_over_r200_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP))
+            except OSError as e:
+                raise ValueError("{0} Need to perform direct-binning-based density profile estimation first.".format(e))
+            return dens_profs, ROverR200
+        else:
+            return None, None
+    
+    def fetchShapeCat(self, local, obj_type):
+        
+        print_status(rank,self.start_time,'Starting fetchShapeCat() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            try:
+                if obj_type == 'dm':
+                    suffix = '_dm_'
+                elif obj_type == 'gx':
+                    suffix = '_gx'
+                else:
+                    suffix = ''
+                d = np.loadtxt('{0}/d_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP)) # Has shape (number_of_objs, D_BINS+1)
+                q = np.loadtxt('{0}/q_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP))
+                s = np.loadtxt('{0}/s_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP))
+                if local == False:
+                    d = np.array(d, ndmin=1)
+                    d = d.reshape(d.shape[0], 1) # Has shape (number_of_objs, 1)
+                    q = np.array(q, ndmin=1)
+                    q = q.reshape(q.shape[0], 1) # Has shape (number_of_objs, 1)
+                    s = np.array(s, ndmin=1)
+                    s = s.reshape(s.shape[0], 1) # Has shape (number_of_objs, 1)
+                else:
+                    # Dealing with the case of 1 obj
+                    if d.ndim == 1 and d.shape[0] == self.D_BINS+1:
+                        d = d.reshape(1, self.D_BINS+1)
+                        q = q.reshape(1, self.D_BINS+1)
+                        s = s.reshape(1, self.D_BINS+1)
+                major_full = np.loadtxt('{0}/major_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP))
+                if major_full.ndim == 2:
+                    major_full = major_full.reshape(major_full.shape[0], major_full.shape[1]//3, 3) # Has shape (number_of_objs, D_BINS+1, 3)
+                else:
+                    if local == True:
+                        if major_full.shape[0] == (self.D_BINS+1)*3:
+                            major_full = major_full.reshape(1, self.D_BINS+1, 3)
+                    else:
+                        if major_full.shape[0] == 3:
+                            major_full = major_full.reshape(1, 1, 3)
+                obj_masses = np.loadtxt('{0}/m_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP)) # Has shape (number_of_hs,)
+                obj_centers = np.loadtxt('{0}/centers_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP)) # Has shape (number_of_hs,3)
+                return obj_masses, obj_centers, d, q, s, major_full
+            except OSError as e: # Components for snap are not available 
+                raise ValueError('Calling fetchShapeProfs() for snap {0} threw OSError: {1}.'.format(self.SNAP))
+        else:
+            return None, None, None, None, None, None
 
 cdef class CosmicShapesDirect(CosmicShapes):
     
@@ -1071,6 +1259,18 @@ cdef class CosmicShapesDirect(CosmicShapes):
         self.masses = masses
         self.cat = cat
         self.r200 = r200
+        if rank == 0:
+            obj_centers, obj_masses = self.calcMassesCenters(cat, xyz, masses, MIN_NUMBER_PTCS, L_BOX, CENTER)
+            np.savetxt('{0}/m_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_masses, fmt='%1.7e')
+            np.savetxt('{0}/centers_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_centers, fmt='%1.7e')
+        
+    def fetchCat(self):
+        print_status(rank,self.start_time,'Starting fetchCat() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            return self.cat
+        else:
+            return None
             
     def calcLocalShapes(self):   
         
@@ -1155,6 +1355,9 @@ cdef class CosmicShapesDirect(CosmicShapes):
                 del d; del q; del s; del minor; del inter; del major; del halos_center; del halo_m
     
     def vizLocalShapes(self, obj_numbers):
+        
+        print_status(rank,self.start_time,'Starting vizLocalShapes() with snap {0}'.format(self.SNAP))
+        
         if rank == 0:
             # Retrieve shape information
             with open('{0}/cat_local_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
@@ -1244,14 +1447,17 @@ cdef class CosmicShapesDirect(CosmicShapes):
                     fontP = FontProperties()
                     fontP.set_size('xx-small')
                     plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)        
-                    plt.xlabel(r"x (cMpc/h)")
-                    plt.ylabel(r"y (cMpc/h)")
-                    ax.set_zlabel(r"z (cMpc/h)")
+                    plt.xlabel(r"x (Mpc/h)")
+                    plt.ylabel(r"y (Mpc/h)")
+                    ax.set_zlabel(r"z (Mpc/h)")
                     ax.set_box_aspect([1,1,1])
                     set_axes_equal(ax)
                     fig.savefig("{}/LocalObj{}_{}.pdf".format(self.VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
         
     def vizGlobalShapes(self, obj_numbers):
+        
+        print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
+
         if rank == 0:
             # Retrieve shape information
             with open('{0}/cat_global_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
@@ -1346,32 +1552,60 @@ cdef class CosmicShapesDirect(CosmicShapes):
                     fontP = FontProperties()
                     fontP.set_size('xx-small')
                     plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
-                    plt.xlabel(r"x (cMpc/h)")
-                    plt.ylabel(r"y (cMpc/h)")
-                    ax.set_zlabel(r"z (cMpc/h)")
+                    plt.xlabel(r"x (Mpc/h)")
+                    plt.ylabel(r"y (Mpc/h)")
+                    ax.set_zlabel(r"z (Mpc/h)")
                     ax.set_box_aspect([1,1,1])
                     set_axes_equal(ax)
                     fig.savefig("{}/GlobalObj{}_{}.pdf".format(self.VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
                     
     def plotGlobalEpsHisto(self):
-        with open('{0}/cat_global_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
-            cat = json.load(filehandle)
-        suffix = '_'
-        getGlobalEpsHisto(cat, self.xyz, self.masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
+        
+        print_status(rank,self.start_time,'Starting plotGlobalEpsHisto() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            with open('{0}/cat_global_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                cat = json.load(filehandle)
+            suffix = '_'
+            getGlobalEpsHisto(cat, self.xyz, self.masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
 
     def calcDensProfsDirectBinning(self, ROverR200):
         
-        obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
-        ROverR200, dens_profs = self.getDensProfsDirectBinning(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
-        return dens_profs
+        print_status(rank,self.start_time,'Starting calcDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
+            ROverR200, dens_profs = self.getDensProfsDirectBinning(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
+            
+            MASS_UNIT = 1e+10
+            np.savetxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
+            np.savetxt('{0}/r_over_r200_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
     def calcDensProfsKernelBased(self, ROverR200):
         
-        obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
-        ROverR200, dens_profs = self.getDensProfsKernelBased(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
-        return dens_profs
+        print_status(rank,self.start_time,'Starting calcDensProfsKernelBased() with snap {0}'.format(self.SNAP))
         
+        if rank == 0:
+            obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
+            ROverR200, dens_profs = self.getDensProfsKernelBased(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
+            
+            MASS_UNIT = 1e+10
+            np.savetxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
+            np.savetxt('{0}/r_over_r200_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
 
+    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method):
+        
+        print_status(rank,self.start_time,'Starting drawDensityProfiles() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            suffix = '_'
+            with open('{0}/cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                cat = json.load(filehandle)
+            # Calculate obj_masses and obj_centers
+            obj_centers, obj_masses = self.fetchMassesCenters('')
+            best_fits, fits_ROverR200 = self.fetchDensProfsBestFits(method)
+            getDensityProfiles(self.VIZ_DEST, self.SNAP, cat, r200s, fits_ROverR200, dens_profs, ROverR200, obj_masses, obj_centers, method, self.start_time, MASS_UNIT=1e10, suffix = suffix)
+    
 cdef class CosmicShapesGadgetHDF5(CosmicShapes):
     
     cdef str HDF5_SNAP_DEST
@@ -1387,7 +1621,39 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         self.MIN_NUMBER_STAR_PTCS = MIN_NUMBER_STAR_PTCS
         self.SNAP_MAX = SNAP_MAX
             
+    def fetchR200s(self):
+        
+        print_status(rank,self.start_time,'Starting fetchR200s() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            return self.r200.base
+        else:
+            return None
+    
+    def fetchHaloCat(self):
+        
+        print_status(rank,self.start_time,'Starting fetchHaloCat() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                h_cat = json.load(filehandle)
+            return h_cat
+        else:
+            return None
+    
+    def fetchGxCat(self):
+        
+        print_status(rank,self.start_time,'Starting fetchGxCat() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                gx_cat = json.load(filehandle)
+            return gx_cat
+    
     def vizLocalShapes(self, obj_numbers, obj_type = 'dm'):
+                
+        print_status(rank,self.start_time,'Starting vizLocalShapes() with snap {0}'.format(self.SNAP))
+        
         if obj_type == 'dm':
             xyz, masses, dm_smoothing, dm_velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
             del dm_smoothing; del dm_velxyz
@@ -1482,14 +1748,17 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
                     fontP = FontProperties()
                     fontP.set_size('xx-small')
                     plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)        
-                    plt.xlabel(r"x (cMpc/h)")
-                    plt.ylabel(r"y (cMpc/h)")
-                    ax.set_zlabel(r"z (cMpc/h)")
+                    plt.xlabel(r"x (Mpc/h)")
+                    plt.ylabel(r"y (Mpc/h)")
+                    ax.set_zlabel(r"z (Mpc/h)")
                     ax.set_box_aspect([1,1,1])
                     set_axes_equal(ax)
                     fig.savefig("{}/Local{}Obj{}_{}.pdf".format(self.VIZ_DEST, obj_type.upper(), obj_number, self.SNAP), bbox_inches='tight')
         
     def vizGlobalShapes(self, obj_numbers, obj_type = 'dm'):
+                
+        print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
+        
         if obj_type == 'dm':
             xyz, masses, dm_smoothing, dm_velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
             del dm_smoothing; del dm_velxyz
@@ -1589,16 +1858,16 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
                     fontP = FontProperties()
                     fontP.set_size('xx-small')
                     plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)   
-                    plt.xlabel(r"x (cMpc/h)")
-                    plt.ylabel(r"y (cMpc/h)")
-                    ax.set_zlabel(r"z (cMpc/h)")
+                    plt.xlabel(r"x (Mpc/h)")
+                    plt.ylabel(r"y (Mpc/h)")
+                    ax.set_zlabel(r"z (Mpc/h)")
                     ax.set_box_aspect([1,1,1])
                     set_axes_equal(ax)
                     fig.savefig("{}/Global{}Obj{}_{}.pdf".format(self.VIZ_DEST, obj_type.upper(), obj_number, self.SNAP), bbox_inches='tight')
     
     def loadDMCat(self):
         
-        print_status(rank,self.start_time,'Starting loadDMCat()')
+        print_status(rank,self.start_time,'Starting loadDMCat() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
         print_status(rank,self.start_time,"Getting HDF5 raw data..")
@@ -1626,8 +1895,16 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
                 json.dump(h_cat_l, filehandle)
             self.r200 = h_r200
             del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del h_cat; del halo_masses; del h_r200
+            
+            dm_xyz, dm_masses, dm_smoothing, dm_velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
+            del dm_smoothing; del dm_velxyz
+            obj_centers, obj_masses = self.calcMassesCenters(h_cat_l, dm_xyz, dm_masses, self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
+            np.savetxt('{0}/m_dm_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_masses, fmt='%1.7e')
+            np.savetxt('{0}/centers_dm_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_centers, fmt='%1.7e')
+            del dm_xyz; del dm_masses
     
-    def loadGxCat(self):        
+    def loadGxCat(self):
+        
         print_status(rank,self.start_time,'Starting loadGxCat() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -1638,7 +1915,7 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
         if rank == 0:
             # Construct gx catalogue
             print_status(rank, self.start_time, "Creating Gx CAT..")
-            gx_cat, gx_pass = getGxCat(np.array(nb_shs), np.array(sh_len_gx), np.array(fof_gx_sizes), self.MIN_NUMBER_PTCS)
+            gx_cat, gx_pass = getGxCat(np.array(nb_shs), np.array(sh_len_gx), np.array(fof_gx_sizes), self.MIN_NUMBER_STAR_PTCS)
             print_status(rank, self.start_time, "Finished getGxCat()")
             gx_cat_l = [[] for i in range(len(nb_shs))]
             corr = 0
@@ -1653,6 +1930,12 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
             with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'w') as filehandle:
                 json.dump(gx_cat_l, filehandle)
             del nb_shs; del sh_len_gx; del fof_gx_sizes; del gx_cat
+            
+            star_xyz, fof_com, sh_com, nb_shs, star_masses, star_smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
+            obj_centers, obj_masses = self.calcMassesCenters(gx_cat_l, star_xyz, star_masses, self.MIN_NUMBER_STAR_PTCS, self.L_BOX, self.CENTER)
+            np.savetxt('{0}/m_gx_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_masses, fmt='%1.7e')
+            np.savetxt('{0}/centers_gx_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_centers, fmt='%1.7e')
+            del star_xyz; del fof_com; del sh_com; del nb_shs; del star_masses; del star_smoothing; del is_star
     
     def calcLocalShapesGx(self):
         
@@ -1706,6 +1989,8 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
             del d; del q; del s; del minor; del inter; del major; del gx_center; del gx_m; del success; del star_xyz; del star_masses # Note: del gx_cat here yields ! marks further up!
             
     def calcGlobalShapesGx(self):
+        
+        print_status(rank,self.start_time,'Starting calcGlobalShapesGx() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
         print_status(rank,self.start_time,"Getting HDF5 raw data..")
@@ -1966,54 +2251,94 @@ cdef class CosmicShapesGadgetHDF5(CosmicShapes):
             
     def calcDensProfsDirectBinning(self, ROverR200, obj_type = ''):
         
-        if obj_type == 'dm':
-            with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
-                cat = json.load(filehandle)
-            xyz, masses, smoothing, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
-            del smoothing; del velxyz
-        elif obj_type == 'gx':
-            with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
-                cat = json.load(filehandle)
-            xyz, fof_com, sh_com, nb_shs, masses, smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
-            del smoothing; del fof_com; del sh_com; del nb_shs; del is_star
-        else:
-            raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
-        obj_keep = np.int32([1 if x != [] else 0 for x in cat])
-        ROverR200, dens_profs = self.getDensProfsDirectBinning(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
-        return dens_profs
+        print_status(rank,self.start_time,'Starting calcDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
+
+        if rank == 0:
+            if obj_type == 'dm':
+                with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+                xyz, masses, smoothing, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
+                del smoothing; del velxyz
+                MIN_NB_PTCS = self.MIN_NUMBER_PTCS
+            elif obj_type == 'gx':
+                with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+                xyz, fof_com, sh_com, nb_shs, masses, smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
+                del smoothing; del fof_com; del sh_com; del nb_shs; del is_star
+                MIN_NB_PTCS = self.MIN_NUMBER_STAR_PTCS
+            else:
+                raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
+            obj_keep = np.int32([1 if x != [] else 0 for x in cat])
+            ROverR200, dens_profs = self.getDensProfsDirectBinning(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
+            
+            MASS_UNIT = 1e+10
+            np.savetxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
+            np.savetxt('{0}/r_over_r200_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
     def calcDensProfsKernelBased(self, ROverR200, obj_type = ''):
         
-        if obj_type == 'dm':
-            with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
-                cat = json.load(filehandle)
-            xyz, masses, smoothing, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
-            del smoothing; del velxyz
-        elif obj_type == 'gx':
-            with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
-                cat = json.load(filehandle)
-            xyz, fof_com, sh_com, nb_shs, masses, smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
-            del smoothing; del fof_com; del sh_com; del nb_shs; del is_star
-        else:
-            raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
-        obj_keep = np.int32([1 if x != [] else 0 for x in cat])
-        ROverR200, dens_profs = self.getDensProfsKernelBased(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), self.L_BOX, self.CENTER)
-        return dens_profs
+        print_status(rank,self.start_time,'Starting calcDensProfsKernelBased() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            if obj_type == 'dm':
+                with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+                xyz, masses, smoothing, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
+                del smoothing; del velxyz
+                MIN_NB_PTCS = self.MIN_NUMBER_DM_PTCS
+            elif obj_type == 'gx':
+                with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+                xyz, fof_com, sh_com, nb_shs, masses, smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
+                del smoothing; del fof_com; del sh_com; del nb_shs; del is_star
+                MIN_NB_PTCS = self.MIN_NUMBER_STAR_PTCS
+            else:
+                raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
+            obj_keep = np.int32([1 if x != [] else 0 for x in cat])
+            ROverR200, dens_profs = self.getDensProfsKernelBased(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
+            
+            MASS_UNIT = 1e+10
+            np.savetxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
+            np.savetxt('{0}/r_over_r200_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
     def plotGlobalEpsHisto(self, obj_type = ''):
-        if obj_type == 'dm':
-            suffix = '_dm_'
-            xyz, masses, smoothing, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
-            del smoothing; del velxyz
-            with open('{0}/cat_global_dm_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
-                cat = json.load(filehandle)
-        elif obj_type == 'gx':
-            suffix = '_gx_'
-            with open('{0}/cat_global_gx_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
-                cat = json.load(filehandle)
-            xyz, fof_com, sh_com, nb_shs, masses, star_smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
-            del fof_com; del sh_com; del nb_shs; del star_smoothing; del is_star
-        else:
-            raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
         
-        getGlobalEpsHisto(cat, xyz, masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
+        print_status(rank,self.start_time,'Starting plotGlobalEpsHisto() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            if obj_type == 'dm':
+                suffix = '_dm_'
+                xyz, masses, smoothing, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
+                del smoothing; del velxyz
+                with open('{0}/cat_global_dm_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+            elif obj_type == 'gx':
+                suffix = '_gx_'
+                with open('{0}/cat_global_gx_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+                xyz, fof_com, sh_com, nb_shs, masses, star_smoothing, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
+                del fof_com; del sh_com; del nb_shs; del star_smoothing; del is_star
+            else:
+                raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
+            
+            getGlobalEpsHisto(cat, xyz, masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
+            
+    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method, obj_type = ''):
+        
+        print_status(rank,self.start_time,'Starting drawDensityProfiles() with snap {0}'.format(self.SNAP))
+        
+        if rank == 0:
+            if obj_type == 'dm':
+                suffix = '_dm_'
+                with open('{0}/h_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+            elif obj_type == 'gx':
+                suffix = '_gx_'
+                with open('{0}/gx_cat_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
+                    cat = json.load(filehandle)
+            else:
+                raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
+            # Calculate obj_masses and obj_centers
+            obj_centers, obj_masses = self.fetchMassesCenters(obj_type)
+            best_fits, fits_ROverR200 = self.fetchDensProfsBestFits(method)
+            getDensityProfiles(self.VIZ_DEST, self.SNAP, cat, r200s, fits_ROverR200, dens_profs, ROverR200, obj_masses, obj_centers, method, self.start_time, MASS_UNIT=1e10, suffix = suffix)

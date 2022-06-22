@@ -24,7 +24,7 @@ import time
 start_time = time.time()
 
 ############## Parameters ####################################################################################
-L_BOX = np.float32(10) # cMpc/h
+L_BOX = np.float32(10) # Mpc/h
 nbar = 8e+3 # If too small, e.g. 5e+3: pynbody later yields OSError: Corrupt header record. If too large, need many GBs of RAM.
 Nmesh = 256
 redshift = 5.5

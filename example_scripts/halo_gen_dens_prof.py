@@ -32,15 +32,15 @@ D_LOGEND = 0
 D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
 M_TOL = np.float32(1e-2)
 N_WALL = 100
-N0 = 100
 N_MIN = 10
 SNAP = '015'
+MASS_UNIT = 1e+10
 MIN_NUMBER_DM_PTCS = 200
 CENTER = 'com'
 
 #################################### Generate 1 mock halo ######################################
 tot_mass = 10**(12) # M_sun/h
-halo_res = 500000
+halo_res = 600000
 r_s = 0.5 # Units are Mpc/h
 alpha = 0.18
 N_bin = 100
@@ -60,7 +60,7 @@ print("Number of particles in the halo is {}. Mass of each DM ptc is {:.2e} M_su
 dm_xyz = np.float32(np.hstack((np.reshape(halo_x, (halo_x.shape[0],1)), np.reshape(halo_y, (halo_y.shape[0],1)), np.reshape(halo_z, (halo_z.shape[0],1)))))
 
 ######################### Extract halo indices and halo sizes ##########################
-mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm
+mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
 h_indices = [np.arange(len(halo_x), dtype = np.int32).tolist()]
 
 ########################### Define CosmicShapesDirect object ###################################
@@ -68,11 +68,13 @@ cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ
 
 ############################## Estimate Density Profile ########################################
 # Visualize density profile: A sample output is shown above!
-dens_profs_db = cshapes.calcDensProfsDirectBinning(r_over_rvir)
-dens_profs_kb = cshapes.calcDensProfsKernelBased(r_over_rvir)
+cshapes.calcDensProfsDirectBinning(r_over_rvir)
+cshapes.calcDensProfsKernelBased(r_over_rvir)
+dens_profs_db, r_over_rvir = cshapes.fetchDensProfsDirectBinning() # dens_profs_db is in M_sun*h^2/Mpc^3
+dens_profs_kb, r_over_rvir = cshapes.fetchDensProfsKernelBased()
 plt.figure()
-plt.loglog(r_over_rvir, dens_profs_db[0], 'o--', label='direct binning', markersize = 3)
-plt.loglog(r_over_rvir, dens_profs_kb[0], 'o--', label='kernel-based', markersize = 3)
+plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='direct binning', markersize = 3)
+plt.loglog(r_over_rvir, dens_profs_kb, 'o--', label='kernel-based', markersize = 3)
 plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], rho_0, r_s, alpha), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} cMpc/h'.format(alpha, r_s))
 plt.xlabel(r'r/$R_{\mathrm{vir}}$')
 plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
@@ -81,8 +83,9 @@ plt.savefig('{}/RhoProfObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')
 
 ############################## Fit Density Profile #############################################
 r_over_rvir = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
-dens_profs_db = dens_profs_db[0][10:]
-best_fits = cshapes.fitDensProfs(dens_profs_db.reshape((1,dens_profs_db.shape[0])), r_over_rvir, r_vir, method = 'einasto')
+dens_profs_db = dens_profs_db[10:]
+cshapes.fitDensProfs(dens_profs_db.reshape((1,dens_profs_db.shape[0])), r_over_rvir, cshapes.fetchCat(), r_vir, method = 'einasto')
+best_fits = cshapes.fetchDensProfsBestFits('einasto')
 best_fit = best_fits[0]
 plt.figure()
 plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='density profile', markersize = 4)
