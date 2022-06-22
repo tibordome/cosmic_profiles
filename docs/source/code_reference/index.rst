@@ -3,9 +3,9 @@ Code Reference
 
 .. toctree::
 
-   cosmic_shapes  
+   cosmic_profiles 
    cython_helpers
-   shape_analysis
+   profile_analysis
    gen_csh_gx_cat
    python_helpers
    get_hdf5

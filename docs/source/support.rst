@@ -1,7 +1,7 @@
 Installation and Support
 *************************
 
-``cosmic_shapes`` has the following dependencies:
+*Cosmic Profiles* has the following dependencies:
 
 - numpy>=1.19.2
 - scipy
@@ -17,4 +17,4 @@ We recommend installing all packages, with the exception of ``openmp``, with `an
 
 The easiest way to get help with the code or to contribute is to open an issue or a pull request (PR) on GitHub.
 
-Github: https://github.com/tibordome/cosmic_shapes
+Github: https://github.com/tibordome/cosmic_profiles

@@ -17,9 +17,9 @@ import sys
 import h5py
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_shapes is not installed
+sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
 import numpy as np
-from cosmic_shapes import CosmicShapesDirect, createLogNormUni
+from cosmic_profiles import CosmicProfilesDirect, createLogNormUni
 import time
 start_time = time.time()
 
@@ -138,13 +138,13 @@ for h_idx in range(len(h_sizes)):
     offset += h_sizes[h_idx] + 1 # Skip line containing number of particles in halo
 #############################################################################################################
 
-############## Run cosmic_shapes: define CosmicShapes object ################################################
-cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+############## Run cosmic_profiles: define CosmicProfiles object ################################################
+cprofiles = CosmicProfilesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
 ############## Create local halo shape catalogue ############################################################
-cshapes.calcLocalShapes()
+cprofiles.calcLocalShapes()
 #############################################################################################################
 
 ############## Viz first halo ###############################################################################
-cshapes.vizLocalShapes([0])
+cprofiles.vizLocalShapes([0])
 #############################################################################################################

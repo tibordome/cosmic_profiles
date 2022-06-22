@@ -35,11 +35,11 @@ which measures the prolateness/oblateness of a halo. :math:`T = 1` describes a c
 
 Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r^{\text{center}}_{k,i}` is the :math:`i`-th component of its position vector with respect to the distribution's center (either mode or center of mass).
 
-To calculate shape profiles with ``cosmic_shapes``, we first instantiate a ``CosmicShapes`` object. Let us assume we are dealing with
+To calculate shape profiles with *Cosmic Profiles*, we first instantiate a ``CosmicProfiles`` object. Let us assume we are dealing with
 
 * a Gadget-style HDF5 snapshot output containing particle and halo/subhalo data in folders ``path/to/folder/snapdir_x`` and ``path/to/folder/groups_x`` with ``x`` typically a three-digit snapshot number identifier such as '042', respectively. Then we will define an object via::
 
-    from cosmic_shapes import CosmicShapesGadgetHDF5
+    from cosmic_profiles import CosmicProfilesGadgetHDF5
     import time
     
     # Parameters
@@ -62,13 +62,13 @@ To calculate shape profiles with ``cosmic_shapes``, we first instantiate a ``Cos
     start_time = time.time()
 
     # Instantiate object
-    cshapes = CosmicShapesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+    cprofiles = CosmicProfilesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
-with arguments explained in :ref:`the code reference<Cosmic Shapes Code Reference>`.
+with arguments explained in :ref:`the code reference<Cosmic Profiles Code Reference>`.
 
 * a very general assortment of point clouds. There is no requirement on the nature of the point clouds whatsoever, yet the shape determination algorithm will perform better the closer the point clouds are to being truly ellipsoidal. Often, the process of identifying such point clouds in a simulation can be challenging, which is why we provide an :ref:`interface<AHF interface>` to the 'Amiga Halo Finder' (AHF) via ``pynbody``. For now, we assume that we have identified the point clouds already and that ``obj_indices`` stores the indices of the particles belonging to the point clouds::
     
-    from cosmic_shapes import CosmicShapesDirect
+    from cosmic_profiles import CosmicProfilesDirect
     import time
     
     # Parameters
@@ -92,13 +92,13 @@ with arguments explained in :ref:`the code reference<Cosmic Shapes Code Referenc
     start_time = time.time()
 
     # Instantiate object
-    cshapes = CosmicShapesDirect(xyz, mass_array, obj_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+    cprofiles = CosmicProfilesDirect(xyz, mass_array, obj_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, we have to invoke ``cshapes.loadDMCat()`` before calculating the shape catalogue! This ensures that we extract the halo catalogue from the FoF/SH data.
+.. note:: In case of a Gadget-style HDF5 snapshot output, we have to invoke ``cprofiles.loadDMCat()`` before calculating the shape catalogue! This ensures that we extract the halo catalogue from the FoF/SH data.
 
 To calculate the local (i.e. as a function of :math:`r_{\text{ell}}`) halo shape catalogue, we can invoke the command::
 
-    cshapes.calcLocalShapes()
+    cprofiles.calcLocalShapes()
 
 which will calculate and store the morphological information in ``CAT_DEST``. We consider a halo shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``M_TOL`` and the maximum number of iterations ``N_WALL`` is not yet achieved. If in addition the halo shape profile converges at the radius of :math:`R_{200}` (200-overdensity radius), the shape profile is determined successfully. The :math:`N_{\text{conv}}` shape profiles are then grouped together and dumped as 1D and 2D arrays. The output consists of
 
@@ -112,7 +112,7 @@ which will calculate and store the morphological information in ``CAT_DEST``. We
 * ``m_x.txt`` of shape (:math:`N_{\text{conv}}`,): masses of halos
 * ``centers_x.txt`` of shape (:math:`N_{\text{conv}}`,3): centers of halos
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, specify ``cshapes.calcLocalShapesDM()`` to calculate local halo shapes and ``cshapes.calcLocalShapesGx()`` to calculate local galaxy shapes. The suffix of the output files will be modified accordingly to e.g. ``d_local_dm_x.txt`` or ``d_local_gx_x.txt``, respectively.
+.. note:: In case of a Gadget-style HDF5 snapshot output, specify ``cprofiles.calcLocalShapesDM()`` to calculate local halo shapes and ``cprofiles.calcLocalShapesGx()`` to calculate local galaxy shapes. The suffix of the output files will be modified accordingly to e.g. ``d_local_dm_x.txt`` or ``d_local_gx_x.txt``, respectively.
 
 ***************
 Global Shapes
@@ -120,7 +120,7 @@ Global Shapes
 
 Instead of shape profiles one might also be interested in obtaining the shape parameters and principal axes of the point clouds as a whole. This information is dumped on request by calling::
 
-    cshapes.calcGlobalShapes(). 
+    cprofiles.calcGlobalShapes(). 
 
 In that case, additional output will be added to ``CAT_DEST``:
 
@@ -134,9 +134,9 @@ In that case, additional output will be added to ``CAT_DEST``:
 * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
 * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-Again, invoke ``cshapes.calcGlobalShapesDM()`` to calculate global halo shapes and ``cshapes.calcGlobalShapesGx()`` to calculate global galaxy shapes, with suffixes adapted accordingly.
+Again, invoke ``cprofiles.calcGlobalShapesDM()`` to calculate global halo shapes and ``cprofiles.calcGlobalShapesGx()`` to calculate global galaxy shapes, with suffixes adapted accordingly.
 
-.. note:: :math:`N_{\text{pass}}` denotes the number of halos that pass the ``MIN_NUMBER_PTCS``-threshold (or ``MIN_NUMBER_STAR_PTCS``-threshold in case of ``cshapes.calcGlobalShapesGx()``). If the global shape determination does not converge, it will appear as NaNs in the output.
+.. note:: :math:`N_{\text{pass}}` denotes the number of halos that pass the ``MIN_NUMBER_PTCS``-threshold (or ``MIN_NUMBER_STAR_PTCS``-threshold in case of ``cprofiles.calcGlobalShapesGx()``). If the global shape determination does not converge, it will appear as NaNs in the output.
 
 *************************************
 Velocity Dispersion Tensor Eigenaxes
@@ -144,9 +144,9 @@ Velocity Dispersion Tensor Eigenaxes
 
 For Gadget-style HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling::
 
-    cshapes.calcGlobalVelShapesDM()
+    cprofiles.calcGlobalVelShapesDM()
 
-for global velocity shapes or ``cshapes.calcLocalVelShapesDM()`` for local velocity shapes. In that case, additional output will be added to ``CAT_DEST``, reflecting the velocity-related morphological information:
+for global velocity shapes or ``cprofiles.calcLocalVelShapesDM()`` for local velocity shapes. In that case, additional output will be added to ``CAT_DEST``, reflecting the velocity-related morphological information:
 
 * ``d_global_vdm_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
 * ``q_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter
@@ -158,6 +158,6 @@ for global velocity shapes or ``cshapes.calcLocalVelShapesDM()`` for local veloc
 * ``m_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
 * ``centers_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-The ``cshapes.calcLocalVelShapesDM()`` command will dump files named ``d_local_vdm_x.txt`` etc.
+The ``cprofiles.calcLocalVelShapesDM()`` command will dump files named ``d_local_vdm_x.txt`` etc.
 
 

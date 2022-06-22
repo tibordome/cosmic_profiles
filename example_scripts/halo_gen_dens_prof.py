@@ -18,8 +18,8 @@ import os
 import sys
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_shapes is not installed
-from cosmic_shapes import CosmicShapesDirect, genHalo, getEinastoProf
+sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
+from cosmic_profiles import CosmicProfilesDirect, genHalo, getEinastoProf
 import time
 start_time = time.time()
 
@@ -63,15 +63,15 @@ dm_xyz = np.float32(np.hstack((np.reshape(halo_x, (halo_x.shape[0],1)), np.resha
 mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
 h_indices = [np.arange(len(halo_x), dtype = np.int32).tolist()]
 
-########################### Define CosmicShapesDirect object ###################################
-cshapes = CosmicShapesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+########################### Define CosmicProfilesDirect object ###################################
+cprofiles = CosmicProfilesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
 ############################## Estimate Density Profile ########################################
 # Visualize density profile: A sample output is shown above!
-cshapes.calcDensProfsDirectBinning(r_over_rvir)
-cshapes.calcDensProfsKernelBased(r_over_rvir)
-dens_profs_db, r_over_rvir = cshapes.fetchDensProfsDirectBinning() # dens_profs_db is in M_sun*h^2/Mpc^3
-dens_profs_kb, r_over_rvir = cshapes.fetchDensProfsKernelBased()
+cprofiles.calcDensProfsDirectBinning(r_over_rvir)
+cprofiles.calcDensProfsKernelBased(r_over_rvir)
+dens_profs_db, r_over_rvir = cprofiles.fetchDensProfsDirectBinning() # dens_profs_db is in M_sun*h^2/Mpc^3
+dens_profs_kb, r_over_rvir = cprofiles.fetchDensProfsKernelBased()
 plt.figure()
 plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='direct binning', markersize = 3)
 plt.loglog(r_over_rvir, dens_profs_kb, 'o--', label='kernel-based', markersize = 3)
@@ -84,8 +84,8 @@ plt.savefig('{}/RhoProfObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')
 ############################## Fit Density Profile #############################################
 r_over_rvir = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
 dens_profs_db = dens_profs_db[10:]
-cshapes.fitDensProfs(dens_profs_db.reshape((1,dens_profs_db.shape[0])), r_over_rvir, cshapes.fetchCat(), r_vir, method = 'einasto')
-best_fits = cshapes.fetchDensProfsBestFits('einasto')
+cprofiles.fitDensProfs(dens_profs_db.reshape((1,dens_profs_db.shape[0])), r_over_rvir, cprofiles.fetchCat(), r_vir, method = 'einasto')
+best_fits = cprofiles.fetchDensProfsBestFits('einasto')
 best_fit = best_fits[0]
 plt.figure()
 plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='density profile', markersize = 4)

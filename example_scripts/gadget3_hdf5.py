@@ -15,8 +15,8 @@ import sys
 import inspect
 import numpy as np
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_shapes is not installed
-from cosmic_shapes import CosmicShapesGadgetHDF5
+sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
+from cosmic_profiles import CosmicProfilesGadgetHDF5
 import time
 start_time = time.time()
 
@@ -39,47 +39,47 @@ MIN_NUMBER_DM_PTCS = 200
 MIN_NUMBER_STAR_PTCS = 100
 ROverR200 = np.logspace(-1.5,0,70)
 
-# Define CosmicShapes object
-cshapes = CosmicShapesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+# Define CosmicProfiles object
+cprofiles = CosmicProfilesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
 
 ########################## Calculating Morphological Properties ###############################
 # Retrieve HDF5 halo catalogue, extract CSHs
-cshapes.loadDMCat()
+cprofiles.loadDMCat()
 
 # Create local halo shape catalogue
-cshapes.calcLocalShapesDM()
+cprofiles.calcLocalShapesDM()
 
 # Create global halo shape catalogue
-cshapes.calcGlobalShapesDM()
+cprofiles.calcGlobalShapesDM()
 
 # Retrieve/Construct gx catalogue
-cshapes.loadGxCat()
+cprofiles.loadGxCat()
 
 # Create local gx shape catalogue
-cshapes.calcLocalShapesGx()
+cprofiles.calcLocalShapesGx()
 
 ######################################## Visualizations #######################################
 # Viz first few halos' shapes
-cshapes.vizLocalShapes([0,1,2], obj_type = 'dm')
+cprofiles.vizLocalShapes([0,1,2], obj_type = 'dm')
 
 # Viz first few galaxies' shapes
-cshapes.vizLocalShapes([0,1,2], obj_type = 'gx')
+cprofiles.vizLocalShapes([0,1,2], obj_type = 'gx')
 
 # Plot halo ellipticity histogram
-cshapes.plotGlobalEpsHisto(obj_type = 'dm')
+cprofiles.plotGlobalEpsHisto(obj_type = 'dm')
 
 # Plot halo triaxiality histogram
-cshapes.plotLocalTHisto(obj_type = 'dm')
+cprofiles.plotLocalTHisto(obj_type = 'dm')
 
 # Draw halo shape profiles (overall and mass-decomposed ones)
-cshapes.drawShapeProfiles(obj_type = 'dm')
+cprofiles.drawShapeProfiles(obj_type = 'dm')
 
 ########################## Calculating and Visualizing Density Profiles #######################
 # Create local halo density catalogue
-cshapes.calcDensProfsDirectBinning(ROverR200, obj_type = 'dm')
+cprofiles.calcDensProfsDirectBinning(ROverR200, obj_type = 'dm')
 
 # Fit density profiles
-cshapes.fitDensProfs(cshapes.fetchDensProfsDirectBinning()[0][:,25:], cshapes.fetchDensProfsDirectBinning()[1][25:], cshapes.fetchHaloCat(), cshapes.fetchR200s(), 'nfw')
+cprofiles.fitDensProfs(cprofiles.fetchDensProfsDirectBinning()[0][:,25:], cprofiles.fetchDensProfsDirectBinning()[1][25:], cprofiles.fetchHaloCat(), cprofiles.fetchR200s(), 'nfw')
 
 # Draw halo density profiles (overall and mass-decomposed ones)
-cshapes.drawDensityProfiles(cshapes.fetchDensProfsDirectBinning()[0][:,25:], cshapes.fetchDensProfsDirectBinning()[1][25:], cshapes.fetchHaloCat(), cshapes.fetchR200s(), 'nfw', obj_type = 'dm')
+cprofiles.drawDensityProfiles(cprofiles.fetchDensProfsDirectBinning()[0][:,25:], cprofiles.fetchDensProfsDirectBinning()[1][25:], cprofiles.fetchHaloCat(), cprofiles.fetchR200s(), 'nfw', obj_type = 'dm')

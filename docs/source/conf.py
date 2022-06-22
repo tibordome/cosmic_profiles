@@ -12,13 +12,13 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../cosmic_shapes/for_docs'))
+sys.path.insert(0, os.path.abspath('../../cosmic_profiles/for_docs'))
 sys.path.insert(0, os.path.abspath('../../example_scripts'))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'cosmic_shapes'
+project = 'cosmic_profiles'
 copyright = '2022, Tibor Dome'
 author = 'Tibor Dome'
 
@@ -86,13 +86,13 @@ def linkcode_resolve(domain, info):
     try:
         filename = 'lasagne/%s#L%d-L%d' % find_source()
     except Exception:
-        if info['module'] == 'gen_csh_gx_cat' or info['module'] == 'cython_helpers' or info['module'] == 'cosmic_shapes':
+        if info['module'] == 'gen_csh_gx_cat' or info['module'] == 'cython_helpers' or info['module'] == 'cosmic_profiles':
             extension = '.pyx'
         else:
             extension = '.py'
         filename = info['module'].replace('.', '/') + extension
     tag = 'master' if 'dev' in release else ('v' + release)
-    return "https://github.com/tibordome/cosmic_shapes/tree/master/cosmic_shapes/%s" % (filename)
+    return "https://github.com/tibordome/cosmic_profiles/tree/master/cosmic_profiles/%s" % (filename)
 
 # -- Making sure __init__ of classes show up --
 def skip(app, what, name, obj, would_skip, options):

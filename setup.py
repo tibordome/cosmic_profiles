@@ -36,20 +36,20 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 ext_modules=[Extension(
-                "cosmic_shapes.cython_helpers",
-                sources=['cosmic_shapes/cython_helpers.c'],
+                "cosmic_profiles.cython_helpers",
+                sources=['cosmic_profiles/cython_helpers.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
             ), Extension(
-                "cosmic_shapes.gen_csh_gx_cat",
-                sources=['cosmic_shapes/gen_csh_gx_cat.c'],
+                "cosmic_profiles.gen_csh_gx_cat",
+                sources=['cosmic_profiles/gen_csh_gx_cat.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
             ), Extension(
-                "cosmic_shapes.cosmic_shapes",
-                sources=['cosmic_shapes/cosmic_shapes.c'],
+                "cosmic_profiles.cosmic_profiles",
+                sources=['cosmic_profiles/cosmic_profiles.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -57,14 +57,14 @@ ext_modules=[Extension(
 
 # This call to setup() does all the work
 setup(
-    name="cosmic_shapes",
-    version="1.12.0",
-    description="Implements various ellipsoidal shape identification algorithms for 3D particle data",
+    name="cosmic_profiles",
+    version="1.0.0",
+    description="Implements 3D point cloud algorithms for estimation and fitting of shape and density profiles",
     long_description=README,
     long_description_content_type="text/markdown",
     project_urls={
-    'Documentation': 'https://cosmic-shapes.readthedocs.io/en/latest/',
-    'Source': "https://github.com/tibordome/cosmic_shapes"
+    'Documentation': 'https://cosmic-profiles.readthedocs.io/en/latest/',
+    'Source': "https://github.com/tibordome/cosmic_profiles"
     },
     author="Tibor Dome",
     author_email="tibor.doeme@gmail.com",
