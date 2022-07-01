@@ -36,20 +36,32 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 ext_modules=[Extension(
-                "cosmic_profiles.cython_helpers",
-                sources=['cosmic_profiles/cython_helpers.c'],
+                "cosmic_profiles.cython_helpers.helper_class",
+                sources=['cosmic_profiles/cython_helpers/helper_class.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
             ), Extension(
-                "cosmic_profiles.gen_csh_gx_cat",
-                sources=['cosmic_profiles/gen_csh_gx_cat.c'],
+                "cosmic_profiles.gadget_hdf5.gen_catalogues",
+                sources=['cosmic_profiles/gadget_hdf5/gen_catalogues.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
             ), Extension(
-                "cosmic_profiles.cosmic_profiles",
-                sources=['cosmic_profiles/cosmic_profiles.c'],
+                "cosmic_profiles.dens_profs.dens_profs_algos",
+                sources=['cosmic_profiles/dens_profs/dens_profs_algos.c'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            ), Extension(
+                "cosmic_profiles.shape_profs.shape_profs_algos",
+                sources=['cosmic_profiles/shape_profs/shape_profs_algos.c'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            ), Extension(
+                "cosmic_profiles.common.profile_classes",
+                sources=['cosmic_profiles/common/profile_classes.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']

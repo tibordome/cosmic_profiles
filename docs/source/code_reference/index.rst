@@ -3,12 +3,12 @@ Code Reference
 
 .. toctree::
 
-   cosmic_profiles 
+   common 
    cython_helpers
-   profile_analysis
-   gen_csh_gx_cat
-   python_helpers
-   get_hdf5
+   dens_profs
+   shape_profs
+   gadget_hdf5
+   mock_tools
 
 .. toctree::
    :hidden:

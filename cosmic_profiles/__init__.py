@@ -1,4 +1,4 @@
-from .python_helpers import (
+from .common.python_routines import (
     eTo10,
     print_status,
     getRhoCrit,
@@ -11,14 +11,23 @@ from .python_helpers import (
     drawUniformFromEllipsoid
 )
 
-from .cosmic_profiles import (
-    createLogNormUni,
-    genHalo,
+from .dens_profs.dens_profs_tools import (
     getAlphaBetaGammaProf,
     getEinastoProf,
     getHernquistProf,
-    getNFWProf,
+    getNFWProf
+)
+
+from .mock_tools.mock_halo_gen import (
+    genHalo
+)
+
+from .mock_tools.mock_uni import (
+    createLogNormUni
+)
+
+from .common.profile_classes import (
     CosmicProfiles,
     CosmicProfilesGadgetHDF5,
-    CosmicProfilesDirect,
+    CosmicProfilesDirect
 )

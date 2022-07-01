@@ -35,8 +35,8 @@ class BuildExtWithoutPlatformSuffix(build_ext):
         return get_ext_filename_without_platform_suffix(filename)
 
 extension1 = [Extension(
-                "cython_helpers",
-                sources=['cython_helpers.pyx'],
+                "cython_helpers.helper_class",
+                sources=['cython_helpers/helper_class.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -50,8 +50,8 @@ setup(
 )
 
 extension2 = [Extension(
-                "gen_csh_gx_cat",
-                sources=['gen_csh_gx_cat.pyx'],
+                "gadget_hdf5.gen_catalogues",
+                sources=['gadget_hdf5/gen_catalogues.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -65,8 +65,8 @@ setup(
 )
 
 extension3 = [Extension(
-                "cosmic_profiles",
-                sources=['cosmic_profiles.pyx'],
+                "dens_profs.dens_profs_algos",
+                sources=['dens_profs/dens_profs_algos.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -77,4 +77,34 @@ extension3 = [Extension(
 setup(
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     ext_modules = cythonize(extension3)
+)
+
+extension4 = [Extension(
+                "shape_profs.shape_profs_algos",
+                sources=['shape_profs/shape_profs_algos.pyx'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            )]
+    
+
+
+setup(
+    cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
+    ext_modules = cythonize(extension4)
+)
+
+extension5 = [Extension(
+                "common.profile_classes",
+                sources=['common/profile_classes.pyx'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            )]
+    
+
+
+setup(
+    cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
+    ext_modules = cythonize(extension5)
 )

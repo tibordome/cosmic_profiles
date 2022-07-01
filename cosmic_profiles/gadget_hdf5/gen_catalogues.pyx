@@ -1,17 +1,13 @@
 #cython: language_level=3
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 28 12:24:04 2022
-"""
 
-from cython_helpers cimport CythonHelpers
 import numpy as np
 cimport cython
 cimport openmp
 from cython.parallel import prange
 
-@cython.embedsignature(True)       
+@cython.embedsignature(True) 
 cdef int[:] getCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS) nogil:
     """ Return the indices of the DM particles that belong to the CSH
     

@@ -6,7 +6,6 @@ Created on Wed Mar  3 13:17:51 2021
 """
 
 import numpy as np
-from libc.math cimport sqrt, pi
 from copy import deepcopy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -26,15 +25,14 @@ from functools import partial
 cimport cython
 import os
 from mpl_toolkits.mplot3d import Axes3D
-from cosmic_profiles.python_helpers import print_status, set_axes_equal, fibonacci_ellipsoid, drawUniformFromShell, getMassDMParticle, respectPBCNoRef, getCoM, findMode
-from cosmic_profiles.profile_analysis import getGlobalEpsHisto, getLocalTHisto, getShapeProfiles, getDensityProfiles, fitDensProfHelper
-from cosmic_profiles.get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData
-from cosmic_profiles.gen_csh_gx_cat import getCSHCat, getGxCat
-from cosmic_profiles.cython_helpers cimport CythonHelpers
-from nbodykit.lab import cosmology, LogNormalCatalog
-from pynverse import inversefunc
-from scipy.integrate import quad
-import math
+from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, getCoM, findMode
+from cosmic_profiles.shape_profs.shape_profs_tools import getGlobalEpsHisto, getLocalTHisto, getShapeProfiles
+from cosmic_profiles.dens_profs.dens_profs_tools import getDensityProfiles, fitDensProfHelper
+from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData
+from cosmic_profiles.gadget_hdf5.gen_catalogues import getCSHCat, getGxCat
+from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
+from cosmic_profiles.shape_profs.shape_profs_algos cimport runEllShellAlgo, runEllAlgo, runEllVDispAlgo
+from cosmic_profiles.dens_profs.dens_profs_algos import getDensProfsDirectBinning, getDensProfsKernelBased
 import time
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -42,117 +40,15 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 @cython.embedsignature(True)
-def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
-    
-    print('Starting createLogNormUni()')
-        
-    if rank == 0:
-        # Generating LogNormal Catalog
-        redshift = redshift
-        cosmo = cosmology.Planck15
-        Plin = cosmology.LinearPower(cosmo, redshift, transfer='EisensteinHu')
-        
-        cat = LogNormalCatalog(Plin=Plin, nbar=nbar, BoxSize=BoxSize, Nmesh=Nmesh, bias=2.0, seed=42)
-        x_vec = np.float32(np.array(cat['Position'][:,0])) # Mpc/h
-        y_vec = np.float32(np.array(cat['Position'][:,1]))
-        z_vec = np.float32(np.array(cat['Position'][:,2]))
-        
-        x_vel = np.float32(np.array(cat['Velocity'][:,0]))
-        y_vel = np.float32(np.array(cat['Velocity'][:,1]))
-        z_vel = np.float32(np.array(cat['Velocity'][:,2]))
-        
-        N = int(round(len(x_vec)**(1/3)))
-        N_tot = len(x_vec)
-        dm_mass = getMassDMParticle(N, BoxSize)/UNIT_MASS
-        return N_tot, x_vec, y_vec, z_vec, x_vel, y_vel, z_vel, np.ones((len(x_vec),),dtype = np.float32)*dm_mass
-    else:
-        return None, None, None, None, None, None, None, None
-    
-@cython.embedsignature(True)
-def getAlphaBetaGammaProf(r, rho_0, alpha, beta, gamma, r_s):
-    
-    return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
-
-@cython.embedsignature(True)
-def getEinastoProf(r, rho_2, r_2, alpha):
-    
-    return rho_2*np.exp(-2/alpha*((r/r_2)**alpha-1))
-
-@cython.embedsignature(True)
-def getNFWProf(r, rho_s, r_s):
-    
-    return rho_s/((r/r_s)*(1+r/r_s)**2)
-
-@cython.embedsignature(True)
-def getHernquistProf(r, rho_s, r_s):
-    
-    return rho_s/((r/r_s)*(1+r/r_s)**3)
-    
-@cython.embedsignature(True)
-def genHalo(tot_mass, res, model_pars, method, a, b, c):
-    
-    print('Starting genHalo()')
-        
-    if rank == 0:
-        # Determine rho_0 in units of M_sun*h^2/Mpc^3
-        def getMassIntegrand0(r, method, model_pars):
-            if method == 'einasto':
-                r_2, alpha = model_pars
-                return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_2)**alpha-1))
-            if method == 'alpha_beta_gamma':
-                alpha, beta, gamma, r_s = model_pars
-                return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
-            if method == 'hernquist':
-                r_s = model_pars
-                return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**3)
-            else:
-                r_s = model_pars
-                return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**2)
-        rho_0 = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(method, model_pars))[0]
-        model_pars = np.hstack((np.array([rho_0]),model_pars))
-        
-        # Determine number of particles in second shell (first proper shell)
-        def getMassIntegrand(r, model_pars):
-            if method == 'einasto':
-                rho_2, r_2, alpha = model_pars
-                return 4*np.pi*r**2*getEinastoProf(r, rho_2, r_2, alpha)
-            if method == 'alpha_beta_gamma':
-                rho_0, alpha, beta, gamma, r_s = model_pars
-                return 4*np.pi*r**2*getAlphaBetaGammaProf(r, rho_0, alpha, beta, gamma, r_s)
-            if method == 'hernquist':
-                rho_s, r_s = model_pars
-                return 4*np.pi*r**2*getHernquistProf(r, rho_s, r_s)
-            else:
-                rho_s, r_s = model_pars
-                return 4*np.pi*r**2*getNFWProf(r, rho_s, r_s)
-        
-        # Determine number of particles in second shell
-        mass_1 = quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0] # Mass in shell 1 in units of M_sun/h
-        N1 = int(round(res*mass_1/tot_mass)) # Number of particles in shell 1. Rounding error is unavoidable.
-        
-        # Build up halo successively in onion-like fashion
-        halo_x = np.empty(0)
-        halo_y = np.empty(0)
-        halo_z = np.empty(0)
-        Nptc = np.zeros((a.shape[0],), dtype = np.int32) # Note: Number of ptcs in shell Shell(a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
-        for shell in range(a.shape[0]):
-            if shell != 0:
-                Nptc[shell] = int(round(N1*quad(getMassIntegrand, a[shell-1], a[shell], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
-            else:
-                Nptc[shell] = int(round(N1*quad(getMassIntegrand, 1e-8, a[0], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
-        with Pool(processes=openmp.omp_get_max_threads()) as pool:
-            results = pool.map(partial(drawUniformFromShell, 3, a, b, c, Nptc), [idx for idx in range(Nptc.shape[0])]) # Draws from Shell(a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
-        for result in results:
-            halo_x = np.hstack((halo_x, result[:,0]))
-            halo_y = np.hstack((halo_y, result[:,1]))
-            halo_z = np.hstack((halo_z, result[:,2]))
-        mass_dm = quad(getMassIntegrand, 1e-8, a[-1], args=(model_pars))[0]/halo_z.shape[0]    
-        return halo_x, halo_y, halo_z, mass_dm, rho_0
-    else:
-        return None, None, None, None, None
-
-@cython.embedsignature(True)
 cdef class CosmicProfiles:
+    """ Parent class governing low-level cosmic shape calculations
+    
+    Its public methods are ``fetchCatLocal()``, ``fetchCatGlobal()``, ``getDensProfsDirectBinning()``,
+    ``getDensProfsKernelBased()``, ``runS1()``, ``runE1()``, ``runE1VelDisp()``, ``getObjMorphLocal()``, ``getObjMorphGlobal()``, 
+    ``getObjMorphLocalVelDisp()``, ``getObjMorphGlobalVelDisp()``, ``getMorphLocal()``, ``getMorphGlobal()``, 
+    ``getMorphLocalVelDisp()``, ``getMorphGlobalVelDisp()``, ``drawShapeProfiles()``, ``plotLocalTHisto()``, 
+    ``fitDensProfs()``, ``fetchDensProfsBestFits()``, ``fetchDensProfsDirectBinning()``,
+    ``fetchDensProfsKernelBased()`` and ``fetchShapeCat()``."""
     cdef str CAT_DEST
     cdef str VIZ_DEST
     cdef str SNAP
@@ -169,7 +65,34 @@ cdef class CosmicProfiles:
     cdef double start_time
     
     def __init__(self, str CAT_DEST, str VIZ_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
-        
+        """        
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string
+        :param VIZ_DEST: visualisation folder destination
+        :type VIZ_DEST: string
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGSTART: int
+        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGEND: int
+        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
+        :type D_BINS: int
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :param start_time: time of start of object initialization
+        :type start_time: float"""
         self.CAT_DEST = CAT_DEST
         self.VIZ_DEST = VIZ_DEST
         self.SNAP = SNAP
@@ -186,7 +109,23 @@ cdef class CosmicProfiles:
         self.start_time = start_time
         
     def calcMassesCenters(self, cat, float[:,:] xyz, float[:] masses, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
+        """ Calculate total mass and centers of objects
         
+        :param cat: list of indices defining the objects
+        :type cat: list of length N1, each consisting of a list of int indices
+        :param xyz: positions of all simulation particles
+        :type xyz: (N2,3) floats, N2 >> N1
+        :param masses: masses of all simulation particles
+        :type masses: (N2,) floats
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param L_BOX: box size
+        :type L_BOX: float
+        :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return centers, m: centers and masses
+        :rtype: (N,3) and (N,) floats"""
         # Transform cat to int[:,:]
         cdef int nb_objs = len(cat)
         cdef int p
@@ -223,7 +162,12 @@ cdef class CosmicProfiles:
         return centers.base, m.base # Only rank = 0 content matters
     
     def fetchMassesCenters(self, obj_type):
+        """ Calculate total mass and centers of objects
         
+        :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
+        :type obj_type: string
+        :return centers, m: centers and masses
+        :rtype: (N,3) and (N,) floats"""
         if obj_type == 'dm':
             suffix = '_dm_'
         elif obj_type == 'gx':
@@ -236,7 +180,12 @@ cdef class CosmicProfiles:
         return centers, ms
     
     def fetchCatLocal(self, obj_type = 'dm'):
+        """ Fetch local halo/gx catalogue
         
+        :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
+        :type obj_type: string
+        :return cat_local: list of indices defining the objects
+        :type cat_local: list of length N1, each consisting of a list of int indices"""
         print_status(rank,self.start_time,'Starting fetchCatLocal() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -254,7 +203,12 @@ cdef class CosmicProfiles:
             return None
     
     def fetchCatGlobal(self, obj_type = 'dm'):
+        """ Fetch global halo/gx catalogue
         
+        :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
+        :type obj_type: string
+        :return cat_global: list of indices defining the objects
+        :type cat_global: list of length N1, each consisting of a list of int indices"""
         print_status(rank,self.start_time,'Starting fetchCatGlobal() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -271,346 +225,50 @@ cdef class CosmicProfiles:
         else:
             return None
     
-    def getDensProfsDirectBinning(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
-        
-        cdef int nb_objs = len(cat)
-        # Determine endpoints of radial bins
-        cdef float[:] rad_bins = np.hstack(([np.float32(1e-8), (ROverR200.base[:-1] + ROverR200.base[1:])/2., ROverR200.base[-1]])) # Length = ROverR200.shape[0]+1
-        cdef int r_res = ROverR200.shape[0]
-        cdef int p
-        cdef int n
-        cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
-        cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
-        for p in range(nb_objs):
-            if len(cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
-                obj_size[p] = len(cat[p])
-                obj_pass[p] = 1
-            else:
-                if obj_keep[p] == 1:
-                    raise ValueError("Having a 1 in obj_keep for an object for which cat is empty is not allowed.")
-        cdef int nb_pass = np.sum(obj_pass.base)
-        cdef int nb_keep = np.sum(obj_keep.base)
-        if nb_objs == 0:
-            return ROverR200.base, np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32)
-        # Transform cat to int[:,:]
-        cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(cat[p]) for p in range(nb_objs)])), dtype = np.int32)
-        cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
-        idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
-        for p in range(nb_objs):
-            if obj_pass[p] == 1:
-                cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(cat[p])
-        # Define memoryviews
-        cdef int[:] idxs_keep = np.zeros((nb_objs,), dtype = np.int32)
-        idxs_keep.base[obj_keep.base.nonzero()[0]] = np.arange(np.sum(obj_keep.base))
-        cdef float[:,:] dens_profs = np.zeros((nb_keep, r_res), dtype = np.float32)
-        cdef float[:,:] Mencls = np.zeros((nb_keep, r_res), dtype = np.float32)
-        cdef float[:,:] rad_bins_tiled = np.reshape(np.tile(rad_bins.base, reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), r_res+1))
-        cdef int[:,:] shell = np.zeros((openmp.omp_get_max_threads(), cat_arr.shape[1]), dtype = np.int32)
-        cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), cat_arr.shape[1], 3), dtype = np.float32)
-        cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), cat_arr.shape[1]), dtype = np.float32)
-        cdef float[:,:] centers = np.zeros((nb_pass,3), dtype = np.float32)
-        for p in range(nb_objs): # Calculate centers of objects
-            if obj_pass[p] == 1:
-                xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
-                if CENTER == 'mode':
-                    centers.base[idxs_compr[p]] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
-                else:
-                    centers.base[idxs_compr[p]] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
-        for p in prange(nb_objs, schedule = 'dynamic', nogil = True):
-            if obj_keep[p] == 1:
-                for n in range(obj_size[p]):
-                    xyz_obj[openmp.omp_get_thread_num(),n] = xyz[cat_arr[idxs_compr[p],n]]
-                    m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
-                xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-                dens_profs[idxs_keep[p]] = CythonHelpers.getDensProfBruteForce(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], centers[idxs_compr[p]], r200s[p], rad_bins_tiled[openmp.omp_get_thread_num()], dens_profs[idxs_keep[p]], shell[openmp.omp_get_thread_num()])
-        
-        return ROverR200.base, dens_profs.base
-    
-    def getDensProfsKernelBased(self, cat, float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):
-        
-        cdef int nb_objs = len(cat)
-        cdef int r_res = ROverR200.shape[0]
-        cdef int p
-        cdef int r_idx
-        cdef int n
-        cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
-        cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
-        for p in range(nb_objs):
-            if len(cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
-                obj_size[p] = len(cat[p])
-                obj_pass[p] = 1
-            else:
-                if obj_keep[p] == 1:
-                    raise ValueError("Having a 1 in obj_keep for an object for which cat is empty is not allowed.")
-        cdef int nb_pass = np.sum(obj_pass.base)
-        cdef int nb_keep = np.sum(obj_keep.base)
-        if nb_objs == 0:
-            return ROverR200.base, np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32), np.zeros((0,r_res), dtype = np.float32)
-        # Transform cat to int[:,:]
-        cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(cat[p]) for p in range(nb_objs)])), dtype = np.int32)
-        cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
-        idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
-        for p in range(nb_objs):
-            if obj_pass[p] == 1:
-                cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(cat[p])
-        # Define memoryviews
-        cdef int[:] idxs_keep = np.zeros((nb_objs,), dtype = np.int32)
-        idxs_keep.base[obj_keep.base.nonzero()[0]] = np.arange(np.sum(obj_keep.base))
-        cdef float[:,:] dens_profs = np.zeros((nb_keep, r_res), dtype = np.float32)
-        cdef float[:,:] Mencls = np.zeros((nb_keep, r_res), dtype = np.float32)
-        cdef int[:] shell = np.zeros((cat_arr.shape[1]), dtype = np.int32)
-        cdef float[:,:] xyz_obj = np.zeros((cat_arr.shape[1], 3), dtype = np.float32)
-        cdef float[:] m_obj = np.zeros((cat_arr.shape[1]), dtype = np.float32)
-        cdef float[:,:] centers = np.zeros((nb_pass,3), dtype = np.float32)
-        cdef float[:] dists = np.zeros((cat_arr.shape[1],), dtype = np.float32) # Distances from center of halo
-        cdef float[:] hs = np.zeros((cat_arr.shape[1],), dtype = np.float32) # Kernel widths
-        for p in range(nb_objs): # Calculate centers of objects
-            if obj_pass[p] == 1:
-                xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
-                if CENTER == 'mode':
-                    centers.base[idxs_compr[p]] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
-                else:
-                    centers.base[idxs_compr[p]] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
-            if obj_keep[p] == 1:
-                for n in range(obj_size[p]):
-                    xyz_obj[n] = xyz[cat_arr[idxs_compr[p],n]]
-                    m_obj[n] = masses[cat_arr[idxs_compr[p],n]]
-                xyz_obj[:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[:obj_size[p]], L_BOX)
-                dists = np.linalg.norm(xyz_obj.base[:obj_size[p]]-centers.base[idxs_compr[p]], axis = 1)
-                hs = 0.005*ROverR200[-1]*r200s[p]*(dists.base/(ROverR200[-1]*r200s[p]))**(0.5)
-                for r_idx in prange(r_res, schedule = 'dynamic', nogil = True):
-                    for n in range(obj_size[p]):
-                        dens_profs[idxs_keep[p]][r_idx] += m_obj[n]*CythonHelpers.getKTilde(ROverR200[r_idx]*r200s[p], dists[n], hs[n])/(hs[n]**3)
-        
-        return ROverR200.base, dens_profs.base
-    
-    cdef float[:] runS1(self, float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN) nogil:
-        
-        shell[:] = 0
-        cdef int pts_in_shell = 0
-        cdef int corr = 0
-        cdef float err = 1.0
-        cdef float q_new = 1.0
-        cdef float s_new = 1.0
-        cdef float q_old = 1.0
-        cdef float s_old = 1.0
-        cdef int iteration = 1
-        cdef float vec2_norm = 1.0
-        cdef float vec1_norm = 1.0
-        cdef float vec0_norm = 1.0
-        cdef int i
-        # Start with spherical shell
-        for i in range(xyz.shape[0]):
-            if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < d**2 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (d-delta_d)**2:
-                shell[i-corr] = i
-                pts_in_shell += 1
-            else:
-                corr += 1
-        while (err > M_TOL):
-            if iteration > N_WALL:
-                morph_info[:] = 0.0
-                return morph_info
-            if pts_in_shell < N_MIN:
-                morph_info[:] = 0.0
-                return morph_info
-            # Get shape tensor
-            shape_tensor = CythonHelpers.getShapeTensor(xyz, shell, shape_tensor, masses, center, pts_in_shell)
-            # Diagonalize shape_tensor
-            eigvec[:,:] = 0.0
-            eigval[:] = 0.0
-            CythonHelpers.ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
-            q_old = q_new; s_old = s_new
-            q_new = sqrt(eigval[1]/eigval[2])
-            s_new = sqrt(eigval[0]/eigval[2]) # It is assumed that eigenvalues are approximately proportional to a^2 etc. (true for uniform ellipsoid or uniform shell), though I have never seen any proof..
-            err = max(CythonHelpers.cython_abs(q_new - q_old)/q_old, CythonHelpers.cython_abs(s_new - s_old)/s_old) # Fractional differences
-            vec2_norm = sqrt(eigvec[0,2].real**2+eigvec[1,2].real**2+eigvec[2,2].real**2)
-            vec1_norm = sqrt(eigvec[0,1].real**2+eigvec[1,1].real**2+eigvec[2,1].real**2)
-            vec0_norm = sqrt(eigvec[0,0].real**2+eigvec[1,0].real**2+eigvec[2,0].real**2)
-            # Update morph_info
-            morph_info[0] = d
-            morph_info[1] = q_new
-            morph_info[2] = s_new
-            morph_info[3] = eigvec[0,2].real/vec2_norm
-            morph_info[4] = eigvec[1,2].real/vec2_norm
-            morph_info[5] = eigvec[2,2].real/vec2_norm
-            morph_info[6] = eigvec[0,1].real/vec1_norm
-            morph_info[7] = eigvec[1,1].real/vec1_norm
-            morph_info[8] = eigvec[2,1].real/vec1_norm
-            morph_info[9] = eigvec[0,0].real/vec0_norm
-            morph_info[10] = eigvec[1,0].real/vec0_norm
-            morph_info[11] = eigvec[2,0].real/vec0_norm
-            # Transformation into the principal frame
-            for i in range(xyz.shape[0]):
-                xyz_princ[i,0] = eigvec[0,2].real/vec2_norm*(xyz[i,0]-center[0])+eigvec[1,2].real/vec2_norm*(xyz[i,1]-center[1])+eigvec[2,2].real/vec2_norm*(xyz[i,2]-center[2])
-                xyz_princ[i,1] = eigvec[0,1].real/vec1_norm*(xyz[i,0]-center[0])+eigvec[1,1].real/vec1_norm*(xyz[i,1]-center[1])+eigvec[2,1].real/vec1_norm*(xyz[i,2]-center[2])
-                xyz_princ[i,2] = eigvec[0,0].real/vec0_norm*(xyz[i,0]-center[0])+eigvec[1,0].real/vec0_norm*(xyz[i,1]-center[1])+eigvec[2,0].real/vec0_norm*(xyz[i,2]-center[2])
-            shell[:] = 0
-            pts_in_shell = 0
-            corr = 0
-            if q_new*d <= delta_d or s_new*d <= delta_d:
-                for i in range(xyz_princ.shape[0]):
-                    if xyz_princ[i,0]**2+xyz_princ[i,1]**2/q_new**2+xyz_princ[i,2]**2/s_new**2 < d**2:
-                        shell[i-corr] = i
-                        pts_in_shell += 1
-                    else:
-                        corr += 1
-            else:
-                for i in range(xyz_princ.shape[0]):
-                    if xyz_princ[i,0]**2+xyz_princ[i,1]**2/q_new**2+xyz_princ[i,2]**2/s_new**2 < d**2 and xyz_princ[i,0]**2/(d-delta_d)**2+xyz_princ[i,1]**2/(q_new*d-delta_d)**2+xyz_princ[i,2]**2/(s_new*d-delta_d)**2 >= 1:
-                        shell[i-corr] = i
-                        pts_in_shell += 1
-                    else:
-                        corr += 1
-            iteration += 1
-        return morph_info
-    
-    
-    cdef float[:] runE1(self, float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN) nogil:
-        
-        ellipsoid[:] = 0
-        cdef int pts_in_ell = 0
-        cdef int corr = 0
-        cdef float err = 1.0
-        cdef float q_new = 1.0
-        cdef float s_new = 1.0
-        cdef float q_old = 1.0
-        cdef float s_old = 1.0
-        cdef int iteration = 1
-        cdef float vec2_norm = 1.0
-        cdef float vec1_norm = 1.0
-        cdef float vec0_norm = 1.0
-        cdef int i
-        # Start with sphere
-        for i in range(xyz.shape[0]):
-            if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < d**2:
-                ellipsoid[i-corr] = i
-                pts_in_ell += 1
-            else:
-                corr += 1
-        while (err > M_TOL):
-            if iteration > N_WALL:
-                morph_info[:] = 0.0
-                return morph_info
-            if pts_in_ell < N_MIN:
-                morph_info[:] = 0.0
-                return morph_info
-            # Get shape tensor
-            shape_tensor = CythonHelpers.getShapeTensor(xyz, ellipsoid, shape_tensor, masses, center, pts_in_ell)
-            # Diagonalize shape_tensor
-            eigvec[:,:] = 0.0
-            eigval[:] = 0.0
-            CythonHelpers.ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
-            q_old = q_new; s_old = s_new
-            q_new = sqrt(eigval[1]/eigval[2])
-            s_new = sqrt(eigval[0]/eigval[2]) # It is assumed that eigenvalues are approximately proportional to a^2 etc. (true for uniform ellipsoid or uniform shell), though I have never seen any proof..
-            err = max(CythonHelpers.cython_abs(q_new - q_old)/q_old, CythonHelpers.cython_abs(s_new - s_old)/s_old) # Fractional differences
-            vec2_norm = sqrt(eigvec[0,2].real**2+eigvec[1,2].real**2+eigvec[2,2].real**2)
-            vec1_norm = sqrt(eigvec[0,1].real**2+eigvec[1,1].real**2+eigvec[2,1].real**2)
-            vec0_norm = sqrt(eigvec[0,0].real**2+eigvec[1,0].real**2+eigvec[2,0].real**2)
-            # Update morph_info
-            morph_info[0] = d
-            morph_info[1] = q_new
-            morph_info[2] = s_new
-            morph_info[3] = eigvec[0,2].real/vec2_norm
-            morph_info[4] = eigvec[1,2].real/vec2_norm
-            morph_info[5] = eigvec[2,2].real/vec2_norm
-            morph_info[6] = eigvec[0,1].real/vec1_norm
-            morph_info[7] = eigvec[1,1].real/vec1_norm
-            morph_info[8] = eigvec[2,1].real/vec1_norm
-            morph_info[9] = eigvec[0,0].real/vec0_norm
-            morph_info[10] = eigvec[1,0].real/vec0_norm
-            morph_info[11] = eigvec[2,0].real/vec0_norm
-            # Transformation into the principal frame
-            for i in range(xyz.shape[0]):
-                xyz_princ[i,0] = eigvec[0,2].real/vec2_norm*(xyz[i,0]-center[0])+eigvec[1,2].real/vec2_norm*(xyz[i,1]-center[1])+eigvec[2,2].real/vec2_norm*(xyz[i,2]-center[2])
-                xyz_princ[i,1] = eigvec[0,1].real/vec1_norm*(xyz[i,0]-center[0])+eigvec[1,1].real/vec1_norm*(xyz[i,1]-center[1])+eigvec[2,1].real/vec1_norm*(xyz[i,2]-center[2])
-                xyz_princ[i,2] = eigvec[0,0].real/vec0_norm*(xyz[i,0]-center[0])+eigvec[1,0].real/vec0_norm*(xyz[i,1]-center[1])+eigvec[2,0].real/vec0_norm*(xyz[i,2]-center[2])
-            ellipsoid[:] = 0
-            pts_in_ell = 0
-            corr = 0
-            for i in range(xyz_princ.shape[0]):
-                if xyz_princ[i,0]**2+xyz_princ[i,1]**2/q_new**2+xyz_princ[i,2]**2/s_new**2 < d**2:
-                    ellipsoid[i-corr] = i
-                    pts_in_ell += 1
-                else:
-                    corr += 1
-            iteration += 1
-        return morph_info
-    
-    cdef float[:] runE1VelDisp(self, float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN) nogil:
-        
-        ellipsoid[:] = 0
-        cdef int pts_in_ell = 0
-        cdef int corr = 0
-        cdef float err = 1.0
-        cdef float q_new = 1.0
-        cdef float s_new = 1.0
-        cdef float q_old = 1.0
-        cdef float s_old = 1.0
-        cdef int iteration = 1
-        cdef float vec2_norm = 1.0
-        cdef float vec1_norm = 1.0
-        cdef float vec0_norm = 1.0
-        cdef int i
-        # Start with sphere
-        for i in range(xyz.shape[0]):
-            if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < d**2:
-                ellipsoid[i-corr] = i
-                pts_in_ell += 1
-            else:
-                corr += 1
-        while (err > M_TOL):
-            if iteration > N_WALL:
-                morph_info[:] = 0.0
-                return morph_info
-            if pts_in_ell < N_MIN:
-                morph_info[:] = 0.0
-                return morph_info
-            # Get shape tensor
-            shape_tensor = CythonHelpers.getShapeTensor(vxyz, ellipsoid, shape_tensor, masses, vcenter, pts_in_ell)
-            # Diagonalize shape_tensor
-            eigvec[:,:] = 0.0
-            eigval[:] = 0.0
-            CythonHelpers.ZHEEVR(shape_tensor[:,:], &eigval[0], eigvec, 3)
-            q_old = q_new; s_old = s_new
-            q_new = sqrt(eigval[1]/eigval[2])
-            s_new = sqrt(eigval[0]/eigval[2]) # It is assumed that eigenvalues are approximately proportional to a^2 etc. (true for uniform ellipsoid or uniform shell), though I have never seen any proof..
-            err = max(CythonHelpers.cython_abs(q_new - q_old)/q_old, CythonHelpers.cython_abs(s_new - s_old)/s_old) # Fractional differences
-            vec2_norm = sqrt(eigvec[0,2].real**2+eigvec[1,2].real**2+eigvec[2,2].real**2)
-            vec1_norm = sqrt(eigvec[0,1].real**2+eigvec[1,1].real**2+eigvec[2,1].real**2)
-            vec0_norm = sqrt(eigvec[0,0].real**2+eigvec[1,0].real**2+eigvec[2,0].real**2)
-            # Update morph_info
-            morph_info[0] = d
-            morph_info[1] = q_new
-            morph_info[2] = s_new
-            morph_info[3] = eigvec[0,2].real/vec2_norm
-            morph_info[4] = eigvec[1,2].real/vec2_norm
-            morph_info[5] = eigvec[2,2].real/vec2_norm
-            morph_info[6] = eigvec[0,1].real/vec1_norm
-            morph_info[7] = eigvec[1,1].real/vec1_norm
-            morph_info[8] = eigvec[2,1].real/vec1_norm
-            morph_info[9] = eigvec[0,0].real/vec0_norm
-            morph_info[10] = eigvec[1,0].real/vec0_norm
-            morph_info[11] = eigvec[2,0].real/vec0_norm
-            # Transformation into the principal frame
-            for i in range(xyz.shape[0]):
-                xyz_princ[i,0] = eigvec[0,2].real/vec2_norm*(xyz[i,0]-center[0])+eigvec[1,2].real/vec2_norm*(xyz[i,1]-center[1])+eigvec[2,2].real/vec2_norm*(xyz[i,2]-center[2])
-                xyz_princ[i,1] = eigvec[0,1].real/vec1_norm*(xyz[i,0]-center[0])+eigvec[1,1].real/vec1_norm*(xyz[i,1]-center[1])+eigvec[2,1].real/vec1_norm*(xyz[i,2]-center[2])
-                xyz_princ[i,2] = eigvec[0,0].real/vec0_norm*(xyz[i,0]-center[0])+eigvec[1,0].real/vec0_norm*(xyz[i,1]-center[1])+eigvec[2,0].real/vec0_norm*(xyz[i,2]-center[2])
-            ellipsoid[:] = 0
-            pts_in_ell = 0
-            corr = 0
-            for i in range(xyz_princ.shape[0]):
-                if xyz_princ[i,0]**2+xyz_princ[i,1]**2/q_new**2+xyz_princ[i,2]**2/s_new**2 < d**2:
-                    ellipsoid[i-corr] = i
-                    pts_in_ell += 1
-                else:
-                    corr += 1
-            iteration += 1
-        return morph_info
-    
     cdef float[:,:] getObjMorphLocal(self, float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
+        """ Calculates the local axis ratios
         
+        The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
+        from the center of the point cloud
+        
+        :param morph_info: Array to be filled with morphological info. For each column, 1st entry: d,
+            2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
+            10th to 12th: normalized minor axis
+        :type morph_info: (12,N) floats
+        :param r200: R_200 (mean not critical) radius of the parent halo
+        :type r200: (N2,) float array
+        :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 
+            radius of the parent halo, e.g. np.logspace(-2,1,100)
+        :type log_d: (N3,) floats
+        :param xyz: positions of particles in point cloud
+        :type xyz: (N1 x 3) floats
+        :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
+        :type xyz_princ: (N1 x 3) floats, zeros
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param shell: indices of points that fall into shell (varies from iteration to iteration)
+        :type shell: (N,) ints, zeros
+        :param center: center of point cloud
+        :type center: (3,) floats
+        :param shape_tensor: shape tensor array to be filled
+        :type shape_tensor: (3,3) complex, zeros
+        :param eigval: eigenvalue array to be filled
+        :type eigval: (3,) double, zeros
+        :param eigvec: eigenvector array to be filled
+        :type eigvec: (3,3) double, zeros
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius
+        :rtype: (12,N) float array"""
         # Return if problematic
         morph_info[:,:] = 0.0
         if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -627,7 +285,7 @@ cdef class CosmicProfiles:
             morph_info[0,i] = r200*log_d[i]
         nb_shells = log_d.shape[0]
         for i in range(nb_shells):
-            morph_info[:,i] = self.runE1(morph_info[:,i], xyz, xyz_princ, masses, shell, center, shape_tensor, eigval, eigvec, morph_info[0,i], M_TOL, N_WALL, N_MIN)
+            morph_info[:,i] = runEllAlgo(morph_info[:,i], xyz, xyz_princ, masses, shell, center, shape_tensor, eigval, eigvec, morph_info[0,i], M_TOL, N_WALL, N_MIN)
         
         # Discard if r200 ellipsoid did not converge
         closest_idx = 0
@@ -639,7 +297,43 @@ cdef class CosmicProfiles:
         return morph_info
     
     cdef float[:] getObjMorphGlobal(self, float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
-    
+        """ Calculates the global axis ratios and eigenframe of the point cloud
+        
+        :param morph_info: Array to be filled with morphological info. 1st entry: d,
+            2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
+            10th to 12th: normalized minor axis
+        :type morph_info: (12,) floats
+        :param r200: R_200 (mean not critical) radius of the parent halo
+        :type r200: (N2,) float array
+        :param xyz: positions of particles in point cloud
+        :type xyz: (N1 x 3) floats
+        :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
+        :type xyz_princ: (N1 x 3) floats, zeros
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
+        :type ellipsoid: (N,) ints, zeros
+        :param center: center of point cloud
+        :type center: (3,) floats
+        :param shape_tensor: shape tensor array to be filled
+        :type shape_tensor: (3,3) complex, zeros
+        :param eigval: eigenvalue array to be filled
+        :type eigval: (3,) double, zeros
+        :param eigvec: eigenvector array to be filled
+        :type eigvec: (3,3) double, zeros
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: ``morph_info`` containing d, q, s, eigframe info
+        :rtype: (12,) float array"""
         # Return if problematic
         morph_info[:] = 0.0
         if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -648,11 +342,57 @@ cdef class CosmicProfiles:
         morph_info[0] = r200+self.SAFE
         
         # Retrieve morphology
-        morph_info[:] = self.runE1(morph_info[:], xyz, xyz_princ, masses, ellipsoid, center, shape_tensor, eigval, eigvec, morph_info[0], M_TOL, N_WALL, N_MIN)
+        morph_info[:] = runEllAlgo(morph_info[:], xyz, xyz_princ, masses, ellipsoid, center, shape_tensor, eigval, eigvec, morph_info[0], M_TOL, N_WALL, N_MIN)
         return morph_info
     
     cdef float[:,:] getObjMorphLocalVelDisp(self, float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
+        """ Calculates the local axis ratios of the velocity dispersion tensor 
         
+        The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
+        from the center of the point cloud
+        
+        :param morph_info: Array to be filled with morphological info. For each column, 1st entry: d,
+            2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
+            10th to 12th: normalized minor axis
+        :type morph_info: (12,N) floats
+        :param r200: R_200 (mean not critical) radius of the parent halo
+        :type r200: (N2,) float array
+        :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 
+            radius of the parent halo, e.g. np.logspace(-2,1,100)
+        :type log_d: (N3,) floats
+        :param xyz: positions of particles in point cloud
+        :type xyz: (N1 x 3) floats
+        :param vxyz: velocity array
+        :type vxyz: (N x 3) floats
+        :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
+        :type xyz_princ: (N1 x 3) floats, zeros
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param shell: indices of points that fall into shell (varies from iteration to iteration)
+        :type shell: (N,) ints, zeros
+        :param center: center of point cloud
+        :type center: (3,) floats
+        :param vcenter: velocity-center of point cloud
+        :type vcenter: (3,) floats
+        :param shape_tensor: shape tensor array to be filled
+        :type shape_tensor: (3,3) complex, zeros
+        :param eigval: eigenvalue array to be filled
+        :type eigval: (3,) double, zeros
+        :param eigvec: eigenvector array to be filled
+        :type eigvec: (3,3) double, zeros
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
+        :rtype: (12,) float array"""
         # Return if problematic
         morph_info[:,:] = 0.0
         if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -669,7 +409,7 @@ cdef class CosmicProfiles:
             morph_info[0,i] = r200*log_d[i]
         nb_shells = log_d.shape[0]
         for i in range(nb_shells):
-            morph_info[:,i] = self.runE1VelDisp(morph_info[:,i], xyz, vxyz, xyz_princ, masses, shell, center, vcenter, shape_tensor, eigval, eigvec, morph_info[0,i], M_TOL, N_WALL, N_MIN)
+            morph_info[:,i] = runEllVDispAlgo(morph_info[:,i], xyz, vxyz, xyz_princ, masses, shell, center, vcenter, shape_tensor, eigval, eigvec, morph_info[0,i], M_TOL, N_WALL, N_MIN)
         
         # Discard if r200 ellipsoid did not converge
         closest_idx = 0
@@ -681,7 +421,51 @@ cdef class CosmicProfiles:
         return morph_info
     
     cdef float[:] getObjMorphGlobalVelDisp(self, float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
+        """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
         
+        :param morph_info: Array to be filled with morphological info. 1st entry: d,
+            2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
+            10th to 12th: normalized minor axis
+        :type morph_info: (12,) floats
+        :param r200: R_200 (mean not critical) radius of the parent halo
+        :type r200: (N2,) float array
+        :param xyz: positions of particles in point cloud
+        :type xyz: (N1 x 3) floats
+        :param vxyz: velocity array
+        :type vxyz: (N x 3) floats
+        :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
+        :type xyz_princ: (N1 x 3) floats, zeros
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
+        :type ellipsoid: (N,) ints, zeros
+        :param center: center of point cloud
+        :type center: (3,) floats
+        :param vcenter: velocity-center of point cloud
+        :type vcenter: (3,) floats
+        :param shape_tensor: shape tensor array to be filled
+        :type shape_tensor: (3,3) complex, zeros
+        :param eigval: eigenvalue array to be filled
+        :type eigval: (3,) double, zeros
+        :param eigvec: eigenvector array to be filled
+        :type eigvec: (3,3) double, zeros
+        :param d: distance from the center, kept fixed during iterative procedure
+        :type d: float
+        :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)
+        :type delta_d: float
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
+        :rtype: (12,) float array"""
         # Return if problematic
         morph_info[:] = 0.0
         if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -690,11 +474,47 @@ cdef class CosmicProfiles:
         morph_info[0] = r200+self.SAFE
         
         # Retrieve morphology
-        morph_info[:] = self.runE1VelDisp(morph_info[:], xyz, vxyz, xyz_princ, masses, ellipsoid, center, vcenter, shape_tensor, eigval, eigvec, morph_info[0], M_TOL, N_WALL, N_MIN)
+        morph_info[:] = runEllVDispAlgo(morph_info[:], xyz, vxyz, xyz_princ, masses, ellipsoid, center, vcenter, shape_tensor, eigval, eigvec, morph_info[0], M_TOL, N_WALL, N_MIN)
         return morph_info
     
     def getMorphLocal(self, float[:,:] xyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
+        """ Calculates the local shape catalogue
         
+        Calls ``getObjMorphLocal()`` in a parallelized manner.\n
+        Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the centers, for each object.
+        
+        :param xyz: positions of all (DM or star) particles in simulation box
+        :type xyz: (N1 x 3) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object
+        :type cat: list of length N2
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
+        :type r200: list of length N2
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGSTART: int
+        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGEND: int
+        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
+        :type D_BINS: int
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)
+        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed
+        """
         # Transform cat to int[:,:]
         cdef int nb_objs = len(cat)
         cdef int p
@@ -798,7 +618,37 @@ cdef class CosmicProfiles:
             return np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), l_succeed
     
     def getMorphGlobal(self, float[:,:] xyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
+        """ Calculates the overall shape catalogue
         
+        Calls ``getObjMorphGlobal()`` in a parallelized manner.\n
+        Calculates the overall axis ratios and eigenframe for each object.
+        
+        :param xyz: positions of all (DM or star) particles in simulation box
+        :type xyz: (N1 x 3) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object
+        :type cat: list of length N2
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
+        :type r200: list of length N2
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses
+        :rtype: (N3,) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)
+        """
         # Transform cat to int[:,:]
         cdef int nb_objs = len(cat)
         cdef int p
@@ -896,7 +746,44 @@ cdef class CosmicProfiles:
         return d.base[succeed], q.base[succeed], s.base[succeed], minor, inter, major, centers.base[succeed], m.base[succeed] # Only rank = 0 content matters
     
     def getMorphLocalVelDisp(self, float[:,:] xyz, float[:,:] vxyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
+        """ Calculates the local velocity dispersion shape catalogue
         
+        Calls ``getObjMorphLocalVelDisp()`` in a parallelized manner.\n
+        Calculates the overall axis ratios and eigenframe for each object.
+        
+        :param xyz: positions of all (DM or star) particles in simulation box
+        :type xyz: (N1 x 3) floats
+        :param vxyz: velocities of all (DM or star) particles in simulation box
+        :type vxyz: (N1 x 3) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object
+        :type cat: list of length N2
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
+        :type r200: list of length N2
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGSTART: int
+        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGEND: int
+        :param D_BINS: number of ellipsoidal radii of interest mi
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)
+        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed
+        """
         # Transform cat to int[:,:]
         cdef int nb_objs = len(cat)
         cdef int p
@@ -1003,7 +890,39 @@ cdef class CosmicProfiles:
             return np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), l_succeed # Only rank = 0 content matters
     
     def getMorphGlobalVelDisp(self, float[:,:] xyz, float[:,:] vxyz, cat, float[:] masses, float[:] r200, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
+        """ Calculates the global velocity dipsersion shape catalogue
         
+        Calls ``getObjMorphGlobalVelDisp()`` in a parallelized manner.\n
+        Calculates the overall axis ratios and eigenframe for each object.
+        
+        :param xyz: positions of all (DM or star) particles in simulation box
+        :type xyz: (N1 x 3) floats
+        :param vxyz: velocities of all (DM or star) particles in simulation box
+        :type vxyz: (N1 x 3) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object
+        :type cat: list of length N2
+        :param masses: masses of the particles expressed in unit mass
+        :type masses: (N1 x 1) floats
+        :param r200: R_200 (mean not critical) radii of the parent halos
+        :type r200: (N2,) floats
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :return: d, q, s, eigframe, centers, masses
+        :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)
+        """
         # Transform cat to int[:,:]
         cdef int nb_objs = len(cat)
         cdef int p
@@ -1105,7 +1024,10 @@ cdef class CosmicProfiles:
         return d.base[succeed], q.base[succeed], s.base[succeed], minor, inter, major, centers.base[succeed], m.base[succeed] # Only rank = 0 content matters
     
     def drawShapeProfiles(self, obj_type = ''):
+        """ Draws some simplistic shape profiles
         
+        :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
+        :type obj_type: string"""
         print_status(rank,self.start_time,'Starting drawShapeProfiles() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1120,7 +1042,10 @@ cdef class CosmicProfiles:
             getShapeProfiles(self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major_full, MASS_UNIT=1e10, suffix = suffix)
             
     def plotLocalTHisto(self, obj_type = ''):
+        """ Plot the triaxiality-histogram
         
+        :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
+        :type obj_type: string"""
         print_status(rank,self.start_time,'Starting plotLocalTHisto() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1135,7 +1060,23 @@ cdef class CosmicProfiles:
             getLocalTHisto(self.CAT_DEST, self.VIZ_DEST, self.SNAP, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS=11, MASS_UNIT=1e10, suffix = suffix, inner = False)
         
     def fitDensProfs(self, dens_profs, ROverR200, cat, r200s, method = 'einasto'):
+        """ Fit the density profiles ``dens_profs``, defined at ``ROverR200``
         
+        The fit assumes a density profile model specified in ``method``
+        
+        :param dens_profs: density profiles to be fit, units are irrelevant since fitting
+            will be done on normalized profiles
+        :type dens_profs: (N2, r_res) floats
+        :param ROverR200: radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object,
+            list is non-entry for an object only if ``dens_profs`` has a corresponding row
+        :type cat: list of length N
+        :param r200s: R_200 (mean not critical) radii of the parent halos
+        :type r200s: (N,) floats, N > N2
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        """
         print_status(rank,self.start_time,'Starting fitDensProfs() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1157,7 +1098,13 @@ cdef class CosmicProfiles:
             np.savetxt('{0}/best_fits_r_over_r200_{1}_{2}.txt'.format(self.CAT_DEST, method, self.SNAP), ROverR200, fmt='%1.7e')
     
     def fetchDensProfsBestFits(self, method):
+        """ Fetch best-fit results for density profile fitting
         
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :return: best-fits for each object, and normalized radii used to calculate best-fits
+        :rtype: (N2, n) floats, where n is the number of free parameters in the model ``method``,
+            and (N3,) floats"""
         print_status(rank,self.start_time,'Starting fetchDensProfsBestFits() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1171,7 +1118,14 @@ cdef class CosmicProfiles:
             return None, None
     
     def fetchDensProfsDirectBinning(self):
+        """ Fetch direct-binning-based density profiles
         
+        For this method to succeed, the density profiles must have been calculated
+        and stored beforehand, preferably via calcDensProfsDirectBinning.
+        
+        :return: density profiles, and normalized radii at which these are defined
+        :rtype: (N2, n) floats, where n is the number of free parameters in the model,
+            and (N3,) floats"""
         print_status(rank,self.start_time,'Starting fetchDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1185,7 +1139,14 @@ cdef class CosmicProfiles:
             return None, None
     
     def fetchDensProfsKernelBased(self):
+        """ Fetch kernel-based density profiles
         
+        For this method to succeed, the density profiles must have been calculated
+        and stored beforehand, preferably via calcDensProfsKernelBased.
+        
+        :return: density profiles, and normalized radii at which these are defined
+        :rtype: (N2, n) floats, where n is the number of free parameters in the model,
+            and (N3,) floats"""
         print_status(rank,self.start_time,'Starting fetchDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1199,7 +1160,19 @@ cdef class CosmicProfiles:
             return None, None
     
     def fetchShapeCat(self, local, obj_type):
+        """ Fetch all relevant shape-related data
         
+        :param local: whether to read in local or global shape data
+        :type local: boolean
+        :param obj_type: either 'dm' or 'gx' or '' (latter in case of CosmicProfilesDirect 
+            instance), depending on what object type we are interested in
+        :type obj_type: string
+        :return: obj_masses, obj_centers, d, q, s, major_full
+        :rtype: (number_of_objs,) float array, (number_of_objs, 3) float array, 3 x (number_of_objs, D_BINS+1) 
+            float arrays, (number_of_objs, D_BINS+1, 3) float array; D_BINS = self.D_BINS if 
+            local == True or D_BINS = 0
+        :raises:
+            ValueError: if some data is not yet available for loading"""
         print_status(rank,self.start_time,'Starting fetchShapeCat() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1245,7 +1218,13 @@ cdef class CosmicProfiles:
             return None, None, None, None, None, None
 
 cdef class CosmicProfilesDirect(CosmicProfiles):
+    """ Subclass to calculate morphology for already identified objects
     
+    The particle indices of the objects identified are stored in ``cat``.\n
+    
+    The public methods are ``fetchCat()``, ``calcGlobalShapes()``, ``calcLocalShapes()``,
+    ``plotGlobalEpsHisto()``, ``vizGlobalShapes()``, ``vizLocalShapes()``, 
+    ``calcDensProfsDirectBinning()``, ``calcDensProfsKernelBased()`` and ``drawDensityProfiles()``."""
     cdef float[:,:] xyz
     cdef float[:] masses
     cdef int[:,:] cat_arr
@@ -1253,18 +1232,60 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
     cdef object cat
 
     def __init__(self, float[:,:] xyz, float[:] masses, cat, float[:] r200, str CAT_DEST, str VIZ_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
+        """      
+        :param xyz: positions of all (DM or star) particles in simulation box
+        :type xyz: (N1 x 3) floats
+        :param masses: masses of the particles expressed in unit mass (= 10^10 M_sun/h)
+        :type masses: (N1 x 1) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object
+        :type cat: list of length N2
+        :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
+        :type r200: list of length N2
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string
+        :param VIZ_DEST: visualisation folder destination
+        :type VIZ_DEST: string
+        :param SNAP: e.g. '024'
+        :type SNAP: string
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGSTART: int
+        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGEND: int
+        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
+        :type D_BINS: int
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :param start_time: time of start of object initialization
+        :type start_time: float"""
         super().__init__(CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
-        self.xyz = xyz
-        self.masses = masses
+        self.xyz = xyz.base
+        self.masses = masses.base
         self.cat = cat
-        self.r200 = r200
+        self.r200 = r200.base
         if rank == 0:
             obj_centers, obj_masses = self.calcMassesCenters(cat, xyz, masses, MIN_NUMBER_PTCS, L_BOX, CENTER)
             np.savetxt('{0}/m_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_masses, fmt='%1.7e')
             np.savetxt('{0}/centers_{1}.txt'.format(self.CAT_DEST, self.SNAP), obj_centers, fmt='%1.7e')
         
     def fetchCat(self):
+        """ Fetch catalogue
+        
+        :return cat: list of indices defining the objects
+        :type cat: list of length N1, each consisting of a list of int indices"""
         print_status(rank,self.start_time,'Starting fetchCat() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1273,7 +1294,7 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
             return None
             
     def calcLocalShapes(self):   
-        
+        """ Calculates and saves local object shape catalogues"""  
         print_status(rank,self.start_time,'Starting calcLocalShapes() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1282,7 +1303,7 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
                 
                 # Morphology: Local Shape
                 print_status(rank, self.start_time, "Calculating local-shape morphologies with {0} processors. The average number of ptcs in the Halos is {1}".format(len(os.sched_getaffinity(0)), np.average(np.array(list(map(lambda x: len([x for x in self.cat if x != []][x]), range(len([x for x in self.cat if x != []]))))))))
-                d, q, s, minor, inter, major, halos_center, halo_m, succeeded = self.getMorphLocal(self.xyz, self.cat, self.masses, self.r200, self.L_BOX, self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.M_TOL, self.N_WALL, self.N_MIN, self.CENTER)
+                d, q, s, minor, inter, major, halos_center, halo_m, succeeded = self.getMorphLocal(self.xyz.base, self.cat, self.masses.base, self.r200.base, self.L_BOX, self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.M_TOL, self.N_WALL, self.N_MIN, self.CENTER)
                 print_status(rank, self.start_time, "Finished morphologies")
             
                 if succeeded != []:
@@ -1314,14 +1335,14 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
                 del d; del q; del s; del minor; del inter; del major; del halos_center; del halo_m; del succeeded
                 
     def calcGlobalShapes(self):
-        
+        """ Calculates and saves global object shape catalogues"""
         print_status(rank,self.start_time,'Starting calcGlobalShapes() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
                 
                 # Morphology: Global Shape (with E1 at large radius)
                 print_status(rank, self.start_time, "Calculating global morphologies with {0} processors. The average number of ptcs in the Halos is {1}".format(len(os.sched_getaffinity(0)), np.average(np.array(list(map(lambda x: len([x for x in self.cat if x != []][x]), range(len([x for x in self.cat if x != []]))))))))
-                d, q, s, minor, inter, major, halos_center, halo_m = self.getMorphGlobal(self.xyz, self.cat, self.masses, self.r200, self.L_BOX, self.MIN_NUMBER_PTCS, self.M_TOL, self.N_WALL, self.N_MIN, self.CENTER)
+                d, q, s, minor, inter, major, halos_center, halo_m = self.getMorphGlobal(self.xyz.base, self.cat, self.masses.base, self.r200.base, self.L_BOX, self.MIN_NUMBER_PTCS, self.M_TOL, self.N_WALL, self.N_MIN, self.CENTER)
                 print_status(rank, self.start_time, "Finished morphologies")
             
                 if d.shape[0] != 0:
@@ -1355,7 +1376,10 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
                 del d; del q; del s; del minor; del inter; del major; del halos_center; del halo_m
     
     def vizLocalShapes(self, obj_numbers):
+        """ Visualize local shape of objects with numbers ``obj_numbers``
         
+        :param obj_numbers: list of object indices for which to visualize local shapes
+        :type obj_numbers: list of ints"""
         print_status(rank,self.start_time,'Starting vizLocalShapes() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1455,7 +1479,10 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
                     fig.savefig("{}/LocalObj{}_{}.pdf".format(self.VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
         
     def vizGlobalShapes(self, obj_numbers):
+        """ Visualize global shape of objects with numbers ``obj_numbers``
         
+        :param obj_numbers: list of object indices for which to visualize global shapes
+        :type obj_numbers: list of ints"""
         print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
 
         if rank == 0:
@@ -1560,7 +1587,7 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
                     fig.savefig("{}/GlobalObj{}_{}.pdf".format(self.VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
                     
     def plotGlobalEpsHisto(self):
-        
+        """ Plot ellipticity histogram"""
         print_status(rank,self.start_time,'Starting plotGlobalEpsHisto() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1570,31 +1597,50 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
             getGlobalEpsHisto(cat, self.xyz, self.masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
 
     def calcDensProfsDirectBinning(self, ROverR200):
+        """ Calculate direct-binning-based density profiles
         
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array"""
         print_status(rank,self.start_time,'Starting calcDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
             obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
-            ROverR200, dens_profs = self.getDensProfsDirectBinning(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsDirectBinning(self.cat, self.xyz.base, obj_keep, self.masses.base, self.r200.base, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
             np.savetxt('{0}/r_over_r200_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
     def calcDensProfsKernelBased(self, ROverR200):
+        """ Calculate kernel-based density profiles
         
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array"""
         print_status(rank,self.start_time,'Starting calcDensProfsKernelBased() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
             obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
-            ROverR200, dens_profs = self.getDensProfsKernelBased(self.cat, self.xyz, obj_keep, self.masses, self.r200, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsKernelBased(self.cat, self.xyz.base, obj_keep, self.masses.base, self.r200.base, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
             np.savetxt('{0}/r_over_r200_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
 
     def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method):
+        """ Draws some simplistic density profiles
         
+        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
+        :type dens_profs: (N2, r_res) floats
+        :param ROverR200: radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object,
+            list is non-entry for an object only if ``dens_profs`` has a corresponding row
+        :type cat: list of length N
+        :param r200s: R_200 (mean not critical) radii of the parent halos
+        :type r200s: (N,) floats, N > N2
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        """
         print_status(rank,self.start_time,'Starting drawDensityProfiles() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1607,7 +1653,13 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
             getDensityProfiles(self.VIZ_DEST, self.SNAP, cat, r200s, fits_ROverR200, dens_profs, ROverR200, obj_masses, obj_centers, method, self.start_time, MASS_UNIT=1e10, suffix = suffix)
     
 cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
+    """ Subclass to calculate morphology for yet to-be-identified objects in Gadget HDF5 simulation
     
+    The public methods are ``fetchR200s()``, ``fetchHaloCat()``, ``fetchGxCat()``, ``calcGlobalShapesDM()``, 
+    ``calcLocalShapesDM()``, ``calcGlobalShapesGx()``, ``calcLocalShapesGx()``, ``calcGlobalVelShapesDM()``, 
+    ``calcLocalVelShapesDM()``, ``loadDMCat()``, ``plotGlobalEpsHisto()``, 
+    ``vizGlobalShapes()``, ``vizLocalShapes()``, ``calcDensProfsDirectBinning()``,
+    ``calcDensProfsKernelBased()`` and ``drawDensityProfiles()``."""
     cdef str HDF5_SNAP_DEST
     cdef str HDF5_GROUP_DEST
     cdef int MIN_NUMBER_STAR_PTCS
@@ -1615,6 +1667,44 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
     cdef float[:] r200
     
     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str CAT_DEST, str VIZ_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
+        """ 
+        :param HDF5_SNAP_DEST: where we can find the snapshot
+        :type HDF5_SNAP_DEST: string
+        :param HDF5_GROUP_DEST: where we can find the group files
+        :type HDF5_GROUP_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string
+        :param VIZ_DEST: visualisation folder destination
+        :type VIZ_DEST: string
+        :param SNAP: e.g. '024'
+        :type SNAP: string
+        :param SNAP_MAX: e.g. '024'
+        :type SNAP_MAX: string
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of particles for halo to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param MIN_NUMBER_STAR_PTCS: minimum number of particles for galaxy (to-be-identified) to qualify for morphology calculation
+        :type MIN_NUMBER_STAR_PTCS: int
+        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGSTART: int
+        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGEND: int
+        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
+        :type D_BINS: int
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :param start_time: time of start of object initialization
+        :type start_time: float"""
         super().__init__(CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
@@ -1622,7 +1712,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
         self.SNAP_MAX = SNAP_MAX
             
     def fetchR200s(self):
-        
+        """ Fetch the virial radii"""
         print_status(rank,self.start_time,'Starting fetchR200s() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1631,7 +1721,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             return None
     
     def fetchHaloCat(self):
-        
+        """ Fetch halo catalogue"""
         print_status(rank,self.start_time,'Starting fetchHaloCat() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1642,7 +1732,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             return None
     
     def fetchGxCat(self):
-        
+        """ Fetch gx catalogue"""
         print_status(rank,self.start_time,'Starting fetchGxCat() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -1651,7 +1741,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             return gx_cat
     
     def vizLocalShapes(self, obj_numbers, obj_type = 'dm'):
-                
+        """ Visualize local shape of objects with numbers ``obj_numbers``"""
         print_status(rank,self.start_time,'Starting vizLocalShapes() with snap {0}'.format(self.SNAP))
         
         if obj_type == 'dm':
@@ -1756,7 +1846,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
                     fig.savefig("{}/Local{}Obj{}_{}.pdf".format(self.VIZ_DEST, obj_type.upper(), obj_number, self.SNAP), bbox_inches='tight')
         
     def vizGlobalShapes(self, obj_numbers, obj_type = 'dm'):
-                
+        """ Visualize global shape of objects with numbers ``obj_numbers``"""   
         print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
         
         if obj_type == 'dm':
@@ -1866,7 +1956,9 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
                     fig.savefig("{}/Global{}Obj{}_{}.pdf".format(self.VIZ_DEST, obj_type.upper(), obj_number, self.SNAP), bbox_inches='tight')
     
     def loadDMCat(self):
+        """ Loads halo (more precisely: CSH) catalogues from FOF data
         
+        Stores R200 as self.r200"""
         print_status(rank,self.start_time,'Starting loadDMCat() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -1904,7 +1996,11 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del dm_xyz; del dm_masses
     
     def loadGxCat(self):
+        """ Loads galaxy catalogues from HDF5 data
         
+        To discard wind particles, add the line
+        `gx_cat_l = [[x for x in gx if is_star[x]] for gx in gx_cat_l]` before
+        saving the catalogue."""
         print_status(rank,self.start_time,'Starting loadGxCat() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -1938,7 +2034,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del star_xyz; del fof_com; del sh_com; del nb_shs; del star_masses; del star_smoothing; del is_star
     
     def calcLocalShapesGx(self):
-        
+        """ Calculates and saves local galaxy shape catalogues"""
         print_status(rank,self.start_time,'Starting calcLocalShapesGx() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -1989,7 +2085,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del d; del q; del s; del minor; del inter; del major; del gx_center; del gx_m; del success; del star_xyz; del star_masses # Note: del gx_cat here yields ! marks further up!
             
     def calcGlobalShapesGx(self):
-        
+        """ Calculates and saves global galaxy shape catalogues"""
         print_status(rank,self.start_time,'Starting calcGlobalShapesGx() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -2045,7 +2141,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del d; del q; del s; del minor; del inter; del major; del gx_center; del gx_m; del star_xyz; del star_masses
     
     def calcLocalShapesDM(self):   
-           
+        """ Calculates and saves local halo shape catalogues"""
         print_status(rank,self.start_time,'Starting calcLocalShapesDM() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -2095,7 +2191,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del dm_xyz; del dm_masses; del dm_velxyz
             
     def calcGlobalShapesDM(self):
-        
+        """ Calculates and saves global halo shape catalogues"""
         print_status(rank,self.start_time,'Starting calcGlobalShapesDM() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -2147,7 +2243,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del dm_xyz; del dm_masses; del dm_velxyz
             
     def calcLocalVelShapesDM(self):
-           
+        """ Calculates and saves local velocity dispersion tensor shape catalogues"""
         print_status(rank,self.start_time,'Starting calcLocalVelShapesDM() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -2197,7 +2293,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del dm_xyz; del dm_masses; del dm_velxyz
     
     def calcGlobalVelShapesDM(self):
-        
+        """ Calculates and saves global velocity dispersion tensor shape catalogues"""
         print_status(rank,self.start_time,'Starting calcGlobalVelShapesDM() with snap {0}'.format(self.SNAP))
         
         # Import hdf5 data
@@ -2250,7 +2346,14 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del dm_xyz; del dm_masses; del dm_velxyz
             
     def calcDensProfsDirectBinning(self, ROverR200, obj_type = ''):
+        """ Calculate direct-binning-based density profiles
         
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array
+        :param obj_type: either 'dm' or 'gx', depending on what catalogue 
+            the ellipticity histogram should be plotted for
+        :type obj_type: string
+        """
         print_status(rank,self.start_time,'Starting calcDensProfsDirectBinning() with snap {0}'.format(self.SNAP))
 
         if rank == 0:
@@ -2269,14 +2372,21 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             else:
                 raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
             obj_keep = np.int32([1 if x != [] else 0 for x in cat])
-            ROverR200, dens_profs = self.getDensProfsDirectBinning(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsDirectBinning(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
             np.savetxt('{0}/r_over_r200_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
     def calcDensProfsKernelBased(self, ROverR200, obj_type = ''):
+        """ Calculate kernel-based density profiles
         
+        :param ROverR200: At which unitless radial values to calculate density profiles
+        :type ROverR200: float array
+        :param obj_type: either 'dm' or 'gx', depending on what catalogue 
+            the ellipticity histogram should be plotted for
+        :type obj_type: string
+        """
         print_status(rank,self.start_time,'Starting calcDensProfsKernelBased() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -2295,14 +2405,18 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             else:
                 raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
             obj_keep = np.int32([1 if x != [] else 0 for x in cat])
-            ROverR200, dens_profs = self.getDensProfsKernelBased(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsKernelBased(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
             np.savetxt('{0}/r_over_r200_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
     def plotGlobalEpsHisto(self, obj_type = ''):
+        """ Plot ellipticity histogram
         
+        :param obj_type: either 'dm' or 'gx', depending on what catalogue 
+            the ellipticity histogram should be plotted for
+        :type obj_type: string"""
         print_status(rank,self.start_time,'Starting plotGlobalEpsHisto() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
@@ -2324,7 +2438,21 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             getGlobalEpsHisto(cat, xyz, masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
             
     def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method, obj_type = ''):
+        """ Draws some simplistic density profiles
         
+        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
+        :type dens_profs: (N2, r_res) floats
+        :param ROverR200: radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param cat: each entry of the list is a list containing indices of particles belonging to an object,
+            list is non-entry for an object only if ``dens_profs`` has a corresponding row
+        :type cat: list of length N
+        :param r200s: R_200 (mean not critical) radii of the parent halos
+        :type r200s: (N,) floats, N > N2
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
+        :type obj_type: string"""
         print_status(rank,self.start_time,'Starting drawDensityProfiles() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
