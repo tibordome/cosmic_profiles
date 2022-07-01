@@ -28,7 +28,7 @@ jobs:
           pip install flake8
           pip install CythonGSL
           pip install scikit-learn
-          pip install mpi4py
+          $CONDA/bin/conda install -c conda-forge mpi4py 
           pip install h5py
           pip install pathos
           pip install intel-openmp
