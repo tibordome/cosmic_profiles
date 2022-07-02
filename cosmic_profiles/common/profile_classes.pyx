@@ -161,7 +161,7 @@ cdef class CosmicProfiles:
         
         return centers.base, m.base # Only rank = 0 content matters
     
-    def fetchMassesCenters(self, obj_type):
+    def fetchMassesCenters(self, obj_type=''):
         """ Calculate total mass and centers of objects
         
         :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
@@ -179,7 +179,7 @@ cdef class CosmicProfiles:
         centers = np.loadtxt('{0}/centers{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
         return centers, ms
     
-    def fetchCatLocal(self, obj_type = 'dm'):
+    def fetchCatLocal(self, obj_type = ''):
         """ Fetch local halo/gx catalogue
         
         :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
@@ -202,7 +202,7 @@ cdef class CosmicProfiles:
         else:
             return None
     
-    def fetchCatGlobal(self, obj_type = 'dm'):
+    def fetchCatGlobal(self, obj_type = ''):
         """ Fetch global halo/gx catalogue
         
         :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
@@ -1159,7 +1159,7 @@ cdef class CosmicProfiles:
         else:
             return None, None
     
-    def fetchShapeCat(self, local, obj_type):
+    def fetchShapeCat(self, local, obj_type = ''):
         """ Fetch all relevant shape-related data
         
         :param local: whether to read in local or global shape data
@@ -1182,7 +1182,7 @@ cdef class CosmicProfiles:
                 elif obj_type == 'gx':
                     suffix = '_gx'
                 else:
-                    suffix = ''
+                    suffix = '_'
                 d = np.loadtxt('{0}/d_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP)) # Has shape (number_of_objs, D_BINS+1)
                 q = np.loadtxt('{0}/q_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP))
                 s = np.loadtxt('{0}/s_{1}{2}{3}.txt'.format(self.CAT_DEST, "local" if local == True else "global", suffix, self.SNAP))
@@ -1502,7 +1502,6 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
             d = d.reshape(d.shape[0], 1) # Has shape (number_of_objs, 1)
             q = q.reshape(q.shape[0], 1) # Has shape (number_of_objs, 1)
             s = s.reshape(s.shape[0], 1) # Has shape (number_of_objs, 1)
-            centers = centers.reshape(centers.shape[0], 1) # Has shape (number_of_objs, 1)
             if major.ndim == 2:
                 major = major.reshape(major.shape[0], major.shape[1]//3, 3) # Has shape (number_of_objs, 1, 3)
                 inter = inter.reshape(inter.shape[0], inter.shape[1]//3, 3) # Has shape (number_of_objs, 1, 3)
@@ -1550,32 +1549,9 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
                     ell_y = np.array([x[1] for x in ell])
                     ell_z = np.array([x[2] for x in ell])
                     ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
-                    for idx in np.arange(self.D_BINS-self.D_BINS//5, self.D_BINS):
-                        if idx == self.D_BINS-1:
-                            ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m', label= "Major")
-                            ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c', label = "Intermediate")
-                            ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y', label = "Minor")
-                        else:
-                            ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m')
-                            ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c')
-                            ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y')
-                    for special in np.arange(-self.D_BINS//5,-self.D_BINS//5+1):
-                        ell = fibonacci_ellipsoid(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special], samples=500)
-                        rot_matrix = np.hstack((np.reshape(major_obj[special]/np.linalg.norm(major_obj[special]), (3,1)), np.reshape(inter_obj[special]/np.linalg.norm(inter_obj[special]), (3,1)), np.reshape(minor_obj[special]/np.linalg.norm(minor_obj[special]), (3,1))))
-                        for j in range(len(ell)): # Transformation into the principal frame
-                            ell[j] = np.dot(rot_matrix, np.array(ell[j])) 
-                        ell_x = np.array([x[0] for x in ell])
-                        ell_y = np.array([x[1] for x in ell])
-                        ell_z = np.array([x[2] for x in ell])
-                        ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="r", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special]))
-                        ax.quiver(*center, major_obj[special][0], major_obj[special][1], major_obj[special][2], length=d_obj[special], color='limegreen', label= "Major {0}".format(special))
-                        ax.quiver(*center, inter_obj[special][0], inter_obj[special][1], inter_obj[special][2], length=q_obj[special]*d_obj[special], color='darkorange', label = "Intermediate {0}".format(special))
-                        ax.quiver(*center, minor_obj[special][0], minor_obj[special][1], minor_obj[special][2], length=s_obj[special]*d_obj[special], color='indigo', label = "Minor {0}".format(special))
-                    else:
-                        ax.quiver(*center, major_obj[-1][0], major_obj[-1][1], major_obj[-1][2], length=d_obj[-1], color='m', label= "Major")
-                        ax.quiver(*center, inter_obj[-1][0], inter_obj[-1][1], inter_obj[-1][2], length=q_obj[-1]*d_obj[-1], color='c', label = "Intermediate")
-                        ax.quiver(*center, minor_obj[-1][0], minor_obj[-1][1], minor_obj[-1][2], length=s_obj[-1]*d_obj[-1], color='y', label = "Minor")
-                      
+                    ax.quiver(*center, major_obj[0][0], major_obj[0][1], major_obj[0][2], length=d_obj[0], color='m', label= "Major")
+                    ax.quiver(*center, inter_obj[0][0], inter_obj[0][1], inter_obj[0][2], length=q_obj[0]*d_obj[0], color='c', label = "Intermediate")
+                    ax.quiver(*center, minor_obj[0][0], minor_obj[0][1], minor_obj[0][2], length=s_obj[0]*d_obj[0], color='y', label = "Minor")
                     fontP = FontProperties()
                     fontP.set_size('xx-small')
                     plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
@@ -1594,7 +1570,7 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
             with open('{0}/cat_global_{1}.txt'.format(self.CAT_DEST, self.SNAP), 'r') as filehandle:
                 cat = json.load(filehandle)
             suffix = '_'
-            getGlobalEpsHisto(cat, self.xyz, self.masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
+            getGlobalEpsHisto(cat, self.xyz.base, self.masses.base, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
 
     def calcDensProfsDirectBinning(self, ROverR200):
         """ Calculate direct-binning-based density profiles
@@ -2345,7 +2321,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             del d; del q; del s; del minor; del inter; del major; del halos_center; del halo_m
             del dm_xyz; del dm_masses; del dm_velxyz
             
-    def calcDensProfsDirectBinning(self, ROverR200, obj_type = ''):
+    def calcDensProfsDirectBinning(self, ROverR200, obj_type = 'dm'):
         """ Calculate direct-binning-based density profiles
         
         :param ROverR200: At which unitless radial values to calculate density profiles
@@ -2378,7 +2354,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             np.savetxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
             np.savetxt('{0}/r_over_r200_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
-    def calcDensProfsKernelBased(self, ROverR200, obj_type = ''):
+    def calcDensProfsKernelBased(self, ROverR200, obj_type = 'dm'):
         """ Calculate kernel-based density profiles
         
         :param ROverR200: At which unitless radial values to calculate density profiles
@@ -2411,7 +2387,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             np.savetxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
             np.savetxt('{0}/r_over_r200_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), ROverR200, fmt='%1.7e')
     
-    def plotGlobalEpsHisto(self, obj_type = ''):
+    def plotGlobalEpsHisto(self, obj_type = 'dm'):
         """ Plot ellipticity histogram
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue 
@@ -2437,7 +2413,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             
             getGlobalEpsHisto(cat, xyz, masses, self.L_BOX, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = 11)
             
-    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method, obj_type = ''):
+    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method, obj_type = 'dm'):
         """ Draws some simplistic density profiles
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3

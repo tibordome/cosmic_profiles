@@ -87,8 +87,7 @@ def calcDensEx():
     r_over_rvir = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db = dens_profs_db[10:]
     cprofiles.fitDensProfs(dens_profs_db.reshape((1,dens_profs_db.shape[0])), r_over_rvir, cprofiles.fetchCat(), r_vir, method = 'einasto')
-    best_fits = cprofiles.fetchDensProfsBestFits('einasto')
-    best_fit = best_fits[0]
+    best_fit, r_over_rvir = cprofiles.fetchDensProfsBestFits('einasto')
     plt.figure()
     plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='density profile', markersize = 4)
     plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], np.array([best_fit[0], best_fit[1], best_fit[2]])), '--', color = 'r', label=r'Einasto-fit')

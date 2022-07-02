@@ -70,7 +70,16 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
         # Determine number of particles in second shell
         mass_1 = quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0] # Mass in shell 1 in units of M_sun/h
         N1 = int(round(res*mass_1/tot_mass)) # Number of particles in shell 1. Rounding error is unavoidable.
-        
+        count_it = 0
+        while N1 == 0: # Need to have coarser radial binning in this case
+            a = a[::2] if a.shape[0] % 2 == 1 else np.hstack((a[::2], a[-1])) # Reduce number of shells 
+            b = b[::2] if b.shape[0] % 2 == 1 else np.hstack((b[::2], b[-1]))
+            c = c[::2] if c.shape[0] % 2 == 1 else np.hstack((c[::2], c[-1]))
+            mass_1 = quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0] # Mass in shell 1 in units of M_sun/h
+            N1 = int(round(res*mass_1/tot_mass)) # Number of particles in shell 1. Rounding error is unavoidable.
+            if count_it > 1000:
+                raise ValueError("Please provide a higher halo resolution target!")
+            count_it += 1
         # Build up halo successively in onion-like fashion
         halo_x = np.empty(0)
         halo_y = np.empty(0)

@@ -99,7 +99,7 @@ cdef class CosmicProfiles:
         :rtype: (N,3) and (N,) floats"""
         return
     
-    def fetchMassesCenters(self, obj_type):
+    def fetchMassesCenters(self, obj_type = ''):
         """ Calculate total mass and centers of objects
         
         :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
@@ -108,7 +108,7 @@ cdef class CosmicProfiles:
         :rtype: (N,3) and (N,) floats"""
         return
     
-    def fetchCatLocal(self, obj_type = 'dm'):
+    def fetchCatLocal(self, obj_type = ''):
         """ Fetch local halo/gx catalogue
         
         :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
@@ -117,7 +117,7 @@ cdef class CosmicProfiles:
         :type cat_local: list of length N1, each consisting of a list of int indices"""
         return
     
-    def fetchCatGlobal(self, obj_type = 'dm'):
+    def fetchCatGlobal(self, obj_type = ''):
         """ Fetch global halo/gx catalogue
         
         :param obj_type: either 'dm' or 'gx' for CosmicProfilesGadgetHDF5 or '' for CosmicProfilesDirect
@@ -527,7 +527,7 @@ cdef class CosmicProfiles:
             and (N3,) floats"""
         return
     
-    def fetchShapeCat(self, local, obj_type):
+    def fetchShapeCat(self, local, obj_type = ''):
         """ Fetch all relevant shape-related data
         
         :param local: whether to read in local or global shape data
@@ -784,7 +784,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
         """ Calculates and saves global velocity dispersion tensor shape catalogues"""
         return
             
-    def calcDensProfsDirectBinning(self, ROverR200, obj_type = ''):
+    def calcDensProfsDirectBinning(self, ROverR200, obj_type = 'dm'):
         """ Calculate direct-binning-based density profiles
         
         :param ROverR200: At which unitless radial values to calculate density profiles
@@ -795,7 +795,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
         """
         return
     
-    def calcDensProfsKernelBased(self, ROverR200, obj_type = ''):
+    def calcDensProfsKernelBased(self, ROverR200, obj_type = 'dm'):
         """ Calculate kernel-based density profiles
         
         :param ROverR200: At which unitless radial values to calculate density profiles
@@ -806,7 +806,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
         """
         return
     
-    def plotGlobalEpsHisto(self, obj_type = ''):
+    def plotGlobalEpsHisto(self, obj_type = 'dm'):
         """ Plot ellipticity histogram
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue 
@@ -814,7 +814,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
         :type obj_type: string"""
         return
             
-    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method, obj_type = ''):
+    def drawDensityProfiles(self, dens_profs, ROverR200, cat, r200s, method, obj_type = 'dm'):
         """ Draws some simplistic density profiles
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3

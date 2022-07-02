@@ -68,31 +68,12 @@ html_static_path = ['_static']
 
 # Resolve function for the linkcode extension.
 def linkcode_resolve(domain, info):
-    def find_source():
-        # try to find the file and line number, based on code from numpy:
-        # https://github.com/numpy/numpy/blob/master/doc/source/conf.py#L286
-        obj = sys.modules[info['module']]
-        for part in info['fullname'].split('.'):
-            obj = getattr(obj, part)
-        import inspect
-        import os
-        fn = inspect.getsourcefile(obj)
-        fn = os.path.relpath(fn, start=os.path.dirname(lasagne.__file__))
-        source, lineno = inspect.getsourcelines(obj)
-        return fn, lineno, lineno + len(source) - 1
-
-    if domain not in ['py'] or not info['module']:
+    if domain != 'py':
         return None
-    try:
-        filename = 'lasagne/%s#L%d-L%d' % find_source()
-    except Exception:
-        if info['module'] == 'gen_csh_gx_cat' or info['module'] == 'cython_helpers' or info['module'] == 'cosmic_profiles':
-            extension = '.pyx'
-        else:
-            extension = '.py'
-        filename = info['module'].replace('.', '/') + extension
-    tag = 'master' if 'dev' in release else ('v' + release)
-    return "https://github.com/tibordome/cosmic_profiles/tree/master/cosmic_profiles/%s" % (filename)
+    if not info['module']:
+        return None
+    filename = info['module'].replace('.', '/')
+    return "github.com/tibordome/cosmic_profiles/tree/master/cosmic_profiles/%s.py" % filename
 
 # -- Making sure __init__ of classes show up --
 def skip(app, what, name, obj, would_skip, options):

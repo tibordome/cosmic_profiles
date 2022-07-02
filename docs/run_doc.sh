@@ -4,7 +4,7 @@ cd ../cosmic_profiles/for_docs
 python3 setup.py build_ext --inplace
 cd ../../docs
 sphinx-build -b html source build
-cd ../cosmic_profiles/common
+cd ../cosmic_profiles/for_docs/common
 rm profile_classes.c
 rm profile_classes.so
 rm -r __pycache__
@@ -29,7 +29,10 @@ rm dens_profs_algos.c
 rm dens_profs_algos.so
 rm -r __pycache__
 rm -r build
+cd ../mock_tools
+rm -r __pycache__
+rm -r build
 cd ..
 rm -r __pycache__
 rm -r build
-cd ../docs
+cd ../../docs

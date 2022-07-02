@@ -25,6 +25,9 @@ rm dens_profs_algos.c
 rm dens_profs_algos.so
 rm -r __pycache__
 rm -r build
+cd ../mock_tools
+rm -r __pycache__
+rm -r build
 cd ../tests
 rm -r __pycache__
 rm -r build
