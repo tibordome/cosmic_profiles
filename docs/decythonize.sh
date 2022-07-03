@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd common
+cd ../cosmic_profiles/common
 rm profile_classes.c
 rm profile_classes.so
 rm -r __pycache__
@@ -31,10 +31,9 @@ rm -r build
 cd ../tests
 rm -r __pycache__
 rm -r build
-cd cat
-rm *
-cd ../viz
-rm *
-cd ../..
+rm -r cat
+rm -r viz
+cd ..
 rm -r __pycache__
 rm -r build
+cd ../docs

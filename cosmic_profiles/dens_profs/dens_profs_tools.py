@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from cosmic_profiles.common.python_routines import print_status, eTo10
 from cosmic_profiles.common.cosmo_tools import M_split
+from pathos.multiprocessing import ProcessingPool as Pool
+from functools import partial
+import os
+from cosmic_profiles.common.python_routines import np_cache_factory
 from scipy import optimize
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -154,7 +158,7 @@ def getDensityProfiles(VIZ_DEST, SNAP, cat, r200s, fits_ROverR200, dens_profs, R
             plt.savefig("{}/RhoProfM{:.2f}_{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), SNAP), bbox_inches="tight")
         return
 
-def fitDensProf(median, ROverR200, r200, method):
+def fitDensProf(ROverR200, method, median_r200_obj_nb):
     """
     Fit density profile according to model provided
     
@@ -173,10 +177,11 @@ def fitDensProf(median, ROverR200, r200, method):
     :return res.x: best-fit results
     :rtype: (n,) floats"""
     
+    median, r200, obj_nb = median_r200_obj_nb
     prof_models = {'einasto': getEinastoProf, 'alpha_beta_gamma': getAlphaBetaGammaProf, 'nfw': getNFWProf, 'hernquist': getHernquistProf}
     def toMinimize(model_pars, median, rbin_centers, method):
         psi_2 = np.sum(np.array([(np.log(median[i])-np.log(prof_models[method](rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
-        return psi_2
+        return psi_2, obj_nb
     R_to_min = ROverR200*r200 # Mpc/h
     # Discard nan values in median
     R_to_min = R_to_min[~np.isnan(median)] # Note: np.isnan returns a boolean
@@ -202,9 +207,10 @@ def fitDensProf(median, ROverR200, r200, method):
         best_fit[0] *= np.average(median)
     except ValueError: # For poor density profiles one might encounter "ValueError: `x0` violates bound constraints."
         best_fit = iguess*np.nan
-    return best_fit
-        
-def fitDensProfHelper(ROverR200, method, dens_prof_plus_r200_plus_obj_number):
+    return best_fit, obj_nb
+
+@np_cache_factory(3,0)
+def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
     """ Helper function to carry out density profile fitting
     
     :param ROverR200: normalized radii where density profile is defined
@@ -217,9 +223,20 @@ def fitDensProfHelper(ROverR200, method, dens_prof_plus_r200_plus_obj_number):
     :type dens_prof_plus_r200_plus_obj_number: (N,) float
     :return res, object_number: best-fit results and object number
     :rtype: (n,) floats, int"""
-        
+    
+    print("Called fitDensProfHelper")
     if rank == 0:
-        res = fitDensProf(dens_prof_plus_r200_plus_obj_number[:-2], ROverR200, dens_prof_plus_r200_plus_obj_number[-2], method)
-        return res, dens_prof_plus_r200_plus_obj_number[-1]
+        if method == 'einasto':
+            best_fits = np.zeros((dens_profs.shape[0], 3))
+        elif method == 'alpha_beta_gamma':
+            best_fits = np.zeros((dens_profs.shape[0], 5))
+        else:
+            best_fits = np.zeros((dens_profs.shape[0], 2))
+        with Pool(processes=len(os.sched_getaffinity(0))) as pool:
+            results = pool.map(partial(fitDensProf, ROverR200, method), [(dens_profs[obj_nb], r200s[obj_nb], obj_nb) for obj_nb in range(dens_profs.shape[0])])
+        for result in results:
+            x, obj = tuple(result)
+            best_fits[int(obj)] = x
+        return best_fits
     else:
-        return None, None
+        return None

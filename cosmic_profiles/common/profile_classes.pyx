@@ -283,19 +283,7 @@ cdef class CosmicProfiles:
         
         if rank == 0:
             r200s = np.int32([r200s[i] for i in range(len(cat)) if cat[i] != []])
-            if method == 'einasto':
-                best_fits = np.zeros((dens_profs.shape[0], 3))
-            elif method == 'alpha_beta_gamma':
-                best_fits = np.zeros((dens_profs.shape[0], 5))
-            else:
-                best_fits = np.zeros((dens_profs.shape[0], 2))
-            dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs, r200s]
-            dens_profs_plus_r200_plus_obj_number = np.c_[dens_profs_plus_r200_plus_obj_number, np.arange(dens_profs.shape[0])]
-            with Pool(processes=openmp.omp_get_max_threads()) as pool:
-                results = pool.map(partial(fitDensProfHelper, ROverR200, method), [dens_profs_plus_r200_plus_obj_number[obj] for obj in range(dens_profs.shape[0])])
-            for result in results:
-                x, obj = tuple(result)
-                best_fits[int(obj)] = x
+            best_fits = fitDensProfHelper(dens_profs, ROverR200, r200s, method)
             np.savetxt('{0}/dens_prof_best_fits_{1}_{2}.txt'.format(self.CAT_DEST, method, self.SNAP), best_fits, fmt='%1.7e')
             np.savetxt('{0}/best_fits_r_over_r200_{1}_{2}.txt'.format(self.CAT_DEST, method, self.SNAP), ROverR200, fmt='%1.7e')
     
@@ -783,7 +771,7 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
         
         if rank == 0:
             obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
-            ROverR200, dens_profs = getDensProfsDirectBinning(self.cat, self.xyz.base, obj_keep, self.masses.base, self.r200.base, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsDirectBinning(self.xyz.base, obj_keep, self.masses.base, self.r200.base, np.float32(ROverR200), self.cat, self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
@@ -798,7 +786,7 @@ cdef class CosmicProfilesDirect(CosmicProfiles):
         
         if rank == 0:
             obj_keep = np.int32([1 if x != [] else 0 for x in self.cat])
-            ROverR200, dens_profs = getDensProfsKernelBased(self.cat, self.xyz.base, obj_keep, self.masses.base, self.r200.base, np.float32(ROverR200), self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsKernelBased(self.xyz.base, obj_keep, self.masses.base, self.r200.base, np.float32(ROverR200), self.cat, self.MIN_NUMBER_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
@@ -1550,7 +1538,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             else:
                 raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
             obj_keep = np.int32([1 if x != [] else 0 for x in cat])
-            ROverR200, dens_profs = getDensProfsDirectBinning(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsDirectBinning(xyz, obj_keep, masses, self.r200, np.float32(ROverR200), cat, MIN_NB_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_db_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3
@@ -1583,7 +1571,7 @@ cdef class CosmicProfilesGadgetHDF5(CosmicProfiles):
             else:
                 raise ValueError("For a GadgetHDF5 simulation, 'obj_type' must be either 'dm' or 'gx'")
             obj_keep = np.int32([1 if x != [] else 0 for x in cat])
-            ROverR200, dens_profs = getDensProfsKernelBased(cat, xyz, obj_keep, masses, self.r200, np.float32(ROverR200), MIN_NB_PTCS, self.L_BOX, self.CENTER)
+            ROverR200, dens_profs = getDensProfsKernelBased(xyz, obj_keep, masses, self.r200, np.float32(ROverR200), cat, MIN_NB_PTCS, self.L_BOX, self.CENTER)
             
             MASS_UNIT = 1e+10
             np.savetxt('{0}/dens_profs_kb_{1}.txt'.format(self.CAT_DEST, self.SNAP), dens_profs*MASS_UNIT, fmt='%1.7e') # In units of M_sun*h^2/Mpc^3

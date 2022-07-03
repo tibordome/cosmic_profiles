@@ -11,6 +11,7 @@ import numpy as np
 import math
 from scipy.linalg import cholesky
 from numpy.linalg import inv
+from functools import lru_cache, wraps
 
 def eTo10(st):
     """Replace e+{xy} by "10^{xy}" etc..
@@ -538,3 +539,38 @@ def getCoM(xyz, masses):
         com[1] += masses[run]*xyz[run,1]/mass_total
         com[2] += masses[run]*xyz[run,2]/mass_total
     return com
+
+def np_cache_factory(nb_arrs, nb_lists):
+    def np_cache(function):
+        @lru_cache()
+        def cached_wrapper(*args_cached, dims):
+            args_l = []
+            for arg in args_cached:
+                args_l.append(arg)
+            for arr_nb in range(nb_arrs):
+                args_l[arr_nb] = np.array(args_l[arr_nb]).reshape(dims[arr_nb])
+            for list_nb in np.arange(nb_arrs, nb_arrs + nb_lists):
+                args_l[list_nb] = [list(args_l[list_nb][run]) for run in range(len(args_l[list_nb]))]
+            return function(*args_l)
+    
+        @wraps(function)
+        def wrapper(*args):
+            args_l = []
+            dims = []
+            for arg in args:
+                args_l.append(arg)
+            for arr_nb in range(nb_arrs):
+                dims.append(args_l[arr_nb].shape)
+                args_l[arr_nb] = tuple(args_l[arr_nb].flatten())
+            for list_nb in np.arange(nb_arrs, nb_arrs + nb_lists):
+                args_l[list_nb] = tuple([tuple(args_l[list_nb][run]) for run in range(len(args_l[list_nb]))])
+            dims = tuple(dims)
+            args_l = tuple(args_l)
+            return cached_wrapper(*args_l, dims=dims)
+    
+        # Copy lru_cache attributes over too
+        wrapper.cache_info = cached_wrapper.cache_info
+        wrapper.cache_clear = cached_wrapper.cache_clear
+    
+        return wrapper
+    return np_cache

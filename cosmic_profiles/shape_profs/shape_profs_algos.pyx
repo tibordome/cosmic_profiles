@@ -10,48 +10,60 @@ import numpy as np
 from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
 from libc.stdio cimport printf
 from cython.parallel import prange
-from cosmic_profiles.common.python_routines import respectPBCNoRef, getCoM, findMode
+from cosmic_profiles.common.python_routines import respectPBCNoRef, getCoM, findMode, np_cache_factory
 cimport cython
 from libc.math cimport sqrt
-from functools import lru_cache, wraps
-
-def np_cache_factory(nb_arrs, nb_lists):
-    def np_cache(function):
-        @lru_cache()
-        def cached_wrapper(*args_cached, dims):
-            args_l = []
-            for arg in args_cached:
-                args_l.append(arg)
-            for arr_nb in range(nb_arrs):
-                args_l[arr_nb] = np.array(args_l[arr_nb]).reshape(dims[arr_nb])
-            for list_nb in np.arange(nb_arrs, nb_arrs + nb_lists):
-                args_l[list_nb] = [list(args_l[list_nb][run]) for run in range(len(args_l[list_nb]))]
-            return function(*args_l)
-    
-        @wraps(function)
-        def wrapper(*args):
-            args_l = []
-            dims = []
-            for arg in args:
-                args_l.append(arg)
-            for arr_nb in range(nb_arrs):
-                dims.append(args_l[arr_nb].shape)
-                args_l[arr_nb] = tuple(args_l[arr_nb].flatten())
-            for list_nb in np.arange(nb_arrs, nb_arrs + nb_lists):
-                args_l[list_nb] = tuple([tuple(args_l[list_nb][run]) for run in range(len(args_l[list_nb]))])
-            dims = tuple(dims)
-            args_l = tuple(args_l)
-            return cached_wrapper(*args_l, dims=dims)
-    
-        # Copy lru_cache attributes over too
-        wrapper.cache_info = cached_wrapper.cache_info
-        wrapper.cache_clear = cached_wrapper.cache_clear
-    
-        return wrapper
-    return np_cache
 
 @cython.embedsignature(True)
 cdef float[:] runEllShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN) nogil:
+    """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
+    
+    Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
+    Note that before and during the iteration, ``d`` is defined with respect to the center of 
+    the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n
+    Differential version of E1.\n
+    Shells can cross (except 2nd shell with 1st), and a shell is assumed to be equally thick everywhere.\n
+    Whether we adopt the last assumption or let the thickness float (Tomassetti et al 2016) barely makes 
+    any difference in terms of shapes found, but the convergence properties improve for the version with fixated thickness.
+    For 1st shell: ``delta_d`` is ``d``
+    
+    :param morph_info: Array to be filled with morphological info. 1st entry: d,
+        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
+        10th to 12th: normalized minor axis
+    :type morph_info: (12,) floats
+    :param xyz: position array
+    :type xyz: (N x 3) floats
+    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
+    :type xyz_princ: (N x 3) floats, zeros
+    :param masses: mass array
+    :type masses: (N x 1) floats
+    :param shell: indices of points that fall into shell (varies from iteration to iteration)
+    :type shell: (N,) ints, zeros
+    :param center: center of point cloud
+    :type center: (3,) floats
+    :param shape_tensor: shape tensor array to be filled
+    :type shape_tensor: (3,3) complex, zeros
+    :param eigval: eigenvalue array to be filled
+    :type eigval: (3,) double, zeros
+    :param eigvec: eigenvector array to be filled
+    :type eigvec: (3,3) double, zeros
+    :param d: distance from the center, kept fixed during iterative procedure
+    :type d: float
+    :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)
+    :type delta_d: float
+    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+        for iteration to stop
+    :type M_TOL: float
+    :param N_WALL: maximum permissible number of iterations
+    :type N_WALL: float
+    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+        if undercut, shape is unclassified
+    :type N_MIN: int
+    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+        or 'com' (center of mass) of each halo
+    :type CENTER: str
+    :return: ``morph_info`` containing d, q, s, eigframe info
+    :rtype: (12,) float array"""
     
     shell[:] = 0
     cdef int pts_in_shell = 0
@@ -131,9 +143,49 @@ cdef float[:] runEllShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xy
         iteration += 1
     return morph_info
 
-
 @cython.embedsignature(True)
 cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN) nogil:
+    """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
+    
+    Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
+    Note that before and during the iteration, ``d`` is defined with respect to the center of 
+    the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n
+    
+    :param morph_info: Array to be filled with morphological info. 1st entry: d,
+        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
+        10th to 12th: normalized minor axis
+    :type morph_info: (12,) floats
+    :param xyz: position array
+    :type xyz: (N x 3) floats
+    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
+    :type xyz_princ: (N x 3) floats, zeros
+    :param masses: mass array
+    :type masses: (N x 1) floats
+    :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
+    :type ellipsoid: (N,) ints, zeros
+    :param center: center of point cloud
+    :type center: (3,) floats
+    :param shape_tensor: shape tensor array to be filled
+    :type shape_tensor: (3,3) complex, zeros
+    :param eigval: eigenvalue array to be filled
+    :type eigval: (3,) double, zeros
+    :param eigvec: eigenvector array to be filled
+    :type eigvec: (3,3) double, zeros
+    :param d: distance from the center, kept fixed during iterative procedure
+    :type d: float
+    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+        for iteration to stop
+    :type M_TOL: float
+    :param N_WALL: maximum permissible number of iterations
+    :type N_WALL: float
+    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+        if undercut, shape is unclassified
+    :type N_MIN: int
+    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+        or 'com' (center of mass) of each halo
+    :type CENTER: str
+    :return: ``morph_info`` containing d, q, s, eigframe info
+    :rtype: (12,) float array"""
     
     ellipsoid[:] = 0
     cdef int pts_in_ell = 0
@@ -207,6 +259,51 @@ cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_pri
 
 @cython.embedsignature(True)
 cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN) nogil:
+    """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
+    
+    Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
+    Note that before and during the iteration, ``d`` is defined with respect to the center of 
+    the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n
+    
+    :param morph_info: Array to be filled with morphological info. 1st entry: d,
+        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
+        10th to 12th: normalized minor axis
+    :type morph_info: (12,) floats
+    :param xyz: position array
+    :type xyz: (N x 3) floats
+    :param vxyz: velocity array
+    :type vxyz: (N x 3) floats
+    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
+    :type xyz_princ: (N x 3) floats, zeros
+    :param masses: mass array
+    :type masses: (N x 1) floats
+    :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
+    :type ellipsoid: (N,) ints, zeros
+    :param center: center of point cloud
+    :type center: (3,) floats
+    :param vcenter: velocity-center of point cloud
+    :type vcenter: (3,) floats
+    :param shape_tensor: shape tensor array to be filled
+    :type shape_tensor: (3,3) complex, zeros
+    :param eigval: eigenvalue array to be filled
+    :type eigval: (3,) double, zeros
+    :param eigvec: eigenvector array to be filled
+    :type eigvec: (3,3) double, zeros
+    :param d: distance from the center, kept fixed during iterative procedure
+    :type d: float
+    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+        for iteration to stop
+    :type M_TOL: float
+    :param N_WALL: maximum permissible number of iterations
+    :type N_WALL: float
+    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+        if undercut, shape is unclassified
+    :type N_MIN: int
+    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+        or 'com' (center of mass) of each halo
+    :type CENTER: str
+    :return: ``morph_info`` containing d, q, s, eigframe info
+    :rtype: (12,) float array"""
     
     ellipsoid[:] = 0
     cdef int pts_in_ell = 0
