@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul  1 16:21:27 2022
-
 @author: tibor
 """
 
