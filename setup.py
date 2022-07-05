@@ -92,7 +92,7 @@ setup(
     ],
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     ext_modules = cythonize(ext_modules),
-    packages=['cosmic_profiles'],
+    packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
     install_requires=["cython", "numpy>=1.19.2", "scikit-learn", "mpi4py", "h5py", "matplotlib", "pynbody", "nbodykit", "pynverse"]
