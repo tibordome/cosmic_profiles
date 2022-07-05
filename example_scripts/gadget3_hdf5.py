@@ -16,7 +16,7 @@ import inspect
 import numpy as np
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import CosmicProfilesGadgetHDF5
+from cosmic_profiles import DensShapeProfsHDF5
 import time
 start_time = time.time()
 
@@ -37,49 +37,50 @@ SNAP = '035'
 CENTER = 'mode'
 MIN_NUMBER_DM_PTCS = 200
 MIN_NUMBER_STAR_PTCS = 100
+WANT_RVIR = False # Whether or not we want quantities (e.g. D_LOGSTART) expressed with respect to the virial radius R_vir or the overdensity radius R_200
 ROverR200 = np.logspace(-1.5,0,70)
+HIST_NB_BINS = 11 # Number of bins used for e.g. ellipticity histogram
+frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf. plotLocalTHist())
 
-# Define CosmicProfiles object
-cprofiles = CosmicProfilesGadgetHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, CAT_DEST, VIZ_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
-
-########################## Calculating Morphological Properties ###############################
-# Retrieve HDF5 halo catalogue, extract CSHs
-cprofiles.loadDMCat()
-
-# Create local halo shape catalogue
-cprofiles.calcLocalShapesDM()
-
-# Create global halo shape catalogue
-cprofiles.calcGlobalShapesDM()
-
-# Retrieve/Construct gx catalogue
-cprofiles.loadGxCat()
-
-# Create local gx shape catalogue
-cprofiles.calcLocalShapesGx()
-
-######################################## Visualizations #######################################
-# Viz first few halos' shapes
-cprofiles.vizLocalShapes([0,1,2], obj_type = 'dm')
-
-# Viz first few galaxies' shapes
-cprofiles.vizLocalShapes([0,1,2], obj_type = 'gx')
-
-# Plot halo ellipticity histogram
-cprofiles.plotGlobalEpsHisto(obj_type = 'dm')
-
-# Plot halo triaxiality histogram
-cprofiles.plotLocalTHisto(obj_type = 'dm')
-
-# Draw halo shape profiles (overall and mass-decomposed ones)
-cprofiles.drawShapeProfiles(obj_type = 'dm')
-
-########################## Calculating and Visualizing Density Profiles #######################
-# Create local halo density catalogue
-cprofiles.calcDensProfsDirectBinning(ROverR200, obj_type = 'dm')
-
-# Fit density profiles
-cprofiles.fitDensProfs(cprofiles.fetchDensProfsDirectBinning()[0][:,25:], cprofiles.fetchDensProfsDirectBinning()[1][25:], cprofiles.fetchHaloCat(), cprofiles.fetchR200s(), 'nfw')
-
-# Draw halo density profiles (overall and mass-decomposed ones)
-cprofiles.drawDensityProfiles(cprofiles.fetchDensProfsDirectBinning()[0][:,25:], cprofiles.fetchDensProfsDirectBinning()[1][25:], cprofiles.fetchHaloCat(), cprofiles.fetchR200s(), 'nfw', obj_type = 'dm')
+def HDF5Ex():
+    
+    # Define DensShapeProfsHDF5 object
+    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, WANT_RVIR, start_time)
+    
+    ########################## Calculating Morphological Properties ###############################
+    # Create halo shape catalogue
+    cprofiles.dumpShapeCatLocal(CAT_DEST, obj_type = 'dm')
+    
+    # Create global halo shape catalogue
+    cprofiles.dumpShapeCatGlobal(CAT_DEST, obj_type = 'dm')
+    
+    # Create local gx shape catalogue
+    cprofiles.dumpShapeCatLocal(CAT_DEST, obj_type = 'gx')
+    
+    ######################################## Visualizations #######################################
+    # Viz first few halos' shapes
+    cprofiles.vizLocalShapes([0,1,2], VIZ_DEST, obj_type = 'dm')
+    
+    # Viz first few galaxies' shapes
+    cprofiles.vizLocalShapes([0,1,2], VIZ_DEST, obj_type = 'gx')
+    
+    # Plot halo ellipticity histogram
+    cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST, obj_type = 'dm')
+    
+    # Plot halo triaxiality histogram
+    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, obj_type = 'dm')
+    
+    # Draw halo shape profiles (overall and mass-decomposed ones)
+    cprofiles.plotShapeProfs(VIZ_DEST, obj_type = 'dm')
+    
+    ########################## Calculating and Visualizing Density Profs ##########################
+    # Create local halo density catalogue
+    dens_profs = cprofiles.getDensProfsDirectBinning(ROverR200, obj_type = 'dm')
+    
+    # Fit density profiles
+    best_fits = cprofiles.getDensProfsBestFits(dens_profs[:,25:], ROverR200[25:], 'nfw', obj_type = 'dm')
+    
+    # Draw halo density profiles (overall and mass-decomposed ones). The results from getDensProfsBestFits() got cached.
+    cprofiles.plotDensProfs(dens_profs, ROverR200, dens_profs[:,25:], ROverR200[25:], 'nfw', VIZ_DEST, obj_type = 'dm')
+    
+HDF5Ex()

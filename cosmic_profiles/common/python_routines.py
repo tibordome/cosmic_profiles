@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Mar 13 17:39:15 2022
-"""
 
 import time
+from scipy.spatial import cKDTree
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 from scipy.linalg import cholesky
 from numpy.linalg import inv
-from functools import lru_cache, wraps
 
 def eTo10(st):
     """Replace e+{xy} by "10^{xy}" etc..
@@ -286,13 +283,13 @@ def fibonacci_sphere(samples=1):
 
     return points
 
-def findMode(xyz, masses, rad):
+def calcMode(xyz, masses, rad):
     """ Find mode (point of highest local density) of point distribution xyz
     
     :param xyz: coordinates of particles of type 1 or type 4
-    :type xyz: (N^3x3) floats
+    :type xyz: (N,3) floats
     :param masses: masses of the particles
-    :type masses: (N^3) floats
+    :type masses: (N,) floats
     :param rad: initial radius to consider from CoM of object
     :type rad: float
     :return: mode of distro
@@ -305,7 +302,7 @@ def findMode(xyz, masses, rad):
         return com
     else:
         rad *= 0.83 # Reduce radius by 17 %
-        return findMode(xyz_constrain, masses_constrain, rad)
+        return calcMode(xyz_constrain, masses_constrain, rad)
         
 def fibonacci_ellipsoid(a, b, c, samples=1):
     """ Creating "evenly" distributed points on an ellipsoid surface
@@ -402,8 +399,6 @@ def inShell(X, a, b, c, shell_nb):
     :type b: float array, units are Mpc/h
     :param c: minor axis array
     :type c: float array, units are Mpc/h
-    :param Nptc: number of particles in each shell Shell(a[idx], b[idx], c[idx]).
-    :type Nptc: int array
     :param shell_nb: ellipsoid number of interest
     :type shell_nb: int
     :return: True if `X` is in Shell(a[shell_nb], b[shell_nb], c[shell_nb]), False otherwise
@@ -508,9 +503,11 @@ def respectPBCNoRef(xyz, L_BOX):
     by more than L_BOX/2, reflect those particles along L_BOX/2
     
     :param xyz: coordinates of particles of type 1 or type 4
-    :type xyz: (N^3x3) floats
+    :type xyz: (N,3) floats
+    :param L_BOX: periodicity of the box
+    :type L_BOX: float
     :return: updated coordinates of particles of type 1 or type 4
-    :rtype: (N^3x3) floats"""
+    :rtype: (N,3) floats"""
     xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
     ref = 0 # Reference particle does not matter
     dist_x = abs(xyz_out[ref, 0]-xyz_out[:,0])
@@ -521,13 +518,13 @@ def respectPBCNoRef(xyz, L_BOX):
     xyz_out[:,2][dist_z > L_BOX/2] = L_BOX-xyz_out[:,2][dist_z > L_BOX/2] # Reflect z-xyz_outition along L_BOX/2
     return xyz_out
 
-def getCoM(xyz, masses):
+def calcCoM(xyz, masses):
     """ Calculate center of mass of point distribution
     
     :param xyz: coordinates of particles of type 1 or type 4
-    :type xyz: (N^3x3) floats
+    :type xyz: (N,3) floats
     :param masses: masses of the particles
-    :type masses: (N^3) floats
+    :type masses: (N,3) floats
     :return: com, center of mass
     :rtype: (3,) floats"""
     com = np.zeros((3,), dtype = np.float32)
@@ -540,37 +537,43 @@ def getCoM(xyz, masses):
         com[2] += masses[run]*xyz[run,2]/mass_total
     return com
 
-def np_cache_factory(nb_arrs, nb_lists):
-    def np_cache(function):
-        @lru_cache()
-        def cached_wrapper(*args_cached, dims):
-            args_l = []
-            for arg in args_cached:
-                args_l.append(arg)
-            for arr_nb in range(nb_arrs):
-                args_l[arr_nb] = np.array(args_l[arr_nb]).reshape(dims[arr_nb])
-            for list_nb in np.arange(nb_arrs, nb_arrs + nb_lists):
-                args_l[list_nb] = [list(args_l[list_nb][run]) for run in range(len(args_l[list_nb]))]
-            return function(*args_l)
+def getCatWithinFracR200(cat_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
+    """ Cleanse index catalogue ``cat_in`` of particles beyond R200 ``r200``
     
-        @wraps(function)
-        def wrapper(*args):
-            args_l = []
-            dims = []
-            for arg in args:
-                args_l.append(arg)
-            for arr_nb in range(nb_arrs):
-                dims.append(args_l[arr_nb].shape)
-                args_l[arr_nb] = tuple(args_l[arr_nb].flatten())
-            for list_nb in np.arange(nb_arrs, nb_arrs + nb_lists):
-                args_l[list_nb] = tuple([tuple(args_l[list_nb][run]) for run in range(len(args_l[list_nb]))])
-            dims = tuple(dims)
-            args_l = tuple(args_l)
-            return cached_wrapper(*args_l, dims=dims)
-    
-        # Copy lru_cache attributes over too
-        wrapper.cache_info = cached_wrapper.cache_info
-        wrapper.cache_clear = cached_wrapper.cache_clear
-    
-        return wrapper
-    return np_cache
+    :param cat_in: each entry of the list is a list containing indices of particles belonging to an object
+    :type cat_in: list of length N1, N1 << N2
+    :param xyz: coordinates of particles of type 1 or type 4
+    :type xyz: (N2,3) floats
+    :param masses: masses of the particles
+    :type masses: (N2,3) floats
+    :param L_BOX: periodicity of the box
+    :type L_BOX: float
+    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+    :type CENTER: str
+    :param r200: R_200 radii of the parent halos
+    :type r200: (N1,) floats
+    :param frac_r200: depth of objects to plot ellipticity, in units of R200
+    :type frac_r200: float
+    :return cat_out: updated cat_in, with particles beyond R200 ``r200`` removed
+    :rtype: list of length N1"""
+    cat_out = [[] for i in range(len(cat_in))]
+    idxs_compr = np.zeros((len(cat_in),), dtype = np.int32)
+    h_pass = np.array([1 if x != [] else 0 for x in cat_in])
+    idxs_compr[h_pass.nonzero()[0]] = np.arange(np.sum(h_pass))
+    centers = np.zeros((len(cat_in),3), dtype = np.float32)
+    for idx in range(len(cat_in)): # Calculate centers of objects
+        if cat_in[idx] != []:
+            xyz_ = respectPBCNoRef(xyz[cat_in[idxs_compr[idx]]], L_BOX)
+            if CENTER == 'mode':
+                centers.base[idx] = calcMode(xyz_, masses[cat_in[idxs_compr[idx]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
+            else:
+                centers.base[idx] = calcCoM(xyz_, masses[cat_in[idxs_compr[idx]]])
+    for idx, obj in enumerate(cat_in):
+        if obj != []:
+            xyz_ = respectPBCNoRef(xyz[obj])
+            tree = cKDTree(xyz_, leafsize=2, balanced_tree = False)
+            all_nn_idxs = tree.query_ball_point(centers[idxs_compr[idx]], r=r200[idx]*frac_r200, n_jobs=-1)
+            if all_nn_idxs != []:
+                cat_out[idx] = list(np.array(obj)[all_nn_idxs])
+    return cat_out

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Created on Sun Mar 13 17:39:15 2022
+"""
 
 from scipy import stats
 import numpy as np
@@ -7,19 +10,19 @@ from math import isnan
 from sklearn.utils import resample
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
-from .python_routines import print_status
+from cosmic_profiles.common.python_routines import print_status
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def findMode(xyz, masses, rad):
+def calcMode(xyz, masses, rad):
     """ Find mode of point distribution xyz
     
     :param xyz: coordinates of particles of type 1 or type 4
-    :type xyz: (N^3x3) floats
+    :type xyz: (N,3) floats
     :param masses: masses of particles of type 1 or type 4
-    :type masses: (N^3x1) floats
+    :type masses: (N,) floats
     :param rad: initial radius to consider away from COM of object
     :type rad: float
     :return: mode of point distribution
@@ -32,7 +35,7 @@ def findMode(xyz, masses, rad):
         return com
     else:
         rad *= 0.83 # Reduce radius by 17 %
-        return findMode(xyz_constrain, masses_constrain, rad)
+        return calcMode(xyz_constrain, masses_constrain, rad)
 
 def respectPBC(xyz, L_BOX):
     """
@@ -42,11 +45,11 @@ def respectPBC(xyz, L_BOX):
     by more than L_BOX/2, reflect those particles along L_BOX/2
     
     :param xyz: coordinates of particles of type 1 or type 4
-    :type xyz: (N^3x3) floats
+    :type xyz: (N,3) floats
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :return: updated coordinates of particles of type 1 or type 4
-    :rtype: (N^3x3) floats"""
+    :rtype: (N,3) floats"""
     xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
     ref = 0 # Reference particle does not matter
     dist_x = abs(xyz_out[ref, 0]-xyz_out[:,0])
@@ -230,6 +233,8 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
     :type center: list of (3,) float arrays
     :param start_time: time of start of shape analysis
     :type start_time: float
+    :param v: major axis of objects (optional) or any other vectorial quantity
+    :type v: list of (3,) float arrays
     :param M_SPLIT_TYPE: either "log_slice", where masses in log space are split, 
         or "const_occ", where masses are split ensuring equal number of points in each bin
         out of the ``NB_BINS`` bins, or "fixed_bins",
@@ -239,8 +244,6 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
     :type TWO_SPLIT: float
     :param NB_BINS: In case of "const_occ" and "log_slice", number of bins
     :type NB_BINS: float
-    :param v: major axis of objects (optional) or any other vectorial quantity
-    :type v: list of (3,) float arrays
     :return: max_min_m (mass bin edges), m_groups (total mass in bins), center_groups (center average in each bin), 
         v_groups (v average in each bin), idx_groups (indices of all objects in each bin)
     :rtype: (N,) floats, (N-1,) floats, (N-1,) floats, (N-1,) floats, list of lists (for each bin) of ints

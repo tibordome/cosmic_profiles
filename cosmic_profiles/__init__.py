@@ -27,7 +27,9 @@ from .mock_tools.mock_uni import (
 )
 
 from .common.profile_classes import (
-    CosmicProfiles,
-    CosmicProfilesGadgetHDF5,
-    CosmicProfilesDirect
+    DensProfs,
+    DensShapeProfs,
+    DensProfsHDF5,
+    DensShapeProfsHDF5
 )
+

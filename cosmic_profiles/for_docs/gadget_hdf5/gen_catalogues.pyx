@@ -8,7 +8,7 @@ cimport openmp
 from cython.parallel import prange
 
 @cython.embedsignature(True) 
-def getCSHIdxs(h_idxs, start_idx, fof_dm_size, nb_shs, csh_size, MIN_NUMBER_DM_PTCS):
+cdef int[:] calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS) nogil:
     """ Return the indices of the DM particles that belong to the CSH
     
     :param h_idxs: array to store the indices
@@ -29,7 +29,7 @@ def getCSHIdxs(h_idxs, start_idx, fof_dm_size, nb_shs, csh_size, MIN_NUMBER_DM_P
     return
 
 @cython.embedsignature(True)
-def getGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
+def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
     """ Construct galaxy catalogue
     
      Note that the indices returned in each gx are 'true index + 1'
@@ -40,13 +40,14 @@ def getGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER
     :type sh_len_gx: (N2,) ints, N2>N1
     :param fof_gx_size: number of star particles in the FoF-halos
     :type fof_gx_size: (N1,) ints
+    :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid
+    :type MIN_NUMBER_STAR_PTCS: int
     :return: galaxy catalogue, containing indices of star particles belong to each galaxy
     :rtype: list of N1 int lists containing indices"""
-    
     return
 
 @cython.embedsignature(True)
-def getCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
+def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
     """ Construct central subhalo (CSH) catalogue from FoF/SH info
     
     Note that the indices returned in each CSH are 'true index + 1'
@@ -66,5 +67,4 @@ def getCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_
     :return: h_cat: indices (+1, to allow 0 to be interpreted as no index),
         h_r200: R200-radii, h_pass: passed `MIN_NUMBER_DM_PTCS`-threshold or not
     :rtype: int array, float array, int array"""
-    
     return

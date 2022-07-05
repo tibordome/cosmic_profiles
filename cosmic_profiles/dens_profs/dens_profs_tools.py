@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Mar 13 17:39:15 2022
-"""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +8,7 @@ from cosmic_profiles.common.cosmo_tools import M_split
 from pathos.multiprocessing import ProcessingPool as Pool
 from functools import partial
 import os
-from cosmic_profiles.common.python_routines import np_cache_factory
+from cosmic_profiles.common.caching import np_cache_factory
 from scipy import optimize
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -70,7 +67,7 @@ def getHernquistProf(r, model_pars):
     rho_s, r_s = model_pars
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
-def getDensityProfiles(VIZ_DEST, SNAP, cat, r200s, fits_ROverR200, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT=1e10, suffix = '_'):
+def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -84,13 +81,15 @@ def getDensityProfiles(VIZ_DEST, SNAP, cat, r200s, fits_ROverR200, dens_profs, R
     :type cat: N2-long list of lists of ints, N2 > N
     :param r200s: catalogue of virial radii (of parent halos in case of gxs)
     :type r200s: N2-long float array
-    :param fits_ROverR200: normalized radii at which the mass-decomposed density
+    :param dens_profs_fit: density profiles, defined at ``ROverR200``, in M_sun*h^2/(Mpc)**3
+    :type dens_profs_fit: (N, r_res2) floats
+    :param ROverR200_fit: normalized radii at which the mass-decomposed density
         profile fits shall be calculated
-    :type fits_ROverR200: (N3,) floats
+    :type ROverR200_fit: (r_res2,) floats
     :param dens_profs: density profiles, defined at ``ROverR200``, in M_sun*h^2/(Mpc)**3
-    :type dens_profs: (N, n) floats
+    :type dens_profs: (N, r_res1) floats
     :param ROverR200: normalized radii at which ``dens_profs`` are defined
-    :type ROverR200: (N4,) floats
+    :type ROverR200: (N, r_res1) floats
     :param obj_masses: masses of objects in M_sun/h
     :type obj_masses: (N,) floats
     :param obj_centers: centers of objects, each coordinate in Mpc/h
@@ -101,10 +100,10 @@ def getDensityProfiles(VIZ_DEST, SNAP, cat, r200s, fits_ROverR200, dens_profs, R
     :type start_time: float
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfilesDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
     :type suffix: string"""
     
-    print_status(rank,start_time,'Starting getDensityProfiles() with snap {0}'.format(SNAP))
+    print_status(rank,start_time,'Starting getDensProfs() with snap {0}'.format(SNAP))
     
     if rank == 0:
         print_status(rank, start_time, "The number of objects considered is {0}".format(obj_masses.shape[0]))
@@ -128,9 +127,17 @@ def getDensityProfiles(VIZ_DEST, SNAP, cat, r200s, fits_ROverR200, dens_profs, R
         err_low = np.array([np.quantile(np.array(z), 0.25)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
         err_high = np.array([np.quantile(np.array(z), 0.75)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
         r200 = np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]])
-        best_fit = fitDensProf(prof_median, ROverR200, r200, method) # Fit median
+        # Prepare median for fitting
+        if np.sum(obj_pass) > 0:
+            dens_prof_fit = dens_profs_fit[idxs_compr[np.nonzero(obj_pass > 0)[0]]]
+        else:
+            dens_prof_fit = np.zeros((0,ROverR200_fit.shape[0]), dtype = np.float32)
+        y = [list(dens_prof_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
+        prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
+        best_fit, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200, 0)) # Fit median
+        # Plotting
         plt.figure()
-        plt.loglog(fits_ROverR200, prof_models[method](fits_ROverR200*np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]]), best_fit), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
+        plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]]), best_fit), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
         plt.loglog(ROverR200, prof_median, color = 'blue')
         plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"All objects")
         plt.xlabel(r"$r/R_{200}$")
@@ -140,16 +147,19 @@ def getDensityProfiles(VIZ_DEST, SNAP, cat, r200s, fits_ROverR200, dens_profs, R
         
         for group in range(len(obj_m_groups)):
             obj_pass_m = np.int32([1 if (obj_pass[i] == 1 and obj_masses[idxs_compr[i]]*MASS_UNIT > max_min_m[group] and obj_masses[idxs_compr[i]]*MASS_UNIT < max_min_m[group+1]) else 0 for i in range(len(cat))])
-            # Fit median
+            # Find profile median
             y = [list(dens_prof_[idxs_compr[np.nonzero(obj_pass_m > 0)[0]],i]) for i in range(ROverR200.shape[0])]
             prof_median = np.array([np.median(z) if z != [] else np.nan for z in y])
             err_low = np.array([np.quantile(np.array(z), 0.25)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
             err_high = np.array([np.quantile(np.array(z), 0.75)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
             r200_m = np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]])
-            best_fit_m = fitDensProf(prof_median, fits_ROverR200, r200_m, method)
+            # Prepare median for fitting
+            y = [list(dens_prof_fit[idxs_compr[np.nonzero(obj_pass_m > 0)[0]],i]) for i in range(ROverR200_fit.shape[0])]
+            prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
+            best_fit_m, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200_m, 0))
             # Plotting
             plt.figure()
-            plt.loglog(fits_ROverR200, prof_models[method](fits_ROverR200*np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]]), best_fit_m), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
+            plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]]), best_fit_m), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
             plt.loglog(ROverR200, prof_median, color = 'blue')
             plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))))
             plt.xlabel(r"$r/R_{200}$")
@@ -165,23 +175,23 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     Note that ``median`` which is defined at ``ROverR200``
     must be in units of UnitMass/(Mpc/h)**3.
     
-    :param median: density profile (often a median of many profiles combined)
-    :type median: (N,) floats
     :param ROverR200: normalized radii where ``median`` is defined and 
         fitting should be carried out
     :type ROverR200: (N,) floats
-    :param r200: virial raiuds (of parent halo in case of gx)
-    :type r200: float
     :param method: string describing density profile model assumed for fitting
     :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
-    :return res.x: best-fit results
-    :rtype: (n,) floats"""
+    :param median_r200_obj_nb: density profile (often a median of many profiles combined,
+        in units of UNIT_MASS/(Mpc/h)**3), virial radius (of parent halo in case of gx) 
+        and object number
+    :type median_r200_obj_nb: tuple of (N,) floats, float, int
+    :return best_fit, obj_nb: best-fit results, object number
+    :rtype: (n,) floats, int"""
     
     median, r200, obj_nb = median_r200_obj_nb
     prof_models = {'einasto': getEinastoProf, 'alpha_beta_gamma': getAlphaBetaGammaProf, 'nfw': getNFWProf, 'hernquist': getHernquistProf}
     def toMinimize(model_pars, median, rbin_centers, method):
         psi_2 = np.sum(np.array([(np.log(median[i])-np.log(prof_models[method](rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
-        return psi_2, obj_nb
+        return psi_2
     R_to_min = ROverR200*r200 # Mpc/h
     # Discard nan values in median
     R_to_min = R_to_min[~np.isnan(median)] # Note: np.isnan returns a boolean
@@ -213,18 +223,19 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
 def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
     """ Helper function to carry out density profile fitting
     
+    :param dens_profs: array containing density profiles in units 
+        of UnitMass/(Mpc/h)**3)
+    :type dens_profs: (N,r_res) floats
     :param ROverR200: normalized radii where density profile is defined
         and fitting should be carried out
-    :type ROverR200: (N2,) floats
+    :type ROverR200: (r_res,) floats
+    :param r200s: R200 values of objects
+    :type r200s: (N,) floats
     :param method: string describing density profile model assumed for fitting
     :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
-    :param dens_prof_plus_r200_plus_obj_number: array containing density profile,
-        (in units of UnitMass/(Mpc/h)**3), r200-value and object number
-    :type dens_prof_plus_r200_plus_obj_number: (N,) float
-    :return res, object_number: best-fit results and object number
-    :rtype: (n,) floats, int"""
+    :return best_fits: best-fit results
+    :rtype: (N,n) floats"""
     
-    print("Called fitDensProfHelper")
     if rank == 0:
         if method == 'einasto':
             best_fits = np.zeros((dens_profs.shape[0], 3))
@@ -235,8 +246,8 @@ def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
         with Pool(processes=len(os.sched_getaffinity(0))) as pool:
             results = pool.map(partial(fitDensProf, ROverR200, method), [(dens_profs[obj_nb], r200s[obj_nb], obj_nb) for obj_nb in range(dens_profs.shape[0])])
         for result in results:
-            x, obj = tuple(result)
-            best_fits[int(obj)] = x
+            x, obj_nb = tuple(result)
+            best_fits[obj_nb] = x
         return best_fits
     else:
         return None

@@ -1,16 +1,14 @@
 #cython: language_level=3
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar  3 13:17:51 2021
-"""
 
 cimport openmp
 import numpy as np
 from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
 from libc.stdio cimport printf
 from cython.parallel import prange
-from cosmic_profiles.common.python_routines import respectPBCNoRef, getCoM, findMode, np_cache_factory
+from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode
+from cosmic_profiles.common.caching import np_cache_factory
 cimport cython
 from libc.math cimport sqrt
 
@@ -59,9 +57,6 @@ cdef float[:] runEllShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xy
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
     
@@ -93,7 +88,7 @@ cdef float[:] runEllShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xy
             morph_info[:] = 0.0
             return morph_info
         # Get shape tensor
-        shape_tensor = CythonHelpers.getShapeTensor(xyz, shell, shape_tensor, masses, center, pts_in_shell)
+        shape_tensor = CythonHelpers.calcShapeTensor(xyz, shell, shape_tensor, masses, center, pts_in_shell)
         # Diagonalize shape_tensor
         eigvec[:,:] = 0.0
         eigval[:] = 0.0
@@ -181,9 +176,6 @@ cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_pri
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
     
@@ -215,7 +207,7 @@ cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_pri
             morph_info[:] = 0.0
             return morph_info
         # Get shape tensor
-        shape_tensor = CythonHelpers.getShapeTensor(xyz, ellipsoid, shape_tensor, masses, center, pts_in_ell)
+        shape_tensor = CythonHelpers.calcShapeTensor(xyz, ellipsoid, shape_tensor, masses, center, pts_in_ell)
         # Diagonalize shape_tensor
         eigvec[:,:] = 0.0
         eigval[:] = 0.0
@@ -299,9 +291,6 @@ cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vx
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
     
@@ -333,7 +322,7 @@ cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vx
             morph_info[:] = 0.0
             return morph_info
         # Get shape tensor
-        shape_tensor = CythonHelpers.getShapeTensor(vxyz, ellipsoid, shape_tensor, masses, vcenter, pts_in_ell)
+        shape_tensor = CythonHelpers.calcShapeTensor(vxyz, ellipsoid, shape_tensor, masses, vcenter, pts_in_ell)
         # Diagonalize shape_tensor
         eigvec[:,:] = 0.0
         eigval[:] = 0.0
@@ -377,20 +366,20 @@ cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vx
 
 @cython.embedsignature(True)
 @np_cache_factory(3,1)
-def getMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
+def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
     """ Calculates the local shape catalogue
     
-    Calls ``getObjMorphLocal()`` in a parallelized manner.\n
+    Calls ``calcObjMorphLocal()`` in a parallelized manner.\n
     Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the centers, for each object.
     
     :param xyz: positions of all (DM or star) particles in simulation box
-    :type xyz: (N1 x 3) floats
+    :type xyz: (N2 x 3) floats
     :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N2
+    :type cat: list of length N1
     :param masses: masses of the particles expressed in unit mass
-    :type masses: (N1 x 1) floats
-    :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
-    :type r200: list of length N2
+    :type masses: (N2 x 1) floats
+    :param r200: each entry of the list gives the R_200 radius of the parent halo
+    :type r200: list of length N1
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -409,9 +398,6 @@ def getMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_B
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
     :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)
     :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed
     """
@@ -462,9 +448,9 @@ def getMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_B
         if obj_pass[p] == 1:
             xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
             if CENTER == 'mode':
-                centers.base[p] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                centers.base[p] = calcMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
             else:
-                centers.base[p] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+                centers.base[p] = calcCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
     for p in prange(nb_objs, schedule = 'dynamic', nogil = True):
         if obj_pass[p] == 1:
             for n in range(obj_size[p]):
@@ -474,7 +460,7 @@ def getMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_B
                 m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                 m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
             xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-            morph_info[openmp.omp_get_thread_num(),:,:] = getObjMorphLocal(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d, xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], centers[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
+            morph_info[openmp.omp_get_thread_num(),:,:] = calcObjMorphLocal(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d, xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], centers[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
             d[p] = morph_info[openmp.omp_get_thread_num(),0]
             q[p] = morph_info[openmp.omp_get_thread_num(),1]
             s[p] = morph_info[openmp.omp_get_thread_num(),2]
@@ -519,20 +505,20 @@ def getMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_B
 
 @cython.embedsignature(True)
 @np_cache_factory(3,1)
-def getMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER, float SAFE):
+def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER, float SAFE):
     """ Calculates the overall shape catalogue
     
-    Calls ``getObjMorphGlobal()`` in a parallelized manner.\n
+    Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n
     Calculates the overall axis ratios and eigenframe for each object.
     
     :param xyz: positions of all (DM or star) particles in simulation box
-    :type xyz: (N1 x 3) floats
+    :type xyz: (N2 x 3) floats
     :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N2
+    :type cat: list of length N1
     :param masses: masses of the particles expressed in unit mass
-    :type masses: (N1 x 1) floats
-    :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
-    :type r200: list of length N2
+    :type masses: (N2 x 1) floats
+    :param r200: each entry of the list gives the R_200 radius of the parent halo
+    :type r200: list of length N1
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -548,6 +534,9 @@ def getMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
         or 'com' (center of mass) of each halo
     :type CENTER: str
+    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. 
+        The larger the better.
+    :type SAFE: float
     :return: d, q, s, eigframe, centers, masses
     :rtype: (N3,) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)
     """
@@ -596,9 +585,9 @@ def getMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
         if obj_pass[p] == 1:
             xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
             if CENTER == 'mode':
-                centers.base[p] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                centers.base[p] = calcMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
             else:
-                centers.base[p] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+                centers.base[p] = calcCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
     for p in prange(nb_objs, schedule = 'dynamic', nogil = True):
         if obj_pass[p] == 1:
             for n in range(obj_size[p]):
@@ -606,7 +595,7 @@ def getMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
                 m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                 m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
             xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-            morph_info[openmp.omp_get_thread_num(),:] = getObjMorphGlobal(morph_info[openmp.omp_get_thread_num(),:], r200[p], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], ellipsoid[openmp.omp_get_thread_num()], centers[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN, SAFE)
+            morph_info[openmp.omp_get_thread_num(),:] = calcObjMorphGlobal(morph_info[openmp.omp_get_thread_num(),:], r200[p], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], ellipsoid[openmp.omp_get_thread_num()], centers[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN, SAFE)
             d[p] = morph_info[openmp.omp_get_thread_num(),0]
             q[p] = morph_info[openmp.omp_get_thread_num(),1]
             s[p] = morph_info[openmp.omp_get_thread_num(),2]
@@ -649,22 +638,22 @@ def getMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
 
 @cython.embedsignature(True)
 @np_cache_factory(4,1)
-def getMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
+def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER):
     """ Calculates the local velocity dispersion shape catalogue
     
-    Calls ``getObjMorphLocalVelDisp()`` in a parallelized manner.\n
+    Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n
     Calculates the overall axis ratios and eigenframe for each object.
     
     :param xyz: positions of all (DM or star) particles in simulation box
-    :type xyz: (N1 x 3) floats
+    :type xyz: (N2 x 3) floats
     :param vxyz: velocities of all (DM or star) particles in simulation box
-    :type vxyz: (N1 x 3) floats
+    :type vxyz: (N2 x 3) floats
     :param cat: each entry of the list is a list containing indices of particles belonging to an object
     :type cat: list of length N2
     :param masses: masses of the particles expressed in unit mass
-    :type masses: (N1 x 1) floats
-    :param r200: each entry of the list gives the R_200 (mean not critical) radius of the parent halo
-    :type r200: list of length N2
+    :type masses: (N2 x 1) floats
+    :param r200: each entry of the list gives the R_200 radius of the parent halo
+    :type r200: list of length N1
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -737,9 +726,9 @@ def getMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float
         if obj_pass[p] == 1:
             xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
             if CENTER == 'mode':
-                centers.base[p] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                centers.base[p] = calcMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
             else:
-                centers.base[p] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+                centers.base[p] = calcCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
     for p in prange(nb_objs, schedule = 'dynamic', nogil = True):
         if obj_pass[p] == 1:
             for n in range(obj_size[p]):
@@ -749,8 +738,8 @@ def getMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float
                 m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                 m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
             xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-            vcenters[p] = CythonHelpers.getCoM(vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], vcenters[p])
-            morph_info[openmp.omp_get_thread_num(),:,:] = getObjMorphLocalVelDisp(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d, xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], centers[p], vcenters[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
+            vcenters[p] = CythonHelpers.calcCoM(vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], vcenters[p])
+            morph_info[openmp.omp_get_thread_num(),:,:] = calcObjMorphLocalVelDisp(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d, xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], centers[p], vcenters[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN)
             d[p] = morph_info[openmp.omp_get_thread_num(),0]
             q[p] = morph_info[openmp.omp_get_thread_num(),1]
             s[p] = morph_info[openmp.omp_get_thread_num(),2]
@@ -795,22 +784,22 @@ def getMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float
 
 @cython.embedsignature(True)
 @np_cache_factory(4,1)
-def getMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER, float SAFE):
+def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER, float SAFE):
     """ Calculates the global velocity dipsersion shape catalogue
     
-    Calls ``getObjMorphGlobalVelDisp()`` in a parallelized manner.\n
+    Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n
     Calculates the overall axis ratios and eigenframe for each object.
     
     :param xyz: positions of all (DM or star) particles in simulation box
-    :type xyz: (N1 x 3) floats
+    :type xyz: (N2 x 3) floats
     :param vxyz: velocities of all (DM or star) particles in simulation box
-    :type vxyz: (N1 x 3) floats
+    :type vxyz: (N2 x 3) floats
     :param cat: each entry of the list is a list containing indices of particles belonging to an object
     :type cat: list of length N2
     :param masses: masses of the particles expressed in unit mass
-    :type masses: (N1 x 1) floats
-    :param r200: R_200 (mean not critical) radii of the parent halos
-    :type r200: (N2,) floats
+    :type masses: (N2 x 1) floats
+    :param r200: R_200 radii of the parent halos
+    :type r200: (N1,) floats
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -826,6 +815,9 @@ def getMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
         or 'com' (center of mass) of each halo
     :type CENTER: str
+    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. 
+        The larger the better.
+    :type SAFE: float
     :return: d, q, s, eigframe, centers, masses
     :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)
     """
@@ -876,9 +868,9 @@ def getMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
         if obj_pass[p] == 1:
             xyz_ = respectPBCNoRef(xyz.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], L_BOX)
             if CENTER == 'mode':
-                centers.base[p] = findMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], 1000)
+                centers.base[p] = calcMode(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
             else:
-                centers.base[p] = getCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
+                centers.base[p] = calcCoM(xyz_, masses.base[cat_arr.base[idxs_compr[p],:obj_size[p]]])
     for p in prange(nb_objs, schedule = 'dynamic', nogil = True):
         if obj_pass[p] == 1:
             for n in range(obj_size[p]):
@@ -887,8 +879,8 @@ def getMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
                 m_obj[openmp.omp_get_thread_num(),n] = masses[cat_arr[idxs_compr[p],n]]
                 m[p] = m[p] + masses[cat_arr[idxs_compr[p],n]]
             xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-            vcenters[p] = CythonHelpers.getCoM(vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], vcenters[p])
-            morph_info[openmp.omp_get_thread_num(),:] = getObjMorphGlobalVelDisp(morph_info[openmp.omp_get_thread_num(),:], r200[p], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], ellipsoid[openmp.omp_get_thread_num()], centers[p], vcenters[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN, SAFE)
+            vcenters[p] = CythonHelpers.calcCoM(vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], vcenters[p])
+            morph_info[openmp.omp_get_thread_num(),:] = calcObjMorphGlobalVelDisp(morph_info[openmp.omp_get_thread_num(),:], r200[p], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], ellipsoid[openmp.omp_get_thread_num()], centers[p], vcenters[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], M_TOL, N_WALL, N_MIN, SAFE)
             d[p] = morph_info[openmp.omp_get_thread_num(),0]
             q[p] = morph_info[openmp.omp_get_thread_num(),1]
             s[p] = morph_info[openmp.omp_get_thread_num(),2]
@@ -930,7 +922,7 @@ def getMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     return d.base[succeed], q.base[succeed], s.base[succeed], minor, inter, major, centers.base[succeed], m.base[succeed] # Only rank = 0 content matters
 
 @cython.embedsignature(True)
-cdef float[:,:] getObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
+cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
     """ Calculates the local axis ratios
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -940,7 +932,7 @@ cdef float[:,:] getObjMorphLocal(float[:,:] morph_info, float r200, float[:] log
         2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
         10th to 12th: normalized minor axis
     :type morph_info: (12,N) floats
-    :param r200: R_200 (mean not critical) radius of the parent halo
+    :param r200: R_200 radius of the parent halo
     :type r200: (N2,) float array
     :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 
         radius of the parent halo, e.g. np.logspace(-2,1,100)
@@ -969,14 +961,11 @@ cdef float[:,:] getObjMorphLocal(float[:,:] morph_info, float r200, float[:] log
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
     :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius
     :rtype: (12,N) float array"""
     # Return if problematic
     morph_info[:,:] = 0.0
-    if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+    if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
         morph_info[:,:] = 0.0
         return morph_info
     if r200 == 0.0: # We are dealing with a halo which does not have any SHs, so R_200 = 0.0 according to AREPO
@@ -1002,14 +991,14 @@ cdef float[:,:] getObjMorphLocal(float[:,:] morph_info, float r200, float[:] log
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:] getObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE) nogil:
+cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE) nogil:
     """ Calculates the global axis ratios and eigenframe of the point cloud
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
         2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
         10th to 12th: normalized minor axis
     :type morph_info: (12,) floats
-    :param r200: R_200 (mean not critical) radius of the parent halo
+    :param r200: R_200 radius of the parent halo
     :type r200: (N2,) float array
     :param xyz: positions of particles in point cloud
     :type xyz: (N1 x 3) floats
@@ -1018,7 +1007,7 @@ cdef float[:] getObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz,
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N1 x 1) floats
     :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
-    :type ellipsoid: (N,) ints, zeros
+    :type ellipsoid: (N1,) ints, zeros
     :param center: center of point cloud
     :type center: (3,) floats
     :param shape_tensor: shape tensor array to be filled
@@ -1035,14 +1024,14 @@ cdef float[:] getObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz,
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
+    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. 
+        The larger the better.
+    :type SAFE: float
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
     # Return if problematic
     morph_info[:] = 0.0
-    if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+    if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
         morph_info[:] = 0.0
         return morph_info
     morph_info[0] = r200+SAFE
@@ -1052,7 +1041,7 @@ cdef float[:] getObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz,
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:,:] getObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
+cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN) nogil:
     """ Calculates the local axis ratios of the velocity dispersion tensor 
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -1062,7 +1051,7 @@ cdef float[:,:] getObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float
         2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
         10th to 12th: normalized minor axis
     :type morph_info: (12,N) floats
-    :param r200: R_200 (mean not critical) radius of the parent halo
+    :param r200: R_200 radius of the parent halo
     :type r200: (N2,) float array
     :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 
         radius of the parent halo, e.g. np.logspace(-2,1,100)
@@ -1070,13 +1059,13 @@ cdef float[:,:] getObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float
     :param xyz: positions of particles in point cloud
     :type xyz: (N1 x 3) floats
     :param vxyz: velocity array
-    :type vxyz: (N x 3) floats
+    :type vxyz: (N1 x 3) floats
     :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
     :type xyz_princ: (N1 x 3) floats, zeros
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N1 x 1) floats
     :param shell: indices of points that fall into shell (varies from iteration to iteration)
-    :type shell: (N,) ints, zeros
+    :type shell: (N1,) ints, zeros
     :param center: center of point cloud
     :type center: (3,) floats
     :param vcenter: velocity-center of point cloud
@@ -1095,14 +1084,11 @@ cdef float[:,:] getObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
     :rtype: (12,) float array"""
     # Return if problematic
     morph_info[:,:] = 0.0
-    if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+    if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
         morph_info[:,:] = 0.0
         return morph_info
     if r200 == 0.0: # We are dealing with a halo which does not have any SHs, so R_200 = 0.0 according to AREPO
@@ -1128,25 +1114,25 @@ cdef float[:,:] getObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:] getObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE) nogil:
+cdef float[:] calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE) nogil:
     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
         2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,
         10th to 12th: normalized minor axis
     :type morph_info: (12,) floats
-    :param r200: R_200 (mean not critical) radius of the parent halo
+    :param r200: R_200 radius of the parent halo
     :type r200: (N2,) float array
     :param xyz: positions of particles in point cloud
     :type xyz: (N1 x 3) floats
     :param vxyz: velocity array
-    :type vxyz: (N x 3) floats
+    :type vxyz: (N1 x 3) floats
     :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
     :type xyz_princ: (N1 x 3) floats, zeros
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N1 x 1) floats
     :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
-    :type ellipsoid: (N,) ints, zeros
+    :type ellipsoid: (N1,) ints, zeros
     :param center: center of point cloud
     :type center: (3,) floats
     :param vcenter: velocity-center of point cloud
@@ -1169,14 +1155,14 @@ cdef float[:] getObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,
     :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
     :type N_MIN: int
-    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-        or 'com' (center of mass) of each halo
-    :type CENTER: str
+    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. 
+        The larger the better.
+    :type SAFE: float
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
     :rtype: (12,) float array"""
     # Return if problematic
     morph_info[:] = 0.0
-    if CythonHelpers.getLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
+    if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
         morph_info[:] = 0.0
         return morph_info
     morph_info[0] = r200+SAFE

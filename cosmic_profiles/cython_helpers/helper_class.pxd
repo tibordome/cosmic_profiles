@@ -8,13 +8,13 @@ Created on Sun Mar 13 17:28:18 2022
 cdef class CythonHelpers:
 
     @staticmethod
-    cdef complex[::1,:] getShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] com, int nb_pts) nogil
+    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] com, int nb_pts) nogil
 
     @staticmethod
-    cdef float getLocalSpread(float[:,:] nns) nogil
+    cdef float calcLocalSpread(float[:,:] nns) nogil
 
     @staticmethod
-    cdef float[:] getCoM(float[:,:] nns, float[:] masses, float[:] com) nogil
+    cdef float[:] calcCoM(float[:,:] nns, float[:] masses, float[:] com) nogil
 
     @staticmethod
     cdef float cython_abs(float x) nogil
@@ -26,10 +26,10 @@ cdef class CythonHelpers:
     cdef float[:,:] respectPBCNoRef(float[:,:] xyz, float L_BOX) nogil
     
     @staticmethod
-    cdef float[:] getDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] dens_prof, int[:] shell) nogil
+    cdef float[:] calcDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] dens_prof, int[:] shell) nogil
     
     @staticmethod
-    cdef float[:] getMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil
+    cdef float[:] calcMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil
     
     @staticmethod
-    cdef float getKTilde(float r, float r_i, float h_i) nogil
+    cdef float calcKTilde(float r, float r_i, float h_i) nogil

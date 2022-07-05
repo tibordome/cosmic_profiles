@@ -1,13 +1,13 @@
 #cython: language_level=3
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 28 12:16:48 2022
-"""
 
 cimport cython
 from libc.math cimport sqrt, pi, exp
 from scipy.linalg.cython_lapack cimport zheevr
+from cython.parallel import prange
+from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode
+from cosmic_profiles.common.caching import np_cache_factory
 include "array_defs.pxi"
 
 @cython.embedsignature(True)
@@ -16,7 +16,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef complex[::1,:] getShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts) nogil:
+    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts) nogil:
         """ Calculate shape tensor for point cloud
         
         :param nns: positions of cloud particles
@@ -52,7 +52,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float getLocalSpread(float[:,:] nns) nogil:
+    cdef float calcLocalSpread(float[:,:] nns) nogil:
         """ Calculate local spread (2nd moment) around center of volume of point cloud
         
         :param nns: positions of cloud particles
@@ -75,7 +75,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] getCoM(float[:,:] nns, float[:] masses, float[:] com) nogil:
+    cdef float[:] calcCoM(float[:,:] nns, float[:] masses, float[:] com) nogil:
         """ Return center of mass (COM)
         
         :param nns: positions of cloud particles
@@ -191,7 +191,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] getDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
+    cdef float[:] calcDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
         """ Calculates density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -233,7 +233,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] getMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil:
+    cdef float[:] calcMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil:
         """ Calculates enclosed mass profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -275,7 +275,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float getKTilde(float r, float r_i, float h_i) nogil:
+    cdef float calcKTilde(float r, float r_i, float h_i) nogil:
         """ Angle-averaged normalized Gaussian kernel for kernel-based density profile estimation
         
         :param r: radius in Mpc/h at which to calculate the local, spherically-averaged density

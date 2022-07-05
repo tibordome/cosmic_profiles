@@ -6,14 +6,14 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
+def createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS):
     """ Create mock simulation box by Poisson-sampling a lognormal density distribution
     
     The Poisson-sampled distribution is evolved according to the Zeldovich (1LPT) prescription
     up until redshift ``redshift`` under the constraint of an 'EisensteinHu' power spectrum
     
-    :param BoxSize: size of to-be-obtained simulation box
-    :type BoxSize: float
+    :param L_BOX: size of to-be-obtained simulation box
+    :type L_BOX: float
     :param nbar: number density of points (i.e. sampling density / resolution) in box, units: 1/(Mpc/h)**3
         Note: ``nbar`` is assumed to be constant across the box
     :type nbar: float

@@ -6,9 +6,10 @@ import numpy as np
 cimport cython
 cimport openmp
 from cython.parallel import prange
+from cosmic_profiles.common.caching import np_cache_factory
 
 @cython.embedsignature(True) 
-cdef int[:] getCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS) nogil:
+cdef int[:] calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS) nogil:
     """ Return the indices of the DM particles that belong to the CSH
     
     :param h_idxs: array to store the indices
@@ -43,7 +44,8 @@ cdef int[:] getCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs
     return h_idxs
 
 @cython.embedsignature(True)
-def getGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
+@np_cache_factory(3,0)
+def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
     """ Construct galaxy catalogue
     
      Note that the indices returned in each gx are 'true index + 1'
@@ -54,6 +56,8 @@ def getGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER
     :type sh_len_gx: (N2,) ints, N2>N1
     :param fof_gx_size: number of star particles in the FoF-halos
     :type fof_gx_size: (N1,) ints
+    :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid
+    :type MIN_NUMBER_STAR_PTCS: int
     :return: galaxy catalogue, containing indices of star particles belong to each galaxy
     :rtype: list of N1 int lists containing indices"""
     cdef int nb_halos = len(nb_shs)
@@ -88,11 +92,12 @@ def getGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER
             for q in range(p):
                 idx_sum = idx_sum+nb_shs[q]
                 start_idx = start_idx+fof_gx_size[q]
-            gx_cat[idxs_compr[p]] = getCSHIdxs(gx_cat[idxs_compr[p]], start_idx, fof_gx_size[p], nb_shs[p], sh_len_gx[idx_sum], MIN_NUMBER_STAR_PTCS)
+            gx_cat[idxs_compr[p]] = calcCSHIdxs(gx_cat[idxs_compr[p]], start_idx, fof_gx_size[p], nb_shs[p], sh_len_gx[idx_sum], MIN_NUMBER_STAR_PTCS)
     return gx_cat.base, gx_pass.base
 
 @cython.embedsignature(True)
-def getCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
+@np_cache_factory(5,0)
+def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
     """ Construct central subhalo (CSH) catalogue from FoF/SH info
     
     Note that the indices returned in each CSH are 'true index + 1'
@@ -144,5 +149,5 @@ def getCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_
             for q in range(p):
                 idx_sum = idx_sum+nb_shs[q]
                 start_idx = start_idx+fof_dm_sizes[q]
-            h_cat[idxs_compr[p]] = getCSHIdxs(h_cat[idxs_compr[p]], start_idx, fof_dm_sizes[p], nb_shs[p], sh_len[idx_sum], MIN_NUMBER_DM_PTCS)
+            h_cat[idxs_compr[p]] = calcCSHIdxs(h_cat[idxs_compr[p]], start_idx, fof_dm_sizes[p], nb_shs[p], sh_len[idx_sum], MIN_NUMBER_DM_PTCS)
     return h_cat.base, h_r200.base, h_pass.base

@@ -16,25 +16,19 @@ We have added density profile estimation capabilities. We contend ourselves with
 
 where :math:`(x,y,z)` are the coordinates of a point cloud particle in some coordinate system centered on either the center of mass or the mode of the cloud. The density profile describes the radial mass distribution of the points in the cloud in units of :math:`M_{\odot}h^2/(\mathrm{Mpc})^3`. 
 
-To calculate density profiles with *Cosmic Profiles*, we first instantiate a ``CosmicProfiles`` object called ``cprofiles`` as described in the :ref:`Shape Estimation section<Shape Estimation>`. Now we can simply invoke the command::
+To calculate density profiles with *Cosmic Profiles*, we first instantiate a ``DensProfs`` object called ``cprofiles``, similar to what we saw in :ref:`Shape Estimation section<Shape Estimation>`. Now we can simply invoke the command::
 
-    cprofiles.calcDensProfsDirectBinning(r_over_r200)
+    dens_profs_db, r_over_r200 = cprofiles.getDensProfsDirectBinning(r_over_r200),
 
-whose output is stored in ``CAT_DEST`` and can be retrieved via ``cprofiles.fetchDensProfsDirectBinning()``. The latter will return a float array ``rho_profs`` of shape :math:`(N_{\text{obj}}, N_r)`. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice.
+where the float array ``dens_profs_db`` of shape :math:`(N_{\text{obj}}, N_r)` contains the estimated density profiles. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice.
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, one must additionally specify `obj_type` = `dm` or `gx` to ``calcDensProfsDirectBinning()`` in order to have the density profiles calculated for either dark matter halos or galaxies.
+.. note:: In case of a Gadget-style HDF5 snapshot output, one must additionally specify `obj_type` = `dm` or `gx` to ``getDensProfsDirectBinning()`` in order to have the density profiles calculated for either dark matter halos or galaxies.
 
-The invokation of ``cprofiles.calcDensProfsDirectBinning()`` dumps the following two files to ``CAT_DEST``:
+As the naming suggests, ``getDensProfsDirectBinning()`` estimates density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. On the other hand::
 
-* ``dens_profs_db_x.txt`` of shape (:math:`N_{\text{obj}}, N_r`): density profile values
-* ``r_over_r200_db_x.txt`` of shape (:math:`N_r`,): spherical radii at which density profiles are calculated
-
-As the naming suggests, ``calcDensProfsDirectBinning()`` estimates density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. On the other hand::
-
-    cprofiles.calcDensProfsKernelBased(r_over_r200)
+    dens_profs_kb, r_over_r200 = cprofiles.getDensProfsDirectBinning(r_over_r200)
 
 performs a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise. 
-
 
 .. _Density Profile Fitting:
 
@@ -57,7 +51,7 @@ Secondly, the Hernquist profile (`Hernquist 1990 <https://ui.adsabs.harvard.edu/
 
 Thirdly, the Einasto profile (`Einasto 1965 <https://ui.adsabs.harvard.edu/abs/1965TrAlm...5...87E/abstract>`_) defined by an additional parameter :math:`\alpha` via
 
-.. math:: \rho(r) = \rho_s \exp\left(-\frac{2}{\alpha}\left[\left(\frac{r}{r_2}\right)^{\alpha}-1\right]\right).
+.. math:: \rho(r) = \rho_s \exp\left(-\frac{2}{\alpha}\left[\left(\frac{r}{r_{-2}}\right)^{\alpha}-1\right]\right).
 
 Finally, the :math:`\alpha \beta \gamma` density profile (`Zemp et al 2011 <https://arxiv.org/abs/1107.5582>`_) is a generalization of the Navarro-Frank-White (NFW) halo density profile with the parametrization
 
@@ -65,14 +59,18 @@ Finally, the :math:`\alpha \beta \gamma` density profile (`Zemp et al 2011 <http
 
 To fit density profiles according to model ``method``, a string which can be either 'nfw', 'hernquist', 'einasto' or 'alpha_beta_gamma', invoke the method::
 
-    cprofiles.fitDensProfs(dens_profs, ROverR200, cat, r200s, method = 'einasto').
+    best_fits = cprofiles.getDensProfsBestFits(dens_profs_fit, r_over_r200_fit, method).
 
-The first argument ``dens_profs`` is an array of shape :math:`(N_{\text{obj}}, N_r)` containing the density profiles defined at radii ``ROverR200``, possibly obtained via ``calcDensProfsDirectBinning()`` or ``calcDensProfsKernelBased()``. The catalogue information in ``cat`` and ``r200s`` should correspond to ``dens_profs`` in the sense that the number of non-empty lists in ``cat`` matches :math:`N_{\text{obj}}` exactly.
+The first argument ``dens_profs_fit`` is an array of shape :math:`(N_{\text{obj}}, N_r)` containing the density profiles defined at radii ``r_over_r200_fit``, possibly obtained via ``getDensProfsDirectBinning()`` or ``getDensProfsDirectBinning()``, with some non-reliable values removed. The last argument ``method`` is 1 of 4 possible strings corresponding to the density profile model, i.e. either ``nfw``, ``hernquist``, ``einasto`` or ``alpha_beta_gamma``. The returned array ``best_fits`` will store the best-fit results and has shape (:math:`N_{\text{obj}}, n`), ``n`` being the number of parameters in model ``method``.
 
-The invokation of ``cprofiles.fitDensProfs()`` dumps the following two files to ``CAT_DEST``
+Once density profiles have been fit, concentrations of objects can be calculated, defined as
 
-*  ``dens_prof_best_fits_method_x.txt``, with ``method`` 1 of 4 possible strings, of shape (:math:`N_{\text{obj}}, n`), ``n`` being the number of parameters in model ``method``: best-fit values
-*  ``best_fits_r_over_r200_method_x.txt`` of shape (:math:`N_r`,): spherical radii that were used to find best-fit values
+.. math:: c \coloneqq \frac{R_{200}}{r_{-2}},
 
-The best-fit values can be retrieved via ``cprofiles.fetchDensProfsBestFits()``.
+with :math:`r_{-2} = r_s` the characteristic or scale radius of the corresponding density profile model. To this end, invoke::
 
+    cs = cprofiles.getConcentrations(dens_profs_fit, r_over_r200_fit, method),
+
+which will return a float array ``cs`` of shape (:math:`N_{\text{obj}},`).
+
+.. note:: In case of a Gadget-style HDF5 snapshot output, one must additionally specify `obj_type` = `dm` or `gx` to ``getDensProfsBestFits()`` in order to have the density profiles fits for either dark matter halos or galaxies.

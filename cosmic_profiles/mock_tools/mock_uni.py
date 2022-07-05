@@ -9,14 +9,14 @@ import numpy as np
 from cosmic_profiles.common.python_routines import getMassDMParticle
 from nbodykit.lab import cosmology, LogNormalCatalog
 
-def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
+def createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS):
     """ Create mock simulation box by Poisson-sampling a lognormal density distribution
     
     The Poisson-sampled distribution is evolved according to the Zeldovich (1LPT) prescription
     up until redshift ``redshift`` under the constraint of an 'EisensteinHu' power spectrum
     
-    :param BoxSize: size of to-be-obtained simulation box
-    :type BoxSize: float
+    :param L_BOX: size of to-be-obtained simulation box
+    :type L_BOX: float
     :param nbar: number density of points (i.e. sampling density / resolution) in box, units: 1/(Mpc/h)**3
         Note: ``nbar`` is assumed to be constant across the box
     :type nbar: float
@@ -38,7 +38,7 @@ def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
         cosmo = cosmology.Planck15
         Plin = cosmology.LinearPower(cosmo, redshift, transfer='EisensteinHu')
         
-        cat = LogNormalCatalog(Plin=Plin, nbar=nbar, BoxSize=BoxSize, Nmesh=Nmesh, bias=2.0, seed=42)
+        cat = LogNormalCatalog(Plin=Plin, nbar=nbar, BoxSize=L_BOX, Nmesh=Nmesh, bias=2.0, seed=42)
         x_vec = np.float32(np.array(cat['Position'][:,0])) # Mpc/h
         y_vec = np.float32(np.array(cat['Position'][:,1]))
         z_vec = np.float32(np.array(cat['Position'][:,2]))
@@ -49,7 +49,7 @@ def createLogNormUni(BoxSize, nbar, redshift, Nmesh, UNIT_MASS):
         
         N = int(round(len(x_vec)**(1/3)))
         N_tot = len(x_vec)
-        dm_mass = getMassDMParticle(N, BoxSize)/UNIT_MASS
+        dm_mass = getMassDMParticle(N, L_BOX)/UNIT_MASS
         return N_tot, x_vec, y_vec, z_vec, x_vel, y_vel, z_vel, np.ones((len(x_vec),),dtype = np.float32)*dm_mass
     else:
         return None, None, None, None, None, None, None, None
