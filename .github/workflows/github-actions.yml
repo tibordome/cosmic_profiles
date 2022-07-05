@@ -37,7 +37,9 @@ jobs:
           # The GitHub editor is 127 chars wide and exit-zero treats all errors as warnings.
           $CONDA/bin/flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Create source dist
-        run: $CONDA/bin/python setup.py sdist
+        run: |
+          $CONDA/bin/python setup.py build
+          $CONDA/bin/python setup.py install
       - name: Test with pytest
         run: |
           $CONDA/bin/conda install pytest
