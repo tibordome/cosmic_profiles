@@ -68,12 +68,16 @@ html_static_path = ['_static']
 
 # Resolve function for the linkcode extension.
 def linkcode_resolve(domain, info):
-    if domain != 'py':
+    
+    if domain not in ['py'] or not info['module']:
         return None
-    if not info['module']:
-        return None
-    filename = info['module'].replace('.', '/')
-    return "github.com/tibordome/cosmic_profiles/tree/master/cosmic_profiles/%s.py" % filename
+    if 'gen_catalogues' in info['module'] or 'helper_class' in info['module'] or 'profile_classes' in info['module'] or 'shape_profs_algos' in info['module'] or 'dens_profs_algos' in info['module']:
+        extension = '.pyx'
+    else:
+        extension = '.py'
+    filename = info['module'].replace('.', '/') + extension
+    tag = 'master' if 'dev' in release else ('v' + release)
+    return "https://github.com/tibordome/cosmic_profiles/tree/master/cosmic_profiles/%s" % (filename)
 
 # -- Making sure __init__ of classes show up --
 def skip(app, what, name, obj, would_skip, options):
