@@ -25,11 +25,11 @@ jobs:
           $CONDA/bin/conda install sympy 
           $CONDA/bin/conda install matplotlib
           $CONDA/bin/conda install flake8
-          $CONDA/bin/conda install CythonGSL
+          $CONDA/bin/conda install -c conda-forge cythongsl
           $CONDA/bin/conda install scikit-learn
           $CONDA/bin/conda install h5py
           $CONDA/bin/conda install pathos
-          $CONDA/bin/conda install openmp
+          $CONDA/bin/conda install -c conda-forge openmp
       - name: Lint with flake8
         run: |
           # Stop the build if there are Python syntax errors or undefined names.
