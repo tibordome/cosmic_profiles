@@ -28,7 +28,7 @@ jobs:
           $CONDA/bin/conda install -c conda-forge cythongsl
           $CONDA/bin/conda install scikit-learn
           $CONDA/bin/conda install h5py
-          $CONDA/bin/conda install pathos
+          $CONDA/bin/conda install -c conda-forge pathos
           $CONDA/bin/conda install -c conda-forge openmp
       - name: Lint with flake8
         run: |
