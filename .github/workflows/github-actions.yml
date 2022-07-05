@@ -19,13 +19,23 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          $CONDA/bin/conda env update --file ../../docs/environment.yml --name base
+          $CONDA/bin/conda install -c conda-forge mpi4py 
+          $CONDA/bin/conda install scipy
+          $CONDA/bin/conda install cython
+          $CONDA/bin/conda install sympy 
+          $CONDA/bin/conda install matplotlib
+          $CONDA/bin/conda install flake8
+          $CONDA/bin/conda install CythonGSL
+          $CONDA/bin/conda install scikit-learn
+          $CONDA/bin/conda install h5py
+          $CONDA/bin/conda install pathos
+          $CONDA/bin/conda install openmp
       - name: Lint with flake8
         run: |
           # Stop the build if there are Python syntax errors or undefined names.
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          $CONDA/bin/flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # The GitHub editor is 127 chars wide and exit-zero treats all errors as warnings.
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          $CONDA/bin/flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
           $CONDA/bin/conda install pytest
