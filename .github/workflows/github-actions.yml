@@ -38,8 +38,8 @@ jobs:
           $CONDA/bin/flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Create source dist
         run: |
-          $CONDA/bin/python setup.py build
-          $CONDA/bin/python setup.py install
+          $CONDA/bin/python setup.py sdist
+          $CONDA/bin/python cosmic_profiles/setup.py build_ext --inplace
       - name: Test with pytest
         run: |
           $CONDA/bin/conda install pytest
