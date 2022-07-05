@@ -23,3 +23,10 @@ The ``python_routines`` module helps in calculating the center of mass of a poin
    :members:
    :undoc-members:
    :show-inheritance:
+
+The ``caching`` module implements caching of function outputs to avoid recalculating/reloading repeatedly.
+
+.. automodule:: common.caching
+   :members:
+   :undoc-members:
+   :show-inheritance:

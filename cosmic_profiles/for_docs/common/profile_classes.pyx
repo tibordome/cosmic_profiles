@@ -1029,7 +1029,7 @@ cdef class DensProfsHDF5(CosmicBase):
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
-        :return xyz, masses, MIN_NUMBER_PTCS
+        :return xyz, masses, MIN_NUMBER_PTCS: positions, masses, and minimum number of particles
         :rtype: (N2,3) floats, (N2,) floats, int"""
         return
         
@@ -1038,7 +1038,7 @@ cdef class DensProfsHDF5(CosmicBase):
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
-        :return velxyz
+        :return velxyz: velocity array
         :rtype: (N2,3) floats"""
         return
         

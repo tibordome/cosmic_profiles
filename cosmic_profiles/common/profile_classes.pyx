@@ -1530,7 +1530,7 @@ cdef class DensProfsHDF5(CosmicBase):
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
-        :return xyz, masses, MIN_NUMBER_PTCS
+        :return xyz, masses, MIN_NUMBER_PTCS: positions, masses, and minimum number of particles
         :rtype: (N2,3) floats, (N2,) floats, int"""
         print_status(rank,self.start_time,'Starting getXYZMasses() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
         if obj_type == 'dm':
@@ -1552,7 +1552,7 @@ cdef class DensProfsHDF5(CosmicBase):
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
-        :return velxyz
+        :return velxyz: velocity array
         :rtype: (N2,3) floats"""
         print_status(rank,self.start_time,'Starting getVelXYZ() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
         if obj_type == 'dm':

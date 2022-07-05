@@ -18,7 +18,7 @@ where :math:`(x,y,z)` are the coordinates of a point cloud particle in some coor
 
 To calculate density profiles with *Cosmic Profiles*, we first instantiate a ``DensProfs`` object called ``cprofiles``, similar to what we saw in :ref:`Shape Estimation section<Shape Estimation>`. Now we can simply invoke the command::
 
-    dens_profs_db, r_over_r200 = cprofiles.getDensProfsDirectBinning(r_over_r200),
+    dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_r200),
 
 where the float array ``dens_profs_db`` of shape :math:`(N_{\text{obj}}, N_r)` contains the estimated density profiles. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice.
 
@@ -26,7 +26,7 @@ where the float array ``dens_profs_db`` of shape :math:`(N_{\text{obj}}, N_r)` c
 
 As the naming suggests, ``getDensProfsDirectBinning()`` estimates density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. On the other hand::
 
-    dens_profs_kb, r_over_r200 = cprofiles.getDensProfsDirectBinning(r_over_r200)
+    dens_profs_kb = cprofiles.getDensProfsDirectBinning(r_over_r200)
 
 performs a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise. 
 
@@ -65,7 +65,7 @@ The first argument ``dens_profs_fit`` is an array of shape :math:`(N_{\text{obj}
 
 Once density profiles have been fit, concentrations of objects can be calculated, defined as
 
-.. math:: c \coloneqq \frac{R_{200}}{r_{-2}},
+.. math:: c = \frac{R_{200}}{r_{-2}},
 
 with :math:`r_{-2} = r_s` the characteristic or scale radius of the corresponding density profile model. To this end, invoke::
 

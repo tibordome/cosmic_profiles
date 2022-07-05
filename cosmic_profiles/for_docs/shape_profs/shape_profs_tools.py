@@ -20,7 +20,7 @@ def getEpsilon(idx_cat, xyz, masses, L_BOX, CENTER, angle=0.0):
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
-            or 'com' (center of mass) of each halo
+        or 'com' (center of mass) of each halo
     :type CENTER: str
     :param angle: rotation of objects around z-axis before ellipticity is calculated (z-projected)
     :type angle: float
@@ -40,7 +40,7 @@ def getShape(Rs, d, param_interest, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS):
     :param param_interest: the quantity of interest defined at all elliptical radii d
     :type param_interest: (N2,) floats
     :param ERROR_METHOD: mean (if ERROR_METHOD == "bootstrap" or "SEM") or median
-    (if ERROR_METHOD == "median_quantile") and the +- 1 sigma error attached
+        (if ERROR_METHOD == "median_quantile") and the +- 1 sigma error attached
     :type ERROR_METHOD: string
     :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
     :type D_LOGSTART: int

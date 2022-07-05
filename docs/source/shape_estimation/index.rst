@@ -95,7 +95,7 @@ To retrieve the local (i.e. as a function of :math:`r_{\text{ell}}`) halo shape 
 
     d, q, s, minor, inter, major, obj_centers, obj_masses, succeeded = cprofiles.getShapeCatLocal()
 
-which will also return the indices of the objects whose local shapes could be determined with the specifications provided above (such as ``M_TOL``) in ``succeeded``. The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``major``, ``obj_centers``, ``obj_masses`` represent the converged shape profiles. We consider a halo shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``M_TOL`` and the maximum number of iterations ``N_WALL`` is not yet achieved. If in addition the halo shape profile converges at the radius of :math:`R_{200}` (200-overdensity radius), the shape profile is determined successfully. The :math:`N_{\text{conv}}` shape profiles are then grouped together and dumped as 1D and 2D arrays. The arrays returned have the following format:
+which will also return the indices of the objects whose local shapes could be determined with the specifications provided above (such as ``M_TOL``) in ``succeeded``. The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``major``, ``obj_centers``, ``obj_masses`` represents the converged shape profiles. We consider a halo shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``M_TOL`` and the maximum number of iterations ``N_WALL`` is not yet achieved. If in addition the halo shape profile converges at the radius of :math:`R_{200}` (200-overdensity radius), the shape profile is determined successfully. The :math:`N_{\text{conv}}` shape profiles are then grouped together and dumped as 1D and 2D arrays. The arrays returned have the following format:
 
 * ``d`` of shape (:math:`N_{\text{conv}}`, ``D_BINS`` + 1): ellipsoidal radii
 * ``q`` of shape (:math:`N_{\text{conv}}`, ``D_BINS`` + 1): q shape parameter
@@ -110,7 +110,7 @@ Note that NaNs will most likely be present in ``q`` etc, especially for shape va
     
     cprofiles.dumpShapeCatLocal(CAT_DEST),
 
-where ``CAT_DEST`` is a string describing the path to the destination folder, e.g. './cat'. The files added are
+where ``CAT_DEST`` is a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. '/path/to/cat'. The files added are
 
 * ``d_local_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{conv}}`, ``D_BINS`` + 1): ellipsoidal radii
 * ``q_local_x.txt`` of shape (:math:`N_{\text{conv}}`, ``D_BINS`` + 1): q shape parameter

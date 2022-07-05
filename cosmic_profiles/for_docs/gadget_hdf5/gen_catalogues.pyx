@@ -8,7 +8,7 @@ cimport openmp
 from cython.parallel import prange
 
 @cython.embedsignature(True) 
-cdef int[:] calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS) nogil:
+def calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS):
     """ Return the indices of the DM particles that belong to the CSH
     
     :param h_idxs: array to store the indices

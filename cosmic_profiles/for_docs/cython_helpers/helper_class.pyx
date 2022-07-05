@@ -8,7 +8,7 @@ from libc.math cimport sqrt, pi, exp
 @cython.embedsignature(True)
 cdef class CythonHelpers:
     
-    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts) nogil:
+    def calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts):
         """ Calculate shape tensor for point cloud
         
         :param nns: positions of cloud particles
@@ -27,7 +27,7 @@ cdef class CythonHelpers:
         :rtype: (3,3) complex"""
         return
     
-    cdef float calcLocalSpread(float[:,:] nns) nogil:
+    def calcLocalSpread(float[:,:] nns):
         """ Calculate local spread (2nd moment) around center of volume of point cloud
         
         :param nns: positions of cloud particles
@@ -36,7 +36,7 @@ cdef class CythonHelpers:
         :rtype: float"""
         return
     
-    cdef float[:] calcCoM(float[:,:] nns, float[:] masses, float[:] com) nogil:
+    def calcCoM(float[:,:] nns, float[:] masses, float[:] com):
         """ Return center of mass (COM)
         
         :param nns: positions of cloud particles
@@ -49,7 +49,7 @@ cdef class CythonHelpers:
         :rtype: (3,) floats"""
         return
     
-    cdef float cython_abs(float x) nogil:
+    def cython_abs(float x):
         """ Absolute value of float
         
         :param x: float value of interest
@@ -58,7 +58,7 @@ cdef class CythonHelpers:
         :rtype: float"""
         return
 
-    cdef void ZHEEVR(complex[::1,:] H, double * eigvals, complex[::1,:] Z, int nrows) nogil:
+    def ZHEEVR(complex[::1,:] H, double[:] eigvals, complex[::1,:] Z, int nrows):
         """
         Computes the eigenvalues and eigenvectors of a dense Hermitian matrix.
         
@@ -76,7 +76,7 @@ cdef class CythonHelpers:
         """
         return
     
-    cdef float[:,:] respectPBCNoRef(float[:,:] xyz, float L_BOX) nogil:
+    def respectPBCNoRef(float[:,:] xyz, float L_BOX):
         """
         Modify xyz inplace so that it respects the box periodicity.
         
@@ -93,7 +93,7 @@ cdef class CythonHelpers:
         
         return
     
-    cdef float[:] calcDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
+    def calcDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell):
         """ Calculates density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -115,7 +115,7 @@ cdef class CythonHelpers:
         :rtype: float array"""
         return
     
-    cdef float[:] calcMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil:
+    def calcMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid):
         """ Calculates enclosed mass profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -137,7 +137,7 @@ cdef class CythonHelpers:
         :rtype: float array"""
         return
     
-    cdef float calcKTilde(float r, float r_i, float h_i) nogil:
+    def calcKTilde(float r, float r_i, float h_i):
         """ Angle-averaged normalized Gaussian kernel for kernel-based density profile estimation
         
         :param r: radius in Mpc/h at which to calculate the local, spherically-averaged density
