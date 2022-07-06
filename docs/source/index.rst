@@ -13,7 +13,6 @@ The *Cosmic Profiles* project
    support
    shape_estimation/index
    density_profiles/index
-   ahf_interface/index
    mock_halo_generator/index
    code_reference/index
    example_scripts/index

@@ -22,10 +22,6 @@ from .mock_tools.mock_halo_gen import (
     genHalo
 )
 
-from .mock_tools.mock_uni import (
-    createLogNormUni
-)
-
 from .common.profile_classes import (
     DensProfs,
     DensShapeProfs,
