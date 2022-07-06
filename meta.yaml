@@ -36,7 +36,7 @@ about:
   license: MIT
   license_familY: MIT
   license_file: LICENSE
-  summary: "Implements 3D point cloud algorithms for estimation and fitting of shape and density profiles "
+  summary: "Implements 3D point cloud algorithms for estimation and fitting of shape and density profiles"
 
 extra:
   recipe-maintainers:

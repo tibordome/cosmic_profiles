@@ -92,7 +92,10 @@ setup(
     ],
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     ext_modules = cythonize(ext_modules),
-    packages=find_packages(),
+    packages=find_packages(
+        where='cosmic_profiles',
+        include=['common', 'cython_helpers', 'dens_profs', 'for_docs', 'gadget_hdf5', 'mock_tools', 'shape_profs']
+    ),
     zip_safe=False,
     include_package_data=True,
     install_requires=["cython", "cythongsl", "numpy>=1.19.2", "scipy", "pathos", "scikit-learn", "mpi4py", "h5py", "matplotlib"]
