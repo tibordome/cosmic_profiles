@@ -24,7 +24,6 @@ jobs:
           $CONDA/bin/conda install cython
           $CONDA/bin/conda install -c conda-forge openmp
           $CONDA/bin/conda install -c conda-forge openmpi=4.1.2
-          $CONDA/bin/conda install sympy 
           $CONDA/bin/conda install matplotlib
           $CONDA/bin/conda install flake8
           $CONDA/bin/conda install -c conda-forge cythongsl
