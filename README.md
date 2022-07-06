@@ -2,7 +2,7 @@
 
 <img src="./info/CProfiles.png" alt="Cosmic Profiles logo" style="height: 100px; width:400px;"/>
 
-# The *Cosmic Profiles* project
+# About the *Cosmic Profiles* project
 
 This repository provides shape and density profile analysis tools for cosmological simulations (and beyond). Its features include
 
