@@ -14,10 +14,7 @@ requirements:
     - python
     - cython
     - cythongsl
-    - openmp
-    - openmpi=4.1.2
-    - pathos
-    - h5py
+    - numpy
   run:
     - python
     - numpy
