@@ -20,10 +20,10 @@ jobs:
       - name: Install dependencies
         run: |
           $CONDA/bin/python -m pip install --upgrade pip
-          $CONDA/bin/pip install nbodykit
-          $CONDA/bin/conda install -c conda-forge mpi4py 
+          $CONDA/bin/conda install -c conda-forge mpi4py
           $CONDA/bin/conda install scipy
           $CONDA/bin/conda install cython
+          $CONDA/bin/pip install nbodykit
           $CONDA/bin/conda install sympy 
           $CONDA/bin/conda install matplotlib
           $CONDA/bin/conda install flake8
