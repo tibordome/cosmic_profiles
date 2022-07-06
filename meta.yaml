@@ -37,7 +37,7 @@ about:
   home: https://github.com/tibordome/cosmic_profiles
   license: MIT
   license_familY: MIT
-  license_file: LICENSE
+  license_file: LICENSE.md
   summary: "Implements 3D point cloud algorithms for estimation and fitting of shape and density profiles"
 
 extra:
