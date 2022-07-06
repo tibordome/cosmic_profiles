@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6]
+        python-version: [3.5]
 
     steps:
       - name: Checkout github repo (+ download lfs dependencies)
@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          $CONDA/bin/conda create -n new-env python=3.6
+          $CONDA/bin/conda create -n new-env python=3.5
           $CONDA/bin/activate new-env
           $CONDA/bin/conda install -c bccp nbodykit
           $CONDA/bin/conda install -c conda-forge mpi4py 
