@@ -19,9 +19,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          $CONDA/bin/conda create -n new-env python=3.5
-          $CONDA/bin/activate new-env
-          $CONDA/bin/conda install -c bccp nbodykit
+          python -m pip install --upgrade pip
+          pip install bccp nbodykit
           $CONDA/bin/conda install -c conda-forge mpi4py 
           $CONDA/bin/conda install scipy
           $CONDA/bin/conda install cython
