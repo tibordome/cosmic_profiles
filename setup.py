@@ -1,5 +1,5 @@
 import pathlib
-from setuptools import find_packages, setup
+from setuptools import find_packages, find_namespace_packages, setup
 from distutils.core import Extension
 import numpy as np
 import os
