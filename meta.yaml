@@ -10,6 +10,9 @@ requirements:
   host:
     - python
     - setuptools
+    - cython
+    - cythongsl
+    - numpy
   build:
     - python
     - cython
