@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           $CONDA/bin/conda create -n new-env python=3.6
-          $CONDA/bin/conda activate new-env
+          $CONDA/bin/activate new-env
           $CONDA/bin/conda install -c bccp nbodykit
           $CONDA/bin/conda install -c conda-forge mpi4py 
           $CONDA/bin/conda install scipy
