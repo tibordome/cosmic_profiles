@@ -1,6 +1,6 @@
 <img src="./info/CProfiles.png" alt="Cosmic Profiles logo" style="height: 100px; width:400px;"/>
 
-Halo Profiling Revisited
+CosmicProfiles is a Python package for Point Cloud Profiling
 
 [![Documentation Status](https://readthedocs.org/projects/cosmic-profiles/badge/?version=latest)](https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/cosmic-profiles.svg)](https://badge.fury.io/py/cosmic-profiles)
 
