@@ -13,11 +13,13 @@ requirements:
     - cython
     - cythongsl
     - numpy
+    - scipy
   build:
     - python
     - cython
     - cythongsl
     - numpy
+    - scipy
   run:
     - python
     - numpy
