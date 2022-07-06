@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/tibordome/cosmic_profiles/blob/master/info/CProfiles.png?raw=true" alt="Cosmic Profiles logo" style="height: 100px; width:400px;"/>
+<img src="https://github.com/tibordome/cosmic_profiles/blob/c5de89a310b8630abad2af59c0425cb5260c181c/info/CProfiles.png" alt="Cosmic Profiles logo" style="height: 100px; width:400px;"/>
 
 CosmicProfiles is a Python package for Point Cloud Profiling
 
