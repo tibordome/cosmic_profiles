@@ -92,9 +92,9 @@ setup(
     ],
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     ext_modules = cythonize(ext_modules),
-    packages=find_packages(
+    packages=find_namespace_packages(
         where='cosmic_profiles',
-        include=['common', 'cython_helpers', 'dens_profs', 'for_docs', 'gadget_hdf5', 'mock_tools', 'shape_profs']
+        exclude=['for_docs']
     ),
     zip_safe=False,
     include_package_data=True,
