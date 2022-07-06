@@ -31,6 +31,7 @@ jobs:
           $CONDA/bin/conda install -c conda-forge pathos
           $CONDA/bin/conda install -c conda-forge openmp
           $CONDA/bin/conda install -c conda-forge openmpi=4.1.2
+          $CONDA/bin/conda install -c bccp nbodykit
       - name: Lint with flake8
         run: |
           # Stop the build if there are Python syntax errors or undefined names.
