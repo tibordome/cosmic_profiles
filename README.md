@@ -4,15 +4,22 @@
 
 This repository provides shape and density profile analysis tools for cosmological simulations (and beyond). Its features include
 
-- iterative shell-based shape determination algorithm for high-resolution halos/galaxies
-- iterative ellipsoid-based shape determination algorithm for lower-resolution halos/galaxies
-- overall halo/galaxy shape determination, shape profiles determination, velocity dispersion tensor eigenaxes determination
-- halo/galaxy density profile estimation using direct binning and kernel-based approaches
+- overall halo shape determination, i.e. major, intermediate, minor axis vectors and shape quantities such as intermediate-to-major axis ratio or sphericity
+- halo shape profile determination
+  - iterative shell-based shape profile determination algorithm for high-resolution halos
+  - iterative ellipsoid-based shape profile determination algorithm for lower-resolution halos
+- works with
+  - 'direct' datasets (i.e. index catalogue provided by user) and
+  - Gadget-style HDF5 snapshot files
+    - additional velocity dispersion tensor eigenaxes determination
+    - galaxy density and shape profile determination also works out of the box
+- halo density profile estimation using direct binning and kernel-based approaches
 - density profile fitting assuming either NFW, Hernquist 1990, Einasto or $\alpha \beta \gamma$-profile model
-- wrapper to the Amiga Halo Finder (AHF) via `pynbody` to identify halos in a cosmological simulation (or mock universe)
-- mock point cloud generator: ellipsoidal or spherical, compatible with the 4 density profile models 
-- mock log-normal ''universe'' generator
-- example scripts.
+  - concentration-mass relationship of halos easy to calculate
+- mock halo generator: ellipsoidal or spherical, compatible with the 4 density profile models
+- easy to interface with `pynbody` to work with halos identified in a cosmological simulation (see example scripts)
+- easy to interface with `nbodykit` to harness large-scale structure capabilities (see example scripts)
+- 3D point cloud plotting tools
 
 The documentation can be found [here](https://cosmic-profiles.readthedocs.io/en/latest/index.html).
 
