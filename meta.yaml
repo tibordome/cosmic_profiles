@@ -12,9 +12,6 @@ requirements:
     - setuptools
   build:
     - python
-    - numpy
-    - scipy
-    - scikit-learn
     - cython
     - cythongsl
     - openmp
