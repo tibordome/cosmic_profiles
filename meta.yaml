@@ -12,6 +12,10 @@ requirements:
     - setuptools
   build:
     - python
+    - cython
+    - cythongsl
+    - openmp
+    - openmpi=4.1.2
   run:
     - python
     - numpy
