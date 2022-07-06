@@ -93,7 +93,6 @@ setup(
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     ext_modules = cythonize(ext_modules),
     packages=find_namespace_packages(
-        where='cosmic_profiles',
         exclude=['for_docs']
     ),
     zip_safe=False,
