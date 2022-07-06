@@ -16,14 +16,13 @@ subprocess.call(['python3', 'setup.py', 'build_ext', '--inplace'], cwd=os.path.j
 subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import genHalo, CosmicProfilesDirect
+from cosmic_profiles import genHalo, DensShapeProfs
 import time
 start_time = time.time()
 
 def test_shapes():
     #################################### Parameters ################################################
     L_BOX = np.float32(10) # Mpc/h
-    CAT_DEST = "./cat"
     VIZ_DEST = "./viz"
     D_LOGSTART = -2
     D_LOGEND = 0
@@ -35,6 +34,8 @@ def test_shapes():
     MASS_UNIT = 1e+10
     MIN_NUMBER_DM_PTCS = 1000
     CENTER = 'mode'
+    HIST_NB_BINS = 11 # Number of bins used for e.g. ellipticity histogram
+    frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf. plotLocalTHist())
     N = 10 # Number of halos used for test
     
     #################################### Generate N mock halos ####################################
@@ -67,70 +68,80 @@ def test_shapes():
     
     ######################### Extract R_vir, halo indices and halo sizes ##########################
     mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
-    h_indices = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
+    idx_cat = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################
-    cprofiles = CosmicProfilesDirect(dm_xyz, mass_array, h_indices, r_vir, CAT_DEST, VIZ_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
     
-    assert h_indices == cprofiles.fetchCat()
-    centers, ms = cprofiles.fetchMassesCenters()
+    assert idx_cat == cprofiles.getIdxCat()
+    centers, ms = cprofiles.getMassesCenters()
     nb_pass = len([1 if nb_ptc > MIN_NUMBER_DM_PTCS else 0 for nb_ptc in nb_ptcs])
     assert centers.shape == (nb_pass,3)
     assert ms.shape == (nb_pass,)
     
     ######################### Calculating Local Morphological Properties #############################
     # Create halo shape catalogue
-    cprofiles.calcLocalShapes()
+    d, q, s, minor, inter, major, obj_centers, obj_masses, succeeded = cprofiles.getShapeCatLocal()
     
-    cat_local = cprofiles.fetchCatLocal()
-    assert np.sum([1 if h_indices[obj] != [] else 0 for obj in range(len(h_indices))]) >= np.sum([1 if cat_local[obj] != [] else 0 for obj in range(len(cat_local))])
+    idx_cat_local = cprofiles.getIdxCatLocal()
+    assert np.sum([1 if idx_cat[obj] != [] else 0 for obj in range(len(idx_cat))]) >= np.sum([1 if idx_cat_local[obj] != [] else 0 for obj in range(len(idx_cat_local))])
     
-    obj_masses, obj_centers, d, q, s, major_full = cprofiles.fetchShapeCat(True)
     assert obj_masses.shape[0] <= nb_pass
     assert obj_centers.shape[0] <= nb_pass
     assert d.shape[0] <= nb_pass
     assert q.shape[0] <= nb_pass
     assert s.shape[0] <= nb_pass
-    assert major_full.shape[0] <= nb_pass
+    assert minor.shape[0] <= nb_pass
+    assert inter.shape[0] <= nb_pass
+    assert major.shape[0] <= nb_pass
     assert d.shape[1] == D_BINS+1
     assert q.shape[1] == D_BINS+1
     assert s.shape[1] == D_BINS+1
-    assert major_full.shape[1] == D_BINS + 1
-    assert major_full.shape[2] == 3
+    assert minor.shape[1] == D_BINS + 1
+    assert minor.shape[2] == 3
+    assert inter.shape[1] == D_BINS + 1
+    assert inter.shape[2] == 3
+    assert major.shape[1] == D_BINS + 1
+    assert major.shape[2] == 3
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.drawShapeProfiles()
+    cprofiles.plotShapeProfs(VIZ_DEST)
     
     # Viz first few halos' shapes
-    cprofiles.vizLocalShapes([0,1,2])
+    cprofiles.vizLocalShapes([0,1,2], VIZ_DEST)
     
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHisto()
+    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200)
     
     ######################### Calculating Global Morphological Properties ############################
-    cprofiles.calcGlobalShapes()
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal()
     
-    cat_global = cprofiles.fetchCatGlobal()
-    assert np.sum([1 if h_indices[obj] != [] else 0 for obj in range(len(h_indices))]) >= np.sum([1 if cat_global[obj] != [] else 0 for obj in range(len(cat_global))])
+    idx_cat_global = cprofiles.getIdxCatGlobal()
+    assert np.sum([1 if idx_cat[obj] != [] else 0 for obj in range(len(idx_cat))]) >= np.sum([1 if idx_cat_global[obj] != [] else 0 for obj in range(len(idx_cat_global))])
     
-    obj_masses, obj_centers, d, q, s, major_full = cprofiles.fetchShapeCat(False)
     assert obj_masses.shape[0] == nb_pass
     assert obj_centers.shape[0] == nb_pass
     assert d.shape[0] == nb_pass
     assert q.shape[0] == nb_pass
     assert s.shape[0] == nb_pass
-    assert major_full.shape[0] == nb_pass
+    assert minor.shape[0] == nb_pass
+    assert inter.shape[0] == nb_pass
+    assert major.shape[0] == nb_pass
     assert d.shape[1] == 1
     assert q.shape[1] == 1
     assert s.shape[1] == 1
-    assert major_full.shape[1] == 1
-    assert major_full.shape[2] == 3
+    assert minor.shape[1] == 1
+    assert minor.shape[2] == 3
+    assert inter.shape[1] == 1
+    assert inter.shape[2] == 3
+    assert major.shape[1] == 1
+    assert major.shape[2] == 3
     
     # Plot halo ellipticity histogram
-    cprofiles.plotGlobalEpsHisto()
+    cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST)
     
     # Viz first few halos' shapes
-    cprofiles.vizGlobalShapes([0,1,2])
+    cprofiles.vizGlobalShapes([0,1,2], VIZ_DEST)
     
     # Clean-up
     subprocess.call(['bash', 'decythonize.sh'], cwd=os.path.join(currentdir, '..'))

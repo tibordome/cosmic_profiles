@@ -32,6 +32,11 @@ rm -r build
 cd ../mock_tools
 rm -r __pycache__
 rm -r build
+cd ../tests
+rm -r __pycache__
+rm -r build
+rm -r cat
+rm -r viz
 cd ..
 rm -r __pycache__
 rm -r build

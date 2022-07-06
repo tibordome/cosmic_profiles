@@ -1221,7 +1221,7 @@ cdef class DensShapeProfs(DensProfs):
         """
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.idx_cat, self.MIN_NUMBER_PTCS, self.M_TOL, self.N_WALL, self.N_MIN, self.CENTER, self.SAFE)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.idx_cat, self.MIN_NUMBER_PTCS, self.M_TOL, self.N_WALL, self.N_MIN)
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
@@ -1444,7 +1444,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting plotShapeProfs() with snap {0}'.format(self.SNAP))
         if rank == 0:
             suffix = '_'
-            self.plotShapeProfsBase(self.xyz.base, self.masses.base, self.idx_cat, self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.M_TOL, self.N_WALL, self.N_MIN, self.CENTER, VIZ_DEST, suffix = suffix)
+            self.plotShapeProfsBase(self.xyz.base, self.masses.base, self.idx_cat, self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.M_TOL, self.N_WALL, self.N_MIN, VIZ_DEST, suffix = suffix)
     
     def dumpShapeCatLocal(self, CAT_DEST):
         """ Dumps all relevant local shape data into ``CAT_DEST``
@@ -1865,7 +1865,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             idx_cat = self.getIdxCat(obj_type)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(xyz, masses, idx_cat, MIN_NUMBER_PTCS, self.M_TOL, self.N_WALL, self.N_MIN, self.CENTER, self.SAFE)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(xyz, masses, idx_cat, MIN_NUMBER_PTCS, self.M_TOL, self.N_WALL, self.N_MIN)
             del xyz; del masses; del idx_cat
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:

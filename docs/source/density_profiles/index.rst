@@ -26,7 +26,7 @@ where the float array ``dens_profs_db`` of shape :math:`(N_{\text{obj}}, N_r)` c
 
 As the naming suggests, ``getDensProfsDirectBinning()`` estimates density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. On the other hand::
 
-    dens_profs_kb = cprofiles.getDensProfsDirectBinning(r_over_r200)
+    dens_profs_kb = cprofiles.getDensProfsKernelBased(r_over_r200)
 
 performs a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise. 
 

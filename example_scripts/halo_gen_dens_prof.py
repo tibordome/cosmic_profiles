@@ -56,10 +56,10 @@ def calcDensEx():
     
     ######################### Extract halo indices and halo sizes ##############################################
     mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
-    h_indices = [np.arange(len(halo_x), dtype = np.int32).tolist()]
+    idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensProfs object ########################################################
-    cprofiles = DensProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, start_time)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, start_time)
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!
