@@ -6,7 +6,7 @@ python:
 # command to install dependencies
 install:
   - sudo apt-get update
-  - pyenv global 3.7
+  - pyenv global 3.6
   - pip install numpy
   - pip install scipy
   - pip install scikit-learn
