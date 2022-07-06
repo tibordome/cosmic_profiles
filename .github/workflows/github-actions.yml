@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          $CONDA/bin/conda install -c bccp nbodykit=3.7.0a0
+          $CONDA/bin/conda install -c bccp nbodykit=3.7.0
           $CONDA/bin/conda install -c conda-forge mpi4py 
           $CONDA/bin/conda install scipy
           $CONDA/bin/conda install cython
