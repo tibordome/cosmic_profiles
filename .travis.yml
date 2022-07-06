@@ -6,19 +6,19 @@ python:
 # command to install dependencies
 install:
   - sudo apt-get update
-  - pip install numpy
-  - pip install scipy
-  - pip install scikit-learn
-  - pip install cython
-  - pip install cythongsl
+  - pip3 install numpy
+  - pip3 install scipy
+  - pip3 install scikit-learn
+  - pip3 install cython
+  - pip3 install cythongsl
   - sudo apt-get install libopenmpi-dev
-  - pip install mpi4py
-  - pip install pathos
-  - pip install h5py
+  - pip3 install mpi4py
+  - pip3 install pathos
+  - pip3 install h5py
   - cd cosmic_profiles
-  - python setup.py build_ext --inplace 
+  - python3 setup.py build_ext --inplace 
   - cd ..
-  - python setup.py install
+  - python3 setup.py install
 # command to run tests
 script: 
   - pytest -v --cov=cosmic_profiles
