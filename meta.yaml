@@ -12,10 +12,16 @@ requirements:
     - setuptools
   build:
     - python
+    - numpy
+    - scipy
+    - scikit-learn
     - cython
     - cythongsl
+    - mpi4py
     - openmp
     - openmpi=4.1.2
+    - pathos
+    - h5py
   run:
     - python
     - numpy
