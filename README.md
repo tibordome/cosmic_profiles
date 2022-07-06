@@ -1,6 +1,6 @@
 [![Documentation Status](https://readthedocs.org/projects/cosmic-profiles/badge/?version=latest)](https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/cosmic-profiles.svg)](https://badge.fury.io/py/cosmic-profiles)
 
-![Cosmic Profiles logo](./cosmic_profiles/info/CProfiles.png "Cosmic Profiles")
+![Cosmic Profiles logo](./info/CProfiles.png "Cosmic Profiles")
 # The *Cosmic Profiles* project
 
 This repository provides shape and density profile analysis tools for cosmological simulations (and beyond). Its features include
