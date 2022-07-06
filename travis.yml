@@ -1,0 +1,23 @@
+python:
+  - "2.7"
+  - "3.8"
+# command to install dependencies
+install:
+  - sudo apt-get update
+  - pip install numpy
+  - pip install scipy
+  - pip install scikit-learn
+  - pip install cython
+  - pip install cythongsl
+  - pip install mpi4py
+  - pip install openmp
+  - pip install openmpi=4.1.2
+  - pip install pathos
+  - pip install h5py
+  - cd cosmic_profiles
+  - python setup.py build_ext --inplace 
+  - cd ..
+  - python setup.py install
+# command to run tests
+script: 
+  - pytest -v --cov=cosmic_profiles
