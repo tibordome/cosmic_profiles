@@ -1,13 +1,12 @@
 language: python
 python:
-  - "3.6"
-  - "3.7"
   - "3.8"
 before_install:
   - sudo apt-get update
   - sudo apt-get install python3
 # command to install dependencies
 install:
+  - pip3 install pytest-cov
   - pip3 install numpy
   - pip3 install scipy
   - pip3 install scikit-learn
