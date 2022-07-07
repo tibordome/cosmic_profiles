@@ -24,7 +24,6 @@ script:
   - cd cosmic_profiles/tests
   - mkdir viz
   - mkdir cat
-  - cd .. 
   - pytest -v --cov=cosmic_profiles
   - rm -r viz
   - rm -r cat
