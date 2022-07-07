@@ -15,29 +15,36 @@ build:
   script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
 
 requirements:
-  host:
+  build:
     - python
+    - cmake
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - cython
+    - cythongsl
+    - numpy
+  host:
+    - python >=3.6
+    - pip
     - setuptools
     - cython
     - cythongsl
     - numpy
-  build:
-    - python
-    - cython
-    - cythongsl
-    - numpy
+    - openmp
+    - libgomp
   run:
-    - python
+    - python >=3.6
     - numpy
     - scipy
+    - matplotlib
     - scikit-learn
     - cython
     - cythongsl
     - mpi4py
     - openmp
-    - openmpi=4.1.2
     - pathos
     - h5py
+    - libgomp
 
 test:
   imports:
