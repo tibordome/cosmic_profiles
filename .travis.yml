@@ -1,6 +1,5 @@
 language: python
 python:
-  - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
@@ -13,7 +12,6 @@ install:
   - pip3 install scipy
   - pip3 install scikit-learn
   - pip3 install cython
-  - pip3 install cythongsl
   - sudo apt-get install libopenmpi-dev
   - pip3 install mpi4py
   - pip3 install pathos
