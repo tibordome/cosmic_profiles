@@ -3,19 +3,20 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install python3
 # command to install dependencies
 install:
-  - sudo apt-get update
-  - pyenv global 3.6
-  - pip install numpy
-  - pip install scipy
-  - pip install scikit-learn
-  - pip install cython
-  - pip install cythongsl
+  - pip3 install numpy
+  - pip3 install scipy
+  - pip3 install scikit-learn
+  - pip3 install cython
+  - pip3 install cythongsl
   - sudo apt-get install libopenmpi-dev
-  - pip install mpi4py
-  - pip install pathos
-  - pip install h5py
+  - pip3 install mpi4py
+  - pip3 install pathos
+  - pip3 install h5py
   - cd cosmic_profiles
   - python3 setup.py build_ext --inplace 
   - cd ..
