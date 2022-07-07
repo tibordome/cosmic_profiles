@@ -23,6 +23,7 @@ requirements:
     - cython
     - cythongsl
     - numpy
+    - libgomp
   host:
     - python >=3.6
     - pip
