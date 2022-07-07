@@ -2,7 +2,7 @@
 
 CosmicProfiles is a Python package for Point Cloud Profiling
 
-[![Documentation Status](https://readthedocs.org/projects/cosmic-profiles/badge/?version=latest)](https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/cosmic-profiles.svg)](https://badge.fury.io/py/cosmic-profiles)
+[![Documentation Status](https://readthedocs.org/projects/cosmic-profiles/badge/?version=latest)](https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/cosmic-profiles.svg)](https://badge.fury.io/py/cosmic-profiles) [![Build Status](https://app.travis-ci.com/tibordome/cosmic_profiles.svg?branch=master)](https://app.travis-ci.com/tibordome/cosmic_profiles)
 
 # The *CosmicProfiles* project
 
