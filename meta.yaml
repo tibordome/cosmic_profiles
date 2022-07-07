@@ -43,13 +43,13 @@ test:
   imports:
     - cosmic_profiles
   source_files:
-    - tests/test_densities.py
-    - tests/test_ex_scripts.py
-    - tests/test_shapes.py
+    - cosmic_profiles/tests/test_densities.py
+    - cosmic_profiles/tests/test_ex_scripts.py
+    - cosmic_profiles/tests/test_shapes.py
   requires:
     - pytest
   commands:
-    - pytest tests/
+    - pytest cosmic_profiles/tests/
 
 about:
   home: https://github.com/tibordome/cosmic_profiles
