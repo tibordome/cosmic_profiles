@@ -16,7 +16,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts) nogil:
+    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None) nogil:
         """ Calculate shape tensor for point cloud
         
         :param nns: positions of cloud particles
@@ -31,6 +31,8 @@ cdef class CythonHelpers:
         :type center: (3,) floats
         :param nb_pts: number of points in `select` to consider
         :type nb_pts: int
+        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
+        :type reduced: boolean
         :return: shape tensor
         :rtype: (3,3) complex"""
         shape_tensor[:,:] = 0.0
@@ -44,7 +46,10 @@ cdef class CythonHelpers:
             for j in range(3):
                 if i >= j:
                     for run in range(nb_pts):
-                        shape_tensor[i,j] = shape_tensor[i,j] + <complex>(masses[select[run]]*(nns[select[run],i]-center[i])*(nns[select[run],j]-center[j])/mass_tot)
+                        if reduced == False:
+                            shape_tensor[i,j] = shape_tensor[i,j] + <complex>(masses[select[run]]*(nns[select[run],i]-center[i])*(nns[select[run],j]-center[j])/mass_tot)
+                        else:
+                            shape_tensor[i,j] = shape_tensor[i,j] + <complex>(masses[select[run]]*(nns[select[run],i]-center[i])*(nns[select[run],j]-center[j])/(mass_tot*r_ell[select[run]]**2))
                     if i > j:
                         shape_tensor[j,i] = shape_tensor[i,j]
         return shape_tensor

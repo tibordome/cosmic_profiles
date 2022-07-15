@@ -24,14 +24,12 @@ from pathos.multiprocessing import ProcessingPool as Pool
 from functools import partial
 cimport cython
 import os
-from mpl_toolkits.mplot3d import Axes3D
 from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, calcCoM
 from cosmic_profiles.shape_profs.shape_profs_tools import getGlobalEpsHist, getLocalEpsHist, getLocalTHist, getGlobalTHist, getShapeProfs
 from cosmic_profiles.dens_profs.dens_profs_tools import getDensProfs, fitDensProfHelper
 from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData
 from cosmic_profiles.gadget_hdf5.gen_catalogues import calcCSHCat, calcGxCat
 from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
-from cosmic_profiles.shape_profs.shape_profs_algos cimport runEllShellAlgo, runEllAlgo, runEllVDispAlgo
 from cosmic_profiles.shape_profs.shape_profs_algos import calcMorphLocal, calcMorphGlobal, calcMorphLocalVelDisp, calcMorphGlobalVelDisp
 from cosmic_profiles.dens_profs.dens_profs_algos import calcMassesCenters, calcDensProfsDirectBinning, calcDensProfsKernelBased
 import time
@@ -137,7 +135,7 @@ cdef class CosmicBase:
             object whose local shape calculation (i.e. shape profiles) converged, empty entry if not converged
         :rtype: list of length N1"""
         if rank == 0:
-            d, q, s, minor, inter, major, halos_center, obj_m, succeeded = calcMorphLocal(xyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, self.CENTER)
+            d, q, s, minor, inter, major, halos_center, obj_m, succeeded = calcMorphLocal(xyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, self.CENTER, self.REDUCED, self.SHELL_BASED)
             del d; del q; del s; del minor; del inter; del major; del halos_center; del obj_m
             print_status(rank, self.start_time, "Finished calcMorphLocal()")
         
@@ -201,7 +199,7 @@ cdef class CosmicBase:
             object whose local shape calculation (i.e. shape profiles) converged, empty entry if not converged
         :rtype: list of length N1"""
         if rank == 0:
-            d, q, s, minor, inter, major, halos_center, obj_m, succeeded = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, self.CENTER)
+            d, q, s, minor, inter, major, halos_center, obj_m, succeeded = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, self.CENTER, self.REDUCED, self.SHELL_BASED)
             del d; del q; del s; del minor; del inter; del major; del halos_center; del obj_m
             print_status(rank, self.start_time, "Finished calcMorphLocalVelDisp()")
             
@@ -303,7 +301,7 @@ cdef class CosmicBase:
             (number_of_objs,3) float array, (number_of_objs,) float array
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_center, obj_m = calcMorphGlobal(xyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, M_TOL, N_WALL, N_MIN, self.CENTER, self.SAFE)
+            d, q, s, minor, inter, major, obj_center, obj_m = calcMorphGlobal(xyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, M_TOL, N_WALL, N_MIN, self.CENTER, self.SAFE, self.REDUCED, self.SHELL_BASED)
             print_status(rank, self.start_time, "Finished calcMorphGlobal()")
         
             if d.shape[0] != 0:
@@ -355,7 +353,7 @@ cdef class CosmicBase:
             list of length N3
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_center, obj_m, succeeded = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, self.CENTER)
+            d, q, s, minor, inter, major, obj_center, obj_m, succeeded = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, self.CENTER, self.REDUCED, self.SHELL_BASED)
             print_status(rank, self.start_time, "Finished calcMorphLocalVelDisp()")
         
             if succeeded == []:
@@ -394,7 +392,7 @@ cdef class CosmicBase:
             (number_of_objs,3) float array, (number_of_objs,) float array
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_center, obj_m = calcMorphGlobalVelDisp(xyz.base, velxyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, M_TOL, N_WALL, N_MIN, self.CENTER, self.SAFE)
+            d, q, s, minor, inter, major, obj_center, obj_m = calcMorphGlobalVelDisp(xyz.base, velxyz.base, masses.base, self.r200.base, idx_cat, self.L_BOX, MIN_NUMBER_PTCS, M_TOL, N_WALL, N_MIN, self.CENTER, self.SAFE, self.REDUCED, self.SHELL_BASED)
             print_status(rank, self.start_time, "Finished calcMorphGlobalVelDisp")
             
             if d.shape[0] != 0:
@@ -1125,8 +1123,10 @@ cdef class DensShapeProfs(DensProfs):
     cdef float M_TOL
     cdef int N_WALL
     cdef int N_MIN
+    cdef bint REDUCED
+    cdef bint SHELL_BASED
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
+    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint REDUCED, bint SHELL_BASED, double start_time):
         """
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
@@ -1168,6 +1168,8 @@ cdef class DensShapeProfs(DensProfs):
         self.M_TOL = M_TOL
         self.N_WALL = N_WALL
         self.N_MIN = N_MIN
+        self.REDUCED = REDUCED
+        self.SHELL_BASED = SHELL_BASED
         
     def getIdxCatLocal(self):
         """ Fetch local shape index catalogue
@@ -1765,7 +1767,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
     ``vizGlobalShapes()``, ``plotGlobalEpsHist()``, ``plotLocalEpsHist()``.
     ``vizGlobalShapes()``, ``plotGlobalEpsHist()``, ``plotLocalEpsHist()``.
     ``plotGlobalTHist()``, ``plotLocalTHist()``, ``dumpShapeCatLocal()``,
-    ``dumpShapeCatGlobal()``, ``dumpShapeCatVelLocal()``, ``dumpShapeCatVelGlobal()``, 
+    ``dumpShapeCatGlobal()``, ``dumpShapeCatVelLocal()``, ``dumpShapeCatVelGlobal()``,
     ``getObjInfoLocal()``, ``getObjInfoGlobal()``, ``getObjInfoVelLocal()``, 
     ``getObjInfoVelGlobal()``."""
     
@@ -1775,8 +1777,10 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
     cdef float M_TOL
     cdef int N_WALL
     cdef int N_MIN
+    cdef bint REDUCED
+    cdef bint SHELL_BASED
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint WANT_RVIR, double start_time):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint REDUCED, bint SHELL_BASED, bint WANT_RVIR, double start_time):
         
         super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR, start_time)
         self.D_LOGSTART = D_LOGSTART
@@ -1785,6 +1789,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         self.M_TOL = M_TOL
         self.N_WALL = N_WALL
         self.N_MIN = N_MIN
+        self.REDUCED = REDUCED
+        self.SHELL_BASED = SHELL_BASED
                 
     def getIdxCatLocal(self, obj_type = 'dm'):
         """ Fetch local shape index catalogue

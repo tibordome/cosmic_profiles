@@ -8,8 +8,8 @@ Created on Sun Mar 13 17:28:18 2022
 cdef class CythonHelpers:
 
     @staticmethod
-    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] com, int nb_pts) nogil
-
+    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = *) nogil
+    
     @staticmethod
     cdef float calcLocalSpread(float[:,:] nns) nogil
 
