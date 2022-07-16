@@ -26,10 +26,16 @@ cdef class CythonHelpers:
     cdef float[:,:] respectPBCNoRef(float[:,:] xyz, float L_BOX) nogil
     
     @staticmethod
-    cdef float[:] calcDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] dens_prof, int[:] shell) nogil
+    cdef float[:] calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] dens_prof, int[:] shell) nogil
     
     @staticmethod
-    cdef float[:] calcMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil
+    cdef float[:] calcMenclsBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil
     
+    @staticmethod
+    cdef float[:] calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil
+            
+    @staticmethod
+    cdef float[:] calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] ellipsoid) nogil
+        
     @staticmethod
     cdef float calcKTilde(float r, float r_i, float h_i) nogil

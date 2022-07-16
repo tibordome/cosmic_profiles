@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 cimport cython
-from libc.math cimport sqrt, pi, exp
+from libc.math cimport sqrt, pi, exp, NAN
 from scipy.linalg.cython_lapack cimport zheevr
 from cython.parallel import prange
 from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode
@@ -196,8 +196,8 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcDensProfBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
-        """ Calculates density profile for one object with coordinates `xyz` and masses `masses`
+    cdef float[:] calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
+        """ Calculates spherically averaged density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
         :type xyz: (N,3) floats
@@ -209,11 +209,11 @@ cdef class CythonHelpers:
         :type r_200: float
         :param rad_bins: radial bins (bin edges) at whose centers the density profiles
             should be calculated, normalized by R200
-        :type rad_bins: float array
+        :type rad_bins: (N2+1,) floats
         :param dens_prof: array to store result in
-        :type dens_prof: float array
+        :type dens_prof: (N2,) floats
         :param shell: array used for the calculation
-        :type shell: int array
+        :type shell: (N,) int array
         :return: density profile
         :rtype: float array"""
         cdef int corr_s = 0
@@ -238,8 +238,97 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcMenclsBruteForce(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil:
-        """ Calculates enclosed mass profile for one object with coordinates `xyz` and masses `masses`
+    cdef float[:] calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
+        """ Calculates ellipsoidal shell-based density profile for one object with coordinates `xyz` and masses `masses`
+        
+        :param xyz: positions of cloud particles
+        :type xyz: (N,3) floats
+        :param xyz_princ: position arrays transformed into principal frame (varies from shell to shell)
+        :type xyz_princ: (N,3) floats
+        :param masses: masses of cloud particles
+        :type masses: (N,) floats
+        :param center: center of the object
+        :type center: (3) floats
+        :param r_200: R200 value of the object
+        :type r_200: float
+        :param a: major axis eigenvalue interpolated at radial bin edges
+        :type a: (N2+1,) floats
+        :param b: intermediate axis eigenvalue interpolated at radial bin edges
+        :type b: (N2+1,) floats
+        :param c: minor axis eigenvalue interpolated at radial bin edges
+        :type c: (N2+1,) floats
+        :param major: major axis eigenvector interpolated at radial bin centers
+        :type major: (N2,3) floats
+        :param inter: inter axis eigenvector interpolated at radial bin centers
+        :type inter: (N2,3) floats
+        :param minor: minor axis eigenvector interpolated at radial bin centers
+        :type minor: (N2,3) floats
+        :param rad_bins: radial bins (bin edges) at whose centers the density profiles
+            should be calculated, normalized by R200
+        :type rad_bins: (N2+1,) floats
+        :param dens_prof: array to store result in
+        :type dens_prof: (N2,) floats
+        :param shell: array used for the calculation
+        :type shell: (N,) int array
+        :return: density profile
+        :rtype: float array"""
+        cdef int corr_s = 0
+        cdef int pts_in_shell = 0
+        cdef int r_i
+        cdef int n
+        cdef int i
+        cdef float vec2_norm = 1.0
+        cdef float vec1_norm = 1.0
+        cdef float vec0_norm = 1.0
+        for r_i in range(a.shape[0]-1): # a, b and c have same shape as ROverR200
+            corr_s = 0
+            pts_in_shell = 0
+            if r_i == 0:
+                for i in range(xyz.shape[0]):
+                    # Transformation into the principal frame
+                    vec2_norm = sqrt(major[r_i,0]**2+major[r_i,1]**2+major[r_i,2]**2)
+                    vec1_norm = sqrt(inter[r_i,0]**2+inter[r_i,1]**2+inter[r_i,2]**2)
+                    vec0_norm = sqrt(minor[r_i,0]**2+minor[r_i,1]**2+minor[r_i,2]**2)
+                    xyz_princ[i,0] = major[r_i,0]/vec2_norm*(xyz[i,0]-center[0])+major[r_i,1]/vec2_norm*(xyz[i,1]-center[1])+major[r_i,2]/vec2_norm*(xyz[i,2]-center[2])
+                    xyz_princ[i,1] = inter[r_i,0]/vec1_norm*(xyz[i,0]-center[0])+inter[r_i,1]/vec1_norm*(xyz[i,1]-center[1])+inter[r_i,2]/vec1_norm*(xyz[i,2]-center[2])
+                    xyz_princ[i,2] = minor[r_i,0]/vec0_norm*(xyz[i,0]-center[0])+minor[r_i,1]/vec0_norm*(xyz[i,1]-center[1])+minor[r_i,2]/vec0_norm*(xyz[i,2]-center[2])
+        
+                    if (xyz_princ[i,0]/a[r_i+1])**2+(xyz_princ[i,1]/b[r_i+1])**2+(xyz_princ[i,2]/c[r_i+1])**2 < 1 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (rad_bins[r_i]*r_200)**2:
+                        shell[i-corr_s] = i
+                        pts_in_shell += 1
+                    else:
+                        corr_s += 1
+                if pts_in_shell != 0:
+                    for n in range(pts_in_shell):
+                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*a[r_i+1]*b[r_i+1]*c[r_i+1]-4/3*pi*(rad_bins[r_i]*r_200)**3)
+                else:
+                    dens_prof[r_i] = NAN
+            else:
+                for i in range(xyz.shape[0]):
+                    # Transformation into the principal frame
+                    vec2_norm = sqrt(major[r_i,0]**2+major[r_i,1]**2+major[r_i,2]**2)
+                    vec1_norm = sqrt(inter[r_i,0]**2+inter[r_i,1]**2+inter[r_i,2]**2)
+                    vec0_norm = sqrt(minor[r_i,0]**2+minor[r_i,1]**2+minor[r_i,2]**2)
+                    xyz_princ[i,0] = major[r_i,0]/vec2_norm*(xyz[i,0]-center[0])+major[r_i,1]/vec2_norm*(xyz[i,1]-center[1])+major[r_i,2]/vec2_norm*(xyz[i,2]-center[2])
+                    xyz_princ[i,1] = inter[r_i,0]/vec1_norm*(xyz[i,0]-center[0])+inter[r_i,1]/vec1_norm*(xyz[i,1]-center[1])+inter[r_i,2]/vec1_norm*(xyz[i,2]-center[2])
+                    xyz_princ[i,2] = minor[r_i,0]/vec0_norm*(xyz[i,0]-center[0])+minor[r_i,1]/vec0_norm*(xyz[i,1]-center[1])+minor[r_i,2]/vec0_norm*(xyz[i,2]-center[2])
+                    if (xyz_princ[i,0]/a[r_i+1])**2+(xyz_princ[i,1]/b[r_i+1])**2+(xyz_princ[i,2]/c[r_i+1])**2 < 1 and (xyz_princ[i,0]/a[r_i])**2+(xyz_princ[i,1]/b[r_i])**2+(xyz_princ[i,2]/c[r_i])**2 >= 1:
+                        shell[i-corr_s] = i
+                        pts_in_shell += 1
+                    else:
+                        corr_s += 1
+                if pts_in_shell != 0:
+                    for n in range(pts_in_shell):
+                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*a[r_i+1]*b[r_i+1]*c[r_i+1]-4/3*pi*a[r_i]*b[r_i]*c[r_i])
+                else:
+                    dens_prof[r_i] = NAN
+        return dens_prof
+    
+    @cython.boundscheck(False)
+    @cython.wraparound(False) 
+    @staticmethod
+    cdef float[:] calcMenclsBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil:
+        """ Calculates spherically averaged enclosed mass profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
         :type xyz: (N,3) floats
@@ -276,6 +365,70 @@ cdef class CythonHelpers:
                 for n in range(pts_in_ell):
                     Mencl[r_i] = Mencl[r_i] + masses[ellipsoid[n]]
         return Mencl
+    
+    @cython.boundscheck(False)
+    @cython.wraparound(False) 
+    @staticmethod
+    cdef float[:] calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] ellipsoid) nogil:
+        """ Calculates ellipsoid-based mass profile for one object with coordinates `xyz` and masses `masses`
+        
+        :param xyz: positions of cloud particles
+        :type xyz: (N,3) floats
+        :param xyz_princ: position arrays transformed into principal frame (varies from shell to shell)
+        :type xyz_princ: (N,3) floats
+        :param masses: masses of cloud particles
+        :type masses: (N,) floats
+        :param center: center of the object
+        :type center: (3) floats
+        :param a: major axis eigenvalue interpolated at radial bin edges
+        :type a: (N2+1,) floats
+        :param b: intermediate axis eigenvalue interpolated at radial bin edges
+        :type b: (N2+1,) floats
+        :param c: minor axis eigenvalue interpolated at radial bin edges
+        :type c: (N2+1,) floats
+        :param major: major axis eigenvector interpolated at radial bin centers
+        :type major: (N2,3) floats
+        :param inter: inter axis eigenvector interpolated at radial bin centers
+        :type inter: (N2,3) floats
+        :param minor: minor axis eigenvector interpolated at radial bin centers
+        :type minor: (N2,3) floats
+        :param Mencl: array to store result in
+        :type Mencl: float array
+        :param ellipsoid: array used for the calculation
+        :type ellipsoid: int array
+        :return: enclosed mass profile
+        :rtype: float array"""
+        cdef int corr_ell = 0
+        cdef int pts_in_ell = 0
+        cdef int r_i
+        cdef int n
+        cdef int i
+        cdef float vec2_norm = 1.0
+        cdef float vec1_norm = 1.0
+        cdef float vec0_norm = 1.0
+        for r_i in range(a.shape[0]-1):
+            corr_ell = 0
+            pts_in_ell = 0
+            for i in range(xyz.shape[0]):
+                # Transformation into the principal frame
+                vec2_norm = sqrt(major[r_i,0]**2+major[r_i,1]**2+major[r_i,2]**2)
+                vec1_norm = sqrt(inter[r_i,0]**2+inter[r_i,1]**2+inter[r_i,2]**2)
+                vec0_norm = sqrt(minor[r_i,0]**2+minor[r_i,1]**2+minor[r_i,2]**2)
+                xyz_princ[i,0] = major[r_i,0]/vec2_norm*(xyz[i,0]-center[0])+major[r_i,1]/vec2_norm*(xyz[i,1]-center[1])+major[r_i,2]/vec2_norm*(xyz[i,2]-center[2])
+                xyz_princ[i,1] = inter[r_i,0]/vec1_norm*(xyz[i,0]-center[0])+inter[r_i,1]/vec1_norm*(xyz[i,1]-center[1])+inter[r_i,2]/vec1_norm*(xyz[i,2]-center[2])
+                xyz_princ[i,2] = minor[r_i,0]/vec0_norm*(xyz[i,0]-center[0])+minor[r_i,1]/vec0_norm*(xyz[i,1]-center[1])+minor[r_i,2]/vec0_norm*(xyz[i,2]-center[2])
+    
+                if (xyz_princ[i,0]/a[r_i+1])**2+(xyz_princ[i,1]/b[r_i+1])**2+(xyz_princ[i,2]/c[r_i+1])**2 < 1:
+                    ellipsoid[i-corr_ell] = i
+                    pts_in_ell += 1
+                else:
+                    corr_ell += 1
+            if pts_in_ell != 0:
+                for n in range(pts_in_ell):
+                    dens_prof[r_i] = dens_prof[r_i] + masses[ellipsoid[n]]
+            else:
+                dens_prof[r_i] = NAN
+        return dens_prof
     
     @cython.boundscheck(False)
     @cython.wraparound(False) 
