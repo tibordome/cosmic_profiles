@@ -19,9 +19,9 @@ import sys
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
+from cosmic_profiles import updateCachingMaxGBs
+updateCachingMaxGBs(GB = 1)
 from cosmic_profiles import DensProfs, genHalo, getEinastoProf
-import time
-start_time = time.time()
 
 def calcDensEx():
     
@@ -59,10 +59,13 @@ def calcDensEx():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensProfs object ########################################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, start_time)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER)
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!
+    dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
     dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
     dens_profs_kb = cprofiles.getDensProfsKernelBased(r_over_rvir)
     plt.figure()

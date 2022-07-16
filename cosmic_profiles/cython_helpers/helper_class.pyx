@@ -369,7 +369,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] ellipsoid) nogil:
+    cdef float[:] calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] Mencl, int[:] ellipsoid) nogil:
         """ Calculates ellipsoid-based mass profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -425,10 +425,10 @@ cdef class CythonHelpers:
                     corr_ell += 1
             if pts_in_ell != 0:
                 for n in range(pts_in_ell):
-                    dens_prof[r_i] = dens_prof[r_i] + masses[ellipsoid[n]]
+                    Mencl[r_i] = Mencl[r_i] + masses[ellipsoid[n]]
             else:
-                dens_prof[r_i] = NAN
-        return dens_prof
+                Mencl[r_i] = NAN
+        return Mencl
     
     @cython.boundscheck(False)
     @cython.wraparound(False) 

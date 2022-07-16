@@ -1,3 +1,7 @@
+from .common.config import (
+    updateCachingMaxGBs
+)
+
 from .common.python_routines import (
     eTo10,
     print_status,
@@ -28,4 +32,3 @@ from .common.profile_classes import (
     DensProfsHDF5,
     DensShapeProfsHDF5
 )
-

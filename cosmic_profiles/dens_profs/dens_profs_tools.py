@@ -10,6 +10,7 @@ from functools import partial
 import os
 from cosmic_profiles.common.caching import np_cache_factory
 from scipy import optimize
+import cosmic_profiles.common.config as config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -219,7 +220,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
         best_fit = iguess*np.nan
     return best_fit, obj_nb
 
-@np_cache_factory(3,0)
+@np_cache_factory(3,0, config.GBs)
 def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
     """ Helper function to carry out density profile fitting
     

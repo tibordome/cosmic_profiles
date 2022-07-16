@@ -17,8 +17,6 @@ subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import genHalo, DensShapeProfs
-import time
-start_time = time.time()
 
 def test_shapes():
     #################################### Parameters ################################################
@@ -71,7 +69,7 @@ def test_shapes():
     idx_cat = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER)
     
     assert idx_cat == cprofiles.getIdxCat()
     centers, ms = cprofiles.getMassesCenters()
@@ -81,10 +79,10 @@ def test_shapes():
     
     ######################### Calculating Local Morphological Properties #############################
     # Create halo shape catalogue
-    d, q, s, minor, inter, major, obj_centers, obj_masses, succeeded = cprofiles.getShapeCatLocal()
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(reduced = False, shell_based = False)
     
-    idx_cat_local = cprofiles.getIdxCatLocal()
-    assert np.sum([1 if idx_cat[obj] != [] else 0 for obj in range(len(idx_cat))]) >= np.sum([1 if idx_cat_local[obj] != [] else 0 for obj in range(len(idx_cat_local))])
+    idx_cat_suff = cprofiles.getIdxCatSuffRes()
+    assert np.sum([1 if idx_cat_suff[obj] != [] else 0 for obj in range(len(idx_cat))]) == d.shape[0]
     
     assert obj_masses.shape[0] <= nb_pass
     assert obj_centers.shape[0] <= nb_pass
@@ -105,19 +103,16 @@ def test_shapes():
     assert major.shape[2] == 3
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.plotShapeProfs(VIZ_DEST)
+    cprofiles.plotShapeProfs(reduced = False, shell_based = False, VIZ_DEST = VIZ_DEST)
     
     # Viz first few halos' shapes
-    cprofiles.vizLocalShapes([0,1,2], VIZ_DEST)
+    cprofiles.vizLocalShapes(reduced = False, shell_based = False, obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST)
     
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200)
+    cprofiles.plotLocalTHist(reduced = False, shell_based = False, HIST_NB_BINS, VIZ_DEST, frac_r200)
     
     ######################### Calculating Global Morphological Properties ############################
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal()
-    
-    idx_cat_global = cprofiles.getIdxCatGlobal()
-    assert np.sum([1 if idx_cat[obj] != [] else 0 for obj in range(len(idx_cat))]) >= np.sum([1 if idx_cat_global[obj] != [] else 0 for obj in range(len(idx_cat_global))])
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(reduced = False)
     
     assert obj_masses.shape[0] == nb_pass
     assert obj_centers.shape[0] == nb_pass
@@ -141,7 +136,7 @@ def test_shapes():
     cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST)
     
     # Viz first few halos' shapes
-    cprofiles.vizGlobalShapes([0,1,2], VIZ_DEST)
+    cprofiles.vizGlobalShapes(reduced = False, obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST)
     
     # Clean-up
     subprocess.call(['bash', 'decythonize.sh'], cwd=os.path.join(currentdir, '..'))
