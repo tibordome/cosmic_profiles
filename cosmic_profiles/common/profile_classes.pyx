@@ -42,15 +42,13 @@ size = comm.Get_size()
 cdef class CosmicBase:
     """ Parent class governing high-level cosmic shape calculations
     
-    Its public methods are ``getR200s()``, ``getMassesCentersBase()``, ``getIdxCatLocalBase()``,
-    ``getIdxCatGlobalBase()``, ``getIdxCatVelLocalBase()``, ``getIdxCatVelGlobalBase()``, 
+    Its public methods are ``getR200s()``, ``getMassesCentersBase()``, 
     ``getShapeCatLocalBase()``, ``getShapeCatGlobalBase()``, ``getShapeCatVelLocalBase()``, 
     ``getShapeCatVelGlobalBase()``, ``dumpShapeCatLocalBase()``, ``dumpShapeCatGlobalBase()``, 
     ``dumpShapeCatVelLocalBase()``, ``dumpShapeCatVelGlobalBase()``, ``plotShapeProfsBase()``,
     ``plotLocalTHistBase()``, ``plotGlobalTHistBase()``, ``getDensProfsBestFitsBase()``,
     ``getConcentrationsBase()``, ``getDensProfsDirectBinningSphBase()``, ``getDensProfsDirectBinningEllBase()``,
-    ``getDensProfsKernelBasedBase()``, ``getObjInfoLocalBase()``, ``getObjInfoGlobalBase()``, 
-    ``getObjInfoVelLocalBase()``, ``getObjInfoVelGlobalBase()``"""
+    ``getDensProfsKernelBasedBase()``, ``getObjInfoBase()``"""
     cdef str SNAP
     cdef float L_BOX
     cdef double start_time
@@ -60,7 +58,7 @@ cdef class CosmicBase:
     cdef float MASS_UNIT
     cdef int MIN_NUMBER_PTCS
     
-    def __init__(self, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, double start_time):
+    def __init__(self, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER):
         """
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
@@ -70,14 +68,12 @@ cdef class CosmicBase:
         :type MIN_NUMBER_PTCS: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str
-        :param start_time: time of start of object initialization
-        :type start_time: float"""
+        :type CENTER: str"""
         self.SNAP = SNAP
         self.L_BOX = L_BOX
         self.CENTER = CENTER
         self.MIN_NUMBER_PTCS = MIN_NUMBER_PTCS
-        self.start_time = start_time
+        self.start_time = time.time()
         self.SAFE = 6
         self.MASS_UNIT = 1e10
     
@@ -765,7 +761,8 @@ cdef class CosmicBase:
 cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
-    Its public methods are ``getIdxCat()``, ``getMassesCenters()``, ``getDensProfsDirectBinning()``,
+    Its public methods are ``getIdxCat()``, ``getIdxCatSuffRes()``,
+    ``getMassesCenters()``, ``getDensProfsDirectBinning()``,
     ``getDensProfsKernelBased()``, ``getDensProfsBestFits()``, ``getConcentrations()``, 
     ``plotDensProfs()``."""
     
@@ -773,7 +770,7 @@ cdef class DensProfs(CosmicBase):
     cdef float[:] masses
     cdef object idx_cat
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, double start_time):
+    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER):
         """
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
@@ -791,10 +788,8 @@ cdef class DensProfs(CosmicBase):
         :type MIN_NUMBER_PTCS: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str
-        :param start_time: time of start of object initialization
-        :type start_time: float"""
-        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, start_time)
+        :type CENTER: str"""
+        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
         self.xyz = xyz.base
         self.masses = masses.base
@@ -810,7 +805,7 @@ cdef class DensProfs(CosmicBase):
         return self.idx_cat
     
     def getIdxCatSuffRes(self):
-        """ Fetch catalogue
+        """ Fetch catalogue, objects with insufficient resolution are set to empty list []
         
         :return cat: list of indices defining the objects
         :rtype: list of length N1, each consisting of a list of int indices"""
@@ -929,11 +924,10 @@ cdef class DensProfs(CosmicBase):
 cdef class DensShapeProfs(DensProfs):
     """ Class for density profile and shape profile calculations
     
-    Its public methods are ``getIdxCatLocal()``, ``getIdxCatGlobal()``, 
-    ``getShapeCatLocal()``, ``getShapeCatGlobal()``, ``vizLocalShapes()``, 
-    ``vizGlobalShapes()``, ``plotGlobalEpsHist()``, ``plotLocalEpsHist()``.
-    ``plotGlobalTHist()``, ``plotLocalTHist()``, ``dumpShapeCatLocal()``,
-    ``dumpShapeCatGlobal()``, ``getObjInfoLocal()``, ``getObjInfoGlobal()``."""
+    Its public methods are ``getShapeCatLocal()``, ``getShapeCatGlobal()``, 
+    ``vizLocalShapes()``, ``vizGlobalShapes()``, ``plotGlobalEpsHist()``, 
+    ``plotLocalEpsHist()``, ``plotGlobalTHist()``, ``plotLocalTHist()``, 
+    ``dumpShapeCatLocal()``, ``dumpShapeCatGlobal()``, ``getObjInfo()``."""
     
     cdef int D_LOGSTART
     cdef int D_LOGEND
@@ -942,7 +936,7 @@ cdef class DensShapeProfs(DensProfs):
     cdef int N_WALL
     cdef int N_MIN
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, double start_time):
+    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER):
         """
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
@@ -974,10 +968,8 @@ cdef class DensShapeProfs(DensProfs):
         :type N_MIN: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str
-        :param start_time: time of start of object initialization
-        :type start_time: float"""
-        super().__init__(xyz.base, masses.base, idx_cat, r200.base, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, start_time)
+        :type CENTER: str"""
+        super().__init__(xyz.base, masses.base, idx_cat, r200.base, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         self.D_LOGSTART = D_LOGSTART
         self.D_LOGEND = D_LOGEND
         self.D_BINS = D_BINS
@@ -1303,8 +1295,9 @@ cdef class DensProfsHDF5(CosmicBase):
     """ Class for density profile calculations for Gadget-style HDF5 data
     
     Its public methods are ``getXYZMasses()``, ``getVelXYZ()``, 
-    ``getIdxCat()``, ``getMassesCenters()``, ``getDensProfsDirectBinning()``,
-    ``getDensProfsKernelBased()``, ``getDensProfsBestFits()``, ``getConcentrations()``, 
+    ``getIdxCat()``, ``getIdxCatSuffRes()``, ``getMassesCenters()``, 
+    ``getDensProfsDirectBinning()``, ``getDensProfsKernelBased()``, 
+    ``getDensProfsBestFits()``, ``getConcentrations()``,
     ``plotDensProfs()``."""
     
     cdef str HDF5_SNAP_DEST
@@ -1313,7 +1306,7 @@ cdef class DensProfsHDF5(CosmicBase):
     cdef int SNAP_MAX
     cdef bint WANT_RVIR
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, str CENTER, bint WANT_RVIR, double start_time):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, str CENTER, bint WANT_RVIR):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -1336,10 +1329,8 @@ cdef class DensProfsHDF5(CosmicBase):
         :type CENTER: str
         :param WANT_RVIR: Whether or not we want quantities (e.g. D_LOGSTART) expressed 
             with respect to the virial radius R_vir or the overdensity radius R_200
-        :type WANT_RVIR: boolean
-        :param start_time: time of start of object initialization
-        :type start_time: float"""
-        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, start_time)
+        :type WANT_RVIR: boolean"""
+        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
         self.MIN_NUMBER_STAR_PTCS = MIN_NUMBER_STAR_PTCS
@@ -1446,8 +1437,10 @@ cdef class DensProfsHDF5(CosmicBase):
                 return gx_cat_l
             
     def getIdxCatSuffRes(self, str obj_type = 'dm'):
-        """ Fetch catalogue
+        """ Fetch catalogue, objects with insufficient resolution are set to empty list []
         
+        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
+        :type obj_type: string
         :return cat: list of indices defining the objects
         :rtype: list of length N1, each consisting of a list of int indices"""
         print_status(rank, self.start_time, 'Starting getIdxCat() with snap {0}'.format(self.SNAP))
@@ -1600,13 +1593,11 @@ cdef class DensProfsHDF5(CosmicBase):
 cdef class DensShapeProfsHDF5(DensProfsHDF5):
     """ Class for density profile and shape profile calculations for Gadget-style HDF5 data
     
-    Its public methods are ``getIdxCatLocal()``, ``getIdxCatGlobal()``, 
-    ``getShapeCatLocal()``, ``getShapeCatGlobal()``, ``vizLocalShapes()``, 
-    ``vizGlobalShapes()``, ``plotGlobalEpsHist()``, ``plotLocalEpsHist()``.
+    Its public methods are ``getShapeCatLocal()``, ``getShapeCatGlobal()``, 
+    ``vizLocalShapes()``, ``vizGlobalShapes()``, ``plotGlobalEpsHist()``, ``plotLocalEpsHist()``.
     ``plotGlobalTHist()``, ``plotLocalTHist()``, ``dumpShapeCatLocal()``,
     ``dumpShapeCatGlobal()``, ``dumpShapeCatVelLocal()``, ``dumpShapeCatVelGlobal()``,
-    ``getObjInfoLocal()``, ``getObjInfoGlobal()``, ``getObjInfoVelLocal()``, 
-    ``getObjInfoVelGlobal()``."""
+    ``getObjInfo()``."""
     
     cdef int D_LOGSTART
     cdef int D_LOGEND
@@ -1615,9 +1606,45 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
     cdef int N_WALL
     cdef int N_MIN
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint WANT_RVIR, double start_time):
-        
-        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR, start_time)
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint WANT_RVIR):
+        """
+        :param HDF5_SNAP_DEST: where we can find the snapshot
+        :type HDF5_SNAP_DEST: string
+        :param HDF5_GROUP_DEST: where we can find the group files
+        :type HDF5_GROUP_DEST: string
+        :param SNAP: e.g. '024'
+        :type SNAP: string
+        :param SNAP_MAX: e.g. 16
+        :type SNAP_MAX: int
+        :param SNAP: snapshot identifier, e.g. '024'
+        :type SNAP: string
+        :param L_BOX: simulation box side length
+        :type L_BOX: float, units: Mpc/h
+        :param MIN_NUMBER_PTCS: minimum number of DM particles for halo to qualify for morphology calculation
+        :type MIN_NUMBER_PTCS: int
+        :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for galaxy to qualify for morphology calculation
+        :type MIN_NUMBER_STAR_PTCS: int
+        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGSTART: int
+        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGEND: int
+        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
+        :type D_BINS: int
+        :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+            for iteration to stop
+        :type M_TOL: float
+        :param N_WALL: maximum permissible number of iterations
+        :type N_WALL: float
+        :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type N_MIN: int
+        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
+            or 'com' (center of mass) of each halo
+        :type CENTER: str
+        :param WANT_RVIR: Whether or not we want quantities (e.g. D_LOGSTART) expressed 
+            with respect to the virial radius R_vir or the overdensity radius R_200
+        :type WANT_RVIR: boolean"""
+        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)
         self.D_LOGSTART = D_LOGSTART
         self.D_LOGEND = D_LOGEND
         self.D_BINS = D_BINS
