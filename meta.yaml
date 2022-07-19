@@ -1,13 +1,13 @@
 {% set name = "cosmic_profiles" %}
-{% set version = "1.1.0" %}
+{% set version = "1.2.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://files.pythonhosted.org/packages/ef/c5/2193db656b88cf1cd39804b0a7e037abe9c693681d8f8b66742dece2c106/cosmic_profiles-1.1.0.tar.gz
-  sha256: 7817321705589208324f93c0704faa3f13d4e31b5d78530cd58f8c38518b66f9
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 7f6ee277cded98c0406e04d1570276b7e220120042b2ed0a06490b8830647630
 
 build:
   noarch: python
@@ -16,36 +16,31 @@ build:
 
 requirements:
   build:
-    - python
     - cmake
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - cython
-    - cythongsl
-    - numpy
-    - libgomp
+    - libgomp  # [linux]
+    - llvm-openmp  # [osx]
   host:
     - python >=3.6
     - pip
     - setuptools
     - cython
     - cythongsl
-    - numpy
-    - openmp
-    - libgomp
+    - numpy >=1.19.2
   run:
     - python >=3.6
-    - numpy
+    - {{ pin_compatible('numpy') }}
     - scipy
     - matplotlib
     - scikit-learn
     - cython
     - cythongsl
     - mpi4py
-    - openmp
     - pathos
     - h5py
-    - libgomp
+    - libgomp  # [linux]
+    - llvm-openmp  # [osx]
 
 test:
   imports:
