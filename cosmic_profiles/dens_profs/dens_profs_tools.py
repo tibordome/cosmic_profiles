@@ -216,7 +216,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
             rho_s, alpha, r_s = model_pars_arr
             model_pars_dict = {'rho_s': rho_s, 'alpha': alpha, 'r_s': r_s}
         elif method == 'alpha_beta_gamma':
-            rho_s, alpha, beta, gamma r_s = model_pars_arr
+            rho_s, alpha, beta, gamma, r_s = model_pars_arr
             model_pars_dict = {'rho_s': rho_s, 'alpha': alpha, 'beta': beta, 'gamma': gamma, 'r_s': r_s}
         else:
             rho_s, r_s = model_pars_arr
