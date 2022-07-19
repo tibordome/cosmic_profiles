@@ -17,9 +17,9 @@ Shape Profiles
 
 Shape profiles depict the ellipsoidal shape of a point cloud as a function of the ellipsoidal radius
 
-.. math:: r_{\text{ell}} = \sqrt{x_{\text{pf}}^2+\frac{y_{\text{pf}}^2}{(b/a)^2}+\frac{z_{\text{pf}}^2}{(c/a)^2}},
+.. math:: r_{\text{ell}} = \sqrt{x_{\text{ell}}^2+\frac{y_{\text{ell}}^2}{(b/a)^2}+\frac{z_{\text{ell}}^2}{(c/a)^2}},
 
-where :math:`(x_{\text{pf}},y_{\text{pf}},z_{\text{pf}})` are the coordinates of a point cloud particle in the eigenvector coordinate system of the ellipsoid (= principal frame), i.e., :math:`r_{\text{ell}}` corresponds to the semi-major axis :math:`a` of the ellipsoidal surface through that particle.
+where :math:`(x_{\text{ell}},y_{\text{ell}},z_{\text{ell}})` are the coordinates of a point cloud particle in the eigenvector coordinate system of the ellipsoid (= principal frame), i.e., :math:`r_{\text{ell}}` corresponds to the semi-major axis :math:`a` of the ellipsoidal surface on which that particle lies.
 
 The shape as a function of ellipsoidal radius can be described by the axis ratios
 
@@ -37,7 +37,7 @@ Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r_{k} = (
 
 * :math:`w_k = 1`, in which case each particle gets the same weight, or
 * :math:`w_k = \frac{1}{r_k^2}` where :math:`r_k^2 = (x_{k})^2+(y_{k})^2+(z_{k})^2` is the distance squared of particle :math:`k` from the center of the cloud, or
-* :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` where :math:`r_{\text{ell},k}^2 = x_{\text{ell},k}^2+y_{\text{ell},k}^2+z_{\text{ell},k}^2` is the ellipsoidal radius, where :math:`(x_{\text{ell},k}, y_{\text{ell},k}, z_{\text{ell},k})` are the coordinates of particle :math:`k` in the eigenvector coordinate system of the ellipsoid. In other words, :math:`r_{\text{ell},k}` corresponds to the semi-major axis :math:`a` of the ellipsoid surface on which particle :math:`k` lies. The shape tensor with :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` is also called the *reduced* shape tensor, a variant that penalizes particles at large radii.
+* :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` where :math:`r_{\text{ell},k}^2 = x_{\text{ell},k}^2+y_{\text{ell},k}^2+z_{\text{ell},k}^2` is the ellipsoidal radius, where :math:`(x_{\text{ell},k}, y_{\text{ell},k}, z_{\text{ell},k})` are the coordinates of particle :math:`k` in the eigenvector coordinate system of the ellipsoid. The shape tensor with :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` is also called the *reduced* shape tensor, a variant that penalizes particles at large radii.
 
 Since the second weighting scheme with :math:`w_k = \frac{1}{r_k^2}` has recently fallen out of favour, see `Zemp et al. 2011 <https://arxiv.org/abs/1107.5582>`_, the other two schemes will be available by switching the boolean ``reduced``, see below.
 
