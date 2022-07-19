@@ -81,6 +81,7 @@ setup(
     author="Tibor Dome",
     author_email="tibor.doeme@gmail.com",
     license="MIT",
+    license_files = ('LICENSE.md',),
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",

@@ -137,6 +137,3 @@ def test_shapes():
     
     # Viz first few halos' shapes
     cprofiles.vizGlobalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False)
-    
-    # Clean-up
-    subprocess.call(['bash', 'decythonize.sh'], cwd=os.path.join(currentdir, '..'))

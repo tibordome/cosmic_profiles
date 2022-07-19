@@ -79,6 +79,3 @@ def test_densities():
     best_fits = cprofiles.getDensProfsBestFits(dens_profs_db, r_over_rvir, method = method)
     assert best_fits.shape[0] == N
     assert best_fits.shape[1] == nb_model_pars[method]
-    
-    # Clean-up
-    subprocess.call(['bash', 'decythonize.sh'], cwd=os.path.join(currentdir, '..'))
