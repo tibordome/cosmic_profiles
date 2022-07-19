@@ -73,7 +73,7 @@ setup(
     version="1.2.2",
     description="Implements 3D point cloud algorithms for estimation and fitting of shape and density profiles",
     long_description=README,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     project_urls={
     'Documentation': 'https://cosmic-profiles.readthedocs.io/en/latest/',
     'Source': "https://github.com/tibordome/cosmic_profiles"
