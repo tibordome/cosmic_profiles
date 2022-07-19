@@ -38,7 +38,7 @@ This repository provides shape and density profile analysis tools for cosmologic
 
 The documentation can be found `here <https://cosmic-profiles.readthedocs.io/en/latest/index.html>`_.
 
-Contributions are welcome. Please raise an issue or open a PR. Comments/recommendations/complaints can be sent `here <mailto:tibor.doeme@gmail.com>`_.
+Contributions are welcome. Please raise an issue or open a PR.
 
 
 .. |PyPI| image:: https://badge.fury.io/py/cosmic_profiles.svg
