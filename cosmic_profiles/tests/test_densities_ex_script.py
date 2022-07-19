@@ -18,6 +18,9 @@ sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_pr
 from cosmic_profiles import updateCachingMaxGBs
 updateCachingMaxGBs(GB = 1)
 from cosmic_profiles import genHalo, DensProfs, getEinastoProf
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.rcParams.update({'font.size': 13})
 
 def test_densities_ex_script():
     
