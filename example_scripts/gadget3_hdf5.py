@@ -17,8 +17,6 @@ import numpy as np
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import DensShapeProfsHDF5
-import time
-start_time = time.time()
 
 # Parameters
 L_BOX = np.float32(10) # Mpc/h
@@ -45,33 +43,33 @@ frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf
 def HDF5Ex():
     
     # Define DensShapeProfsHDF5 object
-    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, WANT_RVIR, start_time)
+    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, WANT_RVIR)
     
     ########################## Calculating Morphological Properties ###############################
     # Create halo shape catalogue
-    cprofiles.dumpShapeCatLocal(CAT_DEST, obj_type = 'dm')
+    cprofiles.dumpShapeCatLocal(CAT_DEST, reduced = False, shell_based = False, obj_type = 'dm')
     
     # Create global halo shape catalogue
-    cprofiles.dumpShapeCatGlobal(CAT_DEST, obj_type = 'dm')
+    cprofiles.dumpShapeCatGlobal(CAT_DEST, reduced = False, obj_type = 'dm')
     
     # Create local gx shape catalogue
-    cprofiles.dumpShapeCatLocal(CAT_DEST, obj_type = 'gx')
+    cprofiles.dumpShapeCatLocal(CAT_DEST, reduced = False, shell_based = False, obj_type = 'gx')
     
     ######################################## Visualizations #######################################
     # Viz first few halos' shapes
-    cprofiles.vizLocalShapes([0,1,2], VIZ_DEST, obj_type = 'dm')
+    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False, obj_type = 'dm')
     
     # Viz first few galaxies' shapes
-    cprofiles.vizLocalShapes([0,1,2], VIZ_DEST, obj_type = 'gx')
+    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False, obj_type = 'gx')
     
     # Plot halo ellipticity histogram
     cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST, obj_type = 'dm')
     
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, obj_type = 'dm')
+    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, reduced = False, shell_based = False, obj_type = 'dm')
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.plotShapeProfs(VIZ_DEST, obj_type = 'dm')
+    cprofiles.plotShapeProfs(VIZ_DEST, reduced = False, shell_based = False, obj_type = 'dm')
     
     ########################## Calculating and Visualizing Density Profs ##########################
     # Create local halo density catalogue

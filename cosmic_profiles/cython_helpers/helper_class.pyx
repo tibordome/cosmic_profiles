@@ -33,6 +33,8 @@ cdef class CythonHelpers:
         :type nb_pts: int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
+        :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (only if reduced == True)
+        :type r_ell: (N,) floats
         :return: shape tensor
         :rtype: (3,3) complex"""
         shape_tensor[:,:] = 0.0
@@ -122,7 +124,9 @@ cdef class CythonHelpers:
         """
         Computes the eigenvalues and eigenvectors of a dense Hermitian matrix.
         
-        Eigenvectors are returned in Z.
+        Eigenvectors are returned in Z, with the with the i-th column of Z 
+        holding the eigenvector associated with eigvals[i]. See
+        https://linux.die.net/man/l/zheevr.
         
         :param H: Hermitian matrix
         :type H: Fortran-ordered 2D double complex memoryview
@@ -196,7 +200,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
+    cdef float[:] calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] bin_edges, float[:] dens_prof, int[:] shell) nogil:
         """ Calculates spherically averaged density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -207,9 +211,9 @@ cdef class CythonHelpers:
         :type center: (3) floats
         :param r_200: R200 value of the object
         :type r_200: float
-        :param rad_bins: radial bins (bin edges) at whose centers the density profiles
+        :param bin_edges: radial bin edges at whose centers the density profiles
             should be calculated, normalized by R200
-        :type rad_bins: (N2+1,) floats
+        :type bin_edges: (N2+1,) floats
         :param dens_prof: array to store result in
         :type dens_prof: (N2,) floats
         :param shell: array used for the calculation
@@ -221,24 +225,24 @@ cdef class CythonHelpers:
         cdef int r_i
         cdef int n
         cdef int i
-        for r_i in range(rad_bins.shape[0]-1):
+        for r_i in range(bin_edges.shape[0]-1):
             corr_s = 0
             pts_in_shell = 0
             for i in range(xyz.shape[0]):
-                if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (rad_bins[r_i+1]*r_200)**2 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (rad_bins[r_i]*r_200)**2:
+                if (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 < (bin_edges[r_i+1]*r_200)**2 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (bin_edges[r_i]*r_200)**2:
                     shell[i-corr_s] = i
                     pts_in_shell += 1
                 else:
                     corr_s += 1
             if pts_in_shell != 0:
                 for n in range(pts_in_shell):
-                    dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*((rad_bins[r_i+1]*r_200)**3-(rad_bins[r_i]*r_200)**3))
+                    dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*((bin_edges[r_i+1]*r_200)**3-(bin_edges[r_i]*r_200)**3))
         return dens_prof
     
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] rad_bins, float[:] dens_prof, int[:] shell) nogil:
+    cdef float[:] calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] shell) nogil:
         """ Calculates ellipsoidal shell-based density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -263,9 +267,6 @@ cdef class CythonHelpers:
         :type inter: (N2,3) floats
         :param minor: minor axis eigenvector interpolated at radial bin centers
         :type minor: (N2,3) floats
-        :param rad_bins: radial bins (bin edges) at whose centers the density profiles
-            should be calculated, normalized by R200
-        :type rad_bins: (N2+1,) floats
         :param dens_prof: array to store result in
         :type dens_prof: (N2,) floats
         :param shell: array used for the calculation
@@ -280,48 +281,27 @@ cdef class CythonHelpers:
         cdef float vec2_norm = 1.0
         cdef float vec1_norm = 1.0
         cdef float vec0_norm = 1.0
-        for r_i in range(a.shape[0]-1): # a, b and c have same shape as ROverR200
+        for r_i in range(a.shape[0]-1):
             corr_s = 0
             pts_in_shell = 0
-            if r_i == 0:
-                for i in range(xyz.shape[0]):
-                    # Transformation into the principal frame
-                    vec2_norm = sqrt(major[r_i,0]**2+major[r_i,1]**2+major[r_i,2]**2)
-                    vec1_norm = sqrt(inter[r_i,0]**2+inter[r_i,1]**2+inter[r_i,2]**2)
-                    vec0_norm = sqrt(minor[r_i,0]**2+minor[r_i,1]**2+minor[r_i,2]**2)
-                    xyz_princ[i,0] = major[r_i,0]/vec2_norm*(xyz[i,0]-center[0])+major[r_i,1]/vec2_norm*(xyz[i,1]-center[1])+major[r_i,2]/vec2_norm*(xyz[i,2]-center[2])
-                    xyz_princ[i,1] = inter[r_i,0]/vec1_norm*(xyz[i,0]-center[0])+inter[r_i,1]/vec1_norm*(xyz[i,1]-center[1])+inter[r_i,2]/vec1_norm*(xyz[i,2]-center[2])
-                    xyz_princ[i,2] = minor[r_i,0]/vec0_norm*(xyz[i,0]-center[0])+minor[r_i,1]/vec0_norm*(xyz[i,1]-center[1])+minor[r_i,2]/vec0_norm*(xyz[i,2]-center[2])
-        
-                    if (xyz_princ[i,0]/a[r_i+1])**2+(xyz_princ[i,1]/b[r_i+1])**2+(xyz_princ[i,2]/c[r_i+1])**2 < 1 and (center[0]-xyz[i,0])**2+(center[1]-xyz[i,1])**2+(center[2]-xyz[i,2])**2 >= (rad_bins[r_i]*r_200)**2:
-                        shell[i-corr_s] = i
-                        pts_in_shell += 1
-                    else:
-                        corr_s += 1
-                if pts_in_shell != 0:
-                    for n in range(pts_in_shell):
-                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*a[r_i+1]*b[r_i+1]*c[r_i+1]-4/3*pi*(rad_bins[r_i]*r_200)**3)
+            for i in range(xyz.shape[0]):
+                # Transformation into the principal frame
+                vec2_norm = sqrt(major[r_i,0]**2+major[r_i,1]**2+major[r_i,2]**2)
+                vec1_norm = sqrt(inter[r_i,0]**2+inter[r_i,1]**2+inter[r_i,2]**2)
+                vec0_norm = sqrt(minor[r_i,0]**2+minor[r_i,1]**2+minor[r_i,2]**2)
+                xyz_princ[i,0] = major[r_i,0]/vec2_norm*(xyz[i,0]-center[0])+major[r_i,1]/vec2_norm*(xyz[i,1]-center[1])+major[r_i,2]/vec2_norm*(xyz[i,2]-center[2])
+                xyz_princ[i,1] = inter[r_i,0]/vec1_norm*(xyz[i,0]-center[0])+inter[r_i,1]/vec1_norm*(xyz[i,1]-center[1])+inter[r_i,2]/vec1_norm*(xyz[i,2]-center[2])
+                xyz_princ[i,2] = minor[r_i,0]/vec0_norm*(xyz[i,0]-center[0])+minor[r_i,1]/vec0_norm*(xyz[i,1]-center[1])+minor[r_i,2]/vec0_norm*(xyz[i,2]-center[2])
+                if (xyz_princ[i,0]/a[r_i+1])**2+(xyz_princ[i,1]/b[r_i+1])**2+(xyz_princ[i,2]/c[r_i+1])**2 < 1 and (xyz_princ[i,0]/a[r_i])**2+(xyz_princ[i,1]/b[r_i])**2+(xyz_princ[i,2]/c[r_i])**2 >= 1:
+                    shell[i-corr_s] = i
+                    pts_in_shell += 1
                 else:
-                    dens_prof[r_i] = NAN
+                    corr_s += 1
+            if pts_in_shell != 0:
+                for n in range(pts_in_shell):
+                    dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*a[r_i+1]*b[r_i+1]*c[r_i+1]-4/3*pi*a[r_i]*b[r_i]*c[r_i])
             else:
-                for i in range(xyz.shape[0]):
-                    # Transformation into the principal frame
-                    vec2_norm = sqrt(major[r_i,0]**2+major[r_i,1]**2+major[r_i,2]**2)
-                    vec1_norm = sqrt(inter[r_i,0]**2+inter[r_i,1]**2+inter[r_i,2]**2)
-                    vec0_norm = sqrt(minor[r_i,0]**2+minor[r_i,1]**2+minor[r_i,2]**2)
-                    xyz_princ[i,0] = major[r_i,0]/vec2_norm*(xyz[i,0]-center[0])+major[r_i,1]/vec2_norm*(xyz[i,1]-center[1])+major[r_i,2]/vec2_norm*(xyz[i,2]-center[2])
-                    xyz_princ[i,1] = inter[r_i,0]/vec1_norm*(xyz[i,0]-center[0])+inter[r_i,1]/vec1_norm*(xyz[i,1]-center[1])+inter[r_i,2]/vec1_norm*(xyz[i,2]-center[2])
-                    xyz_princ[i,2] = minor[r_i,0]/vec0_norm*(xyz[i,0]-center[0])+minor[r_i,1]/vec0_norm*(xyz[i,1]-center[1])+minor[r_i,2]/vec0_norm*(xyz[i,2]-center[2])
-                    if (xyz_princ[i,0]/a[r_i+1])**2+(xyz_princ[i,1]/b[r_i+1])**2+(xyz_princ[i,2]/c[r_i+1])**2 < 1 and (xyz_princ[i,0]/a[r_i])**2+(xyz_princ[i,1]/b[r_i])**2+(xyz_princ[i,2]/c[r_i])**2 >= 1:
-                        shell[i-corr_s] = i
-                        pts_in_shell += 1
-                    else:
-                        corr_s += 1
-                if pts_in_shell != 0:
-                    for n in range(pts_in_shell):
-                        dens_prof[r_i] = dens_prof[r_i] + masses[shell[n]]/(4/3*pi*a[r_i+1]*b[r_i+1]*c[r_i+1]-4/3*pi*a[r_i]*b[r_i]*c[r_i])
-                else:
-                    dens_prof[r_i] = NAN
+                dens_prof[r_i] = NAN
         return dens_prof
     
     @cython.boundscheck(False)

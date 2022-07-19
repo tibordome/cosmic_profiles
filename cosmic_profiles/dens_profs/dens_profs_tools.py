@@ -10,7 +10,6 @@ from functools import partial
 import os
 from cosmic_profiles.common.caching import np_cache_factory
 from scipy import optimize
-import cosmic_profiles.common.config as config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -104,14 +103,12 @@ def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens
     :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
     :type suffix: string"""
     
-    print_status(rank,start_time,'Starting getDensProfs() with snap {0}'.format(SNAP))
-    
     if rank == 0:
         print_status(rank, start_time, "The number of objects considered is {0}".format(obj_masses.shape[0]))
         
         # Mass splitting
         max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time)
-        
+        del obj_centers; del obj_center_groups; del idx_groups
         obj_pass = np.int32(np.array([1 if x != [] else 0 for x in cat]))
         idxs_compr = np.zeros((len(cat),), dtype = np.int32)
         idxs_compr[obj_pass.nonzero()[0]] = np.arange(np.sum(obj_pass)) 
@@ -136,6 +133,7 @@ def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens
         y = [list(dens_prof_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
         prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
         best_fit, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200, 0)) # Fit median
+        del r200
         # Plotting
         plt.figure()
         plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]]), best_fit), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
@@ -167,6 +165,7 @@ def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens
             plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
             plt.legend(loc="upper right", fontsize="x-small")
             plt.savefig("{}/RhoProfM{:.2f}_{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), SNAP), bbox_inches="tight")
+        del obj_pass; del y; del err_low; del err_high
         return
 
 def fitDensProf(ROverR200, method, median_r200_obj_nb):
@@ -220,7 +219,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
         best_fit = iguess*np.nan
     return best_fit, obj_nb
 
-@np_cache_factory(3,0, config.GBs)
+@np_cache_factory(3,0)
 def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
     """ Helper function to carry out density profile fitting
     

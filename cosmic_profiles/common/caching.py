@@ -15,6 +15,7 @@ too many values causes thrashing.
 import psutil
 from functools import RLock, update_wrapper, namedtuple, wraps
 import numpy as np
+import cosmic_profiles.common.config as config
 
 _CacheInfo = namedtuple("CacheInfo", ["hits", "misses", "maxsize", "currsize"])
 
@@ -255,7 +256,7 @@ def lru_cache(maxsize=128, typed=False, use_memory_up_to=False):
 
     return decorating_function
 
-def np_cache_factory(nb_arrs, nb_lists, nb_GBs):
+def np_cache_factory(nb_arrs, nb_lists):
     """ Decorator for caching functions with numpy array and/or lists of lists arguments
     
     Note that the arguments of the to-be-decorated function have to be as follows: 
@@ -270,11 +271,10 @@ def np_cache_factory(nb_arrs, nb_lists, nb_GBs):
     :type nb_GBs: float
     :return: decorator
     :rtype: function"""
-    
     def np_cache(function):
         
         GB = 1024**3 # in bytes
-        @lru_cache(maxsize = 128, use_memory_up_to=(nb_GBs * GB))
+        @lru_cache(maxsize = config.CACHE_MAXSIZE, use_memory_up_to=(config.GBs * GB))
         def cached_wrapper(*args_cached, dims):
             args_l = []
             for arg in args_cached:

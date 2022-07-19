@@ -6,7 +6,6 @@ import numpy as np
 cimport cython
 cimport openmp
 from cython.parallel import prange
-import cosmic_profiles.common.config as config
 from cosmic_profiles.common.caching import np_cache_factory
 
 @cython.embedsignature(True) 
@@ -97,7 +96,7 @@ def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBE
                 gx_cat[idxs_compr[p]] = calcCSHIdxs(gx_cat[idxs_compr[p]], start_idx, fof_gx_size[p], nb_shs[p], sh_len_gx[idx_sum], MIN_NUMBER_STAR_PTCS)
         return gx_cat.base, gx_pass.base
     if(not hasattr(calcGxCat, "inner")):
-        calcGxCat.inner = np_cache_factory(3,0,config.GBs)(inner)
+        calcGxCat.inner = np_cache_factory(3,0)(inner)
     calcGxCat.inner(nb_shs.base, sh_len_gx.base, fof_gx_size.base, MIN_NUMBER_STAR_PTCS)
     return calcGxCat.inner(nb_shs.base, sh_len_gx.base, fof_gx_size.base, MIN_NUMBER_STAR_PTCS)
 
@@ -160,6 +159,6 @@ def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group
                 h_cat[idxs_compr[p]] = calcCSHIdxs(h_cat[idxs_compr[p]], start_idx, fof_dm_sizes[p], nb_shs[p], sh_len[idx_sum], MIN_NUMBER_DM_PTCS)
         return h_cat.base, h_r200.base, h_pass.base
     if(not hasattr(calcCSHCat, "inner")):
-        calcCSHCat.inner = np_cache_factory(5,0,config.GBs)(inner)
+        calcCSHCat.inner = np_cache_factory(5,0)(inner)
     calcCSHCat.inner(nb_shs.base, sh_len.base, fof_dm_sizes.base, group_r200.base, halo_masses.base, MIN_NUMBER_DM_PTCS)
     return calcCSHCat.inner(nb_shs.base, sh_len.base, fof_dm_sizes.base, group_r200.base, halo_masses.base, MIN_NUMBER_DM_PTCS)

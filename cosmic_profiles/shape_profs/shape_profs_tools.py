@@ -133,17 +133,15 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type major_full: (N,D_BINS+1,3) floats
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string"""
-    
-    print_status(rank,start_time,'Starting getShapeProfs() with snap {0}'.format(SNAP))
     
     if rank == 0:
         print_status(rank, start_time, "The number of objects considered is {0}".format(d.shape[0]))
         
         # Mass splitting
         max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time)
-            
+        
         # Maximal elliptical radii
         Rs = np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1)
         ERROR_METHOD = "median_quantile"
@@ -263,11 +261,9 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type frac_r200: float
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
-    """
-    print_status(rank, start_time, "Starting getLocalTHisto(). The number of objects considered is {0}".format(d.shape[0]))
-    
+    """    
     if rank == 0:
         idx = np.zeros((d.shape[0],), dtype = np.int32)
         for obj in range(idx.shape[0]):
@@ -292,7 +288,7 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         plt.savefig("{0}/LocalTCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
         
         t = t[np.logical_not(np.isnan(t))]
-        print_status(rank, start_time, "In degrees: The average T value for the objects is {0} and the standard deviation (assuming T is Gaussian distributed) is {1}".format(round(np.average(t),2), round(np.std(t),2)))
+        print_status(rank, start_time, "The number of objects considered is {0}. In degrees: The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
      
 def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
@@ -319,11 +315,9 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
     :type HIST_NB_BINS: int
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
-    """
-    print_status(rank, start_time, "Starting getLocalTHisto(). The number of objects considered is {0}".format(d.shape[0]))
-    
+    """    
     if rank == 0:
         idx = np.array([np.int32(x) for x in list(np.ones((d.shape[0],))*(-1))])
         
@@ -346,7 +340,7 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
         plt.savefig("{0}/GlobalTCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
         
         t = t[np.logical_not(np.isnan(t))]
-        print_status(rank, start_time, "In degrees: The average T value for the objects is {0} and the standard deviation (assuming T is Gaussian distributed) is {1}".format(round(np.average(t),2), round(np.std(t),2)))
+        print_status(rank, start_time, "The number of objects considered is {0}. In degrees: The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
      
 
 def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
@@ -367,7 +361,7 @@ def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""
@@ -404,7 +398,7 @@ def getLocalEpsHist(idx_cat, xyz, masses, r200, L_BOX, CENTER, VIZ_DEST, SNAP, f
     :type SNAP: string
     :param frac_r200: depth of objects to plot triaxiality, in units of R200
     :type frac_r200: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""

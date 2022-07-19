@@ -21,8 +21,6 @@ sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles
 import numpy as np
 from cosmic_profiles import DensShapeProfs, getMassDMParticle
 from nbodykit.lab import cosmology, LogNormalCatalog
-import time
-start_time = time.time()
 
 def createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS):
     """ Create mock simulation box by Poisson-sampling a lognormal density distribution
@@ -186,14 +184,14 @@ def AHFEx():
     #############################################################################################################
     
     ############## Run cosmic_profiles: define DensShapeProfs object ############################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER)
     
     ############## Create local halo shape catalogue ############################################################
-    cprofiles.dumpShapeCatLocal(CAT_DEST)
+    cprofiles.dumpShapeCatLocal(CAT_DEST, reduced = True, shell_based = True)
     #############################################################################################################
     
     ############## Viz first halo ###############################################################################
-    cprofiles.vizLocalShapes([0], CAT_DEST)
+    cprofiles.vizLocalShapes(obj_numbers = [0], VIZ_DEST = VIZ_DEST, reduced = True, shell_based = True)
     #############################################################################################################
     
 AHFEx()

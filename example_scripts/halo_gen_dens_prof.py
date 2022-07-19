@@ -64,9 +64,6 @@ def calcDensEx():
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!
     dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
-    dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
-    dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
-    dens_profs_db = cprofiles.getDensProfsDirectBinning(r_over_rvir) # dens_profs_db is in M_sun*h^2/Mpc^3
     dens_profs_kb = cprofiles.getDensProfsKernelBased(r_over_rvir)
     plt.figure()
     plt.loglog(r_over_rvir, dens_profs_db[0], 'o--', label='direct binning', markersize = 3)

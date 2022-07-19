@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import numpy as np
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -88,7 +89,7 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type major_full: (N,D_BINS+1,3) floats
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string"""
     
     return
@@ -126,11 +127,11 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type frac_r200: float
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
-    """
+    """    
     return
-
+     
 def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
     
@@ -156,10 +157,10 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
     :type HIST_NB_BINS: int
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
-    """
-    return
+    """    
+    return     
 
 def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
@@ -179,7 +180,7 @@ def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""
@@ -208,7 +209,7 @@ def getLocalEpsHist(idx_cat, xyz, masses, r200, L_BOX, CENTER, VIZ_DEST, SNAP, f
     :type SNAP: string
     :param frac_r200: depth of objects to plot triaxiality, in units of R200
     :type frac_r200: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""

@@ -22,13 +22,17 @@ To calculate density profiles with *Cosmic Profiles*, we first instantiate a ``D
 
 where the float array ``dens_profs_db`` of shape :math:`(N_{\text{obj}}, N_r)` contains the estimated density profiles. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice.
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, one must additionally specify `obj_type` = `dm` or `gx` to ``getDensProfsDirectBinning()`` in order to have the density profiles calculated for either dark matter halos or galaxies.
+.. note:: In case of a Gadget-style HDF5 snapshot output, you may want to additionally specify `obj_type` = `dm` or `gx` to ``getDensProfsDirectBinning()`` in order to have the density profiles calculated for either dark matter halos or galaxies.
 
-As the naming suggests, ``getDensProfsDirectBinning()`` estimates density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. On the other hand::
+As the naming suggests, ``getDensProfsDirectBinning()`` estimates density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. The user also has the liberty to invoke an ellipsoidal shell-based density profile estimation algorithm by setting the boolean `spherical = False`. Note, however, that this necessitates that ``cprofiles`` is an object of the class ``DensShapeProfs`` or ``DensShapeProfsHDF5``, providing access to shape profiling capabilities.
+
+.. note:: If `spherical = False`, the user also has the discretion to set 2 keyword arguments, namely the booleans `reduced` and `shell_based` that are explained in :ref:`Shape Estimation section<Shape Estimation>`.
+
+See `Gonzalez et al. 2022 <https://arxiv.org/abs/2205.06827>`_ for an application of the ellipsoidal shell-based density profile estimation technique. On the other hand::
 
     dens_profs_kb = cprofiles.getDensProfsKernelBased(r_over_r200)
 
-performs a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise. 
+performs a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise.
 
 .. _Density Profile Fitting:
 
@@ -41,7 +45,7 @@ Density Profile Fitting
 .. |pic1| image:: RhoProfFitObj0_015.png
    :width: 60%
 
-Apart from estimating density profiles using the direct-binning or the kernel-based approach, this package supports density profile fitting assuming a certain density profile model. Four different density profile models can be invoked. First, the NFW-profile (`Navarro et al. <https://ui.adsabs.harvard.edu/abs/1997ApJ...490..493N/abstract>`_) defined by 
+Apart from estimating density profiles using the direct-binning or the kernel-based approach, this package supports density profile fitting assuming a certain density profile model. Four different density profile models can be invoked. First, the NFW-profile (`Navarro et al. <https://ui.adsabs.harvard.edu/abs/1997ApJ...490..493N/abstract>`_) defined by
 
 .. math:: \rho(r) = \frac{\rho_s}{(r/r_s)(1+r/r_s)^2}.
 
@@ -73,4 +77,10 @@ with :math:`r_{-2} = r_s` the characteristic or scale radius of the correspondin
 
 which will return a float array ``cs`` of shape (:math:`N_{\text{obj}},`).
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, one must additionally specify `obj_type` = `dm` or `gx` to ``getDensProfsBestFits()`` in order to have the density profiles fits for either dark matter halos or galaxies.
+.. note:: In case of a Gadget-style HDF5 snapshot output, you may want to additionally specify `obj_type` = `dm` or `gx` to ``getDensProfsBestFits()`` in order to have the density profiles fits for either dark matter halos or galaxies.
+
+The density profiles, for instance `dens_profs_db`, and their fits can be visualized using::
+
+    cprofiles.plotDensProfs(dens_profs_db, r_over_r200, dens_profs_fit, r_over_r200_fit, method, VIZ_DEST)
+
+where `dens_profs_fit` and `r_over_r200_fit` refer to those estimated density profile values that the user would like the fitting operation to be carried out over, e.g. `dens_profs_fit = dens_profs_db[:,25:]` and `r_over_r200_fit = r_over_r200[25:]` to discard the values that correspond to deep layers of halos/galaxies/objects. Typically, the gravitational softening scale times some factor and / or information from the local relaxation timescale is used to estimate the inner convergence radius. For guidance on choosing the inner convergence radius see `Navarro et al 2010 <https://academic.oup.com/mnras/article/402/1/21/1028856>`_.

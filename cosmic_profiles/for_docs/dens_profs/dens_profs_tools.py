@@ -90,7 +90,6 @@ def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens
     :type MASS_UNIT: float
     :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
     :type suffix: string"""
-    
     return
 
 def fitDensProf(ROverR200, method, median_r200_obj_nb):
@@ -111,7 +110,6 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     :type median_r200_obj_nb: tuple of (N,) floats, float, int
     :return best_fit, obj_nb: best-fit results, object number
     :rtype: (n,) floats, int"""
-    
     return
 
 def fitDensProfHelper(dens_profs, ROverR200, r200s, method):

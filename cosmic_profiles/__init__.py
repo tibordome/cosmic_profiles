@@ -1,5 +1,6 @@
 from .common.config import (
-    updateCachingMaxGBs
+    updateCachingMaxGBs,
+    updateCachingMaxSize
 )
 
 from .common.python_routines import (

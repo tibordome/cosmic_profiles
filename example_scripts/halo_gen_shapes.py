@@ -17,8 +17,6 @@ import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import DensShapeProfs, genHalo
-import time
-start_time = time.time()
 
 def calcShapeEx():
     
@@ -28,7 +26,7 @@ def calcShapeEx():
     VIZ_DEST = "./viz"
     D_LOGSTART = -2
     D_LOGEND = 0
-    D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
+    D_BINS = 20 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
     M_TOL = np.float32(1e-2)
     N_WALL = 100
     N_MIN = 10
@@ -39,7 +37,7 @@ def calcShapeEx():
     
     #################################### Generate 1 mock halo ######################################
     tot_mass = 10**(12) # M_sun/h
-    halo_res = 500000
+    halo_res = 100000
     r_s = 0.5 # Units are Mpc/h
     alpha = 0.18
     N_bin = 100
@@ -61,14 +59,14 @@ def calcShapeEx():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensShapeProfs object #######################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, start_time)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER)
     
     ######################### Calculating Morphological Properties #################################
     # Create halo shape catalogue
-    cprofiles.dumpShapeCatLocal(CAT_DEST)
+    cprofiles.dumpShapeCatLocal(CAT_DEST, reduced = False, shell_based = False)
     
     ######################################## Visualizations ########################################
     # Visualize halo: A sample output is shown above!
-    cprofiles.vizLocalShapes([0], VIZ_DEST)
+    cprofiles.vizLocalShapes(obj_numbers = [0], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
 
 calcShapeEx()

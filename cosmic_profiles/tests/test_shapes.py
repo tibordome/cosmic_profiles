@@ -103,13 +103,13 @@ def test_shapes():
     assert major.shape[2] == 3
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.plotShapeProfs(reduced = False, shell_based = False, VIZ_DEST = VIZ_DEST)
+    cprofiles.plotShapeProfs(VIZ_DEST, reduced = True, shell_based = True)
     
     # Viz first few halos' shapes
-    cprofiles.vizLocalShapes(reduced = False, shell_based = False, obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST)
+    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
     
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHist(reduced = False, shell_based = False, HIST_NB_BINS, VIZ_DEST, frac_r200)
+    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, reduced = False, shell_based = False)
     
     ######################### Calculating Global Morphological Properties ############################
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(reduced = False)
@@ -136,7 +136,7 @@ def test_shapes():
     cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST)
     
     # Viz first few halos' shapes
-    cprofiles.vizGlobalShapes(reduced = False, obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST)
+    cprofiles.vizGlobalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False)
     
     # Clean-up
     subprocess.call(['bash', 'decythonize.sh'], cwd=os.path.join(currentdir, '..'))

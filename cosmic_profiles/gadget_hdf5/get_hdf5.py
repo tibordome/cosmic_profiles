@@ -5,7 +5,6 @@ import numpy as np
 import itertools
 import h5py
 from cosmic_profiles.common.caching import np_cache_factory
-import cosmic_profiles.common.config as config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -83,7 +82,7 @@ def getHDF5Data(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
         
         return dm_xyz, star_xyz, sh_com, nb_shs, sh_len, fof_dm_sizes, dm_masses, star_masses, fof_com, fof_masses
     if(not hasattr(getHDF5Data, "inner")):
-        getHDF5Data.inner = np_cache_factory(0,0,config.GBs)(inner)
+        getHDF5Data.inner = np_cache_factory(0,0)(inner)
     getHDF5Data.inner(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP)
     return getHDF5Data.inner(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP)
 
@@ -293,7 +292,7 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     
         return star_xyz, fof_com, sh_com, nb_shs_l, star_masses, star_velxyz, is_star
     if(not hasattr(getHDF5GxData, "inner")):
-        getHDF5GxData.inner = np_cache_factory(0,0,config.GBs)(inner)
+        getHDF5GxData.inner = np_cache_factory(0,0)(inner)
     getHDF5GxData.inner(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP)
     return getHDF5GxData.inner(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP_MAX, SNAP)
 
@@ -342,7 +341,7 @@ def getHDF5SHDMData(HDF5_GROUP_DEST, SNAP_MAX, SNAP, WANT_RVIR):
     
         return nb_shs, sh_len, fof_dm_sizes, group_r200, fof_masses, fof_com
     if(not hasattr(getHDF5SHDMData, "inner")):
-        getHDF5SHDMData.inner = np_cache_factory(0,0,config.GBs)(inner)
+        getHDF5SHDMData.inner = np_cache_factory(0,0)(inner)
     getHDF5SHDMData.inner(HDF5_GROUP_DEST, SNAP_MAX, SNAP, WANT_RVIR)
     return getHDF5SHDMData.inner(HDF5_GROUP_DEST, SNAP_MAX, SNAP, WANT_RVIR)
 
@@ -378,7 +377,7 @@ def getHDF5SHGxData(HDF5_GROUP_DEST, SNAP_MAX, SNAP):
     
         return nb_shs, sh_len_gx, fof_gx_sizes
     if(not hasattr(getHDF5SHGxData, "inner")):
-        getHDF5SHGxData.inner = np_cache_factory(0,0,config.GBs)(inner)
+        getHDF5SHGxData.inner = np_cache_factory(0,0)(inner)
     getHDF5SHGxData.inner(HDF5_GROUP_DEST, SNAP_MAX, SNAP)
     return getHDF5SHGxData.inner(HDF5_GROUP_DEST, SNAP_MAX, SNAP)
 
@@ -481,6 +480,6 @@ def getHDF5DMData(HDF5_SNAP_DEST, SNAP_MAX, SNAP):
     
         return dm_xyz, dm_masses, dm_velxyz
     if(not hasattr(getHDF5DMData, "inner")):
-        getHDF5DMData.inner = np_cache_factory(0,0,config.GBs)(inner)
+        getHDF5DMData.inner = np_cache_factory(0,0)(inner)
     getHDF5DMData.inner(HDF5_SNAP_DEST, SNAP_MAX, SNAP)
     return getHDF5DMData.inner(HDF5_SNAP_DEST, SNAP_MAX, SNAP)
