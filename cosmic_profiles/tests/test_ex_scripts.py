@@ -21,8 +21,6 @@ sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_pr
 sys.path.append(os.path.join(currentdir, '..', '..', 'example_scripts'))
 from halo_gen_shapes import calcShapeEx
 from halo_gen_dens_prof import calcDensEx
-import time
-start_time = time.time()
 
 #################################### Parameters ################################################
 L_BOX = np.float32(10) # Mpc/h

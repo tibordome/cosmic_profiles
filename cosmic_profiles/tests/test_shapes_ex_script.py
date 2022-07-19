@@ -4,19 +4,20 @@
 Created on Tue Mar 16 18:23:43 2021
 """
 
-from mpi4py import MPI
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-size = comm.Get_size()
 import numpy as np
 import os
+import subprocess
 import sys
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import DensShapeProfs, genHalo
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+subprocess.call(['python3', 'setup.py', 'build_ext', '--inplace'], cwd=os.path.join(currentdir, '..'))
+subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
+subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
+sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
+from cosmic_profiles import genHalo, DensShapeProfs
 
-def calcShapeEx():
+def test_shapes_ex_script():
     
     #################################### Parameters ################################################
     L_BOX = np.float32(10) # Mpc/h
@@ -66,5 +67,3 @@ def calcShapeEx():
     ######################################## Visualizations ########################################
     # Visualize halo: A sample output is shown above!
     cprofiles.vizLocalShapes(obj_numbers = [0], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
-
-calcShapeEx()

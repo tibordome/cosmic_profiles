@@ -8,5 +8,5 @@ Mock Halo, Density Profile
 
 Here, we generate 1 mock halo and calculate its mass density profile.
 
-.. literalinclude :: ../../../example_scripts/halo_gen_dens_prof.py
+.. literalinclude :: ../../../cosmic_profiles/tests/test_densities_ex_script.py
    :language: python

@@ -4,24 +4,22 @@
 Created on Tue Mar 16 18:23:43 2021
 """
 
-from mpi4py import MPI
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-size = comm.Get_size()
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.rcParams.update({'font.size': 13})
 import os
+import subprocess
 import sys
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+subprocess.call(['python3', 'setup.py', 'build_ext', '--inplace'], cwd=os.path.join(currentdir, '..'))
+subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
+subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
+sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import updateCachingMaxGBs
 updateCachingMaxGBs(GB = 1)
-from cosmic_profiles import DensProfs, genHalo, getEinastoProf
+from cosmic_profiles import genHalo, DensProfs, getEinastoProf
 
-def calcDensEx():
+def test_densities_ex_script():
     
     #################################### Parameters ############################################################
     L_BOX = np.float32(10) # cMpc/h
@@ -85,5 +83,3 @@ def calcDensEx():
     plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
     plt.legend(fontsize="small", bbox_to_anchor=(0.95, 1), loc='upper right')
     plt.savefig('{}/RhoProfFitObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')
-    
-calcDensEx()
