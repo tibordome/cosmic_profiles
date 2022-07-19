@@ -8,9 +8,7 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-import time
 import numpy as np
-start_time = time.time()
 import os
 import sys
 import inspect
@@ -46,8 +44,8 @@ def calcShapeEx():
     b = a*0.6 # Units are Mpc/h
     c = a*0.2 # Units are Mpc/h
     
-    model_pars = np.array([r_s, alpha])
-    halo_x, halo_y, halo_z, mass_dm, rho_0 = genHalo(tot_mass, halo_res, model_pars, 'einasto', a, b, c)
+    model_pars = {'alpha': alpha, 'r_s': r_s}
+    halo_x, halo_y, halo_z, mass_dm, rho_s = genHalo(tot_mass, halo_res, model_pars, 'einasto', a, b, c)
     print("Number of particles in the halo is {}.".format(halo_x.shape[0]))
     halo_x += L_BOX/2 # Move mock halo into the middle of the simulation box
     halo_y += L_BOX/2

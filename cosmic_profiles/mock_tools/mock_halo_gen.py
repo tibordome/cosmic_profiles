@@ -23,9 +23,9 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
     :type tot_mass: float
     :param res: halo resolution
     :type res: int
-    :param model_pars: parameters (except for ``rho_0`` which will be deduced from ``tot_mass``)
+    :param model_pars: parameters (except for ``rho_s`` which will be deduced from ``tot_mass``)
         in density profile model
-    :type model_pars: float array (of length 4, 2 or 1)
+    :type model_pars: dictionary of length 4, 2 or 1
     :param a: major axis array
     :type a: float array, units are Mpc/h
     :param b: intermediate axis array
@@ -33,28 +33,32 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
     :param c: minor axis array
     :type c: float array, units are Mpc/h
     :return: halo_x, halo_y, halo_z: arrays containing positions of halo particles, 
-        mass_ptc: mass of each DM ptc in units of M_sun/h, rho_0: ``rho_0`` parameter in profile model
+        mass_ptc: mass of each DM ptc in units of M_sun/h, rho_s: ``rho_s`` parameter in profile model
     :rtype: 3 (N,) float arrays, 2 floats
     """
     print('Starting genHalo()')
         
     if rank == 0:
-        # Determine rho_0 in units of M_sun*h^2/Mpc^3
+        # Determine rho_s in units of M_sun*h^2/Mpc^3
         def getMassIntegrand0(r, method, model_pars):
             if method == 'einasto':
-                r_2, alpha = model_pars
+                alpha = model_pars['alpha']
+                r_s = model_pars['r_s']
                 return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_2)**alpha-1))
             if method == 'alpha_beta_gamma':
-                alpha, beta, gamma, r_s = model_pars
+                alpha = model_pars['alpha']
+                beta = model_pars['beta']
+                gamma = model_pars['gamma']
+                r_s = model_pars['r_s']
                 return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
             if method == 'hernquist':
-                r_s = model_pars
+                r_s = model_pars['r_s']
                 return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**3)
             else:
-                r_s = model_pars
+                r_s = model_pars['r_s']
                 return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**2)
-        rho_0 = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(method, model_pars))[0]
-        model_pars = np.hstack((np.array([rho_0]),model_pars))
+        rho_s = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(method, model_pars))[0]
+        model_pars['rho_s'] = rho_s
         
         # Determine number of particles in second shell (first proper shell)
         def getMassIntegrand(r, model_pars):
@@ -97,6 +101,6 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
             halo_y = np.hstack((halo_y, result[:,1]))
             halo_z = np.hstack((halo_z, result[:,2]))
         mass_dm = quad(getMassIntegrand, 1e-8, a[-1], args=(model_pars))[0]/halo_z.shape[0]    
-        return halo_x, halo_y, halo_z, mass_dm, rho_0
+        return halo_x, halo_y, halo_z, mass_dm, rho_s
     else:
         return None, None, None, None, None

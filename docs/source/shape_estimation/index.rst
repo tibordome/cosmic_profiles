@@ -36,8 +36,10 @@ which measures the prolateness/oblateness of a halo. :math:`T = 1` describes a c
 Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r_{k} = (x_{k},y_{k},z_{k})^t` is the position vector with respect to the distribution's center (either mode or center of mass). The weight :math:`w_k` allows to define the most common shape tensors by choosing
 
 * :math:`w_k = 1`, in which case each particle gets the same weight, or
-* :math:`w_k = \frac{1}{r_k^2}` where :math:`r_k^2 = (x_{k})^2+(y_{k})^2+(z_{k})^2` is the distance squared of particle :math:`k` from the center of the cloud. This weighting scheme ought not to be used according to `Zemp et al. 2011 <https://arxiv.org/abs/1107.5582>`_. Or
-* :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` where :math:`r_{\text{ell},k}^2 = x_{\text{ell},k}^2+y_{\text{ell},k}^2+z_{\text{ell},k}^2` is the ellipsoidal radius, with :math:`(x_{\text{ell},k}, y_{\text{ell},k}, z_{\text{ell},k})` are the coordinates of particle :math:`k` in the eigenvector coordinate system of the ellipsoid. In other words, :math:`r_{\text{ell},k}` corresponds to the semi-major axis :math:`a` of the ellipsoid surface on which particle :math:`k` lies. The shape tensor with :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` is also called the *reduced* shape tensor, a variant that penalizes particles at large radii.
+* :math:`w_k = \frac{1}{r_k^2}` where :math:`r_k^2 = (x_{k})^2+(y_{k})^2+(z_{k})^2` is the distance squared of particle :math:`k` from the center of the cloud, or
+* :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` where :math:`r_{\text{ell},k}^2 = x_{\text{ell},k}^2+y_{\text{ell},k}^2+z_{\text{ell},k}^2` is the ellipsoidal radius, where :math:`(x_{\text{ell},k}, y_{\text{ell},k}, z_{\text{ell},k})` are the coordinates of particle :math:`k` in the eigenvector coordinate system of the ellipsoid. In other words, :math:`r_{\text{ell},k}` corresponds to the semi-major axis :math:`a` of the ellipsoid surface on which particle :math:`k` lies. The shape tensor with :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` is also called the *reduced* shape tensor, a variant that penalizes particles at large radii.
+
+Since the second weighting scheme with :math:`w_k = \frac{1}{r_k^2}` has recently fallen out of favour, see `Zemp et al. 2011 <https://arxiv.org/abs/1107.5582>`_, the other two schemes will be available by switching the boolean ``reduced``, see below.
 
 To calculate shape profiles with *Cosmic Profiles*, let us assume we are dealing with
 
@@ -95,7 +97,7 @@ To retrieve the local (i.e. as a function of :math:`r_{\text{ell}}`) halo shape 
 
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(reduced = False, shell_based = False).
 
-The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``major``, ``obj_centers``, ``obj_masses`` represents the shape profiles. The arrays will contain NaNs whenever the shape determination did not converge. We consider the shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``M_TOL`` and the maximum number of iterations ``N_WALL`` is not yet achieved. The boolean `reduced` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean `shell_based` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that `shell_based = True` should only be set if the number of particles resolving the objects is :math:`> \mathsc{O}(10^5)`. If :math:`N_{\text{pass}}` stands for the number of objects that are sufficiently resolved, then the 1D and 2D shape profile arrays will have the following format:
+The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``major``, ``obj_centers``, ``obj_masses`` represents the shape profiles. The arrays will contain NaNs whenever the shape determination did not converge. We consider the shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``M_TOL`` and the maximum number of iterations ``N_WALL`` is not yet achieved. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. If :math:`N_{\text{pass}}` stands for the number of objects that are sufficiently resolved, then the 1D and 2D shape profile arrays will have the following format:
 
 * ``d`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): ellipsoidal radii
 * ``q`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): q shape parameter
@@ -106,7 +108,7 @@ The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``ma
 * ``obj_centers`` of shape (:math:`N_{\text{pass}}`,3): centers of objects 
 * ``obj_masses`` of shape (:math:`N_{\text{pass}}`,): masses of objects.
 
-.. note:: In the case of a `DensShapeProfs` object, all the objects `obj` for :math:`obj in range(N_{\text{pass}})` will satisfy `len(idx_cat[obj]) > MIN_NUMBER_PTCS`. In case of a `DensShapeProfsHDF5` object, the same holds true when identifying `idx_cat` with `idx_cat = cprofiles.getIdxCat(obj_type = 'dm')` and replacing `MIN_NUMBER_PTCS` by `MIN_NUMBER_DM_PTCS`, and analogously for star particles in galaxies.
+.. note:: In the case of a ``DensShapeProfs`` object, there will be :math:`N_{\text{pass}}` objects with certain indices `obj` for which ``len(idx_cat[obj]) > MIN_NUMBER_PTCS``. In case of a ``DensShapeProfsHDF5`` object, the same holds true when identifying ``idx_cat`` with ``idx_cat = cprofiles.getIdxCat(obj_type = 'dm')`` and replacing ``MIN_NUMBER_PTCS`` by ``MIN_NUMBER_DM_PTCS``, and analogously for star particles in galaxies.
 
 For post-processing purposes, one can dump the converged shape profiles in a destination ``CAT_DEST`` of choice via::
     
@@ -133,7 +135,7 @@ Instead of shape profiles one might also be interested in obtaining the shape pa
 
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(reduced = False).
 
-If a global shape calculations does not converge (which is rare), the corresponding entry in ``q`` etc. will feature a NaN. The index catalogue ``idx_cat = cprofiles.getIdxCat(obj_type)`` will have an empty entry at the corresponding location in the HDF5 case. In the generic point particle case, ``idx_cat = cprofiles.getIdxCat()`` will just return the `idx_cat` that is provided by the user, even if some entries have insufficient resolution. As with shape profiles, we can dump the global shape catalogue in a destination ``CAT_DEST`` of choice via::
+If a global shape calculations does not converge (which is rare), the corresponding entry in ``q`` etc. will feature a NaN. The index catalogue ``idx_cat = cprofiles.getIdxCat(obj_type)`` will have an empty entry at the corresponding location in the HDF5 case. In the generic point particle case, ``idx_cat = cprofiles.getIdxCat()`` will just return the ``idx_cat`` that is provided by the user, even if some entries have insufficient resolution. As with shape profiles, we can dump the global shape catalogue in a destination ``CAT_DEST`` of choice via::
 
     cprofiles.dumpShapeCatGlobal(CAT_DEST, reduced = False),
 

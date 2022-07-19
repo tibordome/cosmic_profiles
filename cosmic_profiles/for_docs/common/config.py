@@ -7,7 +7,12 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 def initialize(GB, MAXSIZE):
-    """ Initialize all global variables, should only be called once."""
+    """ Initialize all global variables, should only be called once.
+
+    :param GB: new memory limit
+    :type GB: int, or float
+    :param MAXSIZE: new maximum size of each cache
+    :type MAXSIZE: int"""
     
     global GBs # Number of gigabytes. If only this much left (according to psutil.virtual_memory().available), cache will be considered full.
                # I.e. if this many GBs of memory available, stop caching to avoid thrashing.

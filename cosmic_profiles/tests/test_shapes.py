@@ -40,7 +40,7 @@ def test_shapes():
     r_s = 0.5 # Units are Mpc/h
     alpha = 0.18
     
-    model_pars = np.array([r_s, alpha])
+    model_pars = {'alpha': alpha, 'r_s': r_s}
     dm_x = np.empty(0, dtype = np.float32)
     dm_y = np.empty(0, dtype = np.float32)
     dm_z = np.empty(0, dtype = np.float32)
@@ -53,7 +53,7 @@ def test_shapes():
         a = np.logspace(-1.5,0.2,100)*r_vir[-1] # Units are Mpc/h
         b = a*0.6 # Units are Mpc/h
         c = a*0.2 # Units are Mpc/h
-        halo_x, halo_y, halo_z, mass_dm, rho_0 = genHalo(tot_mass, halo_res, model_pars, 'einasto', a, b, c)
+        halo_x, halo_y, halo_z, mass_dm, rho_s = genHalo(tot_mass, halo_res, model_pars, 'einasto', a, b, c)
         print("Number of particles in the halo is {}.".format(halo_x.shape[0]))
         halo_x += np.random.uniform(0,L_BOX/2,1)[0] # Move mock halo into the middle of the simulation box
         halo_y += np.random.uniform(0,L_BOX/2,1)[0]

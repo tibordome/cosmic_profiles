@@ -16,9 +16,9 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
     :type tot_mass: float
     :param res: halo resolution
     :type res: int
-    :param model_pars: parameters (except for ``rho_0`` which will be deduced from ``tot_mass``)
+    :param model_pars: parameters (except for ``rho_s`` which will be deduced from ``tot_mass``)
         in density profile model
-    :type model_pars: float array (of length 4, 2 or 1)
+    :type model_pars: dictionary of length 4, 2 or 1
     :param a: major axis array
     :type a: float array, units are Mpc/h
     :param b: intermediate axis array
@@ -26,7 +26,7 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
     :param c: minor axis array
     :type c: float array, units are Mpc/h
     :return: halo_x, halo_y, halo_z: arrays containing positions of halo particles, 
-        mass_ptc: mass of each DM ptc in units of M_sun/h, rho_0: ``rho_0`` parameter in profile model
+        mass_ptc: mass of each DM ptc in units of M_sun/h, rho_s: ``rho_s`` parameter in profile model
     :rtype: 3 (N,) float arrays, 2 floats
     """
     return

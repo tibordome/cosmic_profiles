@@ -9,9 +9,7 @@ import matplotlib.pyplot as plt
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-import time
 import pynbody
-start_time = time.time()
 import os
 import sys
 import h5py

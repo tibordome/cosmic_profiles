@@ -25,8 +25,10 @@ def getEinastoProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_2, r_2, alpha = model_pars
-    return rho_2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+    rho_s = model_pars['rho_s']
+    alpha = model_pars['alpha']
+    r_s = model_pars['r_s']
+    return rho_s*np.exp(-2/alpha*((r/r_s)**alpha-1))
 
 def getAlphaBetaGammaProf(r, model_pars):
     """
@@ -38,8 +40,12 @@ def getAlphaBetaGammaProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_0, alpha, beta, gamma, r_s = model_pars
-    return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+    rho_s = model_pars['rho_s']
+    alpha = model_pars['alpha']
+    beta = model_pars['beta']
+    gamma = model_pars['gamma']
+    r_s = model_pars['r_s']
+    return rho_s/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
 
 def getNFWProf(r, model_pars):
     """
@@ -51,7 +57,8 @@ def getNFWProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_s, r_s = model_pars
+    rho_s = model_pars['rho_s']
+    r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**2)
 
 def getHernquistProf(r, model_pars):
@@ -64,7 +71,8 @@ def getHernquistProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_s, r_s = model_pars
+    rho_s = model_pars['rho_s']
+    r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
 def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT, suffix = '_'):
@@ -106,6 +114,18 @@ def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens
     if rank == 0:
         print_status(rank, start_time, "The number of objects considered is {0}".format(obj_masses.shape[0]))
         
+        def getModelParsDict(model_pars_arr, method):
+            if method == 'einasto':
+                rho_s, alpha, r_s = model_pars_arr
+                model_pars_dict = {'rho_s': rho_s, 'alpha': alpha, 'r_s': r_s}
+            elif method == 'alpha_beta_gamma':
+                rho_s, alpha, beta, gamma r_s = model_pars_arr
+                model_pars_dict = {'rho_s': rho_s, 'alpha': alpha, 'beta': beta, 'gamma': gamma, 'r_s': r_s}
+            else:
+                rho_s, r_s = model_pars_arr
+                model_pars_dict = {'rho_s': rho_s, 'r_s': r_s}
+            return model_pars_dict
+        
         # Mass splitting
         max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time)
         del obj_centers; del obj_center_groups; del idx_groups
@@ -133,10 +153,11 @@ def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens
         y = [list(dens_prof_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
         prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
         best_fit, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200, 0)) # Fit median
+        best_fit_dict = getModelParsDict(best_fit, method)
         del r200
         # Plotting
         plt.figure()
-        plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]]), best_fit), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
+        plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]]), best_fit_dict), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
         plt.loglog(ROverR200, prof_median, color = 'blue')
         plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"All objects")
         plt.xlabel(r"$r/R_{200}$")
@@ -156,9 +177,10 @@ def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens
             y = [list(dens_prof_fit[idxs_compr[np.nonzero(obj_pass_m > 0)[0]],i]) for i in range(ROverR200_fit.shape[0])]
             prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
             best_fit_m, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200_m, 0))
+            best_fit_m_dict = getModelParsDict(best_fit_m, method)
             # Plotting
             plt.figure()
-            plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]]), best_fit_m), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
+            plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]]), best_fit_m_dict), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
             plt.loglog(ROverR200, prof_median, color = 'blue')
             plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))))
             plt.xlabel(r"$r/R_{200}$")
@@ -189,8 +211,19 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     
     median, r200, obj_nb = median_r200_obj_nb
     prof_models = {'einasto': getEinastoProf, 'alpha_beta_gamma': getAlphaBetaGammaProf, 'nfw': getNFWProf, 'hernquist': getHernquistProf}
-    def toMinimize(model_pars, median, rbin_centers, method):
-        psi_2 = np.sum(np.array([(np.log(median[i])-np.log(prof_models[method](rbin, model_pars)))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
+    def getModelParsDict(model_pars_arr, method):
+        if method == 'einasto':
+            rho_s, alpha, r_s = model_pars_arr
+            model_pars_dict = {'rho_s': rho_s, 'alpha': alpha, 'r_s': r_s}
+        elif method == 'alpha_beta_gamma':
+            rho_s, alpha, beta, gamma r_s = model_pars_arr
+            model_pars_dict = {'rho_s': rho_s, 'alpha': alpha, 'beta': beta, 'gamma': gamma, 'r_s': r_s}
+        else:
+            rho_s, r_s = model_pars_arr
+            model_pars_dict = {'rho_s': rho_s, 'r_s': r_s}
+        return model_pars_dict
+    def toMinimize(model_pars_arr, median, rbin_centers, method):
+        psi_2 = np.sum(np.array([(np.log(median[i])-np.log(prof_models[method](rbin, getModelParsDict(model_pars_arr, method))))**2/rbin_centers.shape[0] for i, rbin in enumerate(rbin_centers)]))
         return psi_2
     R_to_min = ROverR200*r200 # Mpc/h
     # Discard nan values in median
@@ -199,8 +232,8 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     # Set initial guess and minimize scalar function
     try:
         if method == 'einasto':
-            iguess = np.array([0.1, r200/5, 0.18]) # Note: alpha = 0.18 gives ~ NFW
-            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (1e-5, np.inf), (-np.inf, np.inf)]) # Only hand over rescaled median!
+            iguess = np.array([0.1, 0.18, r200/5]) # Note: alpha = 0.18 gives ~ NFW
+            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method), bounds = [(1e-7, np.inf), (-np.inf, np.inf), (1e-5, np.inf)]) # Only hand over rescaled median!
             best_fit = res.x
         elif method == 'alpha_beta_gamma':
             iguess = np.array([0.1, 1.0, 1.0, 1.0, r200/5])

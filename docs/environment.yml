@@ -1,6 +1,5 @@
 channels:
   - conda-forge
-  - bccp
   - defaults
 dependencies:
   - python=3.8
@@ -11,11 +10,7 @@ dependencies:
   - matplotlib
   - scikit-learn
   - cython
+  - psutil
   - sphinx-autoapi
   - sphinx_rtd_theme
-  - nbodykit
   - twine
-  - pip>=20.1
-  - pip:
-    - pynverse==0.1.4.4
-    - pynbody

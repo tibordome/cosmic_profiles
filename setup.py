@@ -97,6 +97,6 @@ setup(
     ),
     zip_safe=False,
     include_package_data=True,
-    install_requires=["cython", "cythongsl", "numpy>=1.19.2", "scipy", "pathos", "scikit-learn", "mpi4py", "h5py", "matplotlib"]
+    install_requires=["cython", "cythongsl", "numpy>=1.19.2", "scipy", "pathos", "scikit-learn", "mpi4py", "h5py", "matplotlib", "psutil"]
 )
 

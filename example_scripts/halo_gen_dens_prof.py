@@ -8,9 +8,7 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-import time
 import numpy as np
-start_time = time.time()
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
@@ -46,8 +44,9 @@ def calcDensEx():
     rho_res = 50
     r_over_rvir = np.logspace(-2,0,rho_res) # Estimate density profile out to the virial radius.
     
-    model_pars = np.array([r_s, alpha])
-    halo_x, halo_y, halo_z, mass_dm, rho_0 = genHalo(tot_mass, halo_res, model_pars, 'einasto', a, b, c)
+    model_pars = {'alpha': alpha, 'r_s': r_s}
+    halo_x, halo_y, halo_z, mass_dm, rho_s = genHalo(tot_mass, halo_res, model_pars, 'einasto', a, b, c)
+    model_pars['rho_s'] = rho_s
     halo_x += L_BOX/2 # Move mock halo into the middle of the simulation box
     halo_y += L_BOX/2
     halo_z += L_BOX/2
@@ -68,7 +67,7 @@ def calcDensEx():
     plt.figure()
     plt.loglog(r_over_rvir, dens_profs_db[0], 'o--', label='direct binning', markersize = 3)
     plt.loglog(r_over_rvir, dens_profs_kb[0], 'o--', label='kernel-based', markersize = 3)
-    plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], np.array([rho_0, r_s, alpha])), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} cMpc/h'.format(alpha, r_s))
+    plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], model_pars), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} cMpc/h'.format(alpha, r_s))
     plt.xlabel(r'r/$R_{\mathrm{vir}}$')
     plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
     plt.legend(fontsize="small", loc='lower left')
@@ -80,7 +79,8 @@ def calcDensEx():
     best_fit = cprofiles.getDensProfsBestFits(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto')
     plt.figure()
     plt.loglog(r_over_rvir, dens_profs_db[0], 'o--', label='density profile', markersize = 4)
-    plt.loglog(r_over_rvir_fit, getEinastoProf(r_over_rvir_fit*r_vir[0], np.array([best_fit[0,0], best_fit[0,1], best_fit[0,2]])), '--', color = 'r', label=r'Einasto-fit')
+    model_pars = {'rho_s': best_fit[0,0], 'alpha': best_fit[0,1], 'r_s': best_fit[0,2]}
+    plt.loglog(r_over_rvir_fit, getEinastoProf(r_over_rvir_fit*r_vir[0], model_pars), '--', color = 'r', label=r'Einasto-fit')
     plt.xlabel(r'r/$R_{\mathrm{vir}}$')
     plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
     plt.legend(fontsize="small", bbox_to_anchor=(0.95, 1), loc='upper right')

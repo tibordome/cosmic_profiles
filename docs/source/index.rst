@@ -3,8 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-The *Cosmic Profiles* project
+The *CosmicProfiles* project
 =============================
+
+|pic0|
+
+.. |pic0| image:: ../../CProfiles.png
+   :width: 50%
 
 .. toctree::
    :maxdepth: 2

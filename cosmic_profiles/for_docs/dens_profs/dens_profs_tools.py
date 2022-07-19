@@ -13,8 +13,10 @@ def getEinastoProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_2, r_2, alpha = model_pars
-    return rho_2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+    rho_s = model_pars['rho_s']
+    alpha = model_pars['alpha']
+    r_s = model_pars['r_s']
+    return rho_s*np.exp(-2/alpha*((r/r_s)**alpha-1))
 
 def getAlphaBetaGammaProf(r, model_pars):
     """
@@ -26,8 +28,12 @@ def getAlphaBetaGammaProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_0, alpha, beta, gamma, r_s = model_pars
-    return rho_0/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
+    rho_s = model_pars['rho_s']
+    alpha = model_pars['alpha']
+    beta = model_pars['beta']
+    gamma = model_pars['gamma']
+    r_s = model_pars['r_s']
+    return rho_s/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
 
 def getNFWProf(r, model_pars):
     """
@@ -39,7 +45,8 @@ def getNFWProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_s, r_s = model_pars
+    rho_s = model_pars['rho_s']
+    r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**2)
 
 def getHernquistProf(r, model_pars):
@@ -52,7 +59,8 @@ def getHernquistProf(r, model_pars):
     :type model_pars: (n,) float array
     :return: profile value at ``r``
     :rtype: float"""
-    rho_s, r_s = model_pars
+    rho_s = model_pars['rho_s']
+    r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
 def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT, suffix = '_'):

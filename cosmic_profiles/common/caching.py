@@ -1,21 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Memory-aware LRU Cache function decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A modification of the builtin ``functools.lru_cache`` decorator that takes an
-additional keyword argument, ``use_memory_up_to``. The cache is considered full
-if there are fewer than ``use_memory_up_to`` bytes of memory available.
-If ``use_memory_up_to`` is set, then ``maxsize`` has no effect.
-Uses the ``psutil`` module to get the available memory. Motivation: Caching
-too many values causes thrashing.
-"""
-
 import psutil
 from functools import RLock, update_wrapper, namedtuple, wraps
-import numpy as np
 import cosmic_profiles.common.config as config
+import numpy as np
 
 _CacheInfo = namedtuple("CacheInfo", ["hits", "misses", "maxsize", "currsize"])
 
@@ -39,9 +28,10 @@ def _make_key(args, kwds, typed,
              fasttypes = {int, str, frozenset, type(None)},
              sorted=sorted, tuple=tuple, type=type, len=len):
     """Make a cache key from optionally typed positional and keyword arguments
+    
     The key is constructed in a way that is flat as possible rather than
-    as a nested structure that would take more memory.
-    If there is only a single argument and its data type is known to cache
+    as a nested structure that would take more memory. If there is only a 
+    single argument and its data type is known to cache
     its hash value, then that argument is returned without a wrapper.  This
     saves space and improves lookup speed.
     """
@@ -61,19 +51,24 @@ def _make_key(args, kwds, typed,
 
 def lru_cache(maxsize=128, typed=False, use_memory_up_to=False):
     """Least-recently-used cache decorator.
-    *use_memory_up_to* is an integer representing the number of bytes of memory
-    that must be available on the system in order for a value to be cached. If
-    it is set, *maxsize* has no effect.
-    If *maxsize* is set to None, the LRU features are disabled and the cache
-    can grow without bound.
-    If *typed* is True, arguments of different types will be cached separately.
-    For example, f(3.0) and f(3) will be treated as distinct calls with
-    distinct results.
+
     Arguments to the cached function must be hashable.
     View the cache statistics named tuple (hits, misses, maxsize, currsize)
     with f.cache_info().  Clear the cache and statistics with f.cache_clear().
     Access the underlying function with f.__wrapped__.
     See:  http://en.wikipedia.org/wiki/Cache_algorithms#Least_Recently_Used
+
+    :param maxsize: if set to None, the LRU features are disabled and the cache
+        can grow without bound
+    :type maxsize: int
+    :param typed: If True, arguments of different types will be cached separately.
+        For example, f(3.0) and f(3) will be treated as distinct calls with
+        distinct results.
+    :param use_memory_up_to: represents the number of bytes of memory
+        that must be available on the system in order for a value to be cached. If
+        it is set, ``maxsize`` has no effect.
+    :type use_memory_up_to: int, or float
+    :return: decorator
     """
     if use_memory_up_to:
         maxsize=None

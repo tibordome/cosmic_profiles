@@ -8,11 +8,7 @@ AHF Example
 .. |pic1| image:: RhoHalo.png
    :width: 60%
 
-Additional packages to install
-##############################
-
-- `pynbody <https://pynbody.github.io/pynbody/>`_
-- `nbodykit <https://nbodykit.readthedocs.io/en/latest/>`_
+.. note:: Additional packages to install: `pynbody <https://pynbody.github.io/pynbody/>`_ and `nbodykit <https://nbodykit.readthedocs.io/en/latest/>`_.
 
 We mentioned that identifying halos and galaxies for a simulation box is a challenging task. Most state-of-the-art halo finders have no direct Python wrappers, yet `pynbody <https://pynbody.github.io/pynbody/>`_ allows to overcome this limitation by wrapping to **most** major halo finders, including the Amiga Halo Finder (AHF), Rockstar and SubFind.
 

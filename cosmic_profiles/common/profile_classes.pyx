@@ -650,10 +650,7 @@ cdef class CosmicBase:
         if rank == 0:
             r200s = np.float32([r200s[i] for i in range(len(idx_cat)) if len(idx_cat[i]) >= MIN_NUMBER_PTCS])
             best_fits = fitDensProfHelper(dens_profs.base, ROverR200.base, r200s.base, method)
-            if method == 'einasto':
-                cs = r200s/best_fits[:,-2]
-            else:
-                cs = r200s/best_fits[:,-1]
+            cs = r200s/best_fits[:,-1]
             del r200s
             return cs
         else:
