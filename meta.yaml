@@ -10,7 +10,6 @@ source:
   sha256: 7f6ee277cded98c0406e04d1570276b7e220120042b2ed0a06490b8830647630
 
 build:
-  noarch: python
   number: 0
   script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
 
@@ -22,23 +21,24 @@ requirements:
     - libgomp  # [linux]
     - llvm-openmp  # [osx]
   host:
-    - python >=3.6
+    - python
     - pip
     - setuptools
     - cython
     - cythongsl
     - numpy >=1.19.2
   run:
-    - python >=3.6
+    - python
     - {{ pin_compatible('numpy') }}
     - scipy
-    - matplotlib
+    - matplotlib-base
     - scikit-learn
     - cython
     - cythongsl
     - mpi4py
     - pathos
     - h5py
+    - psutil
     - libgomp  # [linux]
     - llvm-openmp  # [osx]
 
@@ -57,7 +57,7 @@ test:
 about:
   home: https://github.com/tibordome/cosmic_profiles
   license: MIT
-  license_familY: MIT
+  license_family: MIT
   license_file: LICENSE.md
   summary: "Implements 3D point cloud algorithms for estimation and fitting of shape and density profiles"
   dev_url: https://github.com/tibordome/cosmic_profiles
