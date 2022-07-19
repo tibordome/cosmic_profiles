@@ -27,7 +27,7 @@ This repository provides shape and density profile analysis tools for cosmologic
   - user can choose between direct binning into spherical shells and
   - direct binning into ellipsoidal shells
   
-- density profile fitting assuming either NFW, Hernquist 1990, Einasto or alpha-beta-gamma profile model
+- density profile fitting assuming either `NFW <https://ui.adsabs.harvard.edu/abs/1997ApJ...490..493N/abstract>`_, `Hernquist 1990 <https://ui.adsabs.harvard.edu/abs/1990ApJ...356..359H/abstract>`_, `Einasto <https://ui.adsabs.harvard.edu/abs/1965TrAlm...5...87E/abstract>`_ or `alpha-beta-gamma <https://arxiv.org/abs/1107.5582>`_ profile model
 
   - concentration-mass relationship of halos easy to calculate
 - mock halo generator: ellipsoidal or spherical, compatible with the 4 density profile models
