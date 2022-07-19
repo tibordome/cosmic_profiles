@@ -4,7 +4,7 @@ CosmicProfiles is a Cython package for Point Cloud Profiling
 
 |Documentation Status| |PyPI| |Build Status|
 
-The *CosmicProfiles* project
+The CosmicProfiles project
 ****************************
 
 This repository provides shape and density profile analysis tools for cosmological simulations (and beyond). Its features include
@@ -32,7 +32,7 @@ This repository provides shape and density profile analysis tools for cosmologic
 
 The documentation can be found `here <https://cosmic-profiles.readthedocs.io/en/latest/index.html>`_.
 
-Contributions are welcome. Please raise an issue or open a PR. Comments/recommendations/complaints can be sent [here](mailto:tibor.doeme@gmail.com).
+Contributions are welcome. Please raise an issue or open a PR. Comments/recommendations/complaints can be sent `here <mailto:tibor.doeme@gmail.com>`_.
 
 
 .. |PyPI| image:: https://badge.fury.io/py/cosmic_profiles.svg
