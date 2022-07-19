@@ -44,7 +44,7 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
             if method == 'einasto':
                 alpha = model_pars['alpha']
                 r_s = model_pars['r_s']
-                return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_2)**alpha-1))
+                return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_s)**alpha-1))
             if method == 'alpha_beta_gamma':
                 alpha = model_pars['alpha']
                 beta = model_pars['beta']
