@@ -50,5 +50,5 @@ Contributions are welcome. Please raise an issue or open a PR. Comments/recommen
    :target: https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest
 .. |Build status| image:: https://app.travis-ci.com/tibordome/cosmic_profiles.svg?branch=master
    :target: https://app.travis-ci.com/tibordome/cosmic_profiles
-.. |alpha_beta_gamma| image:: https://latex.codecogs.com/png.format?\alpha\beta\gamma
+.. |alpha_beta_gamma| image:: https://latex.codecogs.com/png.format?\dpi{400}\alpha\beta\gamma
    :width: 40
