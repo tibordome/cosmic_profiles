@@ -27,7 +27,7 @@ This repository provides shape and density profile analysis tools for cosmologic
   - user can choose between direct binning into spherical shells and
   - direct binning into ellipsoidal shells
   
-- density profile fitting assuming either NFW, Hernquist 1990, Einasto or |alpha_beta_gamma|-profile model
+- density profile fitting assuming either NFW, Hernquist 1990, Einasto or alpha-beta-gamma profile model
 
   - concentration-mass relationship of halos easy to calculate
 - mock halo generator: ellipsoidal or spherical, compatible with the 4 density profile models
@@ -50,6 +50,3 @@ Contributions are welcome. Please raise an issue or open a PR.
    :target: https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest
 .. |Build status| image:: https://app.travis-ci.com/tibordome/cosmic_profiles.svg?branch=master
    :target: https://app.travis-ci.com/tibordome/cosmic_profiles
-.. |alpha_beta_gamma| image:: https://latex.codecogs.com/png.format?\dpi{400}\alpha\beta\gamma
-   :target: https://latex.codecogs.com/png.format?\dpi{400}\alpha\beta\gamma
-   :width: 40
