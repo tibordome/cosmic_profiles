@@ -1,4 +1,4 @@
-<img src="https://github.com/tibordome/cosmic_profiles/blob/c5de89a310b8630abad2af59c0425cb5260c181c/info/CProfiles.png" alt="Cosmic Profiles logo" style="height: 100px; width:400px;"/>
+<img src="https://cosmic-profiles.readthedocs.io/en/latest/_images/CProfiles.png" alt="Cosmic Profiles logo" style="height: 100px; width:400px;"/>
 
 CosmicProfiles is a Cython package for Point Cloud Profiling
 
