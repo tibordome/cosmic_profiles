@@ -52,5 +52,4 @@ Contributions are welcome. Please raise an issue or open a PR.
    :target: https://app.travis-ci.com/tibordome/cosmic_profiles
 .. |alpha_beta_gamma| image:: https://latex.codecogs.com/png.format?\dpi{400}\alpha\beta\gamma
    :target: https://latex.codecogs.com
-   :align: bottom
    :width: 40
