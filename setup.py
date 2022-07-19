@@ -70,7 +70,7 @@ ext_modules=[Extension(
 # This call to setup() does all the work
 setup(
     name="cosmic_profiles",
-    version="1.2.0",
+    version="1.3.0",
     description="Implements 3D point cloud algorithms for estimation and fitting of shape and density profiles",
     long_description=README,
     long_description_content_type="text/markdown",
