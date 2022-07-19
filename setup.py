@@ -33,7 +33,7 @@ class BuildExtWithoutPlatformSuffix(build_ext):
 HERE = pathlib.Path(__file__).parent
 
 # The text of the README file
-README = (HERE / "README.md").read_text()
+README = (HERE / "README.rst").read_text()
 
 ext_modules=[Extension(
                 "cosmic_profiles.cython_helpers.helper_class",
