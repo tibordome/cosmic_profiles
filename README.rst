@@ -1,10 +1,11 @@
-<img src="https://cosmic-profiles.readthedocs.io/en/latest/_images/CProfiles.png" alt="Cosmic Profiles logo" style="height: 100px; width:400px;"/>
+|Logo|
 
 CosmicProfiles is a Cython package for Point Cloud Profiling
 
-[![Documentation Status](https://readthedocs.org/projects/cosmic-profiles/badge/?version=latest)](https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/cosmic-profiles.svg)](https://badge.fury.io/py/cosmic-profiles) [![Build Status](https://app.travis-ci.com/tibordome/cosmic_profiles.svg?branch=master)](https://app.travis-ci.com/tibordome/cosmic_profiles)
+|Documentation Status| |PyPI| |Build Status|
 
-# The *CosmicProfiles* project
+The *CosmicProfiles* project
+****************************
 
 This repository provides shape and density profile analysis tools for cosmological simulations (and beyond). Its features include
 
@@ -29,6 +30,17 @@ This repository provides shape and density profile analysis tools for cosmologic
 - 3D point cloud plotting tools
 - efficient caching capabilities to accelerate look-ups
 
-The documentation can be found [here](https://cosmic-profiles.readthedocs.io/en/latest/index.html).
+The documentation can be found `here <https://cosmic-profiles.readthedocs.io/en/latest/index.html>`_.
 
 Contributions are welcome. Please raise an issue or open a PR. Comments/recommendations/complaints can be sent [here](mailto:tibor.doeme@gmail.com).
+
+
+.. |PyPI| image:: https://badge.fury.io/py/cosmic_profiles.svg
+   :target: https://badge.fury.io/py/cosmic_profiles
+.. |Logo| image:: https://cosmic-profiles.readthedocs.io/en/latest/_images/CProfiles.png
+   :target: https://github.com/tibordome/cosmic_profiles
+   :width: 400
+.. |Documentation Status| image:: https://readthedocs.org/projects/cosmic-profiles/badge/?version=latest
+   :target: https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest
+.. |Build status| image:: https://app.travis-ci.com/tibordome/cosmic_profiles.svg?branch=master
+   :target: https://app.travis-ci.com/tibordome/cosmic_profiles
