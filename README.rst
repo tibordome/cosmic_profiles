@@ -11,18 +11,24 @@ This repository provides shape and density profile analysis tools for cosmologic
 
 - overall halo shape determination, i.e. major, intermediate, minor axis vectors and shape quantities such as intermediate-to-major axis ratio or sphericity
 - halo shape profile determination
+
   - iterative shell-based shape profile determination algorithm for high-resolution halos
   - iterative ellipsoid-based shape profile determination algorithm for lower-resolution halos
   - user can choose between reduced shape tensor and non-reduced shape tensor
 - works with
+
   - 'direct' datasets (i.e. index catalogue provided by user) and
   - Gadget-style HDF5 snapshot files
+  
     - additional velocity dispersion tensor eigenaxes determination
     - galaxy density and shape profile determination also works out of the box
 - halo density profile estimation using direct binning and kernel-based approaches
+
   - user can choose between direct binning into spherical shells and
   - direct binning into ellipsoidal shells
+  
 - density profile fitting assuming either NFW, Hernquist 1990, Einasto or $\alpha \beta \gamma$-profile model
+
   - concentration-mass relationship of halos easy to calculate
 - mock halo generator: ellipsoidal or spherical, compatible with the 4 density profile models
 - easy to interface with `pynbody` to work with halos identified in a cosmological simulation (see example scripts)
