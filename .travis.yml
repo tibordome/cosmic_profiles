@@ -21,9 +21,4 @@ install:
   - python3 setup.py install
 # command to run tests
 script:
-  - cd cosmic_profiles/tests
-  - mkdir viz
-  - mkdir cat
-  - pytest -v --cov=cosmic_profiles
-  - rm -r viz
-  - rm -r cat
+  - pytest -v --cov=cosmic_profiles cosmic_profiles/tests
