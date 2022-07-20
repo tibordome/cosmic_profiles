@@ -42,7 +42,7 @@ def test_densities():
     r_vir = np.empty(0, dtype = np.float32)
     for n in range(N):
         tot_mass = 10**(np.random.uniform(10,12,1)[0]) # M_sun/h
-        halo_res = np.random.uniform(600,20000,1)[0]
+        halo_res = np.random.uniform(3000,20000,1)[0]
         r_vir = np.hstack((r_vir, np.float32(np.random.uniform(0.5,1.5,1)[0]))) # Units are Mpc/h
         a = np.logspace(-1.5,0.2,100)*r_vir[-1] # Units are Mpc/h
         b = a*0.6 # Units are Mpc/h

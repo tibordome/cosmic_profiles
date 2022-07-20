@@ -26,7 +26,7 @@ def test_densities_ex_script():
     
     #################################### Parameters ############################################################
     L_BOX = np.float32(10) # cMpc/h
-    VIZ_DEST = "./viz"
+    VIZ_DEST = "./cosmic_profiles/tests/viz"
     SNAP = '015'
     MASS_UNIT = 1e+10
     MIN_NUMBER_DM_PTCS = 200

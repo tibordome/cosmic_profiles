@@ -21,8 +21,8 @@ def test_shapes_ex_script():
     
     #################################### Parameters ################################################
     L_BOX = np.float32(10) # Mpc/h
-    CAT_DEST = "./cat"
-    VIZ_DEST = "./viz"
+    CAT_DEST = "./cosmic_profiles/tests/cat"
+    VIZ_DEST = "./cosmic_profiles/tests/viz"
     D_LOGSTART = -2
     D_LOGEND = 0
     D_BINS = 20 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
