@@ -94,7 +94,14 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
                 Nptc[shell] = int(round(N1*quad(getMassIntegrand, a[shell-1], a[shell], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
             else:
                 Nptc[shell] = int(round(N1*quad(getMassIntegrand, 1e-8, a[0], args=(model_pars))[0]/quad(getMassIntegrand, a[0], a[1], args=(model_pars))[0]))
-        with Pool(processes=os.sched_getaffinity(0)) as pool:
+        n_jobs = None
+        try:
+            n_jobs = len(os.sched_getaffinity(0))
+        except AttributeError:
+            # In this case (Windows and OSX), n_jobs stays None such that Pool will try to
+            # automatically set the number of processes appropriately.
+            pass
+        with Pool(processes=n_jobs) as pool:
             results = pool.map(partial(drawUniformFromShell, 3, a, b, c, Nptc), [idx for idx in range(Nptc.shape[0])]) # Draws from Shell(a[idx-1],b[idx-1],c[idx-1],a[idx],b[idx],c[idx])
         for result in results:
             halo_x = np.hstack((halo_x, result[:,0]))

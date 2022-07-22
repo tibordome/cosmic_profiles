@@ -276,7 +276,14 @@ def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
             best_fits = np.zeros((dens_profs.shape[0], 5))
         else:
             best_fits = np.zeros((dens_profs.shape[0], 2))
-        with Pool(processes=len(os.sched_getaffinity(0))) as pool:
+        n_jobs = None
+        try:
+            n_jobs = len(os.sched_getaffinity(0))
+        except AttributeError:
+            # In this case (Windows and OSX), n_jobs stays None such that Pool will try to
+            # automatically set the number of processes appropriately.
+            pass
+        with Pool(processes=n_jobs) as pool:
             results = pool.map(partial(fitDensProf, ROverR200, method), [(dens_profs[obj_nb], r200s[obj_nb], obj_nb) for obj_nb in range(dens_profs.shape[0])])
         for result in results:
             x, obj_nb = tuple(result)
