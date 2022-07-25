@@ -54,7 +54,7 @@ Contributions are welcome. Please raise an issue or open a PR.
    :target: https://anaconda.org/conda-forge/cosmic_profiles
 .. |Downloads| image:: https://img.shields.io/conda/dn/conda-forge/cosmic_profiles.svg
    :target: https://anaconda.org/conda-forge/cosmic_profiles
-.. |Versions| image:: https://img.shields.io/conda/vn/conda-forge/cosmic_profiles.svg
+.. |Version| image:: https://img.shields.io/conda/vn/conda-forge/cosmic_profiles.svg
    :target: https://anaconda.org/conda-forge/cosmic_profiles
 .. |Platforms| image:: https://img.shields.io/conda/pn/conda-forge/cosmic_profiles.svg
    :target: https://anaconda.org/conda-forge/cosmic_profiles
