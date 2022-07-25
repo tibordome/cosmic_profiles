@@ -32,11 +32,11 @@ Installing *CosmicProfiles* from the Python Package Index using `pip <https://py
 
 To install the latest version of *CosmicProfiles* with pip, simply run::
     
-    pip install --user cosmic_profiles
+    pip install --user cosmic-profiles
 
 If you have installed with pip, you can keep your installation up to date by upgrading from time to time::
     
-    pip install --user --upgrade cosmic_profiles
+    pip install --user --upgrade cosmic-profiles
 
 
 Contributing
