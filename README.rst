@@ -37,7 +37,7 @@ This repository provides shape and density profile analysis tools for cosmologic
 - efficient caching capabilities to accelerate look-ups
 
 Documentation
--------------
+****************************
 
 |Documentation Status|
 
@@ -45,7 +45,7 @@ The documentation for CosmicProfiles is hosted on `Read the Docs
 <https://cosmic-profiles.readthedocs.io/en/latest/>`__.
 
 Installation and Dependencies
------------------------------
+******************************
 
 |PyPI| |Name| |Downloads| |Version|
 
@@ -63,7 +63,7 @@ instructions <https://cosmic-profiles.readthedocs.io/en/latest/support.html>`_ i
 `documentation <https://cosmic-profiles.readthedocs.io/en/latest/>`__ for more information.
 
 License
--------
+****************************
 
 |License|
 
