@@ -49,12 +49,11 @@ Installation and Dependencies
 
 |PyPI| |Name| |Downloads| |Version|
 
-The easiest way to get CosmicProfiles is to install it with conda using the
-conda-forge channel:
+The easiest way to get CosmicProfiles is to install it with conda using the conda-forge channel::
 
     conda install cosmic_profiles --channel conda-forge
     
-or pip via:
+Alternatively, you can use pip::
 
    pip install cosmic-profiles
 
