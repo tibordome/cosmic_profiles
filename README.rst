@@ -2,6 +2,8 @@
 
 CosmicProfiles is a Cython package for Point Cloud Profiling
 
+|Build Status| |Platforms|
+
 The CosmicProfiles project
 ****************************
 
@@ -45,7 +47,7 @@ The documentation for CosmicProfiles is hosted on `Read the Docs
 Installation and Dependencies
 -----------------------------
 
-|PyPI| |Build Status| |Name| |Downloads| |Version| |Platforms|
+|PyPI| |Name| |Downloads| |Version|
 
 The easiest way to get CosmicProfiles is to install it with conda using the
 conda-forge channel::
