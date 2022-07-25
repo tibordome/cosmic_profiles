@@ -39,7 +39,7 @@ Documentation
 
 |Documentation Status|
 
-The documentation for CosmicProfiles is hosted on `Read the docs
+The documentation for CosmicProfiles is hosted on `Read the Docs
 <https://cosmic-profiles.readthedocs.io/en/latest/>`__.
 
 Installation and Dependencies
@@ -89,5 +89,5 @@ Contributions are welcome. Please raise an issue or open a PR.
    :target: https://anaconda.org/conda-forge/cosmic_profiles
 .. |Platforms| image:: https://img.shields.io/conda/pn/conda-forge/cosmic_profiles.svg
    :target: https://anaconda.org/conda-forge/cosmic_profiles
-.. |Licence| image:: https://anaconda.org/conda-forge/cosmic_profiles/badges/license.svg
+.. |License| image:: https://anaconda.org/conda-forge/cosmic_profiles/badges/license.svg
    :target: https://anaconda.org/conda-forge/cosmic_profiles
