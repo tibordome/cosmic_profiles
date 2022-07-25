@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Mar 13 17:39:15 2022
-"""
 
 from scipy import stats
 import numpy as np

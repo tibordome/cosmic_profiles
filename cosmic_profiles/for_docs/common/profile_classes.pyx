@@ -1,9 +1,6 @@
 #cython: language_level=3
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar  3 13:17:51 2021
-"""
 
 import numpy as np
 import matplotlib.pyplot as plt
