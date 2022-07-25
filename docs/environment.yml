@@ -9,6 +9,7 @@ dependencies:
   - h5py
   - matplotlib
   - scikit-learn
+  - pathos
   - cython
   - psutil
   - sphinx-autoapi
