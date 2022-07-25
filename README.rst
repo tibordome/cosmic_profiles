@@ -2,7 +2,7 @@
 
 CosmicProfiles is a Cython package for Point Cloud Profiling
 
-|Documentation Status| |PyPI| |Build Status|
+|Documentation Status| |PyPI| |Build Status| |Name| |Downloads| |Version| |Platforms|
 
 The CosmicProfiles project
 ****************************
@@ -50,3 +50,11 @@ Contributions are welcome. Please raise an issue or open a PR.
    :target: https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest
 .. |Build status| image:: https://app.travis-ci.com/tibordome/cosmic_profiles.svg?branch=master
    :target: https://app.travis-ci.com/tibordome/cosmic_profiles
+.. |Name| image:: https://img.shields.io/badge/recipe-cosmic_profiles-green.svg
+   :target: https://anaconda.org/conda-forge/cosmic_profiles
+.. |Downloads| image:: https://img.shields.io/conda/dn/conda-forge/cosmic_profiles.svg
+   :target: https://anaconda.org/conda-forge/cosmic_profiles
+.. |Versions| image:: https://img.shields.io/conda/vn/conda-forge/cosmic_profiles.svg
+   :target: https://anaconda.org/conda-forge/cosmic_profiles
+.. |Platforms| image:: https://img.shields.io/conda/pn/conda-forge/cosmic_profiles.svg
+   :target: https://anaconda.org/conda-forge/cosmic_profiles
