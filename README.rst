@@ -2,8 +2,6 @@
 
 CosmicProfiles is a Cython package for Point Cloud Profiling
 
-|Documentation Status| |PyPI| |Build Status| |Name| |Downloads| |Version| |Platforms|
-
 The CosmicProfiles project
 ****************************
 
@@ -36,7 +34,40 @@ This repository provides shape and density profile analysis tools for cosmologic
 - 3D point cloud plotting tools
 - efficient caching capabilities to accelerate look-ups
 
-The documentation can be found `here <https://cosmic-profiles.readthedocs.io/en/latest/index.html>`_.
+Documentation
+-------------
+
+|Documentation Status|
+
+The documentation for CosmicProfiles is hosted on `Read the docs
+<https://cosmic-profiles.readthedocs.io/en/latest/>`__.
+
+Installation and Dependencies
+-----------------------------
+
+|PyPI| |Build Status| |Name| |Downloads| |Version| |Platforms|
+
+The easiest way to get CosmicProfiles is to install it with conda using the
+conda-forge channel::
+
+    conda install cosmic_profiles --channel conda-forge
+    
+or pip via::
+
+   pip install cosmic-profiles
+
+See the `installation
+instructions <https://cosmic-profiles.readthedocs.io/en/latest/support.html>`_ in the
+`documentation <https://cosmic-profiles.readthedocs.io/en/latest/>`__ for more information.
+
+License
+-------
+
+|License|
+
+Copyright 2020-2022 Tibor Dome.
+
+CosmicProfiles is free software made available under the MIT License.
 
 Contributions are welcome. Please raise an issue or open a PR.
 
@@ -57,4 +88,6 @@ Contributions are welcome. Please raise an issue or open a PR.
 .. |Version| image:: https://img.shields.io/conda/vn/conda-forge/cosmic_profiles.svg
    :target: https://anaconda.org/conda-forge/cosmic_profiles
 .. |Platforms| image:: https://img.shields.io/conda/pn/conda-forge/cosmic_profiles.svg
+   :target: https://anaconda.org/conda-forge/cosmic_profiles
+.. |Licence| image:: https://anaconda.org/conda-forge/cosmic_profiles/badges/license.svg
    :target: https://anaconda.org/conda-forge/cosmic_profiles
