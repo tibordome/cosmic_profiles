@@ -18,6 +18,7 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 @cython.embedsignature(True)
+@cython.binding(True)
 cdef class CosmicBase:
     """ Parent class governing high-level cosmic shape calculations
     
@@ -589,6 +590,8 @@ cdef class CosmicBase:
         :type obj_type: string"""
         return
 
+@cython.embedsignature(True)
+@cython.binding(True)
 cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
@@ -714,6 +717,8 @@ cdef class DensProfs(CosmicBase):
         """
         return
       
+@cython.embedsignature(True)
+@cython.binding(True)
 cdef class DensShapeProfs(DensProfs):
     """ Class for density profile and shape profile calculations
     
@@ -915,6 +920,8 @@ cdef class DensShapeProfs(DensProfs):
         """ Print basic info about the objects"""
         return
     
+@cython.embedsignature(True)
+@cython.binding(True)
 cdef class DensProfsHDF5(CosmicBase):
     """ Class for density profile calculations for Gadget-style HDF5 data
     
@@ -1072,6 +1079,8 @@ cdef class DensProfsHDF5(CosmicBase):
         """
         return
 
+@cython.embedsignature(True)
+@cython.binding(True)
 cdef class DensShapeProfsHDF5(DensProfsHDF5):
     """ Class for density profile and shape profile calculations for Gadget-style HDF5 data
     

@@ -995,9 +995,9 @@ struct __pyx_MemviewEnum_obj;
 struct __pyx_memoryview_obj;
 struct __pyx_memoryviewslice_obj;
 
-/* "cython_helpers/helper_class.pyx":9
- * 
+/* "cython_helpers/helper_class.pyx":10
  * @cython.embedsignature(True)
+ * @cython.binding(True)
  * cdef class CythonHelpers:             # <<<<<<<<<<<<<<
  * 
  *     def calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None):
@@ -1623,6 +1623,69 @@ static int __Pyx_setup_reduce(PyObject* type_obj);
 /* SetVTable.proto */
 static int __Pyx_SetVtable(PyObject *dict, void *vtable);
 
+/* FetchCommonType.proto */
+static PyTypeObject* __Pyx_FetchCommonType(PyTypeObject* type);
+
+/* CythonFunctionShared.proto */
+#define __Pyx_CyFunction_USED 1
+#define __Pyx_CYFUNCTION_STATICMETHOD  0x01
+#define __Pyx_CYFUNCTION_CLASSMETHOD   0x02
+#define __Pyx_CYFUNCTION_CCLASS        0x04
+#define __Pyx_CyFunction_GetClosure(f)\
+    (((__pyx_CyFunctionObject *) (f))->func_closure)
+#define __Pyx_CyFunction_GetClassObj(f)\
+    (((__pyx_CyFunctionObject *) (f))->func_classobj)
+#define __Pyx_CyFunction_Defaults(type, f)\
+    ((type *)(((__pyx_CyFunctionObject *) (f))->defaults))
+#define __Pyx_CyFunction_SetDefaultsGetter(f, g)\
+    ((__pyx_CyFunctionObject *) (f))->defaults_getter = (g)
+typedef struct {
+    PyCFunctionObject func;
+#if PY_VERSION_HEX < 0x030500A0
+    PyObject *func_weakreflist;
+#endif
+    PyObject *func_dict;
+    PyObject *func_name;
+    PyObject *func_qualname;
+    PyObject *func_doc;
+    PyObject *func_globals;
+    PyObject *func_code;
+    PyObject *func_closure;
+    PyObject *func_classobj;
+    void *defaults;
+    int defaults_pyobjects;
+    size_t defaults_size;  // used by FusedFunction for copying defaults
+    int flags;
+    PyObject *defaults_tuple;
+    PyObject *defaults_kwdict;
+    PyObject *(*defaults_getter)(PyObject *);
+    PyObject *func_annotations;
+} __pyx_CyFunctionObject;
+static PyTypeObject *__pyx_CyFunctionType = 0;
+#define __Pyx_CyFunction_Check(obj)  (__Pyx_TypeCheck(obj, __pyx_CyFunctionType))
+static PyObject *__Pyx_CyFunction_Init(__pyx_CyFunctionObject* op, PyMethodDef *ml,
+                                      int flags, PyObject* qualname,
+                                      PyObject *self,
+                                      PyObject *module, PyObject *globals,
+                                      PyObject* code);
+static CYTHON_INLINE void *__Pyx_CyFunction_InitDefaults(PyObject *m,
+                                                         size_t size,
+                                                         int pyobjects);
+static CYTHON_INLINE void __Pyx_CyFunction_SetDefaultsTuple(PyObject *m,
+                                                            PyObject *tuple);
+static CYTHON_INLINE void __Pyx_CyFunction_SetDefaultsKwDict(PyObject *m,
+                                                             PyObject *dict);
+static CYTHON_INLINE void __Pyx_CyFunction_SetAnnotationsDict(PyObject *m,
+                                                              PyObject *dict);
+static int __pyx_CyFunction_init(void);
+
+/* CythonFunction.proto */
+static PyObject *__Pyx_CyFunction_New(PyMethodDef *ml,
+                                      int flags, PyObject* qualname,
+                                      PyObject *closure,
+                                      PyObject *module, PyObject *globals,
+                                      PyObject* code);
+
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
 #define __Pyx_CLineForTraceback(tstate, c_line)  (((CYTHON_CLINE_IN_TRACEBACK)) ? c_line : 0)
@@ -1890,17 +1953,22 @@ static PyObject *__pyx_builtin_TypeError;
 static PyObject *__pyx_builtin_Ellipsis;
 static PyObject *__pyx_builtin_id;
 static PyObject *__pyx_builtin_IndexError;
+static const char __pyx_k_H[] = "H";
 static const char __pyx_k_O[] = "O";
 static const char __pyx_k_Z[] = "Z";
 static const char __pyx_k_a[] = "a";
 static const char __pyx_k_b[] = "b";
 static const char __pyx_k_c[] = "c";
+static const char __pyx_k_r[] = "r";
+static const char __pyx_k_x[] = "x";
 static const char __pyx_k_id[] = "id";
 static const char __pyx_k_com[] = "com";
 static const char __pyx_k_h_i[] = "h_i";
 static const char __pyx_k_new[] = "__new__";
+static const char __pyx_k_nns[] = "nns";
 static const char __pyx_k_obj[] = "obj";
 static const char __pyx_k_r_i[] = "r_i";
+static const char __pyx_k_xyz[] = "xyz";
 static const char __pyx_k_base[] = "base";
 static const char __pyx_k_dict[] = "__dict__";
 static const char __pyx_k_main[] = "__main__";
@@ -1908,11 +1976,13 @@ static const char __pyx_k_mode[] = "mode";
 static const char __pyx_k_name[] = "name";
 static const char __pyx_k_ndim[] = "ndim";
 static const char __pyx_k_pack[] = "pack";
+static const char __pyx_k_self[] = "self";
 static const char __pyx_k_size[] = "size";
 static const char __pyx_k_step[] = "step";
 static const char __pyx_k_stop[] = "stop";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_ASCII[] = "ASCII";
+static const char __pyx_k_L_BOX[] = "L_BOX";
 static const char __pyx_k_Mencl[] = "Mencl";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_error[] = "error";
@@ -1927,7 +1997,10 @@ static const char __pyx_k_range[] = "range";
 static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_shell[] = "shell";
 static const char __pyx_k_start[] = "start";
+static const char __pyx_k_state[] = "state";
+static const char __pyx_k_ZHEEVR[] = "ZHEEVR";
 static const char __pyx_k_center[] = "center";
+static const char __pyx_k_dict_2[] = "_dict";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_format[] = "format";
 static const char __pyx_k_import[] = "__import__";
@@ -1940,6 +2013,7 @@ static const char __pyx_k_select[] = "select";
 static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
+static const char __pyx_k_calcCoM[] = "calcCoM";
 static const char __pyx_k_eigvals[] = "eigvals";
 static const char __pyx_k_fortran[] = "fortran";
 static const char __pyx_k_memview[] = "memview";
@@ -1960,6 +2034,8 @@ static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_xyz_princ[] = "xyz_princ";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
+static const char __pyx_k_calcKTilde[] = "calcKTilde";
+static const char __pyx_k_cython_abs[] = "cython_abs";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_MemoryError[] = "MemoryError";
@@ -1967,33 +2043,53 @@ static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_shape_tensor[] = "shape_tensor";
 static const char __pyx_k_stringsource[] = "stringsource";
+static const char __pyx_k_use_setstate[] = "use_setstate";
 static const char __pyx_k_CythonHelpers[] = "CythonHelpers";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
+static const char __pyx_k_calcLocalSpread[] = "calcLocalSpread";
+static const char __pyx_k_calcShapeTensor[] = "calcShapeTensor";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
+static const char __pyx_k_respectPBCNoRef[] = "respectPBCNoRef";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
+static const char __pyx_k_CythonHelpers_ZHEEVR[] = "CythonHelpers.ZHEEVR";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
+static const char __pyx_k_CythonHelpers_calcCoM[] = "CythonHelpers.calcCoM";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
 static const char __pyx_k_MemoryView_of_r_at_0x_x[] = "<MemoryView of %r at 0x%x>";
+static const char __pyx_k_calcMenclsBruteForceEll[] = "calcMenclsBruteForceEll";
+static const char __pyx_k_calcMenclsBruteForceSph[] = "calcMenclsBruteForceSph";
 static const char __pyx_k_contiguous_and_indirect[] = "<contiguous and indirect>";
 static const char __pyx_k_Cannot_index_with_type_s[] = "Cannot index with type '%s'";
+static const char __pyx_k_CythonHelpers_calcKTilde[] = "CythonHelpers.calcKTilde";
+static const char __pyx_k_CythonHelpers_cython_abs[] = "CythonHelpers.cython_abs";
 static const char __pyx_k_Invalid_shape_in_axis_d_d[] = "Invalid shape in axis %d: %d.";
+static const char __pyx_k_calcDensProfBruteForceEll[] = "calcDensProfBruteForceEll";
+static const char __pyx_k_calcDensProfBruteForceSph[] = "calcDensProfBruteForceSph";
 static const char __pyx_k_pyx_unpickle_CythonHelpers[] = "__pyx_unpickle_CythonHelpers";
 static const char __pyx_k_cython_helpers_helper_class[] = "cython_helpers.helper_class";
 static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
+static const char __pyx_k_CythonHelpers___reduce_cython[] = "CythonHelpers.__reduce_cython__";
+static const char __pyx_k_CythonHelpers_calcLocalSpread[] = "CythonHelpers.calcLocalSpread";
+static const char __pyx_k_CythonHelpers_calcShapeTensor[] = "CythonHelpers.calcShapeTensor";
+static const char __pyx_k_CythonHelpers_respectPBCNoRef[] = "CythonHelpers.respectPBCNoRef";
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
 static const char __pyx_k_strided_and_direct_or_indirect[] = "<strided and direct or indirect>";
+static const char __pyx_k_CythonHelpers___setstate_cython[] = "CythonHelpers.__setstate_cython__";
+static const char __pyx_k_cython_helpers_helper_class_pyx[] = "cython_helpers/helper_class.pyx";
 static const char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
 static const char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create a buffer that is contiguous in memory.";
 static const char __pyx_k_Cannot_assign_to_read_only_memor[] = "Cannot assign to read-only memoryview";
 static const char __pyx_k_Cannot_create_writable_memory_vi[] = "Cannot create writable memory view from read-only memoryview";
+static const char __pyx_k_CythonHelpers_calcDensProfBruteF[] = "CythonHelpers.calcDensProfBruteForceSph";
+static const char __pyx_k_CythonHelpers_calcMenclsBruteFor[] = "CythonHelpers.calcMenclsBruteForceSph";
 static const char __pyx_k_Empty_shape_tuple_for_cython_arr[] = "Empty shape tuple for cython.array";
 static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible checksums (%s vs 0xb068931 = (name))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0xd4[] = "Incompatible checksums (%s vs 0xd41d8cd = ())";
@@ -2004,6 +2100,8 @@ static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to conver
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
+static const char __pyx_k_CythonHelpers_calcDensProfBruteF_2[] = "CythonHelpers.calcDensProfBruteForceEll";
+static const char __pyx_k_CythonHelpers_calcMenclsBruteFor_2[] = "CythonHelpers.calcMenclsBruteForceEll";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
 static PyObject *__pyx_kp_s_Can_only_create_a_buffer_that_is;
@@ -2011,14 +2109,29 @@ static PyObject *__pyx_kp_s_Cannot_assign_to_read_only_memor;
 static PyObject *__pyx_kp_s_Cannot_create_writable_memory_vi;
 static PyObject *__pyx_kp_s_Cannot_index_with_type_s;
 static PyObject *__pyx_n_s_CythonHelpers;
+static PyObject *__pyx_n_s_CythonHelpers_ZHEEVR;
+static PyObject *__pyx_n_s_CythonHelpers___reduce_cython;
+static PyObject *__pyx_n_s_CythonHelpers___setstate_cython;
+static PyObject *__pyx_n_s_CythonHelpers_calcCoM;
+static PyObject *__pyx_n_s_CythonHelpers_calcDensProfBruteF;
+static PyObject *__pyx_n_s_CythonHelpers_calcDensProfBruteF_2;
+static PyObject *__pyx_n_s_CythonHelpers_calcKTilde;
+static PyObject *__pyx_n_s_CythonHelpers_calcLocalSpread;
+static PyObject *__pyx_n_s_CythonHelpers_calcMenclsBruteFor;
+static PyObject *__pyx_n_s_CythonHelpers_calcMenclsBruteFor_2;
+static PyObject *__pyx_n_s_CythonHelpers_calcShapeTensor;
+static PyObject *__pyx_n_s_CythonHelpers_cython_abs;
+static PyObject *__pyx_n_s_CythonHelpers_respectPBCNoRef;
 static PyObject *__pyx_n_s_Ellipsis;
 static PyObject *__pyx_kp_s_Empty_shape_tuple_for_cython_arr;
+static PyObject *__pyx_n_s_H;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xb0;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xd4;
 static PyObject *__pyx_n_s_IndexError;
 static PyObject *__pyx_kp_s_Indirect_dimensions_not_supporte;
 static PyObject *__pyx_kp_s_Invalid_mode_expected_c_or_fortr;
 static PyObject *__pyx_kp_s_Invalid_shape_in_axis_d_d;
+static PyObject *__pyx_n_s_L_BOX;
 static PyObject *__pyx_n_s_MemoryError;
 static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
@@ -2032,6 +2145,7 @@ static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_View_MemoryView;
 static PyObject *__pyx_n_s_Z;
+static PyObject *__pyx_n_s_ZHEEVR;
 static PyObject *__pyx_n_s_a;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_b;
@@ -2039,15 +2153,26 @@ static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_bin_edges;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
+static PyObject *__pyx_n_s_calcCoM;
+static PyObject *__pyx_n_s_calcDensProfBruteForceEll;
+static PyObject *__pyx_n_s_calcDensProfBruteForceSph;
+static PyObject *__pyx_n_s_calcKTilde;
+static PyObject *__pyx_n_s_calcLocalSpread;
+static PyObject *__pyx_n_s_calcMenclsBruteForceEll;
+static PyObject *__pyx_n_s_calcMenclsBruteForceSph;
+static PyObject *__pyx_n_s_calcShapeTensor;
 static PyObject *__pyx_n_s_center;
 static PyObject *__pyx_n_s_class;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_com;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
+static PyObject *__pyx_n_s_cython_abs;
 static PyObject *__pyx_n_s_cython_helpers_helper_class;
+static PyObject *__pyx_kp_s_cython_helpers_helper_class_pyx;
 static PyObject *__pyx_n_s_dens_prof;
 static PyObject *__pyx_n_s_dict;
+static PyObject *__pyx_n_s_dict_2;
 static PyObject *__pyx_n_s_dtype_is_object;
 static PyObject *__pyx_n_s_eigvals;
 static PyObject *__pyx_n_s_ellipsoid;
@@ -2077,6 +2202,7 @@ static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_n_s_nb_pts;
 static PyObject *__pyx_n_s_ndim;
 static PyObject *__pyx_n_s_new;
+static PyObject *__pyx_n_s_nns;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_nrows;
 static PyObject *__pyx_n_s_obj;
@@ -2091,6 +2217,7 @@ static PyObject *__pyx_n_s_pyx_type;
 static PyObject *__pyx_n_s_pyx_unpickle_CythonHelpers;
 static PyObject *__pyx_n_s_pyx_unpickle_Enum;
 static PyObject *__pyx_n_s_pyx_vtable;
+static PyObject *__pyx_n_s_r;
 static PyObject *__pyx_n_s_r_200;
 static PyObject *__pyx_n_s_r_ell;
 static PyObject *__pyx_n_s_r_i;
@@ -2099,7 +2226,9 @@ static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
 static PyObject *__pyx_n_s_reduced;
+static PyObject *__pyx_n_s_respectPBCNoRef;
 static PyObject *__pyx_n_s_select;
+static PyObject *__pyx_n_s_self;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
@@ -2107,6 +2236,7 @@ static PyObject *__pyx_n_s_shape_tensor;
 static PyObject *__pyx_n_s_shell;
 static PyObject *__pyx_n_s_size;
 static PyObject *__pyx_n_s_start;
+static PyObject *__pyx_n_s_state;
 static PyObject *__pyx_n_s_step;
 static PyObject *__pyx_n_s_stop;
 static PyObject *__pyx_kp_s_strided_and_direct;
@@ -2119,6 +2249,9 @@ static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
+static PyObject *__pyx_n_s_use_setstate;
+static PyObject *__pyx_n_s_x;
+static PyObject *__pyx_n_s_xyz;
 static PyObject *__pyx_n_s_xyz_princ;
 static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_calcShapeTensor(CYTHON_UNUSED struct __pyx_obj_14cython_helpers_12helper_class_CythonHelpers *__pyx_v_nns, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_select, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED int __pyx_v_nb_pts, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell); /* proto */
 static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_2calcLocalSpread(CYTHON_UNUSED struct __pyx_obj_14cython_helpers_12helper_class_CythonHelpers *__pyx_v_nns); /* proto */
@@ -2207,16 +2340,42 @@ static PyObject *__pyx_tuple__18;
 static PyObject *__pyx_tuple__19;
 static PyObject *__pyx_tuple__20;
 static PyObject *__pyx_tuple__22;
-static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_tuple__24;
-static PyObject *__pyx_tuple__25;
 static PyObject *__pyx_tuple__26;
-static PyObject *__pyx_tuple__27;
+static PyObject *__pyx_tuple__28;
+static PyObject *__pyx_tuple__30;
+static PyObject *__pyx_tuple__32;
+static PyObject *__pyx_tuple__34;
+static PyObject *__pyx_tuple__36;
+static PyObject *__pyx_tuple__38;
+static PyObject *__pyx_tuple__40;
+static PyObject *__pyx_tuple__42;
+static PyObject *__pyx_tuple__44;
+static PyObject *__pyx_tuple__46;
+static PyObject *__pyx_tuple__48;
+static PyObject *__pyx_tuple__49;
+static PyObject *__pyx_tuple__50;
+static PyObject *__pyx_tuple__51;
+static PyObject *__pyx_tuple__52;
+static PyObject *__pyx_tuple__53;
 static PyObject *__pyx_codeobj__21;
-static PyObject *__pyx_codeobj__28;
+static PyObject *__pyx_codeobj__23;
+static PyObject *__pyx_codeobj__25;
+static PyObject *__pyx_codeobj__27;
+static PyObject *__pyx_codeobj__29;
+static PyObject *__pyx_codeobj__31;
+static PyObject *__pyx_codeobj__33;
+static PyObject *__pyx_codeobj__35;
+static PyObject *__pyx_codeobj__37;
+static PyObject *__pyx_codeobj__39;
+static PyObject *__pyx_codeobj__41;
+static PyObject *__pyx_codeobj__43;
+static PyObject *__pyx_codeobj__45;
+static PyObject *__pyx_codeobj__47;
+static PyObject *__pyx_codeobj__54;
 /* Late includes */
 
-/* "cython_helpers/helper_class.pyx":11
+/* "cython_helpers/helper_class.pyx":12
  * cdef class CythonHelpers:
  * 
  *     def calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None):             # <<<<<<<<<<<<<<
@@ -2227,6 +2386,7 @@ static PyObject *__pyx_codeobj__28;
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_1calcShapeTensor(PyObject *__pyx_v_nns, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_calcShapeTensor[] = "CythonHelpers.calcShapeTensor(nns, int[:] select, double complex[::1, :] shape_tensor, float[:] masses, float[:] center, int nb_pts, bool reduced, float[:] r_ell=None)\n Calculate shape tensor for point cloud\n        \n        :param nns: positions of cloud particles\n        :type nns: (N,3) floats\n        :param select: indices of cloud particles to consider\n        :type select: (N1,3) ints\n        :param shape_tensor: shape tensor array to be filled\n        :type shape_tensor: (3,3) complex\n        :param masses: masses of cloud particles\n        :type masses: (N,) floats\n        :param center: COM of point cloud\n        :type center: (3,) floats\n        :param nb_pts: number of points in `select` to consider\n        :type nb_pts: int\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (only if reduced == True)\n        :type r_ell: (N,) floats\n        :return: shape tensor\n        :rtype: (3,3) complex";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_1calcShapeTensor = {"calcShapeTensor", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_1calcShapeTensor, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_calcShapeTensor};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_1calcShapeTensor(PyObject *__pyx_v_nns, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_select = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2274,31 +2434,31 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_1calcS
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 1); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 1); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 2); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 2); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 3); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 3); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_nb_pts)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 4); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 4); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 5); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, 5); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
@@ -2308,7 +2468,7 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_1calcS
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcShapeTensor") < 0)) __PYX_ERR(0, 11, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcShapeTensor") < 0)) __PYX_ERR(0, 12, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2324,14 +2484,14 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_1calcS
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_select = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_select.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_nb_pts = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_nb_pts == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_select = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_select.memview)) __PYX_ERR(0, 12, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 12, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 12, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 12, __pyx_L3_error)
+    __pyx_v_nb_pts = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_nb_pts == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 12, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 12, __pyx_L3_error)
     if (values[6]) {
-      __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+      __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 12, __pyx_L3_error)
     } else {
       __pyx_v_r_ell = __pyx_k_;
       __PYX_INC_MEMVIEW(&__pyx_v_r_ell, 1);
@@ -2339,7 +2499,7 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_1calcS
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 11, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcShapeTensor", 0, 6, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 12, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.calcShapeTensor", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2357,7 +2517,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_calcSh
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcShapeTensor", 0);
 
-  /* "cython_helpers/helper_class.pyx":32
+  /* "cython_helpers/helper_class.pyx":33
  *         :return: shape tensor
  *         :rtype: (3,3) complex"""
  *         return             # <<<<<<<<<<<<<<
@@ -2368,7 +2528,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_calcSh
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":11
+  /* "cython_helpers/helper_class.pyx":12
  * cdef class CythonHelpers:
  * 
  *     def calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None):             # <<<<<<<<<<<<<<
@@ -2388,7 +2548,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_calcSh
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":34
+/* "cython_helpers/helper_class.pyx":35
  *         return
  * 
  *     def calcLocalSpread(float[:,:] nns):             # <<<<<<<<<<<<<<
@@ -2399,6 +2559,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_calcSh
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_3calcLocalSpread(PyObject *__pyx_v_nns, CYTHON_UNUSED PyObject *unused); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_2calcLocalSpread[] = "CythonHelpers.calcLocalSpread(nns)\n Calculate local spread (2nd moment) around center of volume of point cloud\n        \n        :param nns: positions of cloud particles\n        :type nns: (N,3) floats\n        :return: local spread\n        :rtype: float";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_3calcLocalSpread = {"calcLocalSpread", (PyCFunction)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_3calcLocalSpread, METH_NOARGS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_2calcLocalSpread};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_3calcLocalSpread(PyObject *__pyx_v_nns, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -2415,7 +2576,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_2calcL
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcLocalSpread", 0);
 
-  /* "cython_helpers/helper_class.pyx":41
+  /* "cython_helpers/helper_class.pyx":42
  *         :return: local spread
  *         :rtype: float"""
  *         return             # <<<<<<<<<<<<<<
@@ -2426,7 +2587,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_2calcL
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":34
+  /* "cython_helpers/helper_class.pyx":35
  *         return
  * 
  *     def calcLocalSpread(float[:,:] nns):             # <<<<<<<<<<<<<<
@@ -2441,7 +2602,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_2calcL
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":43
+/* "cython_helpers/helper_class.pyx":44
  *         return
  * 
  *     def calcCoM(float[:,:] nns, float[:] masses, float[:] com):             # <<<<<<<<<<<<<<
@@ -2452,6 +2613,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_2calcL
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_5calcCoM(PyObject *__pyx_v_nns, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_4calcCoM[] = "CythonHelpers.calcCoM(nns, float[:] masses, float[:] com)\n Return center of mass (COM)\n        \n        :param nns: positions of cloud particles\n        :type nns: (N,3) floats\n        :param masses: masses of cloud particles\n        :type masses: (N,) floats\n        :param com: COM array to be filled\n        :type com: (3,) floats\n        :return: COM\n        :rtype: (3,) floats";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_5calcCoM = {"calcCoM", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_5calcCoM, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_4calcCoM};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_5calcCoM(PyObject *__pyx_v_nns, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_com = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2484,11 +2646,11 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_5calcC
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_com)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCoM", 1, 2, 2, 1); __PYX_ERR(0, 43, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcCoM", 1, 2, 2, 1); __PYX_ERR(0, 44, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcCoM") < 0)) __PYX_ERR(0, 43, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcCoM") < 0)) __PYX_ERR(0, 44, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2496,12 +2658,12 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_5calcC
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 43, __pyx_L3_error)
-    __pyx_v_com = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_com.memview)) __PYX_ERR(0, 43, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 44, __pyx_L3_error)
+    __pyx_v_com = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_com.memview)) __PYX_ERR(0, 44, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcCoM", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 43, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcCoM", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 44, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.calcCoM", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2519,7 +2681,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_4calcC
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcCoM", 0);
 
-  /* "cython_helpers/helper_class.pyx":54
+  /* "cython_helpers/helper_class.pyx":55
  *         :return: COM
  *         :rtype: (3,) floats"""
  *         return             # <<<<<<<<<<<<<<
@@ -2530,7 +2692,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_4calcC
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":43
+  /* "cython_helpers/helper_class.pyx":44
  *         return
  * 
  *     def calcCoM(float[:,:] nns, float[:] masses, float[:] com):             # <<<<<<<<<<<<<<
@@ -2547,7 +2709,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_4calcC
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":56
+/* "cython_helpers/helper_class.pyx":57
  *         return
  * 
  *     def cython_abs(float x):             # <<<<<<<<<<<<<<
@@ -2558,6 +2720,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_4calcC
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_7cython_abs(PyObject *__pyx_v_x, CYTHON_UNUSED PyObject *unused); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_6cython_abs[] = "CythonHelpers.cython_abs(x)\n Absolute value of float\n        \n        :param x: float value of interest\n        :type x: float\n        :return: absolute value\n        :rtype: float";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_7cython_abs = {"cython_abs", (PyCFunction)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_7cython_abs, METH_NOARGS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_6cython_abs};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_7cython_abs(PyObject *__pyx_v_x, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -2574,7 +2737,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_6cytho
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("cython_abs", 0);
 
-  /* "cython_helpers/helper_class.pyx":63
+  /* "cython_helpers/helper_class.pyx":64
  *         :return: absolute value
  *         :rtype: float"""
  *         return             # <<<<<<<<<<<<<<
@@ -2585,7 +2748,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_6cytho
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":56
+  /* "cython_helpers/helper_class.pyx":57
  *         return
  * 
  *     def cython_abs(float x):             # <<<<<<<<<<<<<<
@@ -2600,7 +2763,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_6cytho
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":65
+/* "cython_helpers/helper_class.pyx":66
  *         return
  * 
  *     def ZHEEVR(complex[::1,:] H, double[:] eigvals, complex[::1,:] Z, int nrows):             # <<<<<<<<<<<<<<
@@ -2611,6 +2774,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_6cytho
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_9ZHEEVR(PyObject *__pyx_v_H, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_8ZHEEVR[] = "CythonHelpers.ZHEEVR(H, double[:] eigvals, double complex[::1, :] Z, int nrows)\n\n        Computes the eigenvalues and eigenvectors of a dense Hermitian matrix.\n        \n        Eigenvectors are returned in Z.\n        \n        :param H: Hermitian matrix\n        :type H: Fortran-ordered 2D double complex memoryview\n        :param eigvals: Input array to store eigenvalues\n        :type eigvals: double array like\n        :param Z: Output array of eigenvectors\n        :type Z: Fortran-ordered 2D double complex memoryview\n        :param nrows: Number of rows = number of columns in H\n        :type nrows: int \n        :raises: Exception if not converged\n        ";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_9ZHEEVR = {"ZHEEVR", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_9ZHEEVR, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_8ZHEEVR};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_9ZHEEVR(PyObject *__pyx_v_H, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvals = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_Z = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2646,17 +2810,17 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_9ZHEEV
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Z)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("ZHEEVR", 1, 3, 3, 1); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ZHEEVR", 1, 3, 3, 1); __PYX_ERR(0, 66, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_nrows)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("ZHEEVR", 1, 3, 3, 2); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ZHEEVR", 1, 3, 3, 2); __PYX_ERR(0, 66, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ZHEEVR") < 0)) __PYX_ERR(0, 65, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ZHEEVR") < 0)) __PYX_ERR(0, 66, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2665,13 +2829,13 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_9ZHEEV
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_eigvals = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvals.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_Z = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_Z.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_nrows = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_nrows == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
+    __pyx_v_eigvals = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvals.memview)) __PYX_ERR(0, 66, __pyx_L3_error)
+    __pyx_v_Z = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_Z.memview)) __PYX_ERR(0, 66, __pyx_L3_error)
+    __pyx_v_nrows = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_nrows == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("ZHEEVR", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 65, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("ZHEEVR", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 66, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.ZHEEVR", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2689,7 +2853,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_8ZHEEV
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("ZHEEVR", 0);
 
-  /* "cython_helpers/helper_class.pyx":81
+  /* "cython_helpers/helper_class.pyx":82
  *         :raises: Exception if not converged
  *         """
  *         return             # <<<<<<<<<<<<<<
@@ -2700,7 +2864,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_8ZHEEV
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":65
+  /* "cython_helpers/helper_class.pyx":66
  *         return
  * 
  *     def ZHEEVR(complex[::1,:] H, double[:] eigvals, complex[::1,:] Z, int nrows):             # <<<<<<<<<<<<<<
@@ -2717,7 +2881,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_8ZHEEV
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":83
+/* "cython_helpers/helper_class.pyx":84
  *         return
  * 
  *     def respectPBCNoRef(float[:,:] xyz, float L_BOX):             # <<<<<<<<<<<<<<
@@ -2728,6 +2892,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_8ZHEEV
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_11respectPBCNoRef(PyObject *__pyx_v_xyz, PyObject *__pyx_arg_L_BOX); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_10respectPBCNoRef[] = "CythonHelpers.respectPBCNoRef(xyz, float L_BOX)\n\n        Modify xyz inplace so that it respects the box periodicity.\n        \n        If point distro xyz has particles separated in any Cartesian direction\n        by more than L_BOX/2, reflect those particles along L_BOX/2\n        \n        :param xyz: coordinates of particles of type 1 or type 4\n        :type xyz: (N^3x3) floats\n        :param ref: reference particle, which does not matter in the case of\n            halo morphology analysis\n        :type ref: int\n        :return: updated coordinates of particles of type 1 or type 4\n        :rtype: (N^3x3) floats";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_11respectPBCNoRef = {"respectPBCNoRef", (PyCFunction)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_11respectPBCNoRef, METH_O, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_10respectPBCNoRef};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_11respectPBCNoRef(PyObject *__pyx_v_xyz, PyObject *__pyx_arg_L_BOX) {
   CYTHON_UNUSED float __pyx_v_L_BOX;
   int __pyx_lineno = 0;
@@ -2737,7 +2902,7 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_11resp
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("respectPBCNoRef (wrapper)", 0);
   assert(__pyx_arg_L_BOX); {
-    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(__pyx_arg_L_BOX); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L3_error)
+    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(__pyx_arg_L_BOX); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 84, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2757,7 +2922,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_10resp
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("respectPBCNoRef", 0);
 
-  /* "cython_helpers/helper_class.pyx":98
+  /* "cython_helpers/helper_class.pyx":99
  *         :rtype: (N^3x3) floats"""
  * 
  *         return             # <<<<<<<<<<<<<<
@@ -2768,7 +2933,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_10resp
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":83
+  /* "cython_helpers/helper_class.pyx":84
  *         return
  * 
  *     def respectPBCNoRef(float[:,:] xyz, float L_BOX):             # <<<<<<<<<<<<<<
@@ -2783,7 +2948,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_10resp
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":100
+/* "cython_helpers/helper_class.pyx":101
  *         return
  * 
  *     def calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] bin_edges, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
@@ -2794,6 +2959,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_10resp
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_13calcDensProfBruteForceSph(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_12calcDensProfBruteForceSph[] = "CythonHelpers.calcDensProfBruteForceSph(xyz, float[:] masses, float[:] center, float r_200, float[:] bin_edges, float[:] dens_prof, int[:] shell)\n Calculates spherically averaged density profile for one object with coordinates `xyz` and masses `masses`\n        \n        :param xyz: positions of cloud particles\n        :type xyz: (N,3) floats\n        :param masses: masses of cloud particles\n        :type masses: (N,) floats\n        :param center: center of the object\n        :type center: (3) floats\n        :param r_200: R200 value of the object\n        :type r_200: float\n        :param bin_edges: radial bin edges at whose centers the density profiles\n            should be calculated, normalized by R200\n        :type bin_edges: (N2+1,) floats\n        :param dens_prof: array to store result in\n        :type dens_prof: (N2,) floats\n        :param shell: array used for the calculation\n        :type shell: (N,) int array\n        :return: density profile\n        :rtype: float array";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_13calcDensProfBruteForceSph = {"calcDensProfBruteForceSph", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_13calcDensProfBruteForceSph, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_12calcDensProfBruteForceSph};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_13calcDensProfBruteForceSph(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2838,35 +3004,35 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_13calc
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 1); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 1); __PYX_ERR(0, 101, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 2); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 2); __PYX_ERR(0, 101, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_bin_edges)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 3); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 3); __PYX_ERR(0, 101, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dens_prof)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 4); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 4); __PYX_ERR(0, 101, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 5); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, 5); __PYX_ERR(0, 101, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfBruteForceSph") < 0)) __PYX_ERR(0, 100, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfBruteForceSph") < 0)) __PYX_ERR(0, 101, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -2878,16 +3044,16 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_13calc
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 100, __pyx_L3_error)
-    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 100, __pyx_L3_error)
-    __pyx_v_r_200 = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_r_200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 100, __pyx_L3_error)
-    __pyx_v_bin_edges = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_bin_edges.memview)) __PYX_ERR(0, 100, __pyx_L3_error)
-    __pyx_v_dens_prof = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_dens_prof.memview)) __PYX_ERR(0, 100, __pyx_L3_error)
-    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 100, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 101, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 101, __pyx_L3_error)
+    __pyx_v_r_200 = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_r_200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 101, __pyx_L3_error)
+    __pyx_v_bin_edges = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_bin_edges.memview)) __PYX_ERR(0, 101, __pyx_L3_error)
+    __pyx_v_dens_prof = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_dens_prof.memview)) __PYX_ERR(0, 101, __pyx_L3_error)
+    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 101, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 100, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceSph", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 101, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.calcDensProfBruteForceSph", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2905,7 +3071,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_12calc
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfBruteForceSph", 0);
 
-  /* "cython_helpers/helper_class.pyx":120
+  /* "cython_helpers/helper_class.pyx":121
  *         :return: density profile
  *         :rtype: float array"""
  *         return             # <<<<<<<<<<<<<<
@@ -2916,7 +3082,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_12calc
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":100
+  /* "cython_helpers/helper_class.pyx":101
  *         return
  * 
  *     def calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] bin_edges, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
@@ -2936,7 +3102,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_12calc
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":122
+/* "cython_helpers/helper_class.pyx":123
  *         return
  * 
  *     def calcMenclsBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
@@ -2947,6 +3113,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_12calc
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_15calcMenclsBruteForceSph(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_14calcMenclsBruteForceSph[] = "CythonHelpers.calcMenclsBruteForceSph(xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid)\n Calculates spherically averaged enclosed mass profile for one object with coordinates `xyz` and masses `masses`\n        \n        :param xyz: positions of cloud particles\n        :type xyz: (N,3) floats\n        :param masses: masses of cloud particles\n        :type masses: (N,) floats\n        :param center: center of the object\n        :type center: (3) floats\n        :param r_200: R200 value of the object\n        :type r_200: float\n        :param ROverR200: radii at which the density profiles should be calculated,\n            normalized by R200\n        :type ROverR200: float array\n        :param Mencl: array to store result in\n        :type Mencl: float array\n        :param ellipsoid: array used for the calculation\n        :type ellipsoid: int array\n        :return: enclosed mass profile\n        :rtype: float array";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_15calcMenclsBruteForceSph = {"calcMenclsBruteForceSph", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_15calcMenclsBruteForceSph, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_14calcMenclsBruteForceSph};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_15calcMenclsBruteForceSph(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2991,35 +3158,35 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_15calc
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 1); __PYX_ERR(0, 122, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 1); __PYX_ERR(0, 123, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 2); __PYX_ERR(0, 122, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 2); __PYX_ERR(0, 123, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 3); __PYX_ERR(0, 122, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 3); __PYX_ERR(0, 123, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Mencl)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 4); __PYX_ERR(0, 122, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 4); __PYX_ERR(0, 123, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ellipsoid)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 5); __PYX_ERR(0, 122, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, 5); __PYX_ERR(0, 123, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcMenclsBruteForceSph") < 0)) __PYX_ERR(0, 122, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcMenclsBruteForceSph") < 0)) __PYX_ERR(0, 123, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -3031,16 +3198,16 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_15calc
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 122, __pyx_L3_error)
-    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 122, __pyx_L3_error)
-    __pyx_v_r_200 = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_r_200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 122, __pyx_L3_error)
-    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 122, __pyx_L3_error)
-    __pyx_v_Mencl = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_Mencl.memview)) __PYX_ERR(0, 122, __pyx_L3_error)
-    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 122, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 123, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 123, __pyx_L3_error)
+    __pyx_v_r_200 = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_r_200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L3_error)
+    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 123, __pyx_L3_error)
+    __pyx_v_Mencl = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_Mencl.memview)) __PYX_ERR(0, 123, __pyx_L3_error)
+    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 123, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 122, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceSph", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 123, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.calcMenclsBruteForceSph", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3058,7 +3225,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_14calc
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMenclsBruteForceSph", 0);
 
-  /* "cython_helpers/helper_class.pyx":142
+  /* "cython_helpers/helper_class.pyx":143
  *         :return: enclosed mass profile
  *         :rtype: float array"""
  *         return             # <<<<<<<<<<<<<<
@@ -3069,7 +3236,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_14calc
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":122
+  /* "cython_helpers/helper_class.pyx":123
  *         return
  * 
  *     def calcMenclsBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
@@ -3089,7 +3256,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_14calc
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":144
+/* "cython_helpers/helper_class.pyx":145
  *         return
  * 
  *     def calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
@@ -3100,6 +3267,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_14calc
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_17calcDensProfBruteForceEll(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_16calcDensProfBruteForceEll[] = "CythonHelpers.calcDensProfBruteForceEll(xyz, float[:, :] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:, :] major, float[:, :] inter, float[:, :] minor, float[:] dens_prof, int[:] shell)\n Calculates ellipsoidal shell-based density profile for one object with coordinates `xyz` and masses `masses`\n        \n        :param xyz: positions of cloud particles\n        :type xyz: (N,3) floats\n        :param xyz_princ: position arrays transformed into principal frame (varies from shell to shell)\n        :type xyz_princ: (N,3) floats\n        :param masses: masses of cloud particles\n        :type masses: (N,) floats\n        :param center: center of the object\n        :type center: (3) floats\n        :param r_200: R200 value of the object\n        :type r_200: float\n        :param a: major axis eigenvalue interpolated at radial bin edges\n        :type a: (N2+1,) floats\n        :param b: intermediate axis eigenvalue interpolated at radial bin edges\n        :type b: (N2+1,) floats\n        :param c: minor axis eigenvalue interpolated at radial bin edges\n        :type c: (N2+1,) floats\n        :param major: major axis eigenvector interpolated at radial bin centers\n        :type major: (N2,3) floats\n        :param inter: inter axis eigenvector interpolated at radial bin centers\n        :type inter: (N2,3) floats\n        :param minor: minor axis eigenvector interpolated at radial bin centers\n        :type minor: (N2,3) floats\n        :param dens_prof: array to store result in\n        :type dens_prof: (N2,) floats\n        :param shell: array used for the calculation\n        :type shell: (N,) int array\n        :return: density profile\n        :rtype: float array";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_17calcDensProfBruteForceEll = {"calcDensProfBruteForceEll", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_17calcDensProfBruteForceEll, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_16calcDensProfBruteForceEll};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_17calcDensProfBruteForceEll(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -3162,71 +3330,71 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_17calc
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 1); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 1); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 2); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 2); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 3); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 3); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 4); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 4); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_b)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 5); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 5); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 6); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 6); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_major)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 7); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 7); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  8:
         if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_inter)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 8); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 8); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  9:
         if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_minor)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 9); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 9); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 10:
         if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dens_prof)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 10); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 10); __PYX_ERR(0, 145, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 11:
         if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 11); __PYX_ERR(0, 144, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, 11); __PYX_ERR(0, 145, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfBruteForceEll") < 0)) __PYX_ERR(0, 144, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfBruteForceEll") < 0)) __PYX_ERR(0, 145, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 12) {
       goto __pyx_L5_argtuple_error;
@@ -3244,22 +3412,22 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_17calc
       values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
       values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
     }
-    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_r_200 = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_r_200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_a = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_a.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_b = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_b.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_c = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_major = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_major.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_inter = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_inter.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_minor = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_minor.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_dens_prof = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_dens_prof.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
-    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 144, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_r_200 = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_r_200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_a = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_a.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_b = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_b.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_c = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_major = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_major.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_inter = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_inter.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_minor = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_minor.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_dens_prof = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_dens_prof.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 145, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 144, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcDensProfBruteForceEll", 1, 12, 12, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 145, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.calcDensProfBruteForceEll", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3277,7 +3445,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_16calc
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfBruteForceEll", 0);
 
-  /* "cython_helpers/helper_class.pyx":175
+  /* "cython_helpers/helper_class.pyx":176
  *         :return: density profile
  *         :rtype: float array"""
  *         return             # <<<<<<<<<<<<<<
@@ -3288,7 +3456,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_16calc
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":144
+  /* "cython_helpers/helper_class.pyx":145
  *         return
  * 
  *     def calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
@@ -3314,7 +3482,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_16calc
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":177
+/* "cython_helpers/helper_class.pyx":178
  *         return
  * 
  *     def calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
@@ -3325,6 +3493,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_16calc
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_19calcMenclsBruteForceEll(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_18calcMenclsBruteForceEll[] = "CythonHelpers.calcMenclsBruteForceEll(xyz, float[:, :] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:, :] major, float[:, :] inter, float[:, :] minor, float[:] Mencl, int[:] ellipsoid)\n Calculates ellipsoid-based mass profile for one object with coordinates `xyz` and masses `masses`\n        \n        :param xyz: positions of cloud particles\n        :type xyz: (N,3) floats\n        :param xyz_princ: position arrays transformed into principal frame (varies from shell to shell)\n        :type xyz_princ: (N,3) floats\n        :param masses: masses of cloud particles\n        :type masses: (N,) floats\n        :param center: center of the object\n        :type center: (3) floats\n        :param a: major axis eigenvalue interpolated at radial bin edges\n        :type a: (N2+1,) floats\n        :param b: intermediate axis eigenvalue interpolated at radial bin edges\n        :type b: (N2+1,) floats\n        :param c: minor axis eigenvalue interpolated at radial bin edges\n        :type c: (N2+1,) floats\n        :param major: major axis eigenvector interpolated at radial bin centers\n        :type major: (N2,3) floats\n        :param inter: inter axis eigenvector interpolated at radial bin centers\n        :type inter: (N2,3) floats\n        :param minor: minor axis eigenvector interpolated at radial bin centers\n        :type minor: (N2,3) floats\n        :param Mencl: array to store result in\n        :type Mencl: float array\n        :param ellipsoid: array used for the calculation\n        :type ellipsoid: int array\n        :return: enclosed mass profile\n        :rtype: float array";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_19calcMenclsBruteForceEll = {"calcMenclsBruteForceEll", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_19calcMenclsBruteForceEll, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_18calcMenclsBruteForceEll};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_19calcMenclsBruteForceEll(PyObject *__pyx_v_xyz, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -3384,65 +3553,65 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_19calc
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 1); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 1); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 2); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 2); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 3); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 3); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_b)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 4); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 4); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 5); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 5); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_major)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 6); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 6); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_inter)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 7); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 7); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  8:
         if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_minor)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 8); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 8); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  9:
         if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Mencl)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 9); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 9); __PYX_ERR(0, 178, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 10:
         if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ellipsoid)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 10); __PYX_ERR(0, 177, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, 10); __PYX_ERR(0, 178, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcMenclsBruteForceEll") < 0)) __PYX_ERR(0, 177, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcMenclsBruteForceEll") < 0)) __PYX_ERR(0, 178, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 11) {
       goto __pyx_L5_argtuple_error;
@@ -3459,21 +3628,21 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_19calc
       values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
       values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
     }
-    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_a = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_a.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_b = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_b.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_c = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_major = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_major.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_inter = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_inter.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_minor = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_minor.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_Mencl = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_Mencl.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
-    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 177, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_a = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_a.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_b = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_b.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_c = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_major = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_major.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_inter = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_inter.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_minor = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_minor.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_Mencl = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_Mencl.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
+    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 178, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 177, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcMenclsBruteForceEll", 1, 11, 11, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 178, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.calcMenclsBruteForceEll", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3491,7 +3660,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_18calc
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMenclsBruteForceEll", 0);
 
-  /* "cython_helpers/helper_class.pyx":206
+  /* "cython_helpers/helper_class.pyx":207
  *         :return: enclosed mass profile
  *         :rtype: float array"""
  *         return             # <<<<<<<<<<<<<<
@@ -3502,7 +3671,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_18calc
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":177
+  /* "cython_helpers/helper_class.pyx":178
  *         return
  * 
  *     def calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
@@ -3528,7 +3697,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_18calc
   return __pyx_r;
 }
 
-/* "cython_helpers/helper_class.pyx":208
+/* "cython_helpers/helper_class.pyx":209
  *         return
  * 
  *     def calcKTilde(float r, float r_i, float h_i):             # <<<<<<<<<<<<<<
@@ -3539,6 +3708,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_18calc
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_21calcKTilde(PyObject *__pyx_v_r, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_20calcKTilde[] = "CythonHelpers.calcKTilde(r, float r_i, float h_i)\n Angle-averaged normalized Gaussian kernel for kernel-based density profile estimation\n        \n        :param r: radius in Mpc/h at which to calculate the local, spherically-averaged density\n        :type r: float\n        :param r_i: radius of point i whose contribution to the local, spherically-averaged density shall be determined\n        :type r_i: float\n        :param h_i: width of Gaussian kernel for point i\n        :type h_i: float\n        :return: angle-averaged normalized Gaussian kernel\n        :rtype: float";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_21calcKTilde = {"calcKTilde", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_21calcKTilde, METH_VARARGS|METH_KEYWORDS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_20calcKTilde};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_21calcKTilde(PyObject *__pyx_v_r, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED float __pyx_v_r_i;
   CYTHON_UNUSED float __pyx_v_h_i;
@@ -3571,11 +3741,11 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_21calc
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_h_i)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcKTilde", 1, 2, 2, 1); __PYX_ERR(0, 208, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcKTilde", 1, 2, 2, 1); __PYX_ERR(0, 209, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcKTilde") < 0)) __PYX_ERR(0, 208, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcKTilde") < 0)) __PYX_ERR(0, 209, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -3583,12 +3753,12 @@ static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_21calc
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_r_i = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_r_i == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L3_error)
-    __pyx_v_h_i = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_h_i == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L3_error)
+    __pyx_v_r_i = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_r_i == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 209, __pyx_L3_error)
+    __pyx_v_h_i = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_h_i == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 209, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcKTilde", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 208, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcKTilde", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 209, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cython_helpers.helper_class.CythonHelpers.calcKTilde", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3606,7 +3776,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_20calc
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcKTilde", 0);
 
-  /* "cython_helpers/helper_class.pyx":219
+  /* "cython_helpers/helper_class.pyx":220
  *         :return: angle-averaged normalized Gaussian kernel
  *         :rtype: float"""
  *         return             # <<<<<<<<<<<<<<
@@ -3615,7 +3785,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_20calc
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "cython_helpers/helper_class.pyx":208
+  /* "cython_helpers/helper_class.pyx":209
  *         return
  * 
  *     def calcKTilde(float r, float r_i, float h_i):             # <<<<<<<<<<<<<<
@@ -3639,6 +3809,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_20calc
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_23__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_22__reduce_cython__[] = "CythonHelpers.__reduce_cython__(self)";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_23__reduce_cython__ = {"__reduce_cython__", (PyCFunction)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_23__reduce_cython__, METH_NOARGS, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_22__reduce_cython__};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_23__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -3869,6 +4040,7 @@ static PyObject *__pyx_pf_14cython_helpers_12helper_class_13CythonHelpers_22__re
 /* Python wrapper */
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_25__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
 static char __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_24__setstate_cython__[] = "CythonHelpers.__setstate_cython__(self, __pyx_state)";
+static PyMethodDef __pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_25__setstate_cython__ = {"__setstate_cython__", (PyCFunction)__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_25__setstate_cython__, METH_O, __pyx_doc_14cython_helpers_12helper_class_13CythonHelpers_24__setstate_cython__};
 static PyObject *__pyx_pw_14cython_helpers_12helper_class_13CythonHelpers_25__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -18189,14 +18361,29 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Cannot_create_writable_memory_vi, __pyx_k_Cannot_create_writable_memory_vi, sizeof(__pyx_k_Cannot_create_writable_memory_vi), 0, 0, 1, 0},
   {&__pyx_kp_s_Cannot_index_with_type_s, __pyx_k_Cannot_index_with_type_s, sizeof(__pyx_k_Cannot_index_with_type_s), 0, 0, 1, 0},
   {&__pyx_n_s_CythonHelpers, __pyx_k_CythonHelpers, sizeof(__pyx_k_CythonHelpers), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_ZHEEVR, __pyx_k_CythonHelpers_ZHEEVR, sizeof(__pyx_k_CythonHelpers_ZHEEVR), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers___reduce_cython, __pyx_k_CythonHelpers___reduce_cython, sizeof(__pyx_k_CythonHelpers___reduce_cython), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers___setstate_cython, __pyx_k_CythonHelpers___setstate_cython, sizeof(__pyx_k_CythonHelpers___setstate_cython), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcCoM, __pyx_k_CythonHelpers_calcCoM, sizeof(__pyx_k_CythonHelpers_calcCoM), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcDensProfBruteF, __pyx_k_CythonHelpers_calcDensProfBruteF, sizeof(__pyx_k_CythonHelpers_calcDensProfBruteF), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcDensProfBruteF_2, __pyx_k_CythonHelpers_calcDensProfBruteF_2, sizeof(__pyx_k_CythonHelpers_calcDensProfBruteF_2), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcKTilde, __pyx_k_CythonHelpers_calcKTilde, sizeof(__pyx_k_CythonHelpers_calcKTilde), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcLocalSpread, __pyx_k_CythonHelpers_calcLocalSpread, sizeof(__pyx_k_CythonHelpers_calcLocalSpread), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcMenclsBruteFor, __pyx_k_CythonHelpers_calcMenclsBruteFor, sizeof(__pyx_k_CythonHelpers_calcMenclsBruteFor), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcMenclsBruteFor_2, __pyx_k_CythonHelpers_calcMenclsBruteFor_2, sizeof(__pyx_k_CythonHelpers_calcMenclsBruteFor_2), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_calcShapeTensor, __pyx_k_CythonHelpers_calcShapeTensor, sizeof(__pyx_k_CythonHelpers_calcShapeTensor), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_cython_abs, __pyx_k_CythonHelpers_cython_abs, sizeof(__pyx_k_CythonHelpers_cython_abs), 0, 0, 1, 1},
+  {&__pyx_n_s_CythonHelpers_respectPBCNoRef, __pyx_k_CythonHelpers_respectPBCNoRef, sizeof(__pyx_k_CythonHelpers_respectPBCNoRef), 0, 0, 1, 1},
   {&__pyx_n_s_Ellipsis, __pyx_k_Ellipsis, sizeof(__pyx_k_Ellipsis), 0, 0, 1, 1},
   {&__pyx_kp_s_Empty_shape_tuple_for_cython_arr, __pyx_k_Empty_shape_tuple_for_cython_arr, sizeof(__pyx_k_Empty_shape_tuple_for_cython_arr), 0, 0, 1, 0},
+  {&__pyx_n_s_H, __pyx_k_H, sizeof(__pyx_k_H), 0, 0, 1, 1},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0xb0, __pyx_k_Incompatible_checksums_s_vs_0xb0, sizeof(__pyx_k_Incompatible_checksums_s_vs_0xb0), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0xd4, __pyx_k_Incompatible_checksums_s_vs_0xd4, sizeof(__pyx_k_Incompatible_checksums_s_vs_0xd4), 0, 0, 1, 0},
   {&__pyx_n_s_IndexError, __pyx_k_IndexError, sizeof(__pyx_k_IndexError), 0, 0, 1, 1},
   {&__pyx_kp_s_Indirect_dimensions_not_supporte, __pyx_k_Indirect_dimensions_not_supporte, sizeof(__pyx_k_Indirect_dimensions_not_supporte), 0, 0, 1, 0},
   {&__pyx_kp_s_Invalid_mode_expected_c_or_fortr, __pyx_k_Invalid_mode_expected_c_or_fortr, sizeof(__pyx_k_Invalid_mode_expected_c_or_fortr), 0, 0, 1, 0},
   {&__pyx_kp_s_Invalid_shape_in_axis_d_d, __pyx_k_Invalid_shape_in_axis_d_d, sizeof(__pyx_k_Invalid_shape_in_axis_d_d), 0, 0, 1, 0},
+  {&__pyx_n_s_L_BOX, __pyx_k_L_BOX, sizeof(__pyx_k_L_BOX), 0, 0, 1, 1},
   {&__pyx_n_s_MemoryError, __pyx_k_MemoryError, sizeof(__pyx_k_MemoryError), 0, 0, 1, 1},
   {&__pyx_kp_s_MemoryView_of_r_at_0x_x, __pyx_k_MemoryView_of_r_at_0x_x, sizeof(__pyx_k_MemoryView_of_r_at_0x_x), 0, 0, 1, 0},
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
@@ -18210,6 +18397,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_View_MemoryView, __pyx_k_View_MemoryView, sizeof(__pyx_k_View_MemoryView), 0, 0, 1, 1},
   {&__pyx_n_s_Z, __pyx_k_Z, sizeof(__pyx_k_Z), 0, 0, 1, 1},
+  {&__pyx_n_s_ZHEEVR, __pyx_k_ZHEEVR, sizeof(__pyx_k_ZHEEVR), 0, 0, 1, 1},
   {&__pyx_n_s_a, __pyx_k_a, sizeof(__pyx_k_a), 0, 0, 1, 1},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_b, __pyx_k_b, sizeof(__pyx_k_b), 0, 0, 1, 1},
@@ -18217,15 +18405,26 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_bin_edges, __pyx_k_bin_edges, sizeof(__pyx_k_bin_edges), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
+  {&__pyx_n_s_calcCoM, __pyx_k_calcCoM, sizeof(__pyx_k_calcCoM), 0, 0, 1, 1},
+  {&__pyx_n_s_calcDensProfBruteForceEll, __pyx_k_calcDensProfBruteForceEll, sizeof(__pyx_k_calcDensProfBruteForceEll), 0, 0, 1, 1},
+  {&__pyx_n_s_calcDensProfBruteForceSph, __pyx_k_calcDensProfBruteForceSph, sizeof(__pyx_k_calcDensProfBruteForceSph), 0, 0, 1, 1},
+  {&__pyx_n_s_calcKTilde, __pyx_k_calcKTilde, sizeof(__pyx_k_calcKTilde), 0, 0, 1, 1},
+  {&__pyx_n_s_calcLocalSpread, __pyx_k_calcLocalSpread, sizeof(__pyx_k_calcLocalSpread), 0, 0, 1, 1},
+  {&__pyx_n_s_calcMenclsBruteForceEll, __pyx_k_calcMenclsBruteForceEll, sizeof(__pyx_k_calcMenclsBruteForceEll), 0, 0, 1, 1},
+  {&__pyx_n_s_calcMenclsBruteForceSph, __pyx_k_calcMenclsBruteForceSph, sizeof(__pyx_k_calcMenclsBruteForceSph), 0, 0, 1, 1},
+  {&__pyx_n_s_calcShapeTensor, __pyx_k_calcShapeTensor, sizeof(__pyx_k_calcShapeTensor), 0, 0, 1, 1},
   {&__pyx_n_s_center, __pyx_k_center, sizeof(__pyx_k_center), 0, 0, 1, 1},
   {&__pyx_n_s_class, __pyx_k_class, sizeof(__pyx_k_class), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_com, __pyx_k_com, sizeof(__pyx_k_com), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
+  {&__pyx_n_s_cython_abs, __pyx_k_cython_abs, sizeof(__pyx_k_cython_abs), 0, 0, 1, 1},
   {&__pyx_n_s_cython_helpers_helper_class, __pyx_k_cython_helpers_helper_class, sizeof(__pyx_k_cython_helpers_helper_class), 0, 0, 1, 1},
+  {&__pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_k_cython_helpers_helper_class_pyx, sizeof(__pyx_k_cython_helpers_helper_class_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_dens_prof, __pyx_k_dens_prof, sizeof(__pyx_k_dens_prof), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
+  {&__pyx_n_s_dict_2, __pyx_k_dict_2, sizeof(__pyx_k_dict_2), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
   {&__pyx_n_s_eigvals, __pyx_k_eigvals, sizeof(__pyx_k_eigvals), 0, 0, 1, 1},
   {&__pyx_n_s_ellipsoid, __pyx_k_ellipsoid, sizeof(__pyx_k_ellipsoid), 0, 0, 1, 1},
@@ -18255,6 +18454,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_nb_pts, __pyx_k_nb_pts, sizeof(__pyx_k_nb_pts), 0, 0, 1, 1},
   {&__pyx_n_s_ndim, __pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 0, 1, 1},
   {&__pyx_n_s_new, __pyx_k_new, sizeof(__pyx_k_new), 0, 0, 1, 1},
+  {&__pyx_n_s_nns, __pyx_k_nns, sizeof(__pyx_k_nns), 0, 0, 1, 1},
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
   {&__pyx_n_s_nrows, __pyx_k_nrows, sizeof(__pyx_k_nrows), 0, 0, 1, 1},
   {&__pyx_n_s_obj, __pyx_k_obj, sizeof(__pyx_k_obj), 0, 0, 1, 1},
@@ -18269,6 +18469,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pyx_unpickle_CythonHelpers, __pyx_k_pyx_unpickle_CythonHelpers, sizeof(__pyx_k_pyx_unpickle_CythonHelpers), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_unpickle_Enum, __pyx_k_pyx_unpickle_Enum, sizeof(__pyx_k_pyx_unpickle_Enum), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
+  {&__pyx_n_s_r, __pyx_k_r, sizeof(__pyx_k_r), 0, 0, 1, 1},
   {&__pyx_n_s_r_200, __pyx_k_r_200, sizeof(__pyx_k_r_200), 0, 0, 1, 1},
   {&__pyx_n_s_r_ell, __pyx_k_r_ell, sizeof(__pyx_k_r_ell), 0, 0, 1, 1},
   {&__pyx_n_s_r_i, __pyx_k_r_i, sizeof(__pyx_k_r_i), 0, 0, 1, 1},
@@ -18277,7 +18478,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
   {&__pyx_n_s_reduced, __pyx_k_reduced, sizeof(__pyx_k_reduced), 0, 0, 1, 1},
+  {&__pyx_n_s_respectPBCNoRef, __pyx_k_respectPBCNoRef, sizeof(__pyx_k_respectPBCNoRef), 0, 0, 1, 1},
   {&__pyx_n_s_select, __pyx_k_select, sizeof(__pyx_k_select), 0, 0, 1, 1},
+  {&__pyx_n_s_self, __pyx_k_self, sizeof(__pyx_k_self), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
@@ -18285,6 +18488,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_shell, __pyx_k_shell, sizeof(__pyx_k_shell), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
+  {&__pyx_n_s_state, __pyx_k_state, sizeof(__pyx_k_state), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
   {&__pyx_n_s_stop, __pyx_k_stop, sizeof(__pyx_k_stop), 0, 0, 1, 1},
   {&__pyx_kp_s_strided_and_direct, __pyx_k_strided_and_direct, sizeof(__pyx_k_strided_and_direct), 0, 0, 1, 0},
@@ -18297,6 +18501,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},
   {&__pyx_n_s_unpack, __pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 0, 1, 1},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
+  {&__pyx_n_s_use_setstate, __pyx_k_use_setstate, sizeof(__pyx_k_use_setstate), 0, 0, 1, 1},
+  {&__pyx_n_s_x, __pyx_k_x, sizeof(__pyx_k_x), 0, 0, 1, 1},
+  {&__pyx_n_s_xyz, __pyx_k_xyz, sizeof(__pyx_k_xyz), 0, 0, 1, 1},
   {&__pyx_n_s_xyz_princ, __pyx_k_xyz_princ, sizeof(__pyx_k_xyz_princ), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
@@ -18510,15 +18717,168 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
+  /* "cython_helpers/helper_class.pyx":12
+ * cdef class CythonHelpers:
+ * 
+ *     def calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None):             # <<<<<<<<<<<<<<
+ *         """ Calculate shape tensor for point cloud
+ * 
+ */
+  __pyx_tuple__20 = PyTuple_Pack(8, __pyx_n_s_nns, __pyx_n_s_select, __pyx_n_s_shape_tensor, __pyx_n_s_masses, __pyx_n_s_center, __pyx_n_s_nb_pts, __pyx_n_s_reduced, __pyx_n_s_r_ell); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(8, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcShapeTensor, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 12, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":35
+ *         return
+ * 
+ *     def calcLocalSpread(float[:,:] nns):             # <<<<<<<<<<<<<<
+ *         """ Calculate local spread (2nd moment) around center of volume of point cloud
+ * 
+ */
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_n_s_nns); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcLocalSpread, 35, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 35, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":44
+ *         return
+ * 
+ *     def calcCoM(float[:,:] nns, float[:] masses, float[:] com):             # <<<<<<<<<<<<<<
+ *         """ Return center of mass (COM)
+ * 
+ */
+  __pyx_tuple__24 = PyTuple_Pack(3, __pyx_n_s_nns, __pyx_n_s_masses, __pyx_n_s_com); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcCoM, 44, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 44, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":57
+ *         return
+ * 
+ *     def cython_abs(float x):             # <<<<<<<<<<<<<<
+ *         """ Absolute value of float
+ * 
+ */
+  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_n_s_x); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 57, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_cython_abs, 57, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 57, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":66
+ *         return
+ * 
+ *     def ZHEEVR(complex[::1,:] H, double[:] eigvals, complex[::1,:] Z, int nrows):             # <<<<<<<<<<<<<<
+ *         """
+ *         Computes the eigenvalues and eigenvectors of a dense Hermitian matrix.
+ */
+  __pyx_tuple__28 = PyTuple_Pack(4, __pyx_n_s_H, __pyx_n_s_eigvals, __pyx_n_s_Z, __pyx_n_s_nrows); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__28);
+  __Pyx_GIVEREF(__pyx_tuple__28);
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_ZHEEVR, 66, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 66, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":84
+ *         return
+ * 
+ *     def respectPBCNoRef(float[:,:] xyz, float L_BOX):             # <<<<<<<<<<<<<<
+ *         """
+ *         Modify xyz inplace so that it respects the box periodicity.
+ */
+  __pyx_tuple__30 = PyTuple_Pack(3, __pyx_n_s_xyz, __pyx_n_s_L_BOX, __pyx_n_s_L_BOX); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 84, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__30);
+  __Pyx_GIVEREF(__pyx_tuple__30);
+  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_respectPBCNoRef, 84, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 84, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":101
+ *         return
+ * 
+ *     def calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] bin_edges, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
+ *         """ Calculates spherically averaged density profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_tuple__32 = PyTuple_Pack(7, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_center, __pyx_n_s_r_200, __pyx_n_s_bin_edges, __pyx_n_s_dens_prof, __pyx_n_s_shell); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__32);
+  __Pyx_GIVEREF(__pyx_tuple__32);
+  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(7, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcDensProfBruteForceSph, 101, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 101, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":123
+ *         return
+ * 
+ *     def calcMenclsBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
+ *         """ Calculates spherically averaged enclosed mass profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_tuple__34 = PyTuple_Pack(7, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_center, __pyx_n_s_r_200, __pyx_n_s_ROverR200, __pyx_n_s_Mencl, __pyx_n_s_ellipsoid); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__34);
+  __Pyx_GIVEREF(__pyx_tuple__34);
+  __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(7, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcMenclsBruteForceSph, 123, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) __PYX_ERR(0, 123, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":145
+ *         return
+ * 
+ *     def calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
+ *         """ Calculates ellipsoidal shell-based density profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_tuple__36 = PyTuple_Pack(13, __pyx_n_s_xyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_center, __pyx_n_s_r_200, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_c, __pyx_n_s_major, __pyx_n_s_inter, __pyx_n_s_minor, __pyx_n_s_dens_prof, __pyx_n_s_shell); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__36);
+  __Pyx_GIVEREF(__pyx_tuple__36);
+  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(13, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__36, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcDensProfBruteForceEll, 145, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 145, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":178
+ *         return
+ * 
+ *     def calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
+ *         """ Calculates ellipsoid-based mass profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_tuple__38 = PyTuple_Pack(12, __pyx_n_s_xyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_center, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_c, __pyx_n_s_major, __pyx_n_s_inter, __pyx_n_s_minor, __pyx_n_s_Mencl, __pyx_n_s_ellipsoid); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__38);
+  __Pyx_GIVEREF(__pyx_tuple__38);
+  __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(12, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcMenclsBruteForceEll, 178, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 178, __pyx_L1_error)
+
+  /* "cython_helpers/helper_class.pyx":209
+ *         return
+ * 
+ *     def calcKTilde(float r, float r_i, float h_i):             # <<<<<<<<<<<<<<
+ *         """ Angle-averaged normalized Gaussian kernel for kernel-based density profile estimation
+ * 
+ */
+  __pyx_tuple__40 = PyTuple_Pack(3, __pyx_n_s_r, __pyx_n_s_r_i, __pyx_n_s_h_i); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__40);
+  __Pyx_GIVEREF(__pyx_tuple__40);
+  __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_helpers_helper_class_pyx, __pyx_n_s_calcKTilde, 209, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) __PYX_ERR(0, 209, __pyx_L1_error)
+
+  /* "(tree fragment)":1
+ * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
+ *     cdef tuple state
+ *     cdef object _dict
+ */
+  __pyx_tuple__42 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_state, __pyx_n_s_dict_2, __pyx_n_s_use_setstate); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__42);
+  __Pyx_GIVEREF(__pyx_tuple__42);
+  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_reduce_cython, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(1, 1, __pyx_L1_error)
+
+  /* "(tree fragment)":16
+ *     else:
+ *         return __pyx_unpickle_CythonHelpers, (type(self), 0xd41d8cd, state)
+ * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
+ *     __pyx_unpickle_CythonHelpers__set_state(self, __pyx_state)
+ */
+  __pyx_tuple__44 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_pyx_state); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__44);
+  __Pyx_GIVEREF(__pyx_tuple__44);
+  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_setstate_cython, 16, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(1, 16, __pyx_L1_error)
+
   /* "(tree fragment)":1
  * def __pyx_unpickle_CythonHelpers(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__20 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__20);
-  __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_CythonHelpers, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__46 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__46);
+  __Pyx_GIVEREF(__pyx_tuple__46);
+  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_CythonHelpers, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(1, 1, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -18527,9 +18887,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
+  __pyx_tuple__48 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__48);
+  __Pyx_GIVEREF(__pyx_tuple__48);
 
   /* "View.MemoryView":287
  * 
@@ -18538,9 +18898,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(1, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__23);
-  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_tuple__49 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__49)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__49);
+  __Pyx_GIVEREF(__pyx_tuple__49);
 
   /* "View.MemoryView":288
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -18549,9 +18909,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(1, 288, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_tuple__50 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__50);
+  __Pyx_GIVEREF(__pyx_tuple__50);
 
   /* "View.MemoryView":291
  * 
@@ -18560,9 +18920,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(1, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__25);
-  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_tuple__51 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__51)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__51);
+  __Pyx_GIVEREF(__pyx_tuple__51);
 
   /* "View.MemoryView":292
  * 
@@ -18571,19 +18931,19 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(1, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_tuple__52 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__52)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__52);
+  __Pyx_GIVEREF(__pyx_tuple__52);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__27 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__27);
-  __Pyx_GIVEREF(__pyx_tuple__27);
-  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__53 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__53)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__53);
+  __Pyx_GIVEREF(__pyx_tuple__53);
+  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -18647,15 +19007,15 @@ static int __Pyx_modinit_type_init_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_14cython_helpers_12helper_class_CythonHelpers) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_14cython_helpers_12helper_class_CythonHelpers) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_14cython_helpers_12helper_class_CythonHelpers.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_14cython_helpers_12helper_class_CythonHelpers.tp_dictoffset && __pyx_type_14cython_helpers_12helper_class_CythonHelpers.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_14cython_helpers_12helper_class_CythonHelpers.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_CythonHelpers, (PyObject *)&__pyx_type_14cython_helpers_12helper_class_CythonHelpers) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_14cython_helpers_12helper_class_CythonHelpers) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_CythonHelpers, (PyObject *)&__pyx_type_14cython_helpers_12helper_class_CythonHelpers) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_14cython_helpers_12helper_class_CythonHelpers) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   __pyx_ptype_14cython_helpers_12helper_class_CythonHelpers = &__pyx_type_14cython_helpers_12helper_class_CythonHelpers;
   __pyx_vtabptr_array = &__pyx_vtable_array;
   __pyx_vtable_array.get_memview = (PyObject *(*)(struct __pyx_array_obj *))__pyx_array_get_memview;
@@ -18943,24 +19303,182 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "cython_helpers/helper_class.pyx":11
+  /* "cython_helpers/helper_class.pyx":12
  * cdef class CythonHelpers:
  * 
  *     def calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None):             # <<<<<<<<<<<<<<
  *         """ Calculate shape tensor for point cloud
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 12, __pyx_L1_error)
   __pyx_k_ = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_1calcShapeTensor, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcShapeTensor, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcShapeTensor, __pyx_t_2) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":35
+ *         return
+ * 
+ *     def calcLocalSpread(float[:,:] nns):             # <<<<<<<<<<<<<<
+ *         """ Calculate local spread (2nd moment) around center of volume of point cloud
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_3calcLocalSpread, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcLocalSpread, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__23)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcLocalSpread, __pyx_t_2) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":44
+ *         return
+ * 
+ *     def calcCoM(float[:,:] nns, float[:] masses, float[:] com):             # <<<<<<<<<<<<<<
+ *         """ Return center of mass (COM)
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_5calcCoM, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcCoM, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcCoM, __pyx_t_2) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":57
+ *         return
+ * 
+ *     def cython_abs(float x):             # <<<<<<<<<<<<<<
+ *         """ Absolute value of float
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_7cython_abs, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_cython_abs, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__27)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_cython_abs, __pyx_t_2) < 0) __PYX_ERR(0, 57, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":66
+ *         return
+ * 
+ *     def ZHEEVR(complex[::1,:] H, double[:] eigvals, complex[::1,:] Z, int nrows):             # <<<<<<<<<<<<<<
+ *         """
+ *         Computes the eigenvalues and eigenvectors of a dense Hermitian matrix.
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_9ZHEEVR, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_ZHEEVR, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__29)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_ZHEEVR, __pyx_t_2) < 0) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":84
+ *         return
+ * 
+ *     def respectPBCNoRef(float[:,:] xyz, float L_BOX):             # <<<<<<<<<<<<<<
+ *         """
+ *         Modify xyz inplace so that it respects the box periodicity.
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_11respectPBCNoRef, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_respectPBCNoRef, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__31)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 84, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_respectPBCNoRef, __pyx_t_2) < 0) __PYX_ERR(0, 84, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":101
+ *         return
+ * 
+ *     def calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] bin_edges, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
+ *         """ Calculates spherically averaged density profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_13calcDensProfBruteForceSph, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcDensProfBruteF, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__33)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcDensProfBruteForceSph, __pyx_t_2) < 0) __PYX_ERR(0, 101, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":123
+ *         return
+ * 
+ *     def calcMenclsBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
+ *         """ Calculates spherically averaged enclosed mass profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_15calcMenclsBruteForceSph, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcMenclsBruteFor, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__35)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcMenclsBruteForceSph, __pyx_t_2) < 0) __PYX_ERR(0, 123, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":145
+ *         return
+ * 
+ *     def calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] shell):             # <<<<<<<<<<<<<<
+ *         """ Calculates ellipsoidal shell-based density profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_17calcDensProfBruteForceEll, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcDensProfBruteF_2, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__37)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcDensProfBruteForceEll, __pyx_t_2) < 0) __PYX_ERR(0, 145, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":178
+ *         return
+ * 
+ *     def calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] Mencl, int[:] ellipsoid):             # <<<<<<<<<<<<<<
+ *         """ Calculates ellipsoid-based mass profile for one object with coordinates `xyz` and masses `masses`
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_19calcMenclsBruteForceEll, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcMenclsBruteFor_2, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__39)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcMenclsBruteForceEll, __pyx_t_2) < 0) __PYX_ERR(0, 178, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "cython_helpers/helper_class.pyx":209
+ *         return
+ * 
+ *     def calcKTilde(float r, float r_i, float h_i):             # <<<<<<<<<<<<<<
+ *         """ Angle-averaged normalized Gaussian kernel for kernel-based density profile estimation
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_21calcKTilde, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers_calcKTilde, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__41)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_calcKTilde, __pyx_t_2) < 0) __PYX_ERR(0, 209, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "(tree fragment)":1
+ * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
+ *     cdef tuple state
+ *     cdef object _dict
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_23__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers___reduce_cython, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__43)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_reduce_cython, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
+
+  /* "(tree fragment)":16
+ *     else:
+ *         return __pyx_unpickle_CythonHelpers, (type(self), 0xd41d8cd, state)
+ * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
+ *     __pyx_unpickle_CythonHelpers__set_state(self, __pyx_state)
+ */
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_13CythonHelpers_25__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_n_s_CythonHelpers___setstate_cython, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__45)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers->tp_dict, __pyx_n_s_setstate_cython, __pyx_t_2) < 0) __PYX_ERR(1, 16, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_14cython_helpers_12helper_class_CythonHelpers);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_CythonHelpers(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_14cython_helpers_12helper_class_1__pyx_unpickle_CythonHelpers, NULL, __pyx_n_s_cython_helpers_helper_class); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_14cython_helpers_12helper_class_1__pyx_unpickle_CythonHelpers, 0, __pyx_n_s_pyx_unpickle_CythonHelpers, NULL, __pyx_n_s_cython_helpers_helper_class, __pyx_d, ((PyObject *)__pyx_codeobj__47)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_CythonHelpers, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -18995,7 +19513,7 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__48, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_2);
@@ -19009,7 +19527,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__49, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_2);
@@ -19023,7 +19541,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__50, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_2);
@@ -19037,7 +19555,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__51, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_2);
@@ -19051,7 +19569,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__52, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_2);
@@ -21050,6 +21568,662 @@ static int __Pyx_SetVtable(PyObject *dict, void *vtable) {
 bad:
     Py_XDECREF(ob);
     return -1;
+}
+
+/* FetchCommonType */
+static PyTypeObject* __Pyx_FetchCommonType(PyTypeObject* type) {
+    PyObject* fake_module;
+    PyTypeObject* cached_type = NULL;
+    fake_module = PyImport_AddModule((char*) "_cython_" CYTHON_ABI);
+    if (!fake_module) return NULL;
+    Py_INCREF(fake_module);
+    cached_type = (PyTypeObject*) PyObject_GetAttrString(fake_module, type->tp_name);
+    if (cached_type) {
+        if (!PyType_Check((PyObject*)cached_type)) {
+            PyErr_Format(PyExc_TypeError,
+                "Shared Cython type %.200s is not a type object",
+                type->tp_name);
+            goto bad;
+        }
+        if (cached_type->tp_basicsize != type->tp_basicsize) {
+            PyErr_Format(PyExc_TypeError,
+                "Shared Cython type %.200s has the wrong size, try recompiling",
+                type->tp_name);
+            goto bad;
+        }
+    } else {
+        if (!PyErr_ExceptionMatches(PyExc_AttributeError)) goto bad;
+        PyErr_Clear();
+        if (PyType_Ready(type) < 0) goto bad;
+        if (PyObject_SetAttrString(fake_module, type->tp_name, (PyObject*) type) < 0)
+            goto bad;
+        Py_INCREF(type);
+        cached_type = type;
+    }
+done:
+    Py_DECREF(fake_module);
+    return cached_type;
+bad:
+    Py_XDECREF(cached_type);
+    cached_type = NULL;
+    goto done;
+}
+
+/* CythonFunctionShared */
+#include <structmember.h>
+static PyObject *
+__Pyx_CyFunction_get_doc(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *closure)
+{
+    if (unlikely(op->func_doc == NULL)) {
+        if (op->func.m_ml->ml_doc) {
+#if PY_MAJOR_VERSION >= 3
+            op->func_doc = PyUnicode_FromString(op->func.m_ml->ml_doc);
+#else
+            op->func_doc = PyString_FromString(op->func.m_ml->ml_doc);
+#endif
+            if (unlikely(op->func_doc == NULL))
+                return NULL;
+        } else {
+            Py_INCREF(Py_None);
+            return Py_None;
+        }
+    }
+    Py_INCREF(op->func_doc);
+    return op->func_doc;
+}
+static int
+__Pyx_CyFunction_set_doc(__pyx_CyFunctionObject *op, PyObject *value, CYTHON_UNUSED void *context)
+{
+    PyObject *tmp = op->func_doc;
+    if (value == NULL) {
+        value = Py_None;
+    }
+    Py_INCREF(value);
+    op->func_doc = value;
+    Py_XDECREF(tmp);
+    return 0;
+}
+static PyObject *
+__Pyx_CyFunction_get_name(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context)
+{
+    if (unlikely(op->func_name == NULL)) {
+#if PY_MAJOR_VERSION >= 3
+        op->func_name = PyUnicode_InternFromString(op->func.m_ml->ml_name);
+#else
+        op->func_name = PyString_InternFromString(op->func.m_ml->ml_name);
+#endif
+        if (unlikely(op->func_name == NULL))
+            return NULL;
+    }
+    Py_INCREF(op->func_name);
+    return op->func_name;
+}
+static int
+__Pyx_CyFunction_set_name(__pyx_CyFunctionObject *op, PyObject *value, CYTHON_UNUSED void *context)
+{
+    PyObject *tmp;
+#if PY_MAJOR_VERSION >= 3
+    if (unlikely(value == NULL || !PyUnicode_Check(value)))
+#else
+    if (unlikely(value == NULL || !PyString_Check(value)))
+#endif
+    {
+        PyErr_SetString(PyExc_TypeError,
+                        "__name__ must be set to a string object");
+        return -1;
+    }
+    tmp = op->func_name;
+    Py_INCREF(value);
+    op->func_name = value;
+    Py_XDECREF(tmp);
+    return 0;
+}
+static PyObject *
+__Pyx_CyFunction_get_qualname(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context)
+{
+    Py_INCREF(op->func_qualname);
+    return op->func_qualname;
+}
+static int
+__Pyx_CyFunction_set_qualname(__pyx_CyFunctionObject *op, PyObject *value, CYTHON_UNUSED void *context)
+{
+    PyObject *tmp;
+#if PY_MAJOR_VERSION >= 3
+    if (unlikely(value == NULL || !PyUnicode_Check(value)))
+#else
+    if (unlikely(value == NULL || !PyString_Check(value)))
+#endif
+    {
+        PyErr_SetString(PyExc_TypeError,
+                        "__qualname__ must be set to a string object");
+        return -1;
+    }
+    tmp = op->func_qualname;
+    Py_INCREF(value);
+    op->func_qualname = value;
+    Py_XDECREF(tmp);
+    return 0;
+}
+static PyObject *
+__Pyx_CyFunction_get_self(__pyx_CyFunctionObject *m, CYTHON_UNUSED void *closure)
+{
+    PyObject *self;
+    self = m->func_closure;
+    if (self == NULL)
+        self = Py_None;
+    Py_INCREF(self);
+    return self;
+}
+static PyObject *
+__Pyx_CyFunction_get_dict(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context)
+{
+    if (unlikely(op->func_dict == NULL)) {
+        op->func_dict = PyDict_New();
+        if (unlikely(op->func_dict == NULL))
+            return NULL;
+    }
+    Py_INCREF(op->func_dict);
+    return op->func_dict;
+}
+static int
+__Pyx_CyFunction_set_dict(__pyx_CyFunctionObject *op, PyObject *value, CYTHON_UNUSED void *context)
+{
+    PyObject *tmp;
+    if (unlikely(value == NULL)) {
+        PyErr_SetString(PyExc_TypeError,
+               "function's dictionary may not be deleted");
+        return -1;
+    }
+    if (unlikely(!PyDict_Check(value))) {
+        PyErr_SetString(PyExc_TypeError,
+               "setting function's dictionary to a non-dict");
+        return -1;
+    }
+    tmp = op->func_dict;
+    Py_INCREF(value);
+    op->func_dict = value;
+    Py_XDECREF(tmp);
+    return 0;
+}
+static PyObject *
+__Pyx_CyFunction_get_globals(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context)
+{
+    Py_INCREF(op->func_globals);
+    return op->func_globals;
+}
+static PyObject *
+__Pyx_CyFunction_get_closure(CYTHON_UNUSED __pyx_CyFunctionObject *op, CYTHON_UNUSED void *context)
+{
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+static PyObject *
+__Pyx_CyFunction_get_code(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context)
+{
+    PyObject* result = (op->func_code) ? op->func_code : Py_None;
+    Py_INCREF(result);
+    return result;
+}
+static int
+__Pyx_CyFunction_init_defaults(__pyx_CyFunctionObject *op) {
+    int result = 0;
+    PyObject *res = op->defaults_getter((PyObject *) op);
+    if (unlikely(!res))
+        return -1;
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    op->defaults_tuple = PyTuple_GET_ITEM(res, 0);
+    Py_INCREF(op->defaults_tuple);
+    op->defaults_kwdict = PyTuple_GET_ITEM(res, 1);
+    Py_INCREF(op->defaults_kwdict);
+    #else
+    op->defaults_tuple = PySequence_ITEM(res, 0);
+    if (unlikely(!op->defaults_tuple)) result = -1;
+    else {
+        op->defaults_kwdict = PySequence_ITEM(res, 1);
+        if (unlikely(!op->defaults_kwdict)) result = -1;
+    }
+    #endif
+    Py_DECREF(res);
+    return result;
+}
+static int
+__Pyx_CyFunction_set_defaults(__pyx_CyFunctionObject *op, PyObject* value, CYTHON_UNUSED void *context) {
+    PyObject* tmp;
+    if (!value) {
+        value = Py_None;
+    } else if (value != Py_None && !PyTuple_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "__defaults__ must be set to a tuple object");
+        return -1;
+    }
+    Py_INCREF(value);
+    tmp = op->defaults_tuple;
+    op->defaults_tuple = value;
+    Py_XDECREF(tmp);
+    return 0;
+}
+static PyObject *
+__Pyx_CyFunction_get_defaults(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context) {
+    PyObject* result = op->defaults_tuple;
+    if (unlikely(!result)) {
+        if (op->defaults_getter) {
+            if (__Pyx_CyFunction_init_defaults(op) < 0) return NULL;
+            result = op->defaults_tuple;
+        } else {
+            result = Py_None;
+        }
+    }
+    Py_INCREF(result);
+    return result;
+}
+static int
+__Pyx_CyFunction_set_kwdefaults(__pyx_CyFunctionObject *op, PyObject* value, CYTHON_UNUSED void *context) {
+    PyObject* tmp;
+    if (!value) {
+        value = Py_None;
+    } else if (value != Py_None && !PyDict_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "__kwdefaults__ must be set to a dict object");
+        return -1;
+    }
+    Py_INCREF(value);
+    tmp = op->defaults_kwdict;
+    op->defaults_kwdict = value;
+    Py_XDECREF(tmp);
+    return 0;
+}
+static PyObject *
+__Pyx_CyFunction_get_kwdefaults(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context) {
+    PyObject* result = op->defaults_kwdict;
+    if (unlikely(!result)) {
+        if (op->defaults_getter) {
+            if (__Pyx_CyFunction_init_defaults(op) < 0) return NULL;
+            result = op->defaults_kwdict;
+        } else {
+            result = Py_None;
+        }
+    }
+    Py_INCREF(result);
+    return result;
+}
+static int
+__Pyx_CyFunction_set_annotations(__pyx_CyFunctionObject *op, PyObject* value, CYTHON_UNUSED void *context) {
+    PyObject* tmp;
+    if (!value || value == Py_None) {
+        value = NULL;
+    } else if (!PyDict_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "__annotations__ must be set to a dict object");
+        return -1;
+    }
+    Py_XINCREF(value);
+    tmp = op->func_annotations;
+    op->func_annotations = value;
+    Py_XDECREF(tmp);
+    return 0;
+}
+static PyObject *
+__Pyx_CyFunction_get_annotations(__pyx_CyFunctionObject *op, CYTHON_UNUSED void *context) {
+    PyObject* result = op->func_annotations;
+    if (unlikely(!result)) {
+        result = PyDict_New();
+        if (unlikely(!result)) return NULL;
+        op->func_annotations = result;
+    }
+    Py_INCREF(result);
+    return result;
+}
+static PyGetSetDef __pyx_CyFunction_getsets[] = {
+    {(char *) "func_doc", (getter)__Pyx_CyFunction_get_doc, (setter)__Pyx_CyFunction_set_doc, 0, 0},
+    {(char *) "__doc__",  (getter)__Pyx_CyFunction_get_doc, (setter)__Pyx_CyFunction_set_doc, 0, 0},
+    {(char *) "func_name", (getter)__Pyx_CyFunction_get_name, (setter)__Pyx_CyFunction_set_name, 0, 0},
+    {(char *) "__name__", (getter)__Pyx_CyFunction_get_name, (setter)__Pyx_CyFunction_set_name, 0, 0},
+    {(char *) "__qualname__", (getter)__Pyx_CyFunction_get_qualname, (setter)__Pyx_CyFunction_set_qualname, 0, 0},
+    {(char *) "__self__", (getter)__Pyx_CyFunction_get_self, 0, 0, 0},
+    {(char *) "func_dict", (getter)__Pyx_CyFunction_get_dict, (setter)__Pyx_CyFunction_set_dict, 0, 0},
+    {(char *) "__dict__", (getter)__Pyx_CyFunction_get_dict, (setter)__Pyx_CyFunction_set_dict, 0, 0},
+    {(char *) "func_globals", (getter)__Pyx_CyFunction_get_globals, 0, 0, 0},
+    {(char *) "__globals__", (getter)__Pyx_CyFunction_get_globals, 0, 0, 0},
+    {(char *) "func_closure", (getter)__Pyx_CyFunction_get_closure, 0, 0, 0},
+    {(char *) "__closure__", (getter)__Pyx_CyFunction_get_closure, 0, 0, 0},
+    {(char *) "func_code", (getter)__Pyx_CyFunction_get_code, 0, 0, 0},
+    {(char *) "__code__", (getter)__Pyx_CyFunction_get_code, 0, 0, 0},
+    {(char *) "func_defaults", (getter)__Pyx_CyFunction_get_defaults, (setter)__Pyx_CyFunction_set_defaults, 0, 0},
+    {(char *) "__defaults__", (getter)__Pyx_CyFunction_get_defaults, (setter)__Pyx_CyFunction_set_defaults, 0, 0},
+    {(char *) "__kwdefaults__", (getter)__Pyx_CyFunction_get_kwdefaults, (setter)__Pyx_CyFunction_set_kwdefaults, 0, 0},
+    {(char *) "__annotations__", (getter)__Pyx_CyFunction_get_annotations, (setter)__Pyx_CyFunction_set_annotations, 0, 0},
+    {0, 0, 0, 0, 0}
+};
+static PyMemberDef __pyx_CyFunction_members[] = {
+    {(char *) "__module__", T_OBJECT, offsetof(PyCFunctionObject, m_module), PY_WRITE_RESTRICTED, 0},
+    {0, 0, 0,  0, 0}
+};
+static PyObject *
+__Pyx_CyFunction_reduce(__pyx_CyFunctionObject *m, CYTHON_UNUSED PyObject *args)
+{
+#if PY_MAJOR_VERSION >= 3
+    return PyUnicode_FromString(m->func.m_ml->ml_name);
+#else
+    return PyString_FromString(m->func.m_ml->ml_name);
+#endif
+}
+static PyMethodDef __pyx_CyFunction_methods[] = {
+    {"__reduce__", (PyCFunction)__Pyx_CyFunction_reduce, METH_VARARGS, 0},
+    {0, 0, 0, 0}
+};
+#if PY_VERSION_HEX < 0x030500A0
+#define __Pyx_CyFunction_weakreflist(cyfunc) ((cyfunc)->func_weakreflist)
+#else
+#define __Pyx_CyFunction_weakreflist(cyfunc) ((cyfunc)->func.m_weakreflist)
+#endif
+static PyObject *__Pyx_CyFunction_Init(__pyx_CyFunctionObject *op, PyMethodDef *ml, int flags, PyObject* qualname,
+                                       PyObject *closure, PyObject *module, PyObject* globals, PyObject* code) {
+    if (unlikely(op == NULL))
+        return NULL;
+    op->flags = flags;
+    __Pyx_CyFunction_weakreflist(op) = NULL;
+    op->func.m_ml = ml;
+    op->func.m_self = (PyObject *) op;
+    Py_XINCREF(closure);
+    op->func_closure = closure;
+    Py_XINCREF(module);
+    op->func.m_module = module;
+    op->func_dict = NULL;
+    op->func_name = NULL;
+    Py_INCREF(qualname);
+    op->func_qualname = qualname;
+    op->func_doc = NULL;
+    op->func_classobj = NULL;
+    op->func_globals = globals;
+    Py_INCREF(op->func_globals);
+    Py_XINCREF(code);
+    op->func_code = code;
+    op->defaults_pyobjects = 0;
+    op->defaults_size = 0;
+    op->defaults = NULL;
+    op->defaults_tuple = NULL;
+    op->defaults_kwdict = NULL;
+    op->defaults_getter = NULL;
+    op->func_annotations = NULL;
+    return (PyObject *) op;
+}
+static int
+__Pyx_CyFunction_clear(__pyx_CyFunctionObject *m)
+{
+    Py_CLEAR(m->func_closure);
+    Py_CLEAR(m->func.m_module);
+    Py_CLEAR(m->func_dict);
+    Py_CLEAR(m->func_name);
+    Py_CLEAR(m->func_qualname);
+    Py_CLEAR(m->func_doc);
+    Py_CLEAR(m->func_globals);
+    Py_CLEAR(m->func_code);
+    Py_CLEAR(m->func_classobj);
+    Py_CLEAR(m->defaults_tuple);
+    Py_CLEAR(m->defaults_kwdict);
+    Py_CLEAR(m->func_annotations);
+    if (m->defaults) {
+        PyObject **pydefaults = __Pyx_CyFunction_Defaults(PyObject *, m);
+        int i;
+        for (i = 0; i < m->defaults_pyobjects; i++)
+            Py_XDECREF(pydefaults[i]);
+        PyObject_Free(m->defaults);
+        m->defaults = NULL;
+    }
+    return 0;
+}
+static void __Pyx__CyFunction_dealloc(__pyx_CyFunctionObject *m)
+{
+    if (__Pyx_CyFunction_weakreflist(m) != NULL)
+        PyObject_ClearWeakRefs((PyObject *) m);
+    __Pyx_CyFunction_clear(m);
+    PyObject_GC_Del(m);
+}
+static void __Pyx_CyFunction_dealloc(__pyx_CyFunctionObject *m)
+{
+    PyObject_GC_UnTrack(m);
+    __Pyx__CyFunction_dealloc(m);
+}
+static int __Pyx_CyFunction_traverse(__pyx_CyFunctionObject *m, visitproc visit, void *arg)
+{
+    Py_VISIT(m->func_closure);
+    Py_VISIT(m->func.m_module);
+    Py_VISIT(m->func_dict);
+    Py_VISIT(m->func_name);
+    Py_VISIT(m->func_qualname);
+    Py_VISIT(m->func_doc);
+    Py_VISIT(m->func_globals);
+    Py_VISIT(m->func_code);
+    Py_VISIT(m->func_classobj);
+    Py_VISIT(m->defaults_tuple);
+    Py_VISIT(m->defaults_kwdict);
+    if (m->defaults) {
+        PyObject **pydefaults = __Pyx_CyFunction_Defaults(PyObject *, m);
+        int i;
+        for (i = 0; i < m->defaults_pyobjects; i++)
+            Py_VISIT(pydefaults[i]);
+    }
+    return 0;
+}
+static PyObject *__Pyx_CyFunction_descr_get(PyObject *func, PyObject *obj, PyObject *type)
+{
+#if PY_MAJOR_VERSION < 3
+    __pyx_CyFunctionObject *m = (__pyx_CyFunctionObject *) func;
+    if (m->flags & __Pyx_CYFUNCTION_STATICMETHOD) {
+        Py_INCREF(func);
+        return func;
+    }
+    if (m->flags & __Pyx_CYFUNCTION_CLASSMETHOD) {
+        if (type == NULL)
+            type = (PyObject *)(Py_TYPE(obj));
+        return __Pyx_PyMethod_New(func, type, (PyObject *)(Py_TYPE(type)));
+    }
+    if (obj == Py_None)
+        obj = NULL;
+#endif
+    return __Pyx_PyMethod_New(func, obj, type);
+}
+static PyObject*
+__Pyx_CyFunction_repr(__pyx_CyFunctionObject *op)
+{
+#if PY_MAJOR_VERSION >= 3
+    return PyUnicode_FromFormat("<cyfunction %U at %p>",
+                                op->func_qualname, (void *)op);
+#else
+    return PyString_FromFormat("<cyfunction %s at %p>",
+                               PyString_AsString(op->func_qualname), (void *)op);
+#endif
+}
+static PyObject * __Pyx_CyFunction_CallMethod(PyObject *func, PyObject *self, PyObject *arg, PyObject *kw) {
+    PyCFunctionObject* f = (PyCFunctionObject*)func;
+    PyCFunction meth = f->m_ml->ml_meth;
+    Py_ssize_t size;
+    switch (f->m_ml->ml_flags & (METH_VARARGS | METH_KEYWORDS | METH_NOARGS | METH_O)) {
+    case METH_VARARGS:
+        if (likely(kw == NULL || PyDict_Size(kw) == 0))
+            return (*meth)(self, arg);
+        break;
+    case METH_VARARGS | METH_KEYWORDS:
+        return (*(PyCFunctionWithKeywords)(void*)meth)(self, arg, kw);
+    case METH_NOARGS:
+        if (likely(kw == NULL || PyDict_Size(kw) == 0)) {
+            size = PyTuple_GET_SIZE(arg);
+            if (likely(size == 0))
+                return (*meth)(self, NULL);
+            PyErr_Format(PyExc_TypeError,
+                "%.200s() takes no arguments (%" CYTHON_FORMAT_SSIZE_T "d given)",
+                f->m_ml->ml_name, size);
+            return NULL;
+        }
+        break;
+    case METH_O:
+        if (likely(kw == NULL || PyDict_Size(kw) == 0)) {
+            size = PyTuple_GET_SIZE(arg);
+            if (likely(size == 1)) {
+                PyObject *result, *arg0;
+                #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+                arg0 = PyTuple_GET_ITEM(arg, 0);
+                #else
+                arg0 = PySequence_ITEM(arg, 0); if (unlikely(!arg0)) return NULL;
+                #endif
+                result = (*meth)(self, arg0);
+                #if !(CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS)
+                Py_DECREF(arg0);
+                #endif
+                return result;
+            }
+            PyErr_Format(PyExc_TypeError,
+                "%.200s() takes exactly one argument (%" CYTHON_FORMAT_SSIZE_T "d given)",
+                f->m_ml->ml_name, size);
+            return NULL;
+        }
+        break;
+    default:
+        PyErr_SetString(PyExc_SystemError, "Bad call flags in "
+                        "__Pyx_CyFunction_Call. METH_OLDARGS is no "
+                        "longer supported!");
+        return NULL;
+    }
+    PyErr_Format(PyExc_TypeError, "%.200s() takes no keyword arguments",
+                 f->m_ml->ml_name);
+    return NULL;
+}
+static CYTHON_INLINE PyObject *__Pyx_CyFunction_Call(PyObject *func, PyObject *arg, PyObject *kw) {
+    return __Pyx_CyFunction_CallMethod(func, ((PyCFunctionObject*)func)->m_self, arg, kw);
+}
+static PyObject *__Pyx_CyFunction_CallAsMethod(PyObject *func, PyObject *args, PyObject *kw) {
+    PyObject *result;
+    __pyx_CyFunctionObject *cyfunc = (__pyx_CyFunctionObject *) func;
+    if ((cyfunc->flags & __Pyx_CYFUNCTION_CCLASS) && !(cyfunc->flags & __Pyx_CYFUNCTION_STATICMETHOD)) {
+        Py_ssize_t argc;
+        PyObject *new_args;
+        PyObject *self;
+        argc = PyTuple_GET_SIZE(args);
+        new_args = PyTuple_GetSlice(args, 1, argc);
+        if (unlikely(!new_args))
+            return NULL;
+        self = PyTuple_GetItem(args, 0);
+        if (unlikely(!self)) {
+            Py_DECREF(new_args);
+            return NULL;
+        }
+        result = __Pyx_CyFunction_CallMethod(func, self, new_args, kw);
+        Py_DECREF(new_args);
+    } else {
+        result = __Pyx_CyFunction_Call(func, args, kw);
+    }
+    return result;
+}
+static PyTypeObject __pyx_CyFunctionType_type = {
+    PyVarObject_HEAD_INIT(0, 0)
+    "cython_function_or_method",
+    sizeof(__pyx_CyFunctionObject),
+    0,
+    (destructor) __Pyx_CyFunction_dealloc,
+    0,
+    0,
+    0,
+#if PY_MAJOR_VERSION < 3
+    0,
+#else
+    0,
+#endif
+    (reprfunc) __Pyx_CyFunction_repr,
+    0,
+    0,
+    0,
+    0,
+    __Pyx_CyFunction_CallAsMethod,
+    0,
+    0,
+    0,
+    0,
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
+    0,
+    (traverseproc) __Pyx_CyFunction_traverse,
+    (inquiry) __Pyx_CyFunction_clear,
+    0,
+#if PY_VERSION_HEX < 0x030500A0
+    offsetof(__pyx_CyFunctionObject, func_weakreflist),
+#else
+    offsetof(PyCFunctionObject, m_weakreflist),
+#endif
+    0,
+    0,
+    __pyx_CyFunction_methods,
+    __pyx_CyFunction_members,
+    __pyx_CyFunction_getsets,
+    0,
+    0,
+    __Pyx_CyFunction_descr_get,
+    0,
+    offsetof(__pyx_CyFunctionObject, func_dict),
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+#if PY_VERSION_HEX >= 0x030400a1
+    0,
+#endif
+#if PY_VERSION_HEX >= 0x030800b1
+    0,
+#endif
+#if PY_VERSION_HEX >= 0x030800b4 && PY_VERSION_HEX < 0x03090000
+    0,
+#endif
+};
+static int __pyx_CyFunction_init(void) {
+    __pyx_CyFunctionType = __Pyx_FetchCommonType(&__pyx_CyFunctionType_type);
+    if (unlikely(__pyx_CyFunctionType == NULL)) {
+        return -1;
+    }
+    return 0;
+}
+static CYTHON_INLINE void *__Pyx_CyFunction_InitDefaults(PyObject *func, size_t size, int pyobjects) {
+    __pyx_CyFunctionObject *m = (__pyx_CyFunctionObject *) func;
+    m->defaults = PyObject_Malloc(size);
+    if (unlikely(!m->defaults))
+        return PyErr_NoMemory();
+    memset(m->defaults, 0, size);
+    m->defaults_pyobjects = pyobjects;
+    m->defaults_size = size;
+    return m->defaults;
+}
+static CYTHON_INLINE void __Pyx_CyFunction_SetDefaultsTuple(PyObject *func, PyObject *tuple) {
+    __pyx_CyFunctionObject *m = (__pyx_CyFunctionObject *) func;
+    m->defaults_tuple = tuple;
+    Py_INCREF(tuple);
+}
+static CYTHON_INLINE void __Pyx_CyFunction_SetDefaultsKwDict(PyObject *func, PyObject *dict) {
+    __pyx_CyFunctionObject *m = (__pyx_CyFunctionObject *) func;
+    m->defaults_kwdict = dict;
+    Py_INCREF(dict);
+}
+static CYTHON_INLINE void __Pyx_CyFunction_SetAnnotationsDict(PyObject *func, PyObject *dict) {
+    __pyx_CyFunctionObject *m = (__pyx_CyFunctionObject *) func;
+    m->func_annotations = dict;
+    Py_INCREF(dict);
+}
+
+/* CythonFunction */
+static PyObject *__Pyx_CyFunction_New(PyMethodDef *ml, int flags, PyObject* qualname,
+                                      PyObject *closure, PyObject *module, PyObject* globals, PyObject* code) {
+    PyObject *op = __Pyx_CyFunction_Init(
+        PyObject_GC_New(__pyx_CyFunctionObject, __pyx_CyFunctionType),
+        ml, flags, qualname, closure, module, globals, code
+    );
+    if (likely(op)) {
+        PyObject_GC_Track(op);
+    }
+    return op;
 }
 
 /* CLineInTraceback */

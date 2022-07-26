@@ -6,6 +6,7 @@ cimport cython
 from libc.math cimport sqrt, pi, exp
 
 @cython.embedsignature(True)
+@cython.binding(True)
 cdef class CythonHelpers:
     
     def calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None):

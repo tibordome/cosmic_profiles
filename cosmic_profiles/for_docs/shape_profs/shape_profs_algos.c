@@ -1184,6 +1184,18 @@ static struct __pyx_vtabstruct__memoryviewslice *__pyx_vtabptr__memoryviewslice;
 #define __Pyx_CLEAR(r)    do { PyObject* tmp = ((PyObject*)(r)); r = NULL; __Pyx_DECREF(tmp);} while(0)
 #define __Pyx_XCLEAR(r)   do { if((r) != NULL) {PyObject* tmp = ((PyObject*)(r)); r = NULL; __Pyx_DECREF(tmp);}} while(0)
 
+/* RaiseArgTupleInvalid.proto */
+static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
+    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
+
+/* RaiseDoubleKeywords.proto */
+static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
+
+/* ParseKeywords.proto */
+static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
+    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
+    const char* function_name);
+
 /* MemviewSliceInit.proto */
 #define __Pyx_BUF_MAX_NDIMS %(BUF_MAX_NDIMS)d
 #define __Pyx_MEMVIEW_DIRECT   1
@@ -1209,18 +1221,6 @@ static CYTHON_INLINE int __pyx_sub_acquisition_count_locked(
 #define __PYX_XDEC_MEMVIEW(slice, have_gil) __Pyx_XDEC_MEMVIEW(slice, have_gil, __LINE__)
 static CYTHON_INLINE void __Pyx_INC_MEMVIEW(__Pyx_memviewslice *, int, int);
 static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *, int, int);
-
-/* RaiseArgTupleInvalid.proto */
-static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
-    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
-
-/* RaiseDoubleKeywords.proto */
-static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
-
-/* ParseKeywords.proto */
-static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
-    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
-    const char* function_name);
 
 /* ArgTypeTest.proto */
 #define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
@@ -1818,10 +1818,23 @@ static int __Pyx_ValidateAndInit_memviewslice(
                 PyObject *original_obj);
 
 /* ObjectToMemviewSlice.proto */
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_float(PyObject *, int writable_flag);
+
+/* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_float(PyObject *, int writable_flag);
 
 /* ObjectToMemviewSlice.proto */
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_float(PyObject *, int writable_flag);
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_int(PyObject *, int writable_flag);
+
+/* ObjectToMemviewSlice.proto */
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(PyObject *, int writable_flag);
+
+/* ObjectToMemviewSlice.proto */
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dc_double(PyObject *, int writable_flag);
+
+/* MemviewDtypeToObject.proto */
+static CYTHON_INLINE PyObject *__pyx_memview_get_float(const char *itemp);
+static CYTHON_INLINE int __pyx_memview_set_float(const char *itemp, PyObject *obj);
 
 /* MemviewSliceCopyTemplate.proto */
 static __Pyx_memviewslice
@@ -1916,6 +1929,9 @@ static void __pyx_memoryview_slice_assign_scalar(__Pyx_memviewslice *, int, size
 static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize_t *, int, size_t, void *); /*proto*/
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_float = { "float", NULL, sizeof(float), { 0 }, 0, 'R', 0, 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), { 0 }, 0, IS_UNSIGNED(int) ? 'U' : 'I', IS_UNSIGNED(int), 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo___pyx_t_double_complex = { "double complex", NULL, sizeof(__pyx_t_double_complex), { 0 }, 0, 'C', 0, 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
 #define __Pyx_MODULE_NAME "shape_profs.shape_profs_algos"
 extern int __pyx_module_is_main_shape_profs__shape_profs_algos;
 int __pyx_module_is_main_shape_profs__shape_profs_algos = 0;
@@ -1931,6 +1947,7 @@ static PyObject *__pyx_builtin_id;
 static PyObject *__pyx_builtin_IndexError;
 static const char __pyx_k_O[] = "O";
 static const char __pyx_k_c[] = "c";
+static const char __pyx_k_d[] = "d";
 static const char __pyx_k_id[] = "id";
 static const char __pyx_k_np[] = "np";
 static const char __pyx_k_cat[] = "cat";
@@ -1958,13 +1975,19 @@ static const char __pyx_k_N_MIN[] = "N_MIN";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_error[] = "error";
 static const char __pyx_k_flags[] = "flags";
+static const char __pyx_k_log_d[] = "log_d";
 static const char __pyx_k_numpy[] = "numpy";
+static const char __pyx_k_r_ell[] = "r_ell";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_shape[] = "shape";
+static const char __pyx_k_shell[] = "shell";
 static const char __pyx_k_start[] = "start";
 static const char __pyx_k_CENTER[] = "CENTER";
 static const char __pyx_k_D_BINS[] = "D_BINS";
 static const char __pyx_k_N_WALL[] = "N_WALL";
+static const char __pyx_k_center[] = "center";
+static const char __pyx_k_eigval[] = "eigval";
+static const char __pyx_k_eigvec[] = "eigvec";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_format[] = "format";
 static const char __pyx_k_import[] = "__import__";
@@ -1975,9 +1998,11 @@ static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
+static const char __pyx_k_delta_d[] = "delta_d";
 static const char __pyx_k_fortran[] = "fortran";
 static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_reduced[] = "reduced";
+static const char __pyx_k_vcenter[] = "vcenter";
 static const char __pyx_k_D_LOGEND[] = "D_LOGEND";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
 static const char __pyx_k_getstate[] = "__getstate__";
@@ -1985,18 +2010,24 @@ static const char __pyx_k_itemsize[] = "itemsize";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_TypeError[] = "TypeError";
+static const char __pyx_k_ellipsoid[] = "ellipsoid";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
+static const char __pyx_k_xyz_princ[] = "xyz_princ";
 static const char __pyx_k_D_LOGSTART[] = "D_LOGSTART";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
+static const char __pyx_k_morph_info[] = "morph_info";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
+static const char __pyx_k_runEllAlgo[] = "runEllAlgo";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_shell_based[] = "shell_based";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
+static const char __pyx_k_runShellAlgo[] = "runShellAlgo";
+static const char __pyx_k_shape_tensor[] = "shape_tensor";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
@@ -2007,8 +2038,12 @@ static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_calcMorphGlobal[] = "calcMorphGlobal";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
+static const char __pyx_k_runEllVDispAlgo[] = "runEllVDispAlgo";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
+static const char __pyx_k_calcObjMorphLocal[] = "calcObjMorphLocal";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
+static const char __pyx_k_runShellVDispAlgo[] = "runShellVDispAlgo";
+static const char __pyx_k_calcObjMorphGlobal[] = "calcObjMorphGlobal";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
@@ -2019,7 +2054,9 @@ static const char __pyx_k_calcMorphGlobalVelDisp[] = "calcMorphGlobalVelDisp";
 static const char __pyx_k_MemoryView_of_r_at_0x_x[] = "<MemoryView of %r at 0x%x>";
 static const char __pyx_k_contiguous_and_indirect[] = "<contiguous and indirect>";
 static const char __pyx_k_Cannot_index_with_type_s[] = "Cannot index with type '%s'";
+static const char __pyx_k_calcObjMorphLocalVelDisp[] = "calcObjMorphLocalVelDisp";
 static const char __pyx_k_Invalid_shape_in_axis_d_d[] = "Invalid shape in axis %d: %d.";
+static const char __pyx_k_calcObjMorphGlobalVelDisp[] = "calcObjMorphGlobalVelDisp";
 static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
 static const char __pyx_k_shape_profs_shape_profs_algos[] = "shape_profs.shape_profs_algos";
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
@@ -2079,13 +2116,23 @@ static PyObject *__pyx_n_s_calcMorphGlobal;
 static PyObject *__pyx_n_s_calcMorphGlobalVelDisp;
 static PyObject *__pyx_n_s_calcMorphLocal;
 static PyObject *__pyx_n_s_calcMorphLocalVelDisp;
+static PyObject *__pyx_n_s_calcObjMorphGlobal;
+static PyObject *__pyx_n_s_calcObjMorphGlobalVelDisp;
+static PyObject *__pyx_n_s_calcObjMorphLocal;
+static PyObject *__pyx_n_s_calcObjMorphLocalVelDisp;
 static PyObject *__pyx_n_s_cat;
+static PyObject *__pyx_n_s_center;
 static PyObject *__pyx_n_s_class;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
+static PyObject *__pyx_n_s_d;
+static PyObject *__pyx_n_s_delta_d;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_dtype_is_object;
+static PyObject *__pyx_n_s_eigval;
+static PyObject *__pyx_n_s_eigvec;
+static PyObject *__pyx_n_s_ellipsoid;
 static PyObject *__pyx_n_s_encode;
 static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_error;
@@ -2099,10 +2146,12 @@ static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_itemsize;
 static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
+static PyObject *__pyx_n_s_log_d;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_masses;
 static PyObject *__pyx_n_s_memview;
 static PyObject *__pyx_n_s_mode;
+static PyObject *__pyx_n_s_morph_info;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_n_s_ndim;
@@ -2122,16 +2171,23 @@ static PyObject *__pyx_n_s_pyx_type;
 static PyObject *__pyx_n_s_pyx_unpickle_Enum;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_r200;
+static PyObject *__pyx_n_s_r_ell;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
 static PyObject *__pyx_n_s_reduced;
+static PyObject *__pyx_n_s_runEllAlgo;
+static PyObject *__pyx_n_s_runEllVDispAlgo;
+static PyObject *__pyx_n_s_runShellAlgo;
+static PyObject *__pyx_n_s_runShellVDispAlgo;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_shape_profs_shape_profs_algos;
 static PyObject *__pyx_kp_s_shape_profs_shape_profs_algos_py;
+static PyObject *__pyx_n_s_shape_tensor;
+static PyObject *__pyx_n_s_shell;
 static PyObject *__pyx_n_s_shell_based;
 static PyObject *__pyx_n_s_size;
 static PyObject *__pyx_n_s_start;
@@ -2147,12 +2203,22 @@ static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
+static PyObject *__pyx_n_s_vcenter;
 static PyObject *__pyx_n_s_vxyz;
 static PyObject *__pyx_n_s_xyz;
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_calcMorphLocal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_2calcMorphGlobal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_4calcMorphLocalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_6calcMorphGlobalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_n_s_xyz_princ;
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_runShellAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_delta_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_2runEllAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_4runEllVDispAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_6runShellVDispAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_delta_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_8calcMorphLocal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_10calcMorphGlobal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_12calcMorphLocalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_14calcMorphGlobalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_16calcObjMorphLocal(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_18calcObjMorphGlobal(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_20calcObjMorphLocalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_22calcObjMorphGlobalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2226,28 +2292,270 @@ static PyObject *__pyx_tuple__21;
 static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_tuple__25;
 static PyObject *__pyx_tuple__27;
-static PyObject *__pyx_tuple__28;
 static PyObject *__pyx_tuple__29;
-static PyObject *__pyx_tuple__30;
 static PyObject *__pyx_tuple__31;
-static PyObject *__pyx_tuple__32;
+static PyObject *__pyx_tuple__33;
+static PyObject *__pyx_tuple__35;
+static PyObject *__pyx_tuple__37;
+static PyObject *__pyx_tuple__39;
+static PyObject *__pyx_tuple__41;
+static PyObject *__pyx_tuple__43;
+static PyObject *__pyx_tuple__44;
+static PyObject *__pyx_tuple__45;
+static PyObject *__pyx_tuple__46;
+static PyObject *__pyx_tuple__47;
+static PyObject *__pyx_tuple__48;
 static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__22;
 static PyObject *__pyx_codeobj__24;
 static PyObject *__pyx_codeobj__26;
-static PyObject *__pyx_codeobj__33;
+static PyObject *__pyx_codeobj__28;
+static PyObject *__pyx_codeobj__30;
+static PyObject *__pyx_codeobj__32;
+static PyObject *__pyx_codeobj__34;
+static PyObject *__pyx_codeobj__36;
+static PyObject *__pyx_codeobj__38;
+static PyObject *__pyx_codeobj__40;
+static PyObject *__pyx_codeobj__42;
+static PyObject *__pyx_codeobj__49;
 /* Late includes */
 
 /* "shape_profs/shape_profs_algos.pyx":11
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runShellAlgo(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_delta_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_1runShellAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_runShellAlgo[] = "runShellAlgo(float[:] morph_info, float[:, :] xyz, float[:, :] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bool reduced)\n S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``\n    \n    Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n\n    Note that before and during the iteration, ``d`` is defined with respect to the center of \n    the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n\n    Differential version of E1.\n\n    Shells can cross (except 2nd shell with 1st), and a shell is assumed to be equally thick everywhere.\n\n    Whether we adopt the last assumption or let the thickness float (Tomassetti et al 2016) barely makes \n    any difference in terms of shapes found, but the convergence properties improve for the version with fixated thickness.\n    For 1st shell: ``delta_d`` is ``d``\n    \n    :param morph_info: Array to be filled with morphological info. 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,) floats\n    :param xyz: position array\n    :type xyz: (N x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N x 3) floats, zeros\n    :param masses: mass array\n    :type masses: (N x 1) floats\n    :param shell: indices of points that fall into shell (varies from iteration to iteration)\n    :type shell: (N,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of poin""t cloud\n    :type center: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :type eigval: (3,) double, zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param d: distance from the center, kept fixed during iterative procedure\n    :type d: float\n    :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)\n    :type delta_d: float\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: ``morph_info`` containing d, q, s, eigframe info\n    :rtype: (12,) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_1runShellAlgo = {"runShellAlgo", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_1runShellAlgo, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_runShellAlgo};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_1runShellAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_d;
+  CYTHON_UNUSED float __pyx_v_delta_d;
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("runShellAlgo (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_xyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_shell,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_d,&__pyx_n_s_delta_d,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_reduced,0};
+    PyObject* values[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 16: values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+        CYTHON_FALLTHROUGH;
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 1); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 2); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 3); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 4); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 5); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 6); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 7); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 8); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 9); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 10); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_delta_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 11); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 12); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 13); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 14); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 15:
+        if (likely((values[15] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, 15); __PYX_ERR(0, 11, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "runShellAlgo") < 0)) __PYX_ERR(0, 11, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 16) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+      values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_d = __pyx_PyFloat_AsFloat(values[10]); if (unlikely((__pyx_v_d == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_delta_d = __pyx_PyFloat_AsFloat(values[11]); if (unlikely((__pyx_v_delta_d == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[12]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[13]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[14]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[15]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("runShellAlgo", 1, 16, 16, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 11, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runShellAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_runShellAlgo(__pyx_self, __pyx_v_morph_info, __pyx_v_xyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_shell, __pyx_v_r_ell, __pyx_v_center, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_d, __pyx_v_delta_d, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_reduced);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_runShellAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_delta_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("runShellAlgo", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":61
  *     :return: ``morph_info`` containing d, q, s, eigframe info
@@ -2256,36 +2564,267 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runShellAlgo
  * 
  * @cython.embedsignature(True)
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":11
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runShellAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
 /* "shape_profs/shape_profs_algos.pyx":64
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runEllAlgo(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_3runEllAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_2runEllAlgo[] = "runEllAlgo(float[:] morph_info, float[:, :] xyz, float[:, :] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bool reduced)\n Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``\n    \n    Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n\n    Note that before and during the iteration, ``d`` is defined with respect to the center of \n    the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n\n    \n    :param morph_info: Array to be filled with morphological info. 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,) floats\n    :param xyz: position array\n    :type xyz: (N x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N x 3) floats, zeros\n    :param masses: mass array\n    :type masses: (N x 1) floats\n    :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)\n    :type ellipsoid: (N,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of point cloud\n    :type center: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :type eigval: (3,) double, zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param d: distance from the center, kept fixed during iterative procedure\n    :type d: float""\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: ``morph_info`` containing d, q, s, eigframe info\n    :rtype: (12,) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_3runEllAlgo = {"runEllAlgo", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_3runEllAlgo, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_2runEllAlgo};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_3runEllAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_d;
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("runEllAlgo (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_xyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_ellipsoid,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_d,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_reduced,0};
+    PyObject* values[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 1); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 2); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 3); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ellipsoid)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 4); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 5); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 6); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 7); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 8); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 9); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 10); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 11); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 12); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 13); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, 14); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "runEllAlgo") < 0)) __PYX_ERR(0, 64, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 15) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_d = __pyx_PyFloat_AsFloat(values[10]); if (unlikely((__pyx_v_d == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[11]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[12]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[13]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[14]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("runEllAlgo", 1, 15, 15, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 64, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runEllAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_2runEllAlgo(__pyx_self, __pyx_v_morph_info, __pyx_v_xyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_ellipsoid, __pyx_v_r_ell, __pyx_v_center, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_d, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_reduced);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_2runEllAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("runEllAlgo", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":108
  *     :rtype: (12,) float array"""
@@ -2294,36 +2833,289 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runEllAlgo(_
  * 
  * @cython.embedsignature(True)
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":64
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runEllAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_ellipsoid, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
 /* "shape_profs/shape_profs_algos.pyx":111
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runEllVDispAlgo(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_5runEllVDispAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_4runEllVDispAlgo[] = "runEllVDispAlgo(float[:] morph_info, float[:, :] xyz, float[:, :] vxyz, float[:, :] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bool reduced)\n Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor\n    \n    Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n\n    Note that before and during the iteration, ``d`` is defined with respect to the center of \n    the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n\n    \n    :param morph_info: Array to be filled with morphological info. 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,) floats\n    :param xyz: position array\n    :type xyz: (N x 3) floats\n    :param vxyz: velocity array\n    :type vxyz: (N x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N x 3) floats, zeros\n    :param masses: mass array\n    :type masses: (N x 1) floats\n    :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)\n    :type ellipsoid: (N,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of point cloud\n    :type center: (3,) floats\n    :param vcenter: velocity-center of point cloud\n    :type vcenter: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :type eigval: (3,) double, ""zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param d: distance from the center, kept fixed during iterative procedure\n    :type d: float\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: ``morph_info`` containing d, q, s, eigframe info\n    :rtype: (12,) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_5runEllVDispAlgo = {"runEllVDispAlgo", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_5runEllVDispAlgo, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_4runEllVDispAlgo};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_5runEllVDispAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_d;
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("runEllVDispAlgo (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_xyz,&__pyx_n_s_vxyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_ellipsoid,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_vcenter,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_d,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_reduced,0};
+    PyObject* values[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 17: values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+        CYTHON_FALLTHROUGH;
+        case 16: values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+        CYTHON_FALLTHROUGH;
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 1); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vxyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 2); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 3); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 4); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ellipsoid)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 5); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 6); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 7); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vcenter)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 8); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 9); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 10); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 11); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 12); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 13); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 14); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 15:
+        if (likely((values[15] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 15); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 16:
+        if (likely((values[16] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, 16); __PYX_ERR(0, 111, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "runEllVDispAlgo") < 0)) __PYX_ERR(0, 111, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 17) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+      values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+      values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_vxyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vxyz.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_vcenter = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vcenter.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_d = __pyx_PyFloat_AsFloat(values[12]); if (unlikely((__pyx_v_d == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[13]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[14]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[15]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[16]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("runEllVDispAlgo", 1, 17, 17, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 111, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runEllVDispAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_4runEllVDispAlgo(__pyx_self, __pyx_v_morph_info, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_ellipsoid, __pyx_v_r_ell, __pyx_v_center, __pyx_v_vcenter, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_d, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_reduced);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_4runEllVDispAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("runEllVDispAlgo", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":159
  *     :rtype: (12,) float array"""
@@ -2332,36 +3124,302 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runEllVDispA
  * 
  * @cython.embedsignature(True)
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":111
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runEllVDispAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vxyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_ellipsoid, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vcenter, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
 /* "shape_profs/shape_profs_algos.pyx":162
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runShellVDispAlgo(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_delta_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_7runShellVDispAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_6runShellVDispAlgo[] = "runShellVDispAlgo(float[:] morph_info, float[:, :] xyz, float[:, :] vxyz, float[:, :] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bool reduced)\n Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor\n    \n    Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n\n    Note that before and during the iteration, ``d`` is defined with respect to the center of \n    the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n\n    \n    :param morph_info: Array to be filled with morphological info. 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,) floats\n    :param xyz: position array\n    :type xyz: (N x 3) floats\n    :param vxyz: velocity array\n    :type vxyz: (N x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N x 3) floats, zeros\n    :param masses: mass array\n    :type masses: (N x 1) floats\n    :param shell: indices of points that fall into shell (varies from iteration to iteration)\n    :type shell: (N,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of point cloud\n    :type center: (3,) floats\n    :param vcenter: velocity-center of point cloud\n    :type vcenter: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :type eigval: (3,) doubl""e, zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param d: distance from the center, kept fixed during iterative procedure\n    :type d: float\n    :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)\n    :type delta_d: float\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: ``morph_info`` containing d, q, s, eigframe info\n    :rtype: (12,) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_7runShellVDispAlgo = {"runShellVDispAlgo", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_7runShellVDispAlgo, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_6runShellVDispAlgo};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_7runShellVDispAlgo(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_d;
+  CYTHON_UNUSED float __pyx_v_delta_d;
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("runShellVDispAlgo (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_xyz,&__pyx_n_s_vxyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_shell,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_vcenter,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_d,&__pyx_n_s_delta_d,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_reduced,0};
+    PyObject* values[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 18: values[17] = PyTuple_GET_ITEM(__pyx_args, 17);
+        CYTHON_FALLTHROUGH;
+        case 17: values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+        CYTHON_FALLTHROUGH;
+        case 16: values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+        CYTHON_FALLTHROUGH;
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 1); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vxyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 2); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 3); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 4); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 5); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 6); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 7); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vcenter)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 8); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 9); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 10); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 11); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 12); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_delta_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 13); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 14); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 15:
+        if (likely((values[15] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 15); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 16:
+        if (likely((values[16] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 16); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 17:
+        if (likely((values[17] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, 17); __PYX_ERR(0, 162, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "runShellVDispAlgo") < 0)) __PYX_ERR(0, 162, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 18) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+      values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+      values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+      values[17] = PyTuple_GET_ITEM(__pyx_args, 17);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_vxyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vxyz.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_vcenter = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vcenter.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_d = __pyx_PyFloat_AsFloat(values[12]); if (unlikely((__pyx_v_d == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_delta_d = __pyx_PyFloat_AsFloat(values[13]); if (unlikely((__pyx_v_delta_d == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[14]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[15]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[16]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[17]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("runShellVDispAlgo", 1, 18, 18, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 162, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runShellVDispAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_6runShellVDispAlgo(__pyx_self, __pyx_v_morph_info, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_shell, __pyx_v_r_ell, __pyx_v_center, __pyx_v_vcenter, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_d, __pyx_v_delta_d, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_reduced);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_6runShellVDispAlgo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_d, CYTHON_UNUSED float __pyx_v_delta_d, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("runShellVDispAlgo", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":212
  *     :rtype: (12,) float array"""
@@ -2370,23 +3428,41 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runShellVDis
  * 
  * @cython.embedsignature(True)
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":162
  * 
  * @cython.embedsignature(True)
- * cdef float[:] runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.runShellVDispAlgo", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vxyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vcenter, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
@@ -2399,10 +3475,10 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_runShellVDis
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_1calcMorphLocal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_17shape_profs_algos_calcMorphLocal[] = "calcMorphLocal(float[:, :] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, bool reduced, bool shell_based)\n Calculates the local shape catalogue\n    \n    Calls ``calcObjMorphLocal()`` in a parallelized manner.\n\n    Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the centers, for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N1\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: each entry of the list gives the R_200 radius of the parent halo\n    :type r200: list of length N1\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGSTART: int\n    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGEND: int\n    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)\n    :type D_BINS: int\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param CENTER: shape quantities will be calcu""lated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n    :type shell_based: boolean\n    :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)\n    :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed\n    ";
-static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_1calcMorphLocal = {"calcMorphLocal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_1calcMorphLocal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_calcMorphLocal};
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_1calcMorphLocal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_9calcMorphLocal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_8calcMorphLocal[] = "calcMorphLocal(float[:, :] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, bool reduced, bool shell_based)\n Calculates the local shape catalogue\n    \n    Calls ``calcObjMorphLocal()`` in a parallelized manner.\n\n    Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the centers, for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N1\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: each entry of the list gives the R_200 radius of the parent halo\n    :type r200: list of length N1\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGSTART: int\n    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGEND: int\n    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)\n    :type D_BINS: int\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param CENTER: shape quantities will be calcu""lated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n    :type shell_based: boolean\n    :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)\n    :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed\n    ";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_9calcMorphLocal = {"calcMorphLocal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_9calcMorphLocal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_8calcMorphLocal};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_9calcMorphLocal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2601,7 +3677,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_1calcMorphLocal(PyOb
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 216, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_calcMorphLocal(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_D_LOGSTART, __pyx_v_D_LOGEND, __pyx_v_D_BINS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_reduced, __pyx_v_shell_based);
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_8calcMorphLocal(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_D_LOGSTART, __pyx_v_D_LOGEND, __pyx_v_D_BINS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2612,7 +3688,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_1calcMorphLocal(PyOb
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_calcMorphLocal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_8calcMorphLocal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMorphLocal", 0);
@@ -2655,10 +3731,10 @@ static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_calcMorphLocal(CYTHO
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_3calcMorphGlobal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_17shape_profs_algos_2calcMorphGlobal[] = "calcMorphGlobal(float[:, :] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, float SAFE, bool reduced)\n Calculates the overall shape catalogue\n    \n    Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n\n    Calculates the overall axis ratios and eigenframe for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N1\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: each entry of the list gives the R_200 radius of the parent halo\n    :type r200: list of length N1\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. \n        The larger the better.\n    :type SAFE: float\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: d, q, s, eigframe, centers, masses\n    :rtype: (N3,) floats (for d, q, s, eigfr""ame (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)\n    ";
-static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_3calcMorphGlobal = {"calcMorphGlobal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_3calcMorphGlobal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_2calcMorphGlobal};
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_3calcMorphGlobal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_11calcMorphGlobal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_10calcMorphGlobal[] = "calcMorphGlobal(float[:, :] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, float SAFE, bool reduced)\n Calculates the overall shape catalogue\n    \n    Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n\n    Calculates the overall axis ratios and eigenframe for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N1\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: each entry of the list gives the R_200 radius of the parent halo\n    :type r200: list of length N1\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. \n        The larger the better.\n    :type SAFE: float\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: d, q, s, eigframe, centers, masses\n    :rtype: (N3,) floats (for d, q, s, eigfr""ame (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)\n    ";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_11calcMorphGlobal = {"calcMorphGlobal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_11calcMorphGlobal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_10calcMorphGlobal};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_11calcMorphGlobal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2824,7 +3900,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_3calcMorphGlobal(PyO
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 262, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_2calcMorphGlobal(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_SAFE, __pyx_v_reduced);
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_10calcMorphGlobal(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_SAFE, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2835,7 +3911,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_3calcMorphGlobal(PyO
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_2calcMorphGlobal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_10calcMorphGlobal(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMorphGlobal", 0);
@@ -2878,10 +3954,10 @@ static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_2calcMorphGlobal(CYT
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_5calcMorphLocalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_17shape_profs_algos_4calcMorphLocalVelDisp[] = "calcMorphLocalVelDisp(float[:, :] xyz, float[:, :] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, bool reduced, bool shell_based)\n Calculates the local velocity dispersion shape catalogue\n    \n    Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n\n    Calculates the overall axis ratios and eigenframe for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param vxyz: velocities of all (DM or star) particles in simulation box\n    :type vxyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N2\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: each entry of the list gives the R_200 radius of the parent halo\n    :type r200: list of length N1\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGSTART: int\n    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGEND: int\n    :param D_BINS: number of ellipsoidal radii of interest mi\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param C""ENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n    :type shell_based: boolean\n    :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)\n    :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed\n    ";
-static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_5calcMorphLocalVelDisp = {"calcMorphLocalVelDisp", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_5calcMorphLocalVelDisp, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_4calcMorphLocalVelDisp};
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_5calcMorphLocalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_13calcMorphLocalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_12calcMorphLocalVelDisp[] = "calcMorphLocalVelDisp(float[:, :] xyz, float[:, :] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, bool reduced, bool shell_based)\n Calculates the local velocity dispersion shape catalogue\n    \n    Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n\n    Calculates the overall axis ratios and eigenframe for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param vxyz: velocities of all (DM or star) particles in simulation box\n    :type vxyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N2\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: each entry of the list gives the R_200 radius of the parent halo\n    :type r200: list of length N1\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGSTART: int\n    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n    :type D_LOGEND: int\n    :param D_BINS: number of ellipsoidal radii of interest mi\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param C""ENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n    :type shell_based: boolean\n    :return: d, q, s, eigframe, centers, masses, l_succeed: list of object indices for which morphology could be determined at R200 (length: N3)\n    :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed\n    ";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_13calcMorphLocalVelDisp = {"calcMorphLocalVelDisp", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_13calcMorphLocalVelDisp, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_12calcMorphLocalVelDisp};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_13calcMorphLocalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -3091,7 +4167,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_5calcMorphLocalVelDi
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 303, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_4calcMorphLocalVelDisp(__pyx_self, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_D_LOGSTART, __pyx_v_D_LOGEND, __pyx_v_D_BINS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_reduced, __pyx_v_shell_based);
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_12calcMorphLocalVelDisp(__pyx_self, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_D_LOGSTART, __pyx_v_D_LOGEND, __pyx_v_D_BINS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3102,7 +4178,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_5calcMorphLocalVelDi
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_4calcMorphLocalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_12calcMorphLocalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_D_LOGSTART, CYTHON_UNUSED int __pyx_v_D_LOGEND, CYTHON_UNUSED int __pyx_v_D_BINS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMorphLocalVelDisp", 0);
@@ -3146,10 +4222,10 @@ static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_4calcMorphLocalVelDi
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_7calcMorphGlobalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_17shape_profs_algos_6calcMorphGlobalVelDisp[] = "calcMorphGlobalVelDisp(float[:, :] xyz, float[:, :] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, float SAFE, bool reduced)\n Calculates the global velocity dipsersion shape catalogue\n    \n    Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n\n    Calculates the overall axis ratios and eigenframe for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param vxyz: velocities of all (DM or star) particles in simulation box\n    :type vxyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N2\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: R_200 radii of the parent halos\n    :type r200: (N1,) floats\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. \n        The larger the better.\n    :type SAFE: float\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)""\n    :type reduced: boolean\n    :return: d, q, s, eigframe, centers, masses\n    :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)\n    ";
-static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_7calcMorphGlobalVelDisp = {"calcMorphGlobalVelDisp", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_7calcMorphGlobalVelDisp, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_6calcMorphGlobalVelDisp};
-static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_7calcMorphGlobalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_15calcMorphGlobalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_14calcMorphGlobalVelDisp[] = "calcMorphGlobalVelDisp(float[:, :] xyz, float[:, :] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, unicode CENTER, float SAFE, bool reduced)\n Calculates the global velocity dipsersion shape catalogue\n    \n    Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n\n    Calculates the overall axis ratios and eigenframe for each object.\n    \n    :param xyz: positions of all (DM or star) particles in simulation box\n    :type xyz: (N2 x 3) floats\n    :param vxyz: velocities of all (DM or star) particles in simulation box\n    :type vxyz: (N2 x 3) floats\n    :param cat: each entry of the list is a list containing indices of particles belonging to an object\n    :type cat: list of length N2\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N2 x 1) floats\n    :param r200: R_200 radii of the parent halos\n    :type r200: (N1,) floats\n    :param L_BOX: simulation box side length\n    :type L_BOX: float, units: Mpc/h\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. \n        The larger the better.\n    :type SAFE: float\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)""\n    :type reduced: boolean\n    :return: d, q, s, eigframe, centers, masses\n    :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)\n    ";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_15calcMorphGlobalVelDisp = {"calcMorphGlobalVelDisp", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_15calcMorphGlobalVelDisp, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_14calcMorphGlobalVelDisp};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_15calcMorphGlobalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -3326,7 +4402,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_7calcMorphGlobalVelD
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 350, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_6calcMorphGlobalVelDisp(__pyx_self, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_SAFE, __pyx_v_reduced);
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_14calcMorphGlobalVelDisp(__pyx_self, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_masses, __pyx_v_r200, __pyx_v_cat, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_CENTER, __pyx_v_SAFE, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3337,7 +4413,7 @@ static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_7calcMorphGlobalVelD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_6calcMorphGlobalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_14calcMorphGlobalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED PyObject *__pyx_v_cat, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED int __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED PyObject *__pyx_v_CENTER, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMorphGlobalVelDisp", 0);
@@ -3375,13 +4451,250 @@ static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_6calcMorphGlobalVelD
 /* "shape_profs/shape_profs_algos.pyx":392
  * 
  * @cython.embedsignature(True)
- * cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
  *     """ Calculates the local axis ratios
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_calcObjMorphLocal(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_17calcObjMorphLocal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_16calcObjMorphLocal[] = "calcObjMorphLocal(float[:, :] morph_info, float r200, float[:] log_d, float[:, :] xyz, float[:, :] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float M_TOL, int N_WALL, int N_MIN, bool reduced, bool shell_based)\n Calculates the local axis ratios\n    \n    The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] \n    from the center of the point cloud\n    \n    :param morph_info: Array to be filled with morphological info. For each column, 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,N) floats\n    :param r200: R_200 radius of the parent halo\n    :type r200: (N2,) float array\n    :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 \n        radius of the parent halo, e.g. np.logspace(-2,1,100)\n    :type log_d: (N3,) floats\n    :param xyz: positions of particles in point cloud\n    :type xyz: (N1 x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N1 x 3) floats, zeros\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N1 x 1) floats\n    :param shell: indices of points that fall into shell (varies from iteration to iteration)\n    :type shell: (N,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of point cloud\n    :type center: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :typ""e eigval: (3,) double, zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n    :type shell_based: boolean\n    :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius\n    :rtype: (12,N) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_17calcObjMorphLocal = {"calcObjMorphLocal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_17calcObjMorphLocal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_16calcObjMorphLocal};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_17calcObjMorphLocal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_r200;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  CYTHON_UNUSED int __pyx_v_shell_based;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("calcObjMorphLocal (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_r200,&__pyx_n_s_log_d,&__pyx_n_s_xyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_shell,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 17: values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+        CYTHON_FALLTHROUGH;
+        case 16: values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+        CYTHON_FALLTHROUGH;
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 1); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_log_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 2); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 3); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 4); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 5); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 6); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 7); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 8); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 9); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 10); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 11); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 12); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 13); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 14); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 15:
+        if (likely((values[15] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 15); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 16:
+        if (likely((values[16] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, 16); __PYX_ERR(0, 392, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcObjMorphLocal") < 0)) __PYX_ERR(0, 392, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 17) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+      values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+      values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_r200 = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_r200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_log_d = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_log_d.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[12]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[13]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[14]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[15]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 392, __pyx_L3_error)
+    __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[16]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 392, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("calcObjMorphLocal", 1, 17, 17, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 392, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphLocal", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_16calcObjMorphLocal(__pyx_self, __pyx_v_morph_info, __pyx_v_r200, __pyx_v_log_d, __pyx_v_xyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_shell, __pyx_v_r_ell, __pyx_v_center, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_reduced, __pyx_v_shell_based);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_16calcObjMorphLocal(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("calcObjMorphLocal", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":439
  *     :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius
@@ -3390,36 +4703,279 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_calcObjMorph
  * 
  * @cython.embedsignature(True)
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 2, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":392
  * 
  * @cython.embedsignature(True)
- * cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
  *     """ Calculates the local axis ratios
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphLocal", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_log_d, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
 /* "shape_profs/shape_profs_algos.pyx":442
  * 
  * @cython.embedsignature(True)
- * cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Calculates the global axis ratios and eigenframe of the point cloud
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_calcObjMorphGlobal(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_19calcObjMorphGlobal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_18calcObjMorphGlobal[] = "calcObjMorphGlobal(float[:] morph_info, float r200, float[:, :] xyz, float[:, :] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bool reduced)\n Calculates the global axis ratios and eigenframe of the point cloud\n    \n    :param morph_info: Array to be filled with morphological info. 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,) floats\n    :param r200: R_200 radius of the parent halo\n    :type r200: (N2,) float array\n    :param xyz: positions of particles in point cloud\n    :type xyz: (N1 x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N1 x 3) floats, zeros\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N1 x 1) floats\n    :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)\n    :type ellipsoid: (N1,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of point cloud\n    :type center: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :type eigval: (3,) double, zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :pa""ram N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. \n        The larger the better.\n    :type SAFE: float\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: ``morph_info`` containing d, q, s, eigframe info\n    :rtype: (12,) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_19calcObjMorphGlobal = {"calcObjMorphGlobal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_19calcObjMorphGlobal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_18calcObjMorphGlobal};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_19calcObjMorphGlobal(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_r200;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED float __pyx_v_SAFE;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("calcObjMorphGlobal (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_r200,&__pyx_n_s_xyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_ellipsoid,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_SAFE,&__pyx_n_s_reduced,0};
+    PyObject* values[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 16: values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+        CYTHON_FALLTHROUGH;
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 1); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 2); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 3); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 4); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ellipsoid)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 5); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 6); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 7); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 8); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 9); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 10); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 11); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 12); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 13); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_SAFE)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 14); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 15:
+        if (likely((values[15] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, 15); __PYX_ERR(0, 442, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcObjMorphGlobal") < 0)) __PYX_ERR(0, 442, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 16) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+      values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_r200 = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_r200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[11]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[12]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[13]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_SAFE = __pyx_PyFloat_AsFloat(values[14]); if (unlikely((__pyx_v_SAFE == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 442, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[15]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 442, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobal", 1, 16, 16, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 442, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphGlobal", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_18calcObjMorphGlobal(__pyx_self, __pyx_v_morph_info, __pyx_v_r200, __pyx_v_xyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_ellipsoid, __pyx_v_r_ell, __pyx_v_center, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_SAFE, __pyx_v_reduced);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_18calcObjMorphGlobal(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("calcObjMorphGlobal", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":484
  *     :return: ``morph_info`` containing d, q, s, eigframe info
@@ -3428,36 +4984,311 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_calcObjMorph
  * 
  * @cython.embedsignature(True)
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 484, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":442
  * 
  * @cython.embedsignature(True)
- * cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Calculates the global axis ratios and eigenframe of the point cloud
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphGlobal", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_ellipsoid, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
 /* "shape_profs/shape_profs_algos.pyx":487
  * 
  * @cython.embedsignature(True)
- * cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
  *     """ Calculates the local axis ratios of the velocity dispersion tensor
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_calcObjMorphLocalVelDisp(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_21calcObjMorphLocalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_20calcObjMorphLocalVelDisp[] = "calcObjMorphLocalVelDisp(float[:, :] morph_info, float r200, float[:] log_d, float[:, :] xyz, float[:, :] vxyz, float[:, :] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float M_TOL, int N_WALL, int N_MIN, bool reduced, bool shell_based)\n Calculates the local axis ratios of the velocity dispersion tensor \n    \n    The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] \n    from the center of the point cloud\n    \n    :param morph_info: Array to be filled with morphological info. For each column, 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,N) floats\n    :param r200: R_200 radius of the parent halo\n    :type r200: (N2,) float array\n    :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 \n        radius of the parent halo, e.g. np.logspace(-2,1,100)\n    :type log_d: (N3,) floats\n    :param xyz: positions of particles in point cloud\n    :type xyz: (N1 x 3) floats\n    :param vxyz: velocity array\n    :type vxyz: (N1 x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N1 x 3) floats, zeros\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N1 x 1) floats\n    :param shell: indices of points that fall into shell (varies from iteration to iteration)\n    :type shell: (N1,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of point cloud\n    :type center: (3,) floats\n    :param vcente""r: velocity-center of point cloud\n    :type vcenter: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :type eigval: (3,) double, zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n    :type shell_based: boolean\n    :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info\n    :rtype: (12,) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_21calcObjMorphLocalVelDisp = {"calcObjMorphLocalVelDisp", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_21calcObjMorphLocalVelDisp, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_20calcObjMorphLocalVelDisp};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_21calcObjMorphLocalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_r200;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  CYTHON_UNUSED int __pyx_v_shell_based;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("calcObjMorphLocalVelDisp (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_r200,&__pyx_n_s_log_d,&__pyx_n_s_xyz,&__pyx_n_s_vxyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_shell,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_vcenter,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[19] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 19: values[18] = PyTuple_GET_ITEM(__pyx_args, 18);
+        CYTHON_FALLTHROUGH;
+        case 18: values[17] = PyTuple_GET_ITEM(__pyx_args, 17);
+        CYTHON_FALLTHROUGH;
+        case 17: values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+        CYTHON_FALLTHROUGH;
+        case 16: values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+        CYTHON_FALLTHROUGH;
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 1); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_log_d)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 2); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 3); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vxyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 4); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 5); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 6); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 7); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 8); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 9); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vcenter)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 10); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 11); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 12); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 13); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 14); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 15:
+        if (likely((values[15] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 15); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 16:
+        if (likely((values[16] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 16); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 17:
+        if (likely((values[17] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 17); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 18:
+        if (likely((values[18] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, 18); __PYX_ERR(0, 487, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcObjMorphLocalVelDisp") < 0)) __PYX_ERR(0, 487, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 19) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+      values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+      values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+      values[17] = PyTuple_GET_ITEM(__pyx_args, 17);
+      values[18] = PyTuple_GET_ITEM(__pyx_args, 18);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_r200 = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_r200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_log_d = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_log_d.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_vxyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vxyz.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_shell = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shell.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_vcenter = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vcenter.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[12], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[13], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[14]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[15]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[16]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[17]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 487, __pyx_L3_error)
+    __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[18]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 487, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("calcObjMorphLocalVelDisp", 1, 19, 19, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 487, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphLocalVelDisp", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_20calcObjMorphLocalVelDisp(__pyx_self, __pyx_v_morph_info, __pyx_v_r200, __pyx_v_log_d, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_shell, __pyx_v_r_ell, __pyx_v_center, __pyx_v_vcenter, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_reduced, __pyx_v_shell_based);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_20calcObjMorphLocalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_log_d, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("calcObjMorphLocalVelDisp", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":538
  *     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
@@ -3466,59 +5297,344 @@ static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_calcObjMorph
  * 
  * @cython.embedsignature(True)
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 2, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 538, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":487
  * 
  * @cython.embedsignature(True)
- * cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
  *     """ Calculates the local axis ratios of the velocity dispersion tensor
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphLocalVelDisp", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_log_d, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vxyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vcenter, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
 /* "shape_profs/shape_profs_algos.pyx":541
  * 
  * @cython.embedsignature(True)
- * cdef float[:] calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
  * 
  */
 
-static __Pyx_memviewslice __pyx_f_11shape_profs_17shape_profs_algos_calcObjMorphGlobalVelDisp(__Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
-  __Pyx_memviewslice __pyx_r = { 0, 0, { 0 }, { 0 }, { 0 } };
+/* Python wrapper */
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_23calcObjMorphGlobalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11shape_profs_17shape_profs_algos_22calcObjMorphGlobalVelDisp[] = "calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:, :] xyz, float[:, :] vxyz, float[:, :] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, double complex[::1, :] shape_tensor, double[::1] eigval, double complex[::1, :] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bool reduced)\n Calculates the global axis ratios and eigenframe of the velocity dispersion tensor\n    \n    :param morph_info: Array to be filled with morphological info. 1st entry: d,\n        2nd entry: q, 3rd entry: s, 4th to 6th: normalized major axis, 7th to 9th: normalized intermediate axis,\n        10th to 12th: normalized minor axis\n    :type morph_info: (12,) floats\n    :param r200: R_200 radius of the parent halo\n    :type r200: (N2,) float array\n    :param xyz: positions of particles in point cloud\n    :type xyz: (N1 x 3) floats\n    :param vxyz: velocity array\n    :type vxyz: (N1 x 3) floats\n    :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)\n    :type xyz_princ: (N1 x 3) floats, zeros\n    :param masses: masses of the particles expressed in unit mass\n    :type masses: (N1 x 1) floats\n    :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)\n    :type ellipsoid: (N1,) ints, zeros\n    :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)\n    :type r_ell: (N,) floats, zeros\n    :param center: center of point cloud\n    :type center: (3,) floats\n    :param vcenter: velocity-center of point cloud\n    :type vcenter: (3,) floats\n    :param shape_tensor: shape tensor array to be filled\n    :type shape_tensor: (3,3) complex, zeros\n    :param eigval: eigenvalue array to be filled\n    :type eigval: (3,) double, zeros\n    :param eigvec: eigenvector array to be filled\n    :type eigvec: (3,3) double, zeros\n    :param d: distance from the center"", kept fixed during iterative procedure\n    :type d: float\n    :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)\n    :type delta_d: float\n    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``\n        for iteration to stop\n    :type M_TOL: float\n    :param N_WALL: maximum permissible number of iterations\n    :type N_WALL: float\n    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; \n        if undercut, shape is unclassified\n    :type N_MIN: int\n    :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. \n        The larger the better.\n    :type SAFE: float\n    :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n    :type reduced: boolean\n    :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info\n    :rtype: (12,) float array";
+static PyMethodDef __pyx_mdef_11shape_profs_17shape_profs_algos_23calcObjMorphGlobalVelDisp = {"calcObjMorphGlobalVelDisp", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_17shape_profs_algos_23calcObjMorphGlobalVelDisp, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_17shape_profs_algos_22calcObjMorphGlobalVelDisp};
+static PyObject *__pyx_pw_11shape_profs_17shape_profs_algos_23calcObjMorphGlobalVelDisp(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_morph_info = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_r200;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED float __pyx_v_M_TOL;
+  CYTHON_UNUSED int __pyx_v_N_WALL;
+  CYTHON_UNUSED int __pyx_v_N_MIN;
+  CYTHON_UNUSED float __pyx_v_SAFE;
+  CYTHON_UNUSED int __pyx_v_reduced;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("calcObjMorphGlobalVelDisp (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_morph_info,&__pyx_n_s_r200,&__pyx_n_s_xyz,&__pyx_n_s_vxyz,&__pyx_n_s_xyz_princ,&__pyx_n_s_masses,&__pyx_n_s_ellipsoid,&__pyx_n_s_r_ell,&__pyx_n_s_center,&__pyx_n_s_vcenter,&__pyx_n_s_shape_tensor,&__pyx_n_s_eigval,&__pyx_n_s_eigvec,&__pyx_n_s_M_TOL,&__pyx_n_s_N_WALL,&__pyx_n_s_N_MIN,&__pyx_n_s_SAFE,&__pyx_n_s_reduced,0};
+    PyObject* values[18] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case 18: values[17] = PyTuple_GET_ITEM(__pyx_args, 17);
+        CYTHON_FALLTHROUGH;
+        case 17: values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+        CYTHON_FALLTHROUGH;
+        case 16: values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+        CYTHON_FALLTHROUGH;
+        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+        CYTHON_FALLTHROUGH;
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
+        case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+        CYTHON_FALLTHROUGH;
+        case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+        CYTHON_FALLTHROUGH;
+        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+        CYTHON_FALLTHROUGH;
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_morph_info)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 1); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 2); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vxyz)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 3); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz_princ)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 4); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 5); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ellipsoid)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 6); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_ell)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 7); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_center)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 8); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_vcenter)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 9); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 10:
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shape_tensor)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 10); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 11:
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigval)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 11); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 12:
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_eigvec)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 12); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_M_TOL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 13); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 14:
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_WALL)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 14); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 15:
+        if (likely((values[15] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N_MIN)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 15); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 16:
+        if (likely((values[16] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_SAFE)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 16); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 17:
+        if (likely((values[17] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, 17); __PYX_ERR(0, 541, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcObjMorphGlobalVelDisp") < 0)) __PYX_ERR(0, 541, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 18) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+      values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
+      values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
+      values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
+      values[15] = PyTuple_GET_ITEM(__pyx_args, 15);
+      values[16] = PyTuple_GET_ITEM(__pyx_args, 16);
+      values[17] = PyTuple_GET_ITEM(__pyx_args, 17);
+    }
+    __pyx_v_morph_info = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_morph_info.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_r200 = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_r200 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_vxyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vxyz.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_xyz_princ = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz_princ.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_ellipsoid = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ellipsoid.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_r_ell = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_ell.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_center = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_center.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_vcenter = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_vcenter.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_shape_tensor = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_shape_tensor.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_eigval = __Pyx_PyObject_to_MemoryviewSlice_dc_double(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigval.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_eigvec = __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(values[12], PyBUF_WRITABLE); if (unlikely(!__pyx_v_eigvec.memview)) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_M_TOL = __pyx_PyFloat_AsFloat(values[13]); if (unlikely((__pyx_v_M_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_N_WALL = __Pyx_PyInt_As_int(values[14]); if (unlikely((__pyx_v_N_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_N_MIN = __Pyx_PyInt_As_int(values[15]); if (unlikely((__pyx_v_N_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_SAFE = __pyx_PyFloat_AsFloat(values[16]); if (unlikely((__pyx_v_SAFE == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 541, __pyx_L3_error)
+    __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[17]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 541, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("calcObjMorphGlobalVelDisp", 1, 18, 18, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 541, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphGlobalVelDisp", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_11shape_profs_17shape_profs_algos_22calcObjMorphGlobalVelDisp(__pyx_self, __pyx_v_morph_info, __pyx_v_r200, __pyx_v_xyz, __pyx_v_vxyz, __pyx_v_xyz_princ, __pyx_v_masses, __pyx_v_ellipsoid, __pyx_v_r_ell, __pyx_v_center, __pyx_v_vcenter, __pyx_v_shape_tensor, __pyx_v_eigval, __pyx_v_eigvec, __pyx_v_M_TOL, __pyx_v_N_WALL, __pyx_v_N_MIN, __pyx_v_SAFE, __pyx_v_reduced);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_11shape_profs_17shape_profs_algos_22calcObjMorphGlobalVelDisp(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_morph_info, CYTHON_UNUSED float __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vxyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz_princ, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ellipsoid, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_ell, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_center, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_vcenter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_shape_tensor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigval, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_eigvec, CYTHON_UNUSED float __pyx_v_M_TOL, CYTHON_UNUSED int __pyx_v_N_WALL, CYTHON_UNUSED int __pyx_v_N_MIN, CYTHON_UNUSED float __pyx_v_SAFE, CYTHON_UNUSED int __pyx_v_reduced) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("calcObjMorphGlobalVelDisp", 0);
 
   /* "shape_profs/shape_profs_algos.pyx":591
  *     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
  *     :rtype: (12,) float array"""
  *     return morph_info             # <<<<<<<<<<<<<<
  */
-  __PYX_INC_MEMVIEW(&__pyx_v_morph_info, 1);
-  __pyx_r = __pyx_v_morph_info;
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_morph_info, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 591, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "shape_profs/shape_profs_algos.pyx":541
  * 
  * @cython.embedsignature(True)
- * cdef float[:] calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced) nogil:             # <<<<<<<<<<<<<<
+ * def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
  *     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
  * 
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("shape_profs.shape_profs_algos.calcObjMorphGlobalVelDisp", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
-  if (unlikely(!__pyx_r.memview)) {
-    PyErr_SetString(PyExc_TypeError, "Memoryview return value is not initialized");
-  }
+  __PYX_XDEC_MEMVIEW(&__pyx_v_morph_info, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vxyz, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz_princ, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_ellipsoid, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_r_ell, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_center, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_vcenter, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_shape_tensor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigval, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_eigvec, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
@@ -17342,13 +19458,23 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_calcMorphGlobalVelDisp, __pyx_k_calcMorphGlobalVelDisp, sizeof(__pyx_k_calcMorphGlobalVelDisp), 0, 0, 1, 1},
   {&__pyx_n_s_calcMorphLocal, __pyx_k_calcMorphLocal, sizeof(__pyx_k_calcMorphLocal), 0, 0, 1, 1},
   {&__pyx_n_s_calcMorphLocalVelDisp, __pyx_k_calcMorphLocalVelDisp, sizeof(__pyx_k_calcMorphLocalVelDisp), 0, 0, 1, 1},
+  {&__pyx_n_s_calcObjMorphGlobal, __pyx_k_calcObjMorphGlobal, sizeof(__pyx_k_calcObjMorphGlobal), 0, 0, 1, 1},
+  {&__pyx_n_s_calcObjMorphGlobalVelDisp, __pyx_k_calcObjMorphGlobalVelDisp, sizeof(__pyx_k_calcObjMorphGlobalVelDisp), 0, 0, 1, 1},
+  {&__pyx_n_s_calcObjMorphLocal, __pyx_k_calcObjMorphLocal, sizeof(__pyx_k_calcObjMorphLocal), 0, 0, 1, 1},
+  {&__pyx_n_s_calcObjMorphLocalVelDisp, __pyx_k_calcObjMorphLocalVelDisp, sizeof(__pyx_k_calcObjMorphLocalVelDisp), 0, 0, 1, 1},
   {&__pyx_n_s_cat, __pyx_k_cat, sizeof(__pyx_k_cat), 0, 0, 1, 1},
+  {&__pyx_n_s_center, __pyx_k_center, sizeof(__pyx_k_center), 0, 0, 1, 1},
   {&__pyx_n_s_class, __pyx_k_class, sizeof(__pyx_k_class), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
+  {&__pyx_n_s_d, __pyx_k_d, sizeof(__pyx_k_d), 0, 0, 1, 1},
+  {&__pyx_n_s_delta_d, __pyx_k_delta_d, sizeof(__pyx_k_delta_d), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
+  {&__pyx_n_s_eigval, __pyx_k_eigval, sizeof(__pyx_k_eigval), 0, 0, 1, 1},
+  {&__pyx_n_s_eigvec, __pyx_k_eigvec, sizeof(__pyx_k_eigvec), 0, 0, 1, 1},
+  {&__pyx_n_s_ellipsoid, __pyx_k_ellipsoid, sizeof(__pyx_k_ellipsoid), 0, 0, 1, 1},
   {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},
@@ -17362,10 +19488,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_itemsize, __pyx_k_itemsize, sizeof(__pyx_k_itemsize), 0, 0, 1, 1},
   {&__pyx_kp_s_itemsize_0_for_cython_array, __pyx_k_itemsize_0_for_cython_array, sizeof(__pyx_k_itemsize_0_for_cython_array), 0, 0, 1, 0},
+  {&__pyx_n_s_log_d, __pyx_k_log_d, sizeof(__pyx_k_log_d), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_masses, __pyx_k_masses, sizeof(__pyx_k_masses), 0, 0, 1, 1},
   {&__pyx_n_s_memview, __pyx_k_memview, sizeof(__pyx_k_memview), 0, 0, 1, 1},
   {&__pyx_n_s_mode, __pyx_k_mode, sizeof(__pyx_k_mode), 0, 0, 1, 1},
+  {&__pyx_n_s_morph_info, __pyx_k_morph_info, sizeof(__pyx_k_morph_info), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_name_2, __pyx_k_name_2, sizeof(__pyx_k_name_2), 0, 0, 1, 1},
   {&__pyx_n_s_ndim, __pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 0, 1, 1},
@@ -17385,16 +19513,23 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pyx_unpickle_Enum, __pyx_k_pyx_unpickle_Enum, sizeof(__pyx_k_pyx_unpickle_Enum), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_r200, __pyx_k_r200, sizeof(__pyx_k_r200), 0, 0, 1, 1},
+  {&__pyx_n_s_r_ell, __pyx_k_r_ell, sizeof(__pyx_k_r_ell), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
   {&__pyx_n_s_reduced, __pyx_k_reduced, sizeof(__pyx_k_reduced), 0, 0, 1, 1},
+  {&__pyx_n_s_runEllAlgo, __pyx_k_runEllAlgo, sizeof(__pyx_k_runEllAlgo), 0, 0, 1, 1},
+  {&__pyx_n_s_runEllVDispAlgo, __pyx_k_runEllVDispAlgo, sizeof(__pyx_k_runEllVDispAlgo), 0, 0, 1, 1},
+  {&__pyx_n_s_runShellAlgo, __pyx_k_runShellAlgo, sizeof(__pyx_k_runShellAlgo), 0, 0, 1, 1},
+  {&__pyx_n_s_runShellVDispAlgo, __pyx_k_runShellVDispAlgo, sizeof(__pyx_k_runShellVDispAlgo), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_shape_profs_shape_profs_algos, __pyx_k_shape_profs_shape_profs_algos, sizeof(__pyx_k_shape_profs_shape_profs_algos), 0, 0, 1, 1},
   {&__pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_k_shape_profs_shape_profs_algos_py, sizeof(__pyx_k_shape_profs_shape_profs_algos_py), 0, 0, 1, 0},
+  {&__pyx_n_s_shape_tensor, __pyx_k_shape_tensor, sizeof(__pyx_k_shape_tensor), 0, 0, 1, 1},
+  {&__pyx_n_s_shell, __pyx_k_shell, sizeof(__pyx_k_shell), 0, 0, 1, 1},
   {&__pyx_n_s_shell_based, __pyx_k_shell_based, sizeof(__pyx_k_shell_based), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
@@ -17410,8 +19545,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},
   {&__pyx_n_s_unpack, __pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 0, 1, 1},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
+  {&__pyx_n_s_vcenter, __pyx_k_vcenter, sizeof(__pyx_k_vcenter), 0, 0, 1, 1},
   {&__pyx_n_s_vxyz, __pyx_k_vxyz, sizeof(__pyx_k_vxyz), 0, 0, 1, 1},
   {&__pyx_n_s_xyz, __pyx_k_xyz, sizeof(__pyx_k_xyz), 0, 0, 1, 1},
+  {&__pyx_n_s_xyz_princ, __pyx_k_xyz_princ, sizeof(__pyx_k_xyz_princ), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
@@ -17624,6 +19761,54 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
+  /* "shape_profs/shape_profs_algos.pyx":11
+ * 
+ * @cython.embedsignature(True)
+ * def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
+ * 
+ */
+  __pyx_tuple__19 = PyTuple_Pack(16, __pyx_n_s_morph_info, __pyx_n_s_xyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_shell, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_d, __pyx_n_s_delta_d, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(16, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_runShellAlgo, 11, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 11, __pyx_L1_error)
+
+  /* "shape_profs/shape_profs_algos.pyx":64
+ * 
+ * @cython.embedsignature(True)
+ * def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
+ * 
+ */
+  __pyx_tuple__21 = PyTuple_Pack(15, __pyx_n_s_morph_info, __pyx_n_s_xyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_ellipsoid, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_d, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(15, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_runEllAlgo, 64, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 64, __pyx_L1_error)
+
+  /* "shape_profs/shape_profs_algos.pyx":111
+ * 
+ * @cython.embedsignature(True)
+ * def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
+ * 
+ */
+  __pyx_tuple__23 = PyTuple_Pack(17, __pyx_n_s_morph_info, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_ellipsoid, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_vcenter, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_d, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(17, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_runEllVDispAlgo, 111, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 111, __pyx_L1_error)
+
+  /* "shape_profs/shape_profs_algos.pyx":162
+ * 
+ * @cython.embedsignature(True)
+ * def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
+ * 
+ */
+  __pyx_tuple__25 = PyTuple_Pack(18, __pyx_n_s_morph_info, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_shell, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_vcenter, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_d, __pyx_n_s_delta_d, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(18, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_runShellVDispAlgo, 162, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 162, __pyx_L1_error)
+
   /* "shape_profs/shape_profs_algos.pyx":216
  * @cython.embedsignature(True)
  * @cython.binding(True)
@@ -17631,10 +19816,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """ Calculates the local shape catalogue
  * 
  */
-  __pyx_tuple__19 = PyTuple_Pack(15, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_D_LOGSTART, __pyx_n_s_D_LOGEND, __pyx_n_s_D_BINS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_reduced, __pyx_n_s_shell_based); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 216, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__19);
-  __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(15, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphLocal, 216, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 216, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(15, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_D_LOGSTART, __pyx_n_s_D_LOGEND, __pyx_n_s_D_BINS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_reduced, __pyx_n_s_shell_based); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 216, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__27);
+  __Pyx_GIVEREF(__pyx_tuple__27);
+  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(15, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphLocal, 216, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(0, 216, __pyx_L1_error)
 
   /* "shape_profs/shape_profs_algos.pyx":262
  * @cython.embedsignature(True)
@@ -17643,10 +19828,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """ Calculates the overall shape catalogue
  * 
  */
-  __pyx_tuple__21 = PyTuple_Pack(12, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_SAFE, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 262, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__21);
-  __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(12, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphGlobal, 262, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_tuple__29 = PyTuple_Pack(12, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_SAFE, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__29);
+  __Pyx_GIVEREF(__pyx_tuple__29);
+  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(12, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphGlobal, 262, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) __PYX_ERR(0, 262, __pyx_L1_error)
 
   /* "shape_profs/shape_profs_algos.pyx":303
  * @cython.embedsignature(True)
@@ -17655,10 +19840,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """ Calculates the local velocity dispersion shape catalogue
  * 
  */
-  __pyx_tuple__23 = PyTuple_Pack(16, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_D_LOGSTART, __pyx_n_s_D_LOGEND, __pyx_n_s_D_BINS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_reduced, __pyx_n_s_shell_based); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 303, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__23);
-  __Pyx_GIVEREF(__pyx_tuple__23);
-  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(16, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphLocalVelDisp, 303, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_tuple__31 = PyTuple_Pack(16, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_D_LOGSTART, __pyx_n_s_D_LOGEND, __pyx_n_s_D_BINS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_reduced, __pyx_n_s_shell_based); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__31);
+  __Pyx_GIVEREF(__pyx_tuple__31);
+  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(16, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphLocalVelDisp, 303, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 303, __pyx_L1_error)
 
   /* "shape_profs/shape_profs_algos.pyx":350
  * @cython.embedsignature(True)
@@ -17667,10 +19852,58 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """ Calculates the global velocity dipsersion shape catalogue
  * 
  */
-  __pyx_tuple__25 = PyTuple_Pack(13, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_SAFE, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 350, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__25);
-  __Pyx_GIVEREF(__pyx_tuple__25);
-  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(13, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphGlobalVelDisp, 350, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_tuple__33 = PyTuple_Pack(13, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_masses, __pyx_n_s_r200, __pyx_n_s_cat, __pyx_n_s_L_BOX, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_CENTER, __pyx_n_s_SAFE, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__33);
+  __Pyx_GIVEREF(__pyx_tuple__33);
+  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(13, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcMorphGlobalVelDisp, 350, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 350, __pyx_L1_error)
+
+  /* "shape_profs/shape_profs_algos.pyx":392
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
+ *     """ Calculates the local axis ratios
+ * 
+ */
+  __pyx_tuple__35 = PyTuple_Pack(17, __pyx_n_s_morph_info, __pyx_n_s_r200, __pyx_n_s_log_d, __pyx_n_s_xyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_shell, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_reduced, __pyx_n_s_shell_based); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 392, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__35);
+  __Pyx_GIVEREF(__pyx_tuple__35);
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(17, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcObjMorphLocal, 392, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 392, __pyx_L1_error)
+
+  /* "shape_profs/shape_profs_algos.pyx":442
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Calculates the global axis ratios and eigenframe of the point cloud
+ * 
+ */
+  __pyx_tuple__37 = PyTuple_Pack(16, __pyx_n_s_morph_info, __pyx_n_s_r200, __pyx_n_s_xyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_ellipsoid, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_SAFE, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 442, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__37);
+  __Pyx_GIVEREF(__pyx_tuple__37);
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(16, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcObjMorphGlobal, 442, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 442, __pyx_L1_error)
+
+  /* "shape_profs/shape_profs_algos.pyx":487
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
+ *     """ Calculates the local axis ratios of the velocity dispersion tensor
+ * 
+ */
+  __pyx_tuple__39 = PyTuple_Pack(19, __pyx_n_s_morph_info, __pyx_n_s_r200, __pyx_n_s_log_d, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_shell, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_vcenter, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_reduced, __pyx_n_s_shell_based); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 487, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__39);
+  __Pyx_GIVEREF(__pyx_tuple__39);
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(19, 0, 19, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcObjMorphLocalVelDisp, 487, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 487, __pyx_L1_error)
+
+  /* "shape_profs/shape_profs_algos.pyx":541
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
+ * 
+ */
+  __pyx_tuple__41 = PyTuple_Pack(18, __pyx_n_s_morph_info, __pyx_n_s_r200, __pyx_n_s_xyz, __pyx_n_s_vxyz, __pyx_n_s_xyz_princ, __pyx_n_s_masses, __pyx_n_s_ellipsoid, __pyx_n_s_r_ell, __pyx_n_s_center, __pyx_n_s_vcenter, __pyx_n_s_shape_tensor, __pyx_n_s_eigval, __pyx_n_s_eigvec, __pyx_n_s_M_TOL, __pyx_n_s_N_WALL, __pyx_n_s_N_MIN, __pyx_n_s_SAFE, __pyx_n_s_reduced); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 541, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__41);
+  __Pyx_GIVEREF(__pyx_tuple__41);
+  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(18, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_shape_profs_shape_profs_algos_py, __pyx_n_s_calcObjMorphGlobalVelDisp, 541, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 541, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -17679,9 +19912,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__27 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(1, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__27);
-  __Pyx_GIVEREF(__pyx_tuple__27);
+  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__43);
+  __Pyx_GIVEREF(__pyx_tuple__43);
 
   /* "View.MemoryView":287
  * 
@@ -17690,9 +19923,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__28 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(1, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__28);
-  __Pyx_GIVEREF(__pyx_tuple__28);
+  __pyx_tuple__44 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__44);
+  __Pyx_GIVEREF(__pyx_tuple__44);
 
   /* "View.MemoryView":288
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -17701,9 +19934,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(1, 288, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__29);
-  __Pyx_GIVEREF(__pyx_tuple__29);
+  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__45);
+  __Pyx_GIVEREF(__pyx_tuple__45);
 
   /* "View.MemoryView":291
  * 
@@ -17712,9 +19945,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__30 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(1, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__30);
-  __Pyx_GIVEREF(__pyx_tuple__30);
+  __pyx_tuple__46 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__46);
+  __Pyx_GIVEREF(__pyx_tuple__46);
 
   /* "View.MemoryView":292
  * 
@@ -17723,19 +19956,19 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__31 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(1, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__31);
-  __Pyx_GIVEREF(__pyx_tuple__31);
+  __pyx_tuple__47 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__47);
+  __Pyx_GIVEREF(__pyx_tuple__47);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__32 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__32);
-  __Pyx_GIVEREF(__pyx_tuple__32);
-  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__48 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__48);
+  __Pyx_GIVEREF(__pyx_tuple__48);
+  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -18095,6 +20328,54 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
+  /* "shape_profs/shape_profs_algos.pyx":11
+ * 
+ * @cython.embedsignature(True)
+ * def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_1runShellAlgo, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_runShellAlgo, __pyx_t_1) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "shape_profs/shape_profs_algos.pyx":64
+ * 
+ * @cython.embedsignature(True)
+ * def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_3runEllAlgo, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_runEllAlgo, __pyx_t_1) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "shape_profs/shape_profs_algos.pyx":111
+ * 
+ * @cython.embedsignature(True)
+ * def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_5runEllVDispAlgo, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_runEllVDispAlgo, __pyx_t_1) < 0) __PYX_ERR(0, 111, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "shape_profs/shape_profs_algos.pyx":162
+ * 
+ * @cython.embedsignature(True)
+ * def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_7runShellVDispAlgo, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_runShellVDispAlgo, __pyx_t_1) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
   /* "shape_profs/shape_profs_algos.pyx":216
  * @cython.embedsignature(True)
  * @cython.binding(True)
@@ -18102,7 +20383,7 @@ if (!__Pyx_RefNanny) {
  *     """ Calculates the local shape catalogue
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_1calcMorphLocal, 0, __pyx_n_s_calcMorphLocal, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__20)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_9calcMorphLocal, 0, __pyx_n_s_calcMorphLocal, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__28)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcMorphLocal, __pyx_t_1) < 0) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -18114,7 +20395,7 @@ if (!__Pyx_RefNanny) {
  *     """ Calculates the overall shape catalogue
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_3calcMorphGlobal, 0, __pyx_n_s_calcMorphGlobal, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_11calcMorphGlobal, 0, __pyx_n_s_calcMorphGlobal, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__30)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcMorphGlobal, __pyx_t_1) < 0) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -18126,7 +20407,7 @@ if (!__Pyx_RefNanny) {
  *     """ Calculates the local velocity dispersion shape catalogue
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_5calcMorphLocalVelDisp, 0, __pyx_n_s_calcMorphLocalVelDisp, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_13calcMorphLocalVelDisp, 0, __pyx_n_s_calcMorphLocalVelDisp, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__32)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcMorphLocalVelDisp, __pyx_t_1) < 0) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -18138,9 +20419,57 @@ if (!__Pyx_RefNanny) {
  *     """ Calculates the global velocity dipsersion shape catalogue
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_7calcMorphGlobalVelDisp, 0, __pyx_n_s_calcMorphGlobalVelDisp, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11shape_profs_17shape_profs_algos_15calcMorphGlobalVelDisp, 0, __pyx_n_s_calcMorphGlobalVelDisp, NULL, __pyx_n_s_shape_profs_shape_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__34)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcMorphGlobalVelDisp, __pyx_t_1) < 0) __PYX_ERR(0, 350, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "shape_profs/shape_profs_algos.pyx":392
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
+ *     """ Calculates the local axis ratios
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_17calcObjMorphLocal, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 392, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcObjMorphLocal, __pyx_t_1) < 0) __PYX_ERR(0, 392, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "shape_profs/shape_profs_algos.pyx":442
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Calculates the global axis ratios and eigenframe of the point cloud
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_19calcObjMorphGlobal, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 442, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcObjMorphGlobal, __pyx_t_1) < 0) __PYX_ERR(0, 442, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "shape_profs/shape_profs_algos.pyx":487
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):             # <<<<<<<<<<<<<<
+ *     """ Calculates the local axis ratios of the velocity dispersion tensor
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_21calcObjMorphLocalVelDisp, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 487, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcObjMorphLocalVelDisp, __pyx_t_1) < 0) __PYX_ERR(0, 487, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "shape_profs/shape_profs_algos.pyx":541
+ * 
+ * @cython.embedsignature(True)
+ * def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):             # <<<<<<<<<<<<<<
+ *     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
+ * 
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_17shape_profs_algos_23calcObjMorphGlobalVelDisp, NULL, __pyx_n_s_shape_profs_shape_profs_algos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 541, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcObjMorphGlobalVelDisp, __pyx_t_1) < 0) __PYX_ERR(0, 541, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "shape_profs/shape_profs_algos.pyx":1
@@ -18173,7 +20502,7 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__27, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__43, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_1);
@@ -18187,7 +20516,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__28, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__44, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_1);
@@ -18201,7 +20530,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__29, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__45, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_1);
@@ -18215,7 +20544,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__30, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__46, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_1);
@@ -18229,7 +20558,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__31, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__47, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);
@@ -18347,138 +20676,6 @@ end:
     return (__Pyx_RefNannyAPIStruct *)r;
 }
 #endif
-
-/* MemviewSliceInit */
-static int
-__Pyx_init_memviewslice(struct __pyx_memoryview_obj *memview,
-                        int ndim,
-                        __Pyx_memviewslice *memviewslice,
-                        int memview_is_new_reference)
-{
-    __Pyx_RefNannyDeclarations
-    int i, retval=-1;
-    Py_buffer *buf = &memview->view;
-    __Pyx_RefNannySetupContext("init_memviewslice", 0);
-    if (unlikely(memviewslice->memview || memviewslice->data)) {
-        PyErr_SetString(PyExc_ValueError,
-            "memviewslice is already initialized!");
-        goto fail;
-    }
-    if (buf->strides) {
-        for (i = 0; i < ndim; i++) {
-            memviewslice->strides[i] = buf->strides[i];
-        }
-    } else {
-        Py_ssize_t stride = buf->itemsize;
-        for (i = ndim - 1; i >= 0; i--) {
-            memviewslice->strides[i] = stride;
-            stride *= buf->shape[i];
-        }
-    }
-    for (i = 0; i < ndim; i++) {
-        memviewslice->shape[i]   = buf->shape[i];
-        if (buf->suboffsets) {
-            memviewslice->suboffsets[i] = buf->suboffsets[i];
-        } else {
-            memviewslice->suboffsets[i] = -1;
-        }
-    }
-    memviewslice->memview = memview;
-    memviewslice->data = (char *)buf->buf;
-    if (__pyx_add_acquisition_count(memview) == 0 && !memview_is_new_reference) {
-        Py_INCREF(memview);
-    }
-    retval = 0;
-    goto no_fail;
-fail:
-    memviewslice->memview = 0;
-    memviewslice->data = 0;
-    retval = -1;
-no_fail:
-    __Pyx_RefNannyFinishContext();
-    return retval;
-}
-#ifndef Py_NO_RETURN
-#define Py_NO_RETURN
-#endif
-static void __pyx_fatalerror(const char *fmt, ...) Py_NO_RETURN {
-    va_list vargs;
-    char msg[200];
-#ifdef HAVE_STDARG_PROTOTYPES
-    va_start(vargs, fmt);
-#else
-    va_start(vargs);
-#endif
-    vsnprintf(msg, 200, fmt, vargs);
-    va_end(vargs);
-    Py_FatalError(msg);
-}
-static CYTHON_INLINE int
-__pyx_add_acquisition_count_locked(__pyx_atomic_int *acquisition_count,
-                                   PyThread_type_lock lock)
-{
-    int result;
-    PyThread_acquire_lock(lock, 1);
-    result = (*acquisition_count)++;
-    PyThread_release_lock(lock);
-    return result;
-}
-static CYTHON_INLINE int
-__pyx_sub_acquisition_count_locked(__pyx_atomic_int *acquisition_count,
-                                   PyThread_type_lock lock)
-{
-    int result;
-    PyThread_acquire_lock(lock, 1);
-    result = (*acquisition_count)--;
-    PyThread_release_lock(lock);
-    return result;
-}
-static CYTHON_INLINE void
-__Pyx_INC_MEMVIEW(__Pyx_memviewslice *memslice, int have_gil, int lineno)
-{
-    int first_time;
-    struct __pyx_memoryview_obj *memview = memslice->memview;
-    if (unlikely(!memview || (PyObject *) memview == Py_None))
-        return;
-    if (unlikely(__pyx_get_slice_count(memview) < 0))
-        __pyx_fatalerror("Acquisition count is %d (line %d)",
-                         __pyx_get_slice_count(memview), lineno);
-    first_time = __pyx_add_acquisition_count(memview) == 0;
-    if (unlikely(first_time)) {
-        if (have_gil) {
-            Py_INCREF((PyObject *) memview);
-        } else {
-            PyGILState_STATE _gilstate = PyGILState_Ensure();
-            Py_INCREF((PyObject *) memview);
-            PyGILState_Release(_gilstate);
-        }
-    }
-}
-static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *memslice,
-                                             int have_gil, int lineno) {
-    int last_time;
-    struct __pyx_memoryview_obj *memview = memslice->memview;
-    if (unlikely(!memview || (PyObject *) memview == Py_None)) {
-        memslice->memview = NULL;
-        return;
-    }
-    if (unlikely(__pyx_get_slice_count(memview) <= 0))
-        __pyx_fatalerror("Acquisition count is %d (line %d)",
-                         __pyx_get_slice_count(memview), lineno);
-    last_time = __pyx_sub_acquisition_count(memview) == 1;
-    memslice->data = NULL;
-    if (unlikely(last_time)) {
-        if (have_gil) {
-            Py_CLEAR(memslice->memview);
-        } else {
-            PyGILState_STATE _gilstate = PyGILState_Ensure();
-            Py_CLEAR(memslice->memview);
-            PyGILState_Release(_gilstate);
-        }
-    } else {
-        memslice->memview = NULL;
-    }
-}
 
 /* RaiseArgTupleInvalid */
 static void __Pyx_RaiseArgtupleInvalid(
@@ -18620,6 +20817,138 @@ invalid_keyword:
     #endif
 bad:
     return -1;
+}
+
+/* MemviewSliceInit */
+static int
+__Pyx_init_memviewslice(struct __pyx_memoryview_obj *memview,
+                        int ndim,
+                        __Pyx_memviewslice *memviewslice,
+                        int memview_is_new_reference)
+{
+    __Pyx_RefNannyDeclarations
+    int i, retval=-1;
+    Py_buffer *buf = &memview->view;
+    __Pyx_RefNannySetupContext("init_memviewslice", 0);
+    if (unlikely(memviewslice->memview || memviewslice->data)) {
+        PyErr_SetString(PyExc_ValueError,
+            "memviewslice is already initialized!");
+        goto fail;
+    }
+    if (buf->strides) {
+        for (i = 0; i < ndim; i++) {
+            memviewslice->strides[i] = buf->strides[i];
+        }
+    } else {
+        Py_ssize_t stride = buf->itemsize;
+        for (i = ndim - 1; i >= 0; i--) {
+            memviewslice->strides[i] = stride;
+            stride *= buf->shape[i];
+        }
+    }
+    for (i = 0; i < ndim; i++) {
+        memviewslice->shape[i]   = buf->shape[i];
+        if (buf->suboffsets) {
+            memviewslice->suboffsets[i] = buf->suboffsets[i];
+        } else {
+            memviewslice->suboffsets[i] = -1;
+        }
+    }
+    memviewslice->memview = memview;
+    memviewslice->data = (char *)buf->buf;
+    if (__pyx_add_acquisition_count(memview) == 0 && !memview_is_new_reference) {
+        Py_INCREF(memview);
+    }
+    retval = 0;
+    goto no_fail;
+fail:
+    memviewslice->memview = 0;
+    memviewslice->data = 0;
+    retval = -1;
+no_fail:
+    __Pyx_RefNannyFinishContext();
+    return retval;
+}
+#ifndef Py_NO_RETURN
+#define Py_NO_RETURN
+#endif
+static void __pyx_fatalerror(const char *fmt, ...) Py_NO_RETURN {
+    va_list vargs;
+    char msg[200];
+#ifdef HAVE_STDARG_PROTOTYPES
+    va_start(vargs, fmt);
+#else
+    va_start(vargs);
+#endif
+    vsnprintf(msg, 200, fmt, vargs);
+    va_end(vargs);
+    Py_FatalError(msg);
+}
+static CYTHON_INLINE int
+__pyx_add_acquisition_count_locked(__pyx_atomic_int *acquisition_count,
+                                   PyThread_type_lock lock)
+{
+    int result;
+    PyThread_acquire_lock(lock, 1);
+    result = (*acquisition_count)++;
+    PyThread_release_lock(lock);
+    return result;
+}
+static CYTHON_INLINE int
+__pyx_sub_acquisition_count_locked(__pyx_atomic_int *acquisition_count,
+                                   PyThread_type_lock lock)
+{
+    int result;
+    PyThread_acquire_lock(lock, 1);
+    result = (*acquisition_count)--;
+    PyThread_release_lock(lock);
+    return result;
+}
+static CYTHON_INLINE void
+__Pyx_INC_MEMVIEW(__Pyx_memviewslice *memslice, int have_gil, int lineno)
+{
+    int first_time;
+    struct __pyx_memoryview_obj *memview = memslice->memview;
+    if (unlikely(!memview || (PyObject *) memview == Py_None))
+        return;
+    if (unlikely(__pyx_get_slice_count(memview) < 0))
+        __pyx_fatalerror("Acquisition count is %d (line %d)",
+                         __pyx_get_slice_count(memview), lineno);
+    first_time = __pyx_add_acquisition_count(memview) == 0;
+    if (unlikely(first_time)) {
+        if (have_gil) {
+            Py_INCREF((PyObject *) memview);
+        } else {
+            PyGILState_STATE _gilstate = PyGILState_Ensure();
+            Py_INCREF((PyObject *) memview);
+            PyGILState_Release(_gilstate);
+        }
+    }
+}
+static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *memslice,
+                                             int have_gil, int lineno) {
+    int last_time;
+    struct __pyx_memoryview_obj *memview = memslice->memview;
+    if (unlikely(!memview || (PyObject *) memview == Py_None)) {
+        memslice->memview = NULL;
+        return;
+    }
+    if (unlikely(__pyx_get_slice_count(memview) <= 0))
+        __pyx_fatalerror("Acquisition count is %d (line %d)",
+                         __pyx_get_slice_count(memview), lineno);
+    last_time = __pyx_sub_acquisition_count(memview) == 1;
+    memslice->data = NULL;
+    if (unlikely(last_time)) {
+        if (have_gil) {
+            Py_CLEAR(memslice->memview);
+        } else {
+            PyGILState_STATE _gilstate = PyGILState_Ensure();
+            Py_CLEAR(memslice->memview);
+            PyGILState_Release(_gilstate);
+        }
+    } else {
+        memslice->memview = NULL;
+    }
 }
 
 /* ArgTypeTest */
@@ -22075,6 +24404,29 @@ no_fail:
 }
 
 /* ObjectToMemviewSlice */
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_float(PyObject *obj, int writable_flag) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
+                                                 PyBUF_RECORDS_RO | writable_flag, 1,
+                                                 &__Pyx_TypeInfo_float, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
+
+/* ObjectToMemviewSlice */
   static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_float(PyObject *obj, int writable_flag) {
     __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
     __Pyx_BufFmt_StackElem stack[1];
@@ -22098,7 +24450,7 @@ __pyx_fail:
 }
 
 /* ObjectToMemviewSlice */
-  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_float(PyObject *obj, int writable_flag) {
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_int(PyObject *obj, int writable_flag) {
     __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
     __Pyx_BufFmt_StackElem stack[1];
     int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
@@ -22109,7 +24461,53 @@ __pyx_fail:
     }
     retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
                                                  PyBUF_RECORDS_RO | writable_flag, 1,
-                                                 &__Pyx_TypeInfo_float, stack,
+                                                 &__Pyx_TypeInfo_int, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
+
+/* ObjectToMemviewSlice */
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dcd____pyx_t_double_complex(PyObject *obj, int writable_flag) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_CONTIG), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_FOLLOW) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, __Pyx_IS_F_CONTIG,
+                                                 (PyBUF_F_CONTIGUOUS | PyBUF_FORMAT) | writable_flag, 2,
+                                                 &__Pyx_TypeInfo___pyx_t_double_complex, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
+
+/* ObjectToMemviewSlice */
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dc_double(PyObject *obj, int writable_flag) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_CONTIG) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, __Pyx_IS_C_CONTIG,
+                                                 (PyBUF_C_CONTIGUOUS | PyBUF_FORMAT) | writable_flag, 1,
+                                                 &__Pyx_TypeInfo_double, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))
         goto __pyx_fail;
@@ -22141,6 +24539,18 @@ __pyx_fail:
         }\
         return (target_type) value;\
     }
+
+/* MemviewDtypeToObject */
+  static CYTHON_INLINE PyObject *__pyx_memview_get_float(const char *itemp) {
+    return (PyObject *) PyFloat_FromDouble(*(float *) itemp);
+}
+static CYTHON_INLINE int __pyx_memview_set_float(const char *itemp, PyObject *obj) {
+    float value = __pyx_PyFloat_AsFloat(obj);
+    if ((value == (float)-1) && PyErr_Occurred())
+        return 0;
+    *(float *) itemp = value;
+    return 1;
+}
 
 /* MemviewSliceCopyTemplate */
   static __Pyx_memviewslice
