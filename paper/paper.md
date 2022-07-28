@@ -8,9 +8,10 @@ tags:
   - point clouds
 authors:
   - name: Tibor Dome
+    orcid: 0000-0003-2586-3702
     affiliation: 1
 affiliations:
- - name: PhD Student, University of Cambridge, Institute of Astronomy, United Kingdom
+ - name: PhD Student, University of Cambridge, Institute of Astronomy, Madingley Rd, Cambridge CB3 0HA, United Kingdom
    index: 1
 date: 7 July 2022
 bibliography: paper.bib
