@@ -65,7 +65,7 @@ def lru_cache(maxsize=128, typed=False, use_memory_up_to=False):
         distinct results.
     :param use_memory_up_to: represents the number of bytes of memory
         that must be available on the system in order for a value to be cached. If
-        it is set, ``maxsize`` has no effect.
+        it is set (i.e. not ``False``), ``maxsize`` has no effect.
     :type use_memory_up_to: int, or float
     :return: decorator
     """
