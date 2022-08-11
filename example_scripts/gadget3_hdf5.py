@@ -22,7 +22,6 @@ CAT_DEST = "./cat"
 HDF5_GROUP_DEST = "../../code_git/example_snapshot/LLGas256b20/groups_035"
 HDF5_SNAP_DEST = "../../code_git/example_snapshot/LLGas256b20/snapdir_035"
 VIZ_DEST = "./viz"
-SNAP_MAX = 16
 D_LOGSTART = -2
 D_LOGEND = 0.5
 D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
@@ -41,7 +40,7 @@ frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf
 def HDF5Ex():
     
     # Define DensShapeProfsHDF5 object
-    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, WANT_RVIR)
+    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, WANT_RVIR)
     
     ########################## Calculating Morphological Properties ###############################
     # Create halo shape catalogue

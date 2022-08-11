@@ -934,10 +934,9 @@ cdef class DensProfsHDF5(CosmicBase):
     cdef str HDF5_SNAP_DEST
     cdef str HDF5_GROUP_DEST
     cdef int MIN_NUMBER_STAR_PTCS
-    cdef int SNAP_MAX
     cdef bint WANT_RVIR
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, str CENTER, bint WANT_RVIR):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, str CENTER, bint WANT_RVIR):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -945,8 +944,6 @@ cdef class DensProfsHDF5(CosmicBase):
         :type HDF5_GROUP_DEST: string
         :param SNAP: e.g. '024'
         :type SNAP: string
-        :param SNAP_MAX: e.g. 16
-        :type SNAP_MAX: int
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
         :param L_BOX: simulation box side length
@@ -965,7 +962,6 @@ cdef class DensProfsHDF5(CosmicBase):
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
         self.MIN_NUMBER_STAR_PTCS = MIN_NUMBER_STAR_PTCS
-        self.SNAP_MAX = SNAP_MAX
         self.WANT_RVIR = WANT_RVIR
         
     def getXYZMasses(self, str obj_type = 'dm'):
@@ -1097,7 +1093,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
     cdef int N_WALL
     cdef int N_MIN
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint WANT_RVIR):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint WANT_RVIR):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -1105,8 +1101,6 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type HDF5_GROUP_DEST: string
         :param SNAP: e.g. '024'
         :type SNAP: string
-        :param SNAP_MAX: e.g. 16
-        :type SNAP_MAX: int
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
         :param L_BOX: simulation box side length
@@ -1135,7 +1129,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :param WANT_RVIR: Whether or not we want quantities (e.g. D_LOGSTART) expressed 
             with respect to the virial radius R_vir or the overdensity radius R_200
         :type WANT_RVIR: boolean"""
-        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)
+        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)
         self.D_LOGSTART = D_LOGSTART
         self.D_LOGEND = D_LOGEND
         self.D_BINS = D_BINS

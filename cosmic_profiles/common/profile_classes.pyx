@@ -14,7 +14,7 @@ cimport cython
 from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, calcCoM
 from cosmic_profiles.shape_profs.shape_profs_tools import getGlobalEpsHist, getLocalEpsHist, getLocalTHist, getGlobalTHist, getShapeProfs
 from cosmic_profiles.dens_profs.dens_profs_tools import getDensProfs, fitDensProfHelper
-from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5Data, getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData
+from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData
 from cosmic_profiles.gadget_hdf5.gen_catalogues import calcCSHCat, calcGxCat
 from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
 from cosmic_profiles.shape_profs.shape_profs_algos import calcMorphLocal, calcMorphGlobal, calcMorphLocalVelDisp, calcMorphGlobalVelDisp
@@ -1333,10 +1333,9 @@ cdef class DensProfsHDF5(CosmicBase):
     cdef str HDF5_SNAP_DEST
     cdef str HDF5_GROUP_DEST
     cdef int MIN_NUMBER_STAR_PTCS
-    cdef int SNAP_MAX
     cdef bint WANT_RVIR
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, str CENTER, bint WANT_RVIR):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, str CENTER, bint WANT_RVIR):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -1344,8 +1343,6 @@ cdef class DensProfsHDF5(CosmicBase):
         :type HDF5_GROUP_DEST: string
         :param SNAP: e.g. '024'
         :type SNAP: string
-        :param SNAP_MAX: e.g. 16
-        :type SNAP_MAX: int
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
         :param L_BOX: simulation box side length
@@ -1364,7 +1361,6 @@ cdef class DensProfsHDF5(CosmicBase):
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
         self.MIN_NUMBER_STAR_PTCS = MIN_NUMBER_STAR_PTCS
-        self.SNAP_MAX = SNAP_MAX
         self.WANT_RVIR = WANT_RVIR
         
     def getXYZMasses(self, str obj_type = 'dm'):
@@ -1375,12 +1371,12 @@ cdef class DensProfsHDF5(CosmicBase):
         :return xyz, masses, MIN_NUMBER_PTCS: positions, masses, and minimum number of particles
         :rtype: (N2,3) floats, (N2,) floats, int"""
         if obj_type == 'dm':
-            xyz, masses, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
+            xyz, masses, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP)
             del velxyz
             MIN_NUMBER_PTCS = self.MIN_NUMBER_PTCS
         else:
-            xyz, fof_com, sh_com, nb_shs, masses, velxyz, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
-            del fof_com; del sh_com; del nb_shs; del velxyz; del is_star
+            xyz, nb_shs, masses, velxyz, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP)
+            del nb_shs; del velxyz; del is_star
             MIN_NUMBER_PTCS = self.MIN_NUMBER_STAR_PTCS
         if rank == 0:
             return xyz, masses, MIN_NUMBER_PTCS
@@ -1396,11 +1392,11 @@ cdef class DensProfsHDF5(CosmicBase):
         :return velxyz: velocity array
         :rtype: (N2,3) floats"""
         if obj_type == 'dm':
-            xyz, masses, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP_MAX, self.SNAP)
+            xyz, masses, velxyz = getHDF5DMData(self.HDF5_SNAP_DEST, self.SNAP)
             del xyz; del masses
         else:
-            xyz, fof_com, sh_com, nb_shs, masses, velxyz, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
-            del xyz; del fof_com; del sh_com; del nb_shs; del masses; del is_star
+            xyz, nb_shs, masses, velxyz, is_star = getHDF5GxData(self.HDF5_SNAP_DEST, self.HDF5_GROUP_DEST, self.SNAP)
+            del xyz; del nb_shs; del masses; del is_star
         if rank == 0:
             return velxyz
         else:
@@ -1419,8 +1415,7 @@ cdef class DensProfsHDF5(CosmicBase):
             return None
         if obj_type == 'dm':
             # Import hdf5 data
-            nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, fof_coms = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP, self.WANT_RVIR)
-            del fof_coms
+            nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.SNAP, self.WANT_RVIR)
             # Construct catalogue
             h_cat, h_r200, h_pass = calcCSHCat(np.array(nb_shs), np.array(sh_len), np.array(fof_dm_sizes), group_r200, halo_masses, self.MIN_NUMBER_PTCS)
             nb_shs_vec = np.array(nb_shs)
@@ -1437,15 +1432,14 @@ cdef class DensProfsHDF5(CosmicBase):
         else:
             if self.r200 is None:
                 # Import hdf5 data
-                nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, fof_coms = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP, self.WANT_RVIR)
-                del fof_coms
+                nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.SNAP, self.WANT_RVIR)
                 # Construct catalogue
                 h_cat, h_r200, h_pass = calcCSHCat(np.array(nb_shs), np.array(sh_len), np.array(fof_dm_sizes), group_r200, halo_masses, self.MIN_NUMBER_PTCS)
                 nb_shs_vec = np.array(nb_shs)         
                 self.r200 = h_r200
                 del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del h_cat; del halo_masses; del h_r200
             # Import hdf5 data
-            nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
+            nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST, self.SNAP)
             # Construct catalogue
             gx_cat, gx_pass = calcGxCat(np.array(nb_shs), np.array(sh_len_gx), np.array(fof_gx_sizes), self.MIN_NUMBER_STAR_PTCS)
             gx_cat_l = [[] for i in range(len(nb_shs))]
@@ -1611,7 +1605,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
     cdef int N_WALL
     cdef int N_MIN
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, int SNAP_MAX, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint WANT_RVIR):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CENTER, bint WANT_RVIR):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -1619,8 +1613,6 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type HDF5_GROUP_DEST: string
         :param SNAP: e.g. '024'
         :type SNAP: string
-        :param SNAP_MAX: e.g. 16
-        :type SNAP_MAX: int
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
         :param L_BOX: simulation box side length
@@ -1649,7 +1641,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :param WANT_RVIR: Whether or not we want quantities (e.g. D_LOGSTART) expressed 
             with respect to the virial radius R_vir or the overdensity radius R_200
         :type WANT_RVIR: boolean"""
-        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)
+        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)
         self.D_LOGSTART = D_LOGSTART
         self.D_LOGEND = D_LOGEND
         self.D_BINS = D_BINS
@@ -2175,7 +2167,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             idx_cat = self.getIdxCat(obj_type)
             self.getObjInfoBase(xyz, masses, idx_cat, MIN_NUMBER_PTCS, obj_type)
             if obj_type == 'dm':
-                nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, fof_coms = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP, self.WANT_RVIR)
+                nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.SNAP, self.WANT_RVIR)
                 nb_shs_vec = np.array(nb_shs)
                 idx_cat = self.getIdxCat(obj_type)
                 print_status(rank, self.start_time, "More detailed info on central subhalo catalogue. The total number of halos with > 0 SHs is {0}".format(nb_shs_vec[nb_shs_vec != 0].shape[0]))
@@ -2183,9 +2175,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                 print_status(rank, self.start_time, "The total number of SHs (subhalos) is {0}".format(len(sh_len)))
                 print_status(rank, self.start_time, "The number of halos that have no SH is {0}".format(nb_shs_vec[nb_shs_vec == 0].shape[0]))
                 print_status(rank, self.start_time, "The total number of halos (CSH) that have sufficient resolution is {0}".format(len([x for x in idx_cat if x != []])))
-                del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses; del fof_coms
+                del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses
             else:
-                nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST, self.SNAP_MAX, self.SNAP)
+                nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST, self.SNAP)
                 nb_shs_vec = np.array(nb_shs)
                 idx_cat = self.getIdxCat(obj_type)
                 print_status(rank, self.start_time, "More detailed info on galaxy catalogue. The total number of halos with > 0 SHs containing star particles is {0}".format(nb_shs_vec[nb_shs_vec != 0].shape[0]))
