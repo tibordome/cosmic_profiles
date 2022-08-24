@@ -523,12 +523,12 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
     
     :param xyz: positions of all (DM or star) particles in simulation box
     :type xyz: (N2 x 3) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N1
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N2 x 1) floats
-    :param r200: each entry of the list gives the R_200 radius of the parent halo
-    :type r200: list of length N1
+    :param r200: R_200 radii of the parent halos
+    :type r200: (N1,) floats
+    :param cat: each entry of the list is a list containing indices of particles belonging to an object
+    :type cat: list of length N1
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -660,12 +660,12 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L
     
     :param xyz: positions of all (DM or star) particles in simulation box
     :type xyz: (N2 x 3) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N1
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N2 x 1) floats
-    :param r200: each entry of the list gives the R_200 radius of the parent halo
-    :type r200: list of length N1
+    :param r200: R_200 radii of the parent halos
+    :type r200: (N1,) floats
+    :param cat: each entry of the list is a list containing indices of particles belonging to an object
+    :type cat: list of length N1
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -790,12 +790,12 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     :type xyz: (N2 x 3) floats
     :param vxyz: velocities of all (DM or star) particles in simulation box
     :type vxyz: (N2 x 3) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N2
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N2 x 1) floats
-    :param r200: each entry of the list gives the R_200 radius of the parent halo
-    :type r200: list of length N1
+    :param r200: R_200 radii of the parent halos
+    :type r200: (N1,) floats
+    :param cat: each entry of the list is a list containing indices of particles belonging to an object
+    :type cat: list of length N1
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -931,12 +931,12 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     :type xyz: (N2 x 3) floats
     :param vxyz: velocities of all (DM or star) particles in simulation box
     :type vxyz: (N2 x 3) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N2
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N2 x 1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
+    :param cat: each entry of the list is a list containing indices of particles belonging to an object
+    :type cat: list of length N1
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -1065,10 +1065,10 @@ cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] lo
         10th to 12th: normalized minor axis
     :type morph_info: (12,N) floats
     :param r200: R_200 radius of the parent halo
-    :type r200: (N2,) float array
+    :type r200: float
     :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 
         radius of the parent halo, e.g. np.logspace(-2,1,100)
-    :type log_d: (N3,) floats
+    :type log_d: (N,) floats
     :param xyz: positions of particles in point cloud
     :type xyz: (N1 x 3) floats
     :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
@@ -1076,9 +1076,9 @@ cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] lo
     :param masses: masses of the particles expressed in unit mass
     :type masses: (N1 x 1) floats
     :param shell: indices of points that fall into shell (varies from iteration to iteration)
-    :type shell: (N,) ints, zeros
+    :type shell: (N1,) ints, zeros
     :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)
-    :type r_ell: (N,) floats, zeros
+    :type r_ell: (N1,) floats, zeros
     :param center: center of point cloud
     :type center: (3,) floats
     :param shape_tensor: shape tensor array to be filled
@@ -1136,7 +1136,7 @@ cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz
         10th to 12th: normalized minor axis
     :type morph_info: (12,) floats
     :param r200: R_200 radius of the parent halo
-    :type r200: (N2,) float array
+    :type r200: float
     :param xyz: positions of particles in point cloud
     :type xyz: (N1 x 3) floats
     :param xyz_princ: position arrays transformed into principal frame (varies from iteration to iteration)
@@ -1146,7 +1146,7 @@ cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz
     :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
     :type ellipsoid: (N1,) ints, zeros
     :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)
-    :type r_ell: (N,) floats, zeros
+    :type r_ell: (N1,) floats, zeros
     :param center: center of point cloud
     :type center: (3,) floats
     :param shape_tensor: shape tensor array to be filled
@@ -1193,10 +1193,10 @@ cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, floa
         10th to 12th: normalized minor axis
     :type morph_info: (12,N) floats
     :param r200: R_200 radius of the parent halo
-    :type r200: (N2,) float array
+    :type r200: float
     :param log_d: logarithmically equally spaced ellipsoidal radius array of interest, in units of R_200 
         radius of the parent halo, e.g. np.logspace(-2,1,100)
-    :type log_d: (N3,) floats
+    :type log_d: (N,) floats
     :param xyz: positions of particles in point cloud
     :type xyz: (N1 x 3) floats
     :param vxyz: velocity array
@@ -1208,7 +1208,7 @@ cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, floa
     :param shell: indices of points that fall into shell (varies from iteration to iteration)
     :type shell: (N1,) ints, zeros
     :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)
-    :type r_ell: (N,) floats, zeros
+    :type r_ell: (N1,) floats, zeros
     :param center: center of point cloud
     :type center: (3,) floats
     :param vcenter: velocity-center of point cloud
@@ -1232,7 +1232,7 @@ cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, floa
     :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
     :type shell_based: boolean
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,N) float array"""
     # Return if problematic
     morph_info[:,:] = 0.0
     if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -1268,7 +1268,7 @@ cdef float[:] calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:
         10th to 12th: normalized minor axis
     :type morph_info: (12,) floats
     :param r200: R_200 radius of the parent halo
-    :type r200: (N2,) float array
+    :type r200: float
     :param xyz: positions of particles in point cloud
     :type xyz: (N1 x 3) floats
     :param vxyz: velocity array
@@ -1280,7 +1280,7 @@ cdef float[:] calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:
     :param ellipsoid: indices of points that fall into ellipsoid (varies from iteration to iteration)
     :type ellipsoid: (N1,) ints, zeros
     :param r_ell: semi-major axis a of the ellipsoid surface on which each particle lies (varies from iteration to iteration)
-    :type r_ell: (N,) floats, zeros
+    :type r_ell: (N1,) floats, zeros
     :param center: center of point cloud
     :type center: (3,) floats
     :param vcenter: velocity-center of point cloud

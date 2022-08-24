@@ -75,7 +75,7 @@ def getHernquistProf(r, model_pars):
     r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
-def getDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT, suffix = '_'):
+def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     

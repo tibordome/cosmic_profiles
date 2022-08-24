@@ -577,3 +577,21 @@ def getCatWithinFracR200(cat_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
             if all_nn_idxs != []:
                 cat_out[idx] = list(np.array(obj)[all_nn_idxs])
     return cat_out
+
+def isValidSelection(select, nb_objects):
+    """ Trivial function to check whether selection of objects is valid
+    
+    :param select: index of first and last object to look at in the format [idx_first, idx_last]
+    :type select: list containing two integers
+    :param nb_objects: number of objects in inventory
+    :type nb_objects: integer
+    :return valid: True if selection of objects is valid one, False otherwise
+    :rtype: boolean
+    :raises: ``ValueError`` if selection of objects is invalid"""
+    if select[0] < 0 or select[1] < 0:
+        raise ValueError("No negative indices allowed in `select` list.")
+    if select[1] < select[0]:
+        raise ValueError("Index of last object of interest cannot be smaller than index of first object of interest. `select[0]` must be smaller than `select[1]`.")
+    if select[0] >= nb_objects or select[1] >= nb_objects:
+        raise ValueError("Index / indices in `select` list too large. There aren't that many objects in the inventory.")
+    return True
