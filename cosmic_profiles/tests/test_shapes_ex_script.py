@@ -62,7 +62,8 @@ def test_shapes_ex_script():
     
     ######################### Calculating Morphological Properties #################################
     # Create halo shape catalogue
-    cprofiles.dumpShapeCatLocal(CAT_DEST, reduced = False, shell_based = False)
+    halos_select = [0, 0]
+    cprofiles.dumpShapeCatLocal(CAT_DEST, select = halos_select, reduced = False, shell_based = False)
     
     ######################################## Visualizations ########################################
     # Visualize halo: A sample output is shown above!

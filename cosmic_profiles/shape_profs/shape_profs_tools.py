@@ -343,15 +343,15 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
         print_status(rank, start_time, "The number of objects considered is {0}. In degrees: The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
      
 
-def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
+def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, internal units
     :type masses: (N^3x1) floats
+    :param idx_cat: catalogue of objects (objs/gxs)
+    :type idx_cat: list of lists of ints
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -376,17 +376,17 @@ def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix
         plt.xlim(0.0, 1.0)
         plt.savefig("{0}/EpsCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
         
-def getLocalEpsHist(idx_cat, xyz, masses, r200, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
+def getLocalEpsHist(xyz, masses, r200, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
     :param xyz: coordinates of particles of type 1 or type 4, in Mpc/h
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, internal units
     :type masses: (N^3x1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
+    :param idx_cat: catalogue of objects (objs/gxs)
+    :type idx_cat: list of lists of ints
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)

@@ -78,7 +78,7 @@ def test_densities_ex_script():
     ############################## Fit Density Profile #########################################################
     r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db_fit = dens_profs_db[0,10:]
-    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto')
+    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', select = halos_select)
     plt.figure()
     plt.loglog(r_over_rvir, dens_profs_db[0], 'o--', label='density profile', markersize = 4)
     model_pars = {'rho_s': best_fit[0,0], 'alpha': best_fit[0,1], 'r_s': best_fit[0,2]}

@@ -69,14 +69,16 @@ def test_densities():
     halos_select = [0, 5]
     dens_profs_db = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
     dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = False) # These estimates will be kernel-based
-    assert dens_profs_db.shape[0] == halos_select[1] - halos_select[0] + 1
+    idx_cat_suff = cprofiles.getIdxCatSuffRes()
+    nb_sel_suff_res = np.sum([1 if idx_cat_suff[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])
+    assert dens_profs_db.shape[0] == nb_sel_suff_res
     assert dens_profs_db.shape[1] == r_over_rvir.shape[0]
-    assert dens_profs_kb.shape[0] == halos_select[1] - halos_select[0] + 1
+    assert dens_profs_kb.shape[0] == nb_sel_suff_res
     assert dens_profs_kb.shape[1] == r_over_rvir.shape[0]
     
     ############################## Fit Density Profile ###############################################
     r_over_rvir = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db = dens_profs_db[:,10:]
-    best_fits = cprofiles.fitDensProfs(dens_profs_db, r_over_rvir, method = method)
-    assert best_fits.shape[0] == halos_select[1] - halos_select[0] + 1
+    best_fits = cprofiles.fitDensProfs(dens_profs_db, r_over_rvir, method = method, select = halos_select)
+    assert best_fits.shape[0] == nb_sel_suff_res
     assert best_fits.shape[1] == nb_model_pars[method]
