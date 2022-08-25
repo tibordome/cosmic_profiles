@@ -76,9 +76,9 @@ SNAP = '025'
 D_LOGSTART = -2
 D_LOGEND = 1
 D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-M_TOL = np.float32(1e-2)
-N_WALL = 100
-N_MIN = 10
+IT_TOL = np.float32(1e-2)
+IT_WALL = 100
+IT_MIN = 10
 MIN_NUMBER_DM_PTCS = 200
 CENTER = 'mode'
 CAT_DEST = "./cat"
@@ -182,10 +182,12 @@ def AHFEx():
     #############################################################################################################
     
     ############## Run cosmic_profiles: define DensShapeProfs object ############################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
+    h_idx_cat_len = len(cprofiles.getIdxCat())
+    halos_select = [0, h_idx_cat_len//2]
     
     ############## Create local halo shape catalogue ############################################################
-    cprofiles.dumpShapeCatLocal(CAT_DEST, reduced = True, shell_based = True)
+    cprofiles.dumpShapeCatLocal(CAT_DEST, select = halos_select, reduced = True, shell_based = True)
     #############################################################################################################
     
     ############## Viz first halo ###############################################################################

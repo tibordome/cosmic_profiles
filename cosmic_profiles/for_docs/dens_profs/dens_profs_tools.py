@@ -63,7 +63,7 @@ def getHernquistProf(r, model_pars):
     r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
-def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT, suffix = '_'):
+def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, start_time, MASS_UNIT, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -92,6 +92,8 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
     :type obj_centers: (N,3) floats
     :param method: string describing density profile model assumed for fitting
     :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :param nb_bins: Number of mass bins to plot density profiles for
+    :type nb_bins: int
     :param start_time: time of start of shape analysis
     :type start_time: float
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h

@@ -56,7 +56,7 @@ def getShapeMs(Rs, d, idx_groups, group, param_interest, ERROR_METHOD, D_LOGSTAR
     """ Similar to getShape, but with mass-splitting"""
     return
 
-def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, MASS_UNIT=1e10, suffix = '_'):
+def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, nb_bins, MASS_UNIT=1e10, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -86,6 +86,8 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type s: (N, D_BINS+1) floats
     :param major_full: major axis vectors
     :type major_full: (N,D_BINS+1,3) floats
+    :param nb_bins: Number of mass bins to plot density profiles for
+    :type nb_bins: int
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
     :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)

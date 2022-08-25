@@ -77,6 +77,6 @@ which will return a float array ``cs`` of shape (:math:`N_{\text{pass}},`).
 
 The density profiles, for instance ``dens_profs_db``, and their fits can be visualized using::
 
-    cprofiles.plotDensProfs(dens_profs_db, r_over_r200, dens_profs_fit, r_over_r200_fit, method, VIZ_DEST, select = [0, nb_objs-1])
+    cprofiles.plotDensProfs(dens_profs_db, r_over_r200, dens_profs_fit, r_over_r200_fit, method, nb_bins = 2, VIZ_DEST = VIZ_DEST, select = [0, nb_objs-1])
 
 where ``dens_profs_fit`` and ``r_over_r200_fit`` refer to those estimated density profile values that the user would like the fitting operation to be carried out over, e.g. ``dens_profs_fit = dens_profs_db[:,25:]`` and ``r_over_r200_fit = r_over_r200[25:]`` to discard the values that correspond to deep layers of halos/galaxies/objects. Typically, the gravitational softening scale times some factor and / or information from the local relaxation timescale is used to estimate the inner convergence radius. For guidance on choosing the inner convergence radius see `Navarro et al 2010 <https://academic.oup.com/mnras/article/402/1/21/1028856>`_.

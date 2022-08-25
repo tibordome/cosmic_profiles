@@ -39,7 +39,7 @@ def getHDF5Data(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
         hdf5SnapFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_SNAP_DEST))
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
         for fname in hdf5GroupFilenamesList:
-            g = h5py.File(r'{}/{}'.format(HDF5_GROUP_DEST, fname), 'r')
+            g = h5py.File(r'{}'.format(fname), 'r')
             if 'Group/GroupLenType' in g:
                 to_be_appended = [np.float32(g['Group/GroupLenType'][i,1]) for i in range(g['Group/GroupLenType'].shape[0])]
                 fof_dm_sizes.append(to_be_appended)
@@ -48,7 +48,7 @@ def getHDF5Data(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
             if 'Subhalo/SubhaloLenType' in g:
                 sh_len.append([np.float32(g['Subhalo/SubhaloLenType'][i,1]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])
         for fname in hdf5SnapFilenamesList:
-            f = h5py.File(r'{}/{}'.format(HDF5_SNAP_DEST, fname), 'r')
+            f = h5py.File(r'{}'.format(fname), 'r')
             dm_x = np.hstack((dm_x, np.float32(f['PartType1/Coordinates'][:,0]/1000))) # in Mpc = 3.085678e+27 cm
             dm_y = np.hstack((dm_y, np.float32(f['PartType1/Coordinates'][:,1]/1000))) 
             dm_z = np.hstack((dm_z, np.float32(f['PartType1/Coordinates'][:,2]/1000))) 
@@ -83,7 +83,9 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
     :type HDF5_GROUP_DEST: string
     :return: star_xyz (star ptc positions),
         nb_shs (# subhalos in each FoF-halo), 
-        star_masses (mass of each star ptc)
+        star_masses (mass of each star ptc),
+        star_velxyz (star ptc velocities),
+        is_star (whether or not particle is star particle or wind particle)
     :rtype: float and int arrays"""
     def inner(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
         is_star = np.empty(0, dtype = bool)
@@ -107,7 +109,7 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
         else:
             last = rank == nb_jobs_to_do - 1
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
-            f = h5py.File(r'{}/{}'.format(HDF5_SNAP_DEST, hdf5SnapFilenamesList[snap_run]), 'r')
+            f = h5py.File(r'{}'.format(hdf5SnapFilenamesList[snap_run]), 'r')
             if 'PartType4/Coordinates' in f:
                 is_star = np.hstack((is_star, f['PartType4/GFM_StellarFormationTime'][:] > 0)) # Wind particle?
                 star_x = np.hstack((star_x, np.float32(f['PartType4/Coordinates'][:,0]/1000))) # in Mpc = 3.085678e+27 cm
@@ -197,7 +199,7 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
         else:
             last = rank == nb_jobs_to_do - 1
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
-            g = h5py.File(r'{}/{}'.format(HDF5_GROUP_DEST, hdf5GroupFilenamesList[snap_run]), 'r')
+            g = h5py.File(r'{}'.format(hdf5GroupFilenamesList[snap_run]), 'r')
             if 'Group/GroupCM' in g:
                 nb_shs_l.append([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])
                 count_sh_l += 1
@@ -218,7 +220,7 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
     return getHDF5GxData.inner(HDF5_SNAP_DEST, HDF5_GROUP_DEST)
 
 def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
-    """ Retrieve FoF/SH-related HDF5 data from the simulation box
+    """ Retrieve FoF/SH-related DM HDF5 data from the simulation box
         
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
     :type HDF5_GROUP_DEST: string
@@ -229,7 +231,7 @@ def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
         fof_dm_sizes (size of each FoF-halo), group_r200 (R200 radius of each FoF-halo), 
         fof_masses (mass of each FoF-halo)
     :rtype: float and int arrays"""
-    def inner(HDF5_GROUP_DEST, FILE_NAME, WANT_RVIR):
+    def inner(HDF5_GROUP_DEST, WANT_RVIR):
         fof_dm_sizes = []
         nb_shs = []
         sh_len = []
@@ -237,7 +239,7 @@ def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
         fof_masses = np.empty(0, dtype = np.float32)
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
         for fname in hdf5GroupFilenamesList:
-            g = h5py.File(r'{}/{}'.format(HDF5_GROUP_DEST, fname), 'r')
+            g = h5py.File(r'{}'.format(fname), 'r')
             if 'Group/GroupLenType' in g:
                 to_be_appended = [np.int32(g['Group/GroupLenType'][i,1]) for i in range(g['Group/GroupLenType'].shape[0])]
                 if WANT_RVIR:
@@ -262,20 +264,20 @@ def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
     return getHDF5SHDMData.inner(HDF5_GROUP_DEST, WANT_RVIR)
 
 def getHDF5SHGxData(HDF5_GROUP_DEST):
-    """ Retrieve FoF/SH-related HDF5 data from the simulation box
+    """ Retrieve FoF/SH-related gx HDF5 data from the simulation box
         
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
     :type HDF5_GROUP_DEST: string
      :return: nb_shs (# subhalos in each FoF-halo), sh_len (star particle size of each SH), 
         fof_gx_sizes (star particle size of each FoF-halo)
     :rtype: int arrays"""
-    def inner(HDF5_GROUP_DEST, FILE_NAME):
+    def inner(HDF5_GROUP_DEST):
         nb_shs = []
         fof_gx_sizes = []
         sh_len_gx = []
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
         for fname in hdf5GroupFilenamesList:
-            g = h5py.File(r'{}/{}'.format(HDF5_GROUP_DEST, fname), 'r')
+            g = h5py.File(r'{}'.format(fname), 'r')
             if 'Group/GroupLenType' in g:
                 nb_shs.append([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])
                 to_be_appended = [np.int32(g['Group/GroupLenType'][i,4]) for i in range(g['Group/GroupLenType'].shape[0])]
@@ -295,14 +297,14 @@ def getHDF5SHGxData(HDF5_GROUP_DEST):
     return getHDF5SHGxData.inner(HDF5_GROUP_DEST)
 
 def getHDF5DMData(HDF5_SNAP_DEST):
-    """ Retrieve FoF/SH-related HDF5 data from the simulation box
+    """ Retrieve DM HDF5 data from the simulation box
         
-    :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
-    :type HDF5_GROUP_DEST: string
+    :param HDF5_SNAP_DEST: path to snapshot, particle data
+    :type HDF5_SNAP_DEST: string
     :return: dm_xyz (DM ptc positions), dm_masses (mass of each DM ptc),
         dm_velxyz (velocity of each DM ptc)
     :rtype: float and int arrays"""
-    def inner(HDF5_SNAP_DEST, FILE_NAME):
+    def inner(HDF5_SNAP_DEST):
         dm_x = np.empty(0, dtype = np.float32)
         dm_y = np.empty(0, dtype = np.float32)
         dm_z = np.empty(0, dtype = np.float32)
@@ -320,7 +322,7 @@ def getHDF5DMData(HDF5_SNAP_DEST):
         else:
             last = rank == nb_jobs_to_do - 1
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
-            f = h5py.File(r'{}/{}'.format(HDF5_SNAP_DEST, hdf5SnapFilenamesList[snap_run]), 'r')
+            f = h5py.File(r'{}'.format(hdf5SnapFilenamesList[snap_run]), 'r')
             dm_x = np.hstack((dm_x, np.float32(f['PartType1/Coordinates'][:,0]/1000))) # in Mpc = 3.085678e+27 cm
             dm_y = np.hstack((dm_y, np.float32(f['PartType1/Coordinates'][:,1]/1000)))
             dm_z = np.hstack((dm_z, np.float32(f['PartType1/Coordinates'][:,2]/1000)))

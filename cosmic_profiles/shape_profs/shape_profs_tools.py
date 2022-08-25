@@ -101,7 +101,7 @@ def getShapeMs(Rs, d, idx_groups, group, param_interest, ERROR_METHOD, D_LOGSTAR
     mean, err_low, err_high = getMeanOrMedianAndError(y, "median_quantile")
     return mean, err_low, err_high
 
-def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, MASS_UNIT=1e10, suffix = '_'):
+def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, nb_bins, MASS_UNIT=1e10, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -131,16 +131,20 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type s: (N, D_BINS+1) floats
     :param major_full: major axis vectors
     :type major_full: (N,D_BINS+1,3) floats
+    :param nb_bins: Number of mass bins to plot density profiles for
+    :type nb_bins: int
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
     :type MASS_UNIT: float
     :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string"""
     
     if rank == 0:
-        print_status(rank, start_time, "The number of objects considered is {0}".format(d.shape[0]))
         
         # Mass splitting
-        max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time)
+        max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time, NB_BINS = nb_bins)
+        print_status(rank, start_time, "The number of objects considered is {0}".format(d.shape[0]))
+        print_status(rank, start_time, "The mass bins (except maybe last) have size {0}".format(len(obj_m_groups[0])))
+        print_status(rank, start_time, "The number of mass bins is {0}".format(len(obj_m_groups)))
         
         # Maximal elliptical radii
         Rs = np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1)
@@ -288,7 +292,7 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         plt.savefig("{0}/LocalTCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
         
         t = t[np.logical_not(np.isnan(t))]
-        print_status(rank, start_time, "The number of objects considered is {0}. In degrees: The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
+        print_status(rank, start_time, "The number of objects considered is {0}. The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
      
 def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
@@ -340,7 +344,7 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
         plt.savefig("{0}/GlobalTCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
         
         t = t[np.logical_not(np.isnan(t))]
-        print_status(rank, start_time, "The number of objects considered is {0}. In degrees: The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
+        print_status(rank, start_time, "The number of objects considered is {0}. The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
      
 
 def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):

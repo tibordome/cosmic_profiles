@@ -7,7 +7,6 @@ from math import isnan
 from sklearn.utils import resample
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
-from cosmic_profiles.common.python_routines import print_status
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -269,8 +268,6 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
         gx_center_groups = list(getBlocks(center[args_sort], chunk_size)) # List of arrays
         if v is not None:
             v_groups = list(getBlocks(v[args_sort], chunk_size)) # List of arrays
-        print_status(rank, start_time, "The mass bins (except maybe last) have size {0}".format(chunk_size))
-        print_status(rank, start_time, "The number of mass bins is {0}".format(len(m_groups)))
         for i in range(len(m_groups)+1):
             if i == len(m_groups):
                 max_min_m.append(np.float32(m_ordered[-1]))
@@ -303,7 +300,6 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
                 else:
                     assert vdim == 2
                     v_groups.append(np.float32(np.reshape(v_add, (v_add.shape[0], 3))))
-        print_status(rank, start_time, "Split occupancies: {0}".format(split_occ))
     elif M_SPLIT_TYPE == "fixed_bins":
         log_m_min = 7
         log_m_max = 15
@@ -331,7 +327,6 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
                 else:
                     assert vdim == 2
                     v_groups.append(np.float32(np.reshape(v_add, (v_add.shape[0], 3))))
-        print_status(rank, start_time, "Split occupancies: {0}".format(split_occ))
     else:
         assert M_SPLIT_TYPE == "2_fixed_bins"
         max_min_m.append(np.float32(10**(7)))
@@ -356,7 +351,6 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
                 else:
                     assert vdim == 2
                     v_groups.append(np.float32(np.reshape(v_add, (v_add.shape[0], 3))))
-        print_status(rank, start_time, "Split occupancies: {0}".format(split_occ))
         
     idx_groups = [[args_sort[i] for i in np.arange(int(np.array([len(m_groups[k]) for k in range(j)]).sum()), int(np.array([len(m_groups[k]) for k in range(j)]).sum())+len(m_groups[j]))] for j in range(len(m_groups))]
     if v_groups == []:

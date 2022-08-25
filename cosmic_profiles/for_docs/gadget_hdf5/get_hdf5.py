@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import numpy as np
-import itertools
-import h5py
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -35,12 +32,14 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
     :type HDF5_GROUP_DEST: string
     :return: star_xyz (star ptc positions),
         nb_shs (# subhalos in each FoF-halo), 
-        star_masses (mass of each star ptc)
+        star_masses (mass of each star ptc),
+        star_velxyz (star ptc velocities),
+        is_star (whether or not particle is star particle or wind particle)
     :rtype: float and int arrays"""
     return
 
 def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
-    """ Retrieve FoF/SH-related HDF5 data from the simulation box
+    """ Retrieve FoF/SH-related DM HDF5 data from the simulation box
         
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
     :type HDF5_GROUP_DEST: string
@@ -54,20 +53,20 @@ def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
     return
 
 def getHDF5SHGxData(HDF5_GROUP_DEST):
-    """ Retrieve FoF/SH-related HDF5 data from the simulation box
+    """ Retrieve FoF/SH-related gx HDF5 data from the simulation box
         
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
     :type HDF5_GROUP_DEST: string
-    :return: nb_shs (# subhalos in each FoF-halo), sh_len (star particle size of each SH), 
+     :return: nb_shs (# subhalos in each FoF-halo), sh_len (star particle size of each SH), 
         fof_gx_sizes (star particle size of each FoF-halo)
     :rtype: int arrays"""
     return
 
 def getHDF5DMData(HDF5_SNAP_DEST):
-    """ Retrieve FoF/SH-related HDF5 data from the simulation box
+    """ Retrieve DM HDF5 data from the simulation box
         
-    :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
-    :type HDF5_GROUP_DEST: string
+    :param HDF5_SNAP_DEST: path to snapshot, particle data
+    :type HDF5_SNAP_DEST: string
     :return: dm_xyz (DM ptc positions), dm_masses (mass of each DM ptc),
         dm_velxyz (velocity of each DM ptc)
     :rtype: float and int arrays"""

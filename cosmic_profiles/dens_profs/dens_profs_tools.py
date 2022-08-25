@@ -75,7 +75,7 @@ def getHernquistProf(r, model_pars):
     r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
-def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, start_time, MASS_UNIT, suffix = '_'):
+def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, start_time, MASS_UNIT, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -104,6 +104,8 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
     :type obj_centers: (N,3) floats
     :param method: string describing density profile model assumed for fitting
     :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :param nb_bins: Number of mass bins to plot density profiles for
+    :type nb_bins: int
     :param start_time: time of start of shape analysis
     :type start_time: float
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
@@ -112,7 +114,6 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
     :type suffix: string"""
     
     if rank == 0:
-        print_status(rank, start_time, "The number of objects considered is {0}".format(obj_masses.shape[0]))
         
         def getModelParsDict(model_pars_arr, method):
             if method == 'einasto':
@@ -127,9 +128,12 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
             return model_pars_dict
         
         # Mass splitting
-        max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time)
+        max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time, NB_BINS = nb_bins)
         del obj_centers; del obj_center_groups; del idx_groups
         obj_pass = np.int32(np.array([1 if x != [] else 0 for x in cat]))
+        print_status(rank, start_time, "The number of objects considered is {0}".format(np.sum(obj_pass)))
+        print_status(rank, start_time, "The mass bins (except maybe last) have size {0}".format(len(obj_m_groups[0])))
+        print_status(rank, start_time, "The number of mass bins is {0}".format(len(obj_m_groups)))
         idxs_compr = np.zeros((len(cat),), dtype = np.int32)
         idxs_compr[obj_pass.nonzero()[0]] = np.arange(np.sum(obj_pass)) 
         prof_models = {'einasto': getEinastoProf, 'alpha_beta_gamma': getAlphaBetaGammaProf, 'nfw': getNFWProf, 'hernquist': getHernquistProf}

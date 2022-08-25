@@ -595,3 +595,17 @@ def isValidSelection(select, nb_objects):
     if select[0] >= nb_objects or select[1] >= nb_objects:
         raise ValueError("Index / indices in `select` list too large. There aren't that many objects in the inventory.")
     return True
+
+def getIdxCorr(obj_pass, obj_idx):
+    """ Calculate index correction when constructing index list from index array
+    
+    Note that the correction comes from poorly resolved objects
+    
+    :param obj_pass: 1 for sufficiently resolved object, 0 otherwise
+    :type obj_pass: (N1,) integers
+    :param obj_idx: index of object for which correction shall be calculated
+    :type obj_idx: integer
+    :return corr: correction
+    :type corr: integer"""
+    corr = np.int32(np.sum([1 if obj_pass[i] != 1 else 0 for i in range(obj_idx) ]))
+    return corr

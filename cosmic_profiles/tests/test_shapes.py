@@ -25,9 +25,9 @@ def test_shapes():
     D_LOGSTART = -2
     D_LOGEND = 0
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-    M_TOL = np.float32(1e-2)
-    N_WALL = 100
-    N_MIN = 10
+    IT_TOL = np.float32(1e-2)
+    IT_WALL = 100
+    IT_MIN = 10
     SNAP = '015'
     MASS_UNIT = 1e+10
     MIN_NUMBER_DM_PTCS = 1000
@@ -69,7 +69,7 @@ def test_shapes():
     idx_cat = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
     
     assert idx_cat == cprofiles.getIdxCat()
     halos_select = [0, 5]
@@ -103,7 +103,7 @@ def test_shapes():
     assert major.shape[2] == 3
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.plotShapeProfs(VIZ_DEST, select = halos_select, reduced = True, shell_based = True)
+    cprofiles.plotShapeProfs(nb_bins = 2, VIZ_DEST = VIZ_DEST, select = halos_select, reduced = True, shell_based = True)
     
     # Viz first few halos' shapes
     cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)

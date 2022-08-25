@@ -8,7 +8,7 @@ cimport cython
 from libc.math cimport sqrt
 
 @cython.embedsignature(True)
-def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):
+def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -46,22 +46,22 @@ def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, floa
     :type d: float
     :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)
     :type delta_d: float
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
-    return morph_info
+    return
 
 @cython.embedsignature(True)
-def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):
+def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -92,23 +92,22 @@ def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[
     :type eigvec: (3,3) double, zeros
     :param d: distance from the center, kept fixed during iterative procedure
     :type d: float
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
-    
-    return morph_info
+    return
 
 @cython.embedsignature(True)
-def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float M_TOL, int N_WALL, int N_MIN, bint reduced):
+def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -143,23 +142,22 @@ def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[
     :type eigvec: (3,3) double, zeros
     :param d: distance from the center, kept fixed during iterative procedure
     :type d: float
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
-    
-    return morph_info
+    return
 
 @cython.embedsignature(True)
-def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float M_TOL, int N_WALL, int N_MIN, bint reduced):
+def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -196,24 +194,23 @@ def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, floa
     :type d: float
     :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)
     :type delta_d: float
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
-    
-    return morph_info
+    return
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local shape catalogue
     
     Calls ``calcObjMorphLocal()`` in a parallelized manner.\n
@@ -237,14 +234,14 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
     :type D_LOGEND: int
     :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
     :type D_BINS: int
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
         or 'com' (center of mass) of each halo
     :type CENTER: str
@@ -259,7 +256,7 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
     """ Calculates the overall shape catalogue
     
     Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n
@@ -277,14 +274,14 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
     :type MIN_NUMBER_PTCS: int
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
         or 'com' (center of mass) of each halo
     :type CENTER: str
@@ -300,7 +297,7 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int M_TOL, int N_WALL, int N_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local velocity dispersion shape catalogue
     
     Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n
@@ -325,14 +322,14 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
     :type D_LOGEND: int
     :param D_BINS: number of ellipsoidal radii of interest mi
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
         or 'com' (center of mass) of each halo
     :type CENTER: str
@@ -347,7 +344,7 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int M_TOL, int N_WALL, int N_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
     """ Calculates the global velocity dipsersion shape catalogue
     
     Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n
@@ -367,14 +364,14 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
     :type MIN_NUMBER_PTCS: int
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
         or 'com' (center of mass) of each halo
     :type CENTER: str
@@ -389,7 +386,7 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     return
 
 @cython.embedsignature(True)
-def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):
+def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
     """ Calculates the local axis ratios
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -422,24 +419,24 @@ def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:
     :type eigval: (3,) double, zeros
     :param eigvec: eigenvector array to be filled
     :type eigvec: (3,3) double, zeros
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
     :type shell_based: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius
     :rtype: (12,N) float array"""
-    return morph_info
+    return
 
 @cython.embedsignature(True)
-def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):
+def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
     """ Calculates the global axis ratios and eigenframe of the point cloud
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -466,14 +463,14 @@ def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,
     :type eigval: (3,) double, zeros
     :param eigvec: eigenvector array to be filled
     :type eigvec: (3,3) double, zeros
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. 
         The larger the better.
     :type SAFE: float
@@ -481,10 +478,10 @@ def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
     :rtype: (12,) float array"""
-    return morph_info
+    return
 
 @cython.embedsignature(True)
-def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):
+def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
     """ Calculates the local axis ratios of the velocity dispersion tensor 
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -521,24 +518,24 @@ def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, 
     :type eigval: (3,) double, zeros
     :param eigvec: eigenvector array to be filled
     :type eigvec: (3,3) double, zeros
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
     :type shell_based: boolean
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
     :rtype: (12,N) float array"""
-    return morph_info
+    return
 
 @cython.embedsignature(True)
-def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float M_TOL, int N_WALL, int N_MIN, float SAFE, bint reduced):
+def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -573,14 +570,14 @@ def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, f
     :type d: float
     :param delta_d: thickness of the shell in real space (constant across shells in logarithmic space)
     :type delta_d: float
-    :param M_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``M_TOL``
+    :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
-    :type M_TOL: float
-    :param N_WALL: maximum permissible number of iterations
-    :type N_WALL: float
-    :param N_MIN: minimum number of particles (DM or star particle) in any iteration; 
+    :type IT_TOL: float
+    :param IT_WALL: maximum permissible number of iterations
+    :type IT_WALL: float
+    :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
         if undercut, shape is unclassified
-    :type N_MIN: int
+    :type IT_MIN: int
     :param SAFE: ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. 
         The larger the better.
     :type SAFE: float
@@ -588,4 +585,4 @@ def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, f
     :type reduced: boolean
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
     :rtype: (12,) float array"""
-    return morph_info
+    return
