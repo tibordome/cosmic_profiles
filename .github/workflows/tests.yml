@@ -21,7 +21,7 @@ jobs:
         run: |
           $CONDA/bin/conda install -c conda-forge mpi4py
           $CONDA/bin/conda install scipy
-          $CONDA/bin/conda install cython
+          $CONDA/bin/conda install -c anaconda cython
           $CONDA/bin/conda install -c conda-forge openmp
           $CONDA/bin/conda install -c conda-forge openmpi=4.1.2
           $CONDA/bin/conda install matplotlib
