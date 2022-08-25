@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import numpy as np
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -91,7 +90,6 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type MASS_UNIT: float
     :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string"""
-    
     return
 
 def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, frac_r200, MASS_UNIT, suffix = '_'):
@@ -162,15 +160,15 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
     """    
     return     
 
-def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
+def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, internal units
     :type masses: (N^3x1) floats
+    :param idx_cat: catalogue of objects (objs/gxs)
+    :type idx_cat: list of lists of ints
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -184,20 +182,19 @@ def getGlobalEpsHist(idx_cat, xyz, masses, L_BOX, CENTER, VIZ_DEST, SNAP, suffix
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""
-    
     return
         
-def getLocalEpsHist(idx_cat, xyz, masses, r200, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
+def getLocalEpsHist(xyz, masses, r200, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
     :param xyz: coordinates of particles of type 1 or type 4, in Mpc/h
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, internal units
     :type masses: (N^3x1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
+    :param idx_cat: catalogue of objects (objs/gxs)
+    :type idx_cat: list of lists of ints
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -213,5 +210,4 @@ def getLocalEpsHist(idx_cat, xyz, masses, r200, L_BOX, CENTER, VIZ_DEST, SNAP, f
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""
-    
     return

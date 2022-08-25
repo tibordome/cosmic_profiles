@@ -805,7 +805,7 @@ cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
     Its public methods are ``getIdxCat()``, ``getIdxCatSuffRes()``,
-    ``getMassesCenters()``, ``estDensProfs``, ``fitDensProfs()``, ``getConcentrations()``, 
+    ``getMassesCenters()``, ``estDensProfs``, ``fitDensProfs()``, ``estConcentrations()``, 
     ``plotDensProfs()``."""
     
     cdef float[:,:] xyz
@@ -895,7 +895,7 @@ cdef class DensProfs(CosmicBase):
             return dens_profs
         else:
             return None
-        
+    
     def fitDensProfs(self, dens_profs, ROverR200, str method, list select):
         """ Get best-fit results for density profile fitting
         
@@ -910,6 +910,8 @@ cdef class DensProfs(CosmicBase):
         :return: best-fits for each object
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         print_status(rank,self.start_time,'Starting fitDensProfs() with snap {0}'.format(self.SNAP))
+        if len(dens_profs) > select[1] - select[0] + 1:
+            raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         if rank == 0:
             best_fits = self.getDensProfsBestFitsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, method)
             return best_fits
@@ -930,7 +932,9 @@ cdef class DensProfs(CosmicBase):
         :type select: list containing two integers
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
-        print_status(rank,self.start_time,'Starting getConcentrations() with snap {0}'.format(self.SNAP))
+        print_status(rank,self.start_time,'Starting estConcentrations() with snap {0}'.format(self.SNAP))
+        if len(dens_profs) > select[1] - select[0] + 1:
+            raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         if rank == 0:
             cs = self.getConcentrationsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, method)
             return cs
@@ -956,6 +960,8 @@ cdef class DensProfs(CosmicBase):
         :type select: list containing two integers
         """
         print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0}'.format(self.SNAP))
+        if len(dens_profs) > select[1] - select[0] + 1:
+            raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         obj_centers, obj_masses = self.getMassesCenters(select = [0, len(self.idx_cat)-1])
         
         if rank == 0:
@@ -1580,6 +1586,8 @@ cdef class DensProfsHDF5(CosmicBase):
         :return: best-fits for each object
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         print_status(rank,self.start_time,'Starting fitDensProfs() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
+        if len(dens_profs) > select[1] - select[0] + 1:
+            raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         if rank == 0:
             idx_cat = self.getIdxCat(obj_type)
@@ -1590,7 +1598,7 @@ cdef class DensProfsHDF5(CosmicBase):
             del xyz; del masses
             return None
     
-    def fitConcentrations(self, dens_profs, ROverR200, str method, list select, str obj_type = 'dm'):
+    def estConcentrations(self, dens_profs, ROverR200, str method, list select, str obj_type = 'dm'):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -1605,7 +1613,9 @@ cdef class DensProfsHDF5(CosmicBase):
         :type obj_type: string
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
-        print_status(rank,self.start_time,'Starting getConcentrations() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
+        print_status(rank,self.start_time,'Starting estConcentrations() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
+        if len(dens_profs) > select[1] - select[0] + 1:
+            raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         if rank == 0:
             idx_cat = self.getIdxCat(obj_type)
@@ -1637,6 +1647,8 @@ cdef class DensProfsHDF5(CosmicBase):
         :type obj_type: string
         """
         print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
+        if len(dens_profs) > select[1] - select[0] + 1:
+            raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         obj_centers, obj_masses = self.getMassesCenters(obj_type, select = [0, len(self.idx_cat)-1])
         
         if rank == 0:

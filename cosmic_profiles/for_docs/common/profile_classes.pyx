@@ -18,13 +18,12 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 @cython.embedsignature(True)
-@cython.binding(True)
 cdef class CosmicBase:
     """ Parent class governing high-level cosmic shape calculations
     
     Its public methods are ``getR200s()``, ``getMassesCentersBase()``, 
     ``getShapeCatLocalBase()``, ``getShapeCatGlobalBase()``, ``getShapeCatVelLocalBase()``, 
-    ``getShapeCatVelGlobalBase()``, ``dumpShapeCatLocalBase()``, ``dumpShapeCatGlobalBase()``, 
+    ``getShapeCatVelGlobalBase()``, ``dumpShapeCatLocalBase()``, ``dumpShapeCatGlobalBase()``,
     ``dumpShapeCatVelLocalBase()``, ``dumpShapeCatVelGlobalBase()``, ``plotShapeProfsBase()``,
     ``plotLocalTHistBase()``, ``plotGlobalTHistBase()``, ``getDensProfsBestFitsBase()``,
     ``getConcentrationsBase()``, ``getDensProfsSphDirectBinningBase()``, ``getDensProfsEllDirectBinningBase()``,
@@ -77,13 +76,15 @@ cdef class CosmicBase:
         :rtype: (N,3) and (N,) floats"""
         return
     
-    def getShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):
+    def getShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):
         """ Get all relevant local shape data
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -113,13 +114,15 @@ cdef class CosmicBase:
         """
         return
     
-    def getShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, bint reduced):
+    def getShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, bint reduced):
         """ Get all relevant global shape data
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -141,7 +144,7 @@ cdef class CosmicBase:
         """
         return
         
-    def getShapeCatVelLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):
+    def getShapeCatVelLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, bint reduced, bint shell_based):
         """ Get all relevant local velocity shape data
         
         :param xyz: positions of all simulation particles
@@ -150,6 +153,8 @@ cdef class CosmicBase:
         :type velxyz: (N2,3) floats
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -179,7 +184,7 @@ cdef class CosmicBase:
         """
         return
     
-    def getShapeCatVelGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, bint reduced):
+    def getShapeCatVelGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, bint reduced):
         """ Get all relevant global velocity shape data
         
         :param xyz: positions of all simulation particles
@@ -188,6 +193,8 @@ cdef class CosmicBase:
         :type velxyz: (N2,3) floats
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -209,13 +216,15 @@ cdef class CosmicBase:
         """
         return
     
-    def dumpShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
+    def dumpShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -245,13 +254,15 @@ cdef class CosmicBase:
         """
         return
         
-    def dumpShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced):
+    def dumpShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced):
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -272,7 +283,7 @@ cdef class CosmicBase:
         :type reduced: boolean"""
         return
     
-    def dumpShapeVelCatLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
+    def dumpShapeVelCatLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles
@@ -281,6 +292,8 @@ cdef class CosmicBase:
         :type velxyz: (N2,3) floats
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -310,7 +323,7 @@ cdef class CosmicBase:
         """
         return
     
-    def dumpShapeVelCatGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced):
+    def dumpShapeVelCatGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, str CAT_DEST, str suffix, bint reduced):
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles
@@ -319,6 +332,8 @@ cdef class CosmicBase:
         :type velxyz: (N2,3) floats
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -344,16 +359,17 @@ cdef class CosmicBase:
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         """
-        
         return
     
-    def plotShapeProfsBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str VIZ_DEST, bint reduced, bint shell_based, str suffix = ''):
+    def plotShapeProfsBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str VIZ_DEST, bint reduced, bint shell_based, str suffix = ''):
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -381,16 +397,17 @@ cdef class CosmicBase:
         :param suffix: suffix for file names
         :type suffix: string
         """
-                
         return
             
-    def plotLocalTHistBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str VIZ_DEST, int HIST_NB_BINS, float frac_r200, bint reduced, bint shell_based, str suffix = ''):
+    def plotLocalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float M_TOL, int N_WALL, int N_MIN, str VIZ_DEST, int HIST_NB_BINS, float frac_r200, bint reduced, bint shell_based, str suffix = ''):
         """ Plot a local-shape triaxiality histogram at a specified ellipsoidal depth of ``frac_r200``
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -422,16 +439,17 @@ cdef class CosmicBase:
         :param suffix: suffix for file names
         :type suffix: string
         """
-                
         return
     
-    def plotGlobalTHistBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, str VIZ_DEST, int HIST_NB_BINS, bint reduced, str suffix = ''):
+    def plotGlobalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float M_TOL, int N_WALL, int N_MIN, str VIZ_DEST, int HIST_NB_BINS, bint reduced, str suffix = ''):
         """ Plot a global-shape triaxiality histogram
                 
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -451,20 +469,19 @@ cdef class CosmicBase:
         :param suffix: suffix for file names
         :type suffix: string
         """
-                
         return
     
-    def getDensProfsBestFitsBase(self, float[:,:] dens_profs, float[:] ROverR200, idx_cat, float[:] r200s, int MIN_NUMBER_PTCS, str method = 'einasto'):
+    def getDensProfsBestFitsBase(self, float[:,:] dens_profs, float[:] ROverR200, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, str method = 'einasto'):
         """ Get best-fit results for density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
         :type dens_profs: (N3, r_res) floats
         :param ROverR200: normalized radii at which ``dens_profs`` are defined
         :type ROverR200: (r_res,) floats
+        :param r200: R_200 radii of the parent halos
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
-        :param r200s: R_200 radii of the parent halos
-        :type r200s: (N1,) floats
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param method: string describing density profile model assumed for fitting
@@ -472,36 +489,36 @@ cdef class CosmicBase:
         :return: best-fits for each object, and normalized radii used to calculate best-fits
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``,
             and (r_res,) floats"""
-        
         return
         
-    def getConcentrationsBase(self, float[:,:] dens_profs, float[:] ROverR200, idx_cat, float[:] r200s, int MIN_NUMBER_PTCS, str method = 'einasto'):
+    def getConcentrationsBase(self, float[:,:] dens_profs, float[:] ROverR200, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, str method = 'einasto'):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
         :type dens_profs: (N3, r_res) floats
         :param ROverR200: normalized radii at which ``dens_profs`` are defined
         :type ROverR200: (r_res,) floats
+        :param r200: R_200 radii of the parent halos
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
-        :param r200s: R_200 radii of the parent halos
-        :type r200s: (N1,) floats
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
-                
         return
         
-    def getDensProfsSphDirectBinningBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float[:] ROverR200):
+    def getDensProfsSphDirectBinningBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float[:] ROverR200):
         """ Get direct-binning-based spherically averaged density profiles
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -510,16 +527,17 @@ cdef class CosmicBase:
         :type ROverR200: (r_res,) floats
         :return: density profiles
         :rtype: (N2, r_res) floats"""
-                
         return
         
-    def getDensProfsEllDirectBinningBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor):
+    def getDensProfsEllDirectBinningBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor):
         """ Get direct-binning-based ellipsoidal shell-based density profiles
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -540,16 +558,17 @@ cdef class CosmicBase:
         :type minor: (N1,D_BINS+1,3) floats
         :return: density profiles
         :rtype: (N2, r_res) floats"""
-        
         return
         
-    def getDensProfsKernelBasedBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float[:] ROverR200):
+    def getDensProfsKernelBasedBase(self, float[:,:] xyz, float[:] masses, float[:] r200, idx_cat, int MIN_NUMBER_PTCS, float[:] ROverR200):
         """ Get kernel-based density profiles
         
         :param xyz: positions of all simulation particles
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles
         :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo
+        :type r200: (N1,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -558,7 +577,6 @@ cdef class CosmicBase:
         :type ROverR200: (r_res,) floats
         :return: density profiles
         :rtype: (N2, r_res) floats"""
-                
         return
         
     def getObjInfoBase(self, float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, str obj_type):
@@ -590,14 +608,11 @@ cdef class CosmicBase:
         :type obj_type: string"""
         return
 
-@cython.embedsignature(True)
-@cython.binding(True)
 cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
     Its public methods are ``getIdxCat()``, ``getIdxCatSuffRes()``,
-    ``getMassesCenters()``, ``getDensProfsDirectBinning()``,
-    ``getDensProfsKernelBased()``, ``getDensProfsBestFits()``, ``getConcentrations()``, 
+    ``getMassesCenters()``, ``estDensProfs``, ``fitDensProfs()``, ``getConcentrations()``, 
     ``plotDensProfs()``."""
     
     cdef float[:,:] xyz
@@ -644,34 +659,33 @@ cdef class DensProfs(CosmicBase):
         :rtype: list of length N1, each consisting of a list of int indices"""
         return
     
-    def getMassesCenters(self):
+    def getMassesCenters(self, list select):
         """ Calculate total mass and centers of objects
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
         return
     
-    def getDensProfsDirectBinning(self, ROverR200, bint spherical = True):
-        """ Get direct-binning-based density profiles
+    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):
+        """ Estimate density profiles
         
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
+        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
         :type ROverR200: (r_res,) floats
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
+        :param direct_binning: whether or not direct binning approach or
+            kernel-based approach should be used
+        :type direct_binning: boolean
         :param spherical: whether or not spherical shell-based or ellipsoidal shell-based
+            should be used, ignored if ``direct_binning`` = False
         :type spherical: boolean
         :return: density profiles
         :rtype: (N2, r_res) floats"""
         return
-
-    def getDensProfsKernelBased(self, ROverR200):
-        """ Get kernel-based density profiles
         
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
-        :return: density profiles
-        :rtype: (N2, r_res) floats"""
-        return
-        
-    def getDensProfsBestFits(self, dens_profs, ROverR200, str method):
+    def fitDensProfs(self, dens_profs, ROverR200, str method, list select):
         """ Get best-fit results for density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -680,24 +694,29 @@ cdef class DensProfs(CosmicBase):
         :type ROverR200: (r_res,) floats
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :return: best-fits for each object
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         return
         
-    def getConcentrations(self, dens_profs, ROverR200, str method):
+    def estConcentrations(self, dens_profs, ROverR200, str method, list select):
         """ Get best-fit concentration values of objects from density profile fitting
         
-        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
+        :param dens_profs: density profiles whose concentrations are to be determined, 
+            in units of M_sun*h^2/(Mpc)**3
         :type dens_profs: (N3, r_res) floats
         :param ROverR200: normalized radii at which ``dens_profs`` are defined
         :type ROverR200: (r_res,) floats
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
         return
         
-    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, str VIZ_DEST):
+    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, str VIZ_DEST, list select):
         """ Draws some simplistic density profiles
         
         :param dens_profs: estimated density profiles, in units of M_sun*h^2/(Mpc)**3
@@ -712,17 +731,15 @@ cdef class DensProfs(CosmicBase):
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         """
         return
       
-@cython.embedsignature(True)
-@cython.binding(True)
 cdef class DensShapeProfs(DensProfs):
     """ Class for density profile and shape profile calculations
     
-    Its public methods are ``getShapeCatLocal()``, ``getShapeCatGlobal()``, 
+    Its public methods are ``estDensProfs()``, ``getShapeCatLocal()``, ``getShapeCatGlobal()``, 
     ``vizLocalShapes()``, ``vizGlobalShapes()``, ``plotGlobalEpsHist()``, 
     ``plotLocalEpsHist()``, ``plotGlobalTHist()``, ``plotLocalTHist()``, 
     ``dumpShapeCatLocal()``, ``dumpShapeCatGlobal()``, ``getObjInfo()``."""
@@ -775,24 +792,34 @@ cdef class DensShapeProfs(DensProfs):
         self.N_WALL = N_WALL
         self.N_MIN = N_MIN
         
-    def getDensProfsDirectBinning(self, ROverR200, bint spherical = True, bint reduced = False, bint shell_based = False):
-        """ Get direct-binning-based density profiles
+    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False):
+        """ Estimate density profiles
         
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
+        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
         :type ROverR200: (r_res,) floats
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
+        :param direct_binning: whether or not direct binning approach or
+            kernel-based approach should be used
+        :type direct_binning: boolean
         :param spherical: whether or not spherical shell-based or ellipsoidal shell-based
+            should be used, ignored if ``direct_binning`` = False
         :type spherical: boolean
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
+        :param reduced: whether or not reduced shape tensor (1/r^2 factor) should be used,
+            ignored if ``direct_binning`` = False
         :type reduced: boolean
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
+        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run,
+            ignored if ``direct_binning`` = False
         :type shell_based: boolean
         :return: density profiles
         :rtype: (N2, r_res) floats"""
         return
         
-    def getShapeCatLocal(self, bint reduced = False, bint shell_based = False):
+    def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False):
         """ Get all relevant local shape data
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -803,9 +830,11 @@ cdef class DensShapeProfs(DensProfs):
             (number_of_objs,3) float array, (number_of_objs,) float array"""
         return
     
-    def getShapeCatGlobal(self, bint reduced = False):
+    def getShapeCatGlobal(self, list select, bint reduced = False):
         """ Get all relevant global shape data
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :return: d, q, s, minor, inter, major, obj_center, obj_m
@@ -839,16 +868,18 @@ cdef class DensShapeProfs(DensProfs):
         :type reduced: boolean"""
         return
     
-    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST):
+    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select):
         """ Plot global ellipticity histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string"""
+        :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers"""
         return
     
-    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST):
+    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select):
         """ Plot local ellipticity histogram at depth ``frac_r200``
         
         :param frac_r200: depth of objects to plot ellipticity, in units of R200
@@ -856,10 +887,12 @@ cdef class DensShapeProfs(DensProfs):
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string"""
+        :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers"""
         return
     
-    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, bint reduced = False, bint shell_based = False):
+    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False):
         """ Plot local triaxiality histogram at depth ``frac_r200``
         
         :param HIST_NB_BINS: number of histogram bins
@@ -868,50 +901,60 @@ cdef class DensShapeProfs(DensProfs):
         :type VIZ_DEST: string
         :param frac_r200: depth of objects to plot triaxiality, in units of R200
         :type frac_r200: float
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         return
     
-    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, bint reduced = False):
+    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False):
         """ Plot global triaxiality histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         return
     
-    def plotShapeProfs(self, str VIZ_DEST, bint reduced = False, bint shell_based = False):
+    def plotShapeProfs(self, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False):
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         return
     
-    def dumpShapeCatLocal(self, str CAT_DEST, bint reduced = False, bint shell_based = False):
+    def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         return
     
-    def dumpShapeCatGlobal(self, str CAT_DEST, bint reduced = False):
+    def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False):
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         return
@@ -920,15 +963,12 @@ cdef class DensShapeProfs(DensProfs):
         """ Print basic info about the objects"""
         return
     
-@cython.embedsignature(True)
-@cython.binding(True)
 cdef class DensProfsHDF5(CosmicBase):
     """ Class for density profile calculations for Gadget-style HDF5 data
     
     Its public methods are ``getXYZMasses()``, ``getVelXYZ()``, 
     ``getIdxCat()``,  ``getMassesCenters()``, 
-    ``getDensProfsDirectBinning()``, ``getDensProfsKernelBased()``, 
-    ``getDensProfsBestFits()``, ``getConcentrations()``,
+    ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,
     ``plotDensProfs()``."""
     
     cdef str HDF5_SNAP_DEST
@@ -989,43 +1029,39 @@ cdef class DensProfsHDF5(CosmicBase):
         :type obj_type: string
         :return cat: list of indices defining the objects
         :rtype: list of length N1, each consisting of a list of int indices"""
-        
         return
     
-    def getMassesCenters(self, str obj_type = 'dm'):
+    def getMassesCenters(self, list select, str obj_type = 'dm'):
         """ Calculate total mass and centers of objects
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
         return
-    
-    def getDensProfsDirectBinning(self, ROverR200, bint spherical = True, str obj_type = 'dm'):
-        """ Get direct-binning-based density profiles
         
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
+    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, str obj_type = 'dm'):
+        """ Estimate density profiles
+        
+        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
         :type ROverR200: (r_res,) floats
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
+        :param direct_binning: whether or not direct binning approach or
+            kernel-based approach should be used
+        :type direct_binning: boolean
         :param spherical: whether or not spherical shell-based or ellipsoidal shell-based
+            should be used, ignored if ``direct_binning`` = False
         :type spherical: boolean
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
         :return: density profiles
         :rtype: (N2, r_res) floats"""
         return
-
-    def getDensProfsKernelBased(self, ROverR200, str obj_type = 'dm'):
-        """ Get kernel-based density profiles
         
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
-        :return: density profiles
-        :rtype: (N2, r_res) floats"""
-        return
-        
-    def getDensProfsBestFits(self, dens_profs, ROverR200, str method, str obj_type = 'dm'):
+    def fitDensProfs(self, dens_profs, ROverR200, str method, list select, str obj_type = 'dm'):
         """ Get best-fit results for density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -1034,13 +1070,15 @@ cdef class DensProfsHDF5(CosmicBase):
         :type ROverR200: (r_res,) floats
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
         :return: best-fits for each object
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         return
-        
-    def getConcentrations(self, dens_profs, ROverR200, method, str obj_type = 'dm'):
+    
+    def fitConcentrations(self, dens_profs, ROverR200, str method, list select, str obj_type = 'dm'):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -1049,13 +1087,15 @@ cdef class DensProfsHDF5(CosmicBase):
         :type ROverR200: (r_res,) floats
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
         return
         
-    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, str VIZ_DEST, str obj_type = 'dm'):
+    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, str VIZ_DEST, list select, str obj_type = 'dm'):
         """ Draws some simplistic density profiles
         
         :param dens_profs: estimated density profiles, in units of M_sun*h^2/(Mpc)**3
@@ -1070,13 +1110,13 @@ cdef class DensProfsHDF5(CosmicBase):
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
         """
         return
 
-@cython.embedsignature(True)
-@cython.binding(True)
 cdef class DensShapeProfsHDF5(DensProfsHDF5):
     """ Class for density profile and shape profile calculations for Gadget-style HDF5 data
     
@@ -1137,12 +1177,18 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         self.N_WALL = N_WALL
         self.N_MIN = N_MIN
         
-    def getDensProfsDirectBinning(self, ROverR200, bint spherical = True, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
-        """ Get direct-binning-based density profiles
+    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+        """ Estimate density profiles
         
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
+        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
         :type ROverR200: (r_res,) floats
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
+        :param direct_binning: whether or not direct binning approach or
+            kernel-based approach should be used
+        :type direct_binning: boolean
         :param spherical: whether or not spherical shell-based or ellipsoidal shell-based
+            should be used, ignored if ``direct_binning`` = False
         :type spherical: boolean
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
@@ -1153,10 +1199,12 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :return: density profiles
         :rtype: (N2, r_res) floats"""
         return
-        
-    def getShapeCatLocal(self, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+    
+    def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Get all relevant local shape data
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -1169,9 +1217,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             (number_of_objs,3) float array, (number_of_objs,) float array"""
         return
     
-    def getShapeCatGlobal(self, bint reduced = False, str obj_type = 'dm'):
+    def getShapeCatGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):
         """ Get all relevant global shape data
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
@@ -1182,9 +1232,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             (number_of_objs,3) float array, (number_of_objs,) float array"""
         return
         
-    def getShapeCatVelLocal(self, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+    def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Get all relevant local velocity shape data
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -1197,9 +1249,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             (number_of_objs,3) float array, (number_of_objs,) float array"""
         return
     
-    def getShapeCatVelGlobal(self, bint reduced = False, str obj_type = 'dm'):
+    def getShapeCatVelGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):
         """ Get all relevant global velocity shape data
         
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
@@ -1239,18 +1293,20 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type obj_type: string"""
         return
     
-    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, str obj_type = 'dm'):
+    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):
         """ Plot global ellipticity histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string"""
         return
 
-    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, str obj_type = 'dm'):
+    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):
         """ Plot local ellipticity histogram at depth ``frac_r200``
         
         :param frac_r200: depth of objects to plot ellipticity, in units of R200
@@ -1259,11 +1315,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string"""
         return
     
-    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Plot local triaxiality histogram at depth ``frac_r200``
         
         :param HIST_NB_BINS: number of histogram bins
@@ -1272,6 +1330,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type VIZ_DEST: string
         :param frac_r200: depth of objects to plot triaxiality, in units of R200
         :type frac_r200: float
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -1280,7 +1340,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type obj_type: string"""
         return
     
-    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, bint reduced = False, str obj_type = 'dm'):
+    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False, str obj_type = 'dm'):
         """ Plot global triaxiality histogram
         
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -1289,15 +1349,21 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
+        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
+        :type reduced: boolean
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string"""
         return
         
-    def plotShapeProfs(self, str VIZ_DEST, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+    def plotShapeProfs(self, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -1306,11 +1372,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type obj_type: string"""
         return
 
-    def dumpShapeCatLocal(self, str CAT_DEST, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+    def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -1319,22 +1387,26 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type obj_type: string"""
         return
 
-    def dumpShapeCatGlobal(self, str CAT_DEST, bint reduced = False, str obj_type = 'dm'):
+    def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string"""
         return
 
-    def dumpShapeVelCatLocal(self, str CAT_DEST, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+    def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -1343,11 +1415,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type obj_type: string"""
         return
 
-    def dumpShapeVelCatGlobal(self, str CAT_DEST, bint reduced = False, str obj_type = 'dm'):
+    def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
+        :param select: index of first and last object to look at in the format [idx_first, idx_last]
+        :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
