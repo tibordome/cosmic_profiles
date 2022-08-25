@@ -55,9 +55,9 @@ To calculate shape profiles with *Cosmic Profiles*, let us assume we are dealing
     D_LOGSTART = -2
     D_LOGEND = 1
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-    M_TOL = np.float32(1e-2)
-    N_WALL = 100
-    N_MIN = 10
+    IT_TOL = np.float32(1e-2)
+    IT_WALL = 100
+    IT_MIN = 10
     SNAP = '035'
     CENTER = 'mode'
     MIN_NUMBER_DM_PTCS = 200
@@ -65,7 +65,7 @@ To calculate shape profiles with *Cosmic Profiles*, let us assume we are dealing
     WANT_RVIR = False # Whether or not we want quantities (e.g. D_LOGSTART) expressed with respect to the virial radius R_vir or overdensity radius R_200
 
     # Instantiate object
-    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER, WANT_RVIR)
+    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, WANT_RVIR)
 
 with arguments explained in :ref:`the code reference<Cosmic Profiles Code Reference>`.
 
@@ -83,21 +83,21 @@ with arguments explained in :ref:`the code reference<Cosmic Profiles Code Refere
     D_LOGSTART = -2
     D_LOGEND = 1
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-    M_TOL = np.float32(1e-2)
-    N_WALL = 100
-    N_MIN = 10
+    IT_TOL = np.float32(1e-2)
+    IT_WALL = 100
+    IT_MIN = 10
     SNAP = '035'
     CENTER = 'mode'
     MIN_NUMBER_PTCS = 200
 
     # Instantiate object
-    cprofiles = DensShapeProfs(xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, M_TOL, N_WALL, N_MIN, CENTER)
+    cprofiles = DensShapeProfs(xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
 
 To retrieve the local (i.e. as a function of :math:`r_{\text{ell}}`) halo shape catalogue, we can invoke the command::
 
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(select = [0, len(idx_cat)-1], reduced = False, shell_based = False).
 
-The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``major``, ``obj_centers``, ``obj_masses`` represents the shape profiles. The arrays will contain NaNs whenever the shape determination did not converge. We consider the shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``M_TOL`` and the maximum number of iterations ``N_WALL`` is not yet achieved. The ``select`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, all objects are considered since the range ``[0, len(idx_cat)-1]`` spans the maximum range of indices. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. If :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``select`` argument and in addition are sufficiently resolved, then the 1D and 2D shape profile arrays will have the following format:
+The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``major``, ``obj_centers``, ``obj_masses`` represents the shape profiles. The arrays will contain NaNs whenever the shape determination did not converge. We consider the shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``IT_TOL`` and the maximum number of iterations ``IT_WALL`` is not yet achieved. The ``select`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, all objects are considered since the range ``[0, len(idx_cat)-1]`` spans the maximum range of indices. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. If :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``select`` argument and in addition are sufficiently resolved, then the 1D and 2D shape profile arrays will have the following format:
 
 * ``d`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): ellipsoidal radii
 * ``q`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): q shape parameter
