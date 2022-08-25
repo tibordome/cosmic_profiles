@@ -970,7 +970,7 @@ cdef class DensProfs(CosmicBase):
         
         if rank == 0:
             suffix = '_'
-            drawDensProfs(VIZ_DEST, self.SNAP, self.idx_cat[select[0]:select[1]+1], self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, np.float32(ROverR200), obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            drawDensProfs(VIZ_DEST, self.SNAP, self.idx_cat[select[0]:select[1]+1], self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, np.float32(ROverR200), obj_masses, obj_centers, method, nb_bins, select, self.start_time, self.MASS_UNIT, suffix = suffix)
             del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
         else:
             del obj_centers; del obj_masses
@@ -1655,7 +1655,7 @@ cdef class DensProfsHDF5(CosmicBase):
         
         if rank == 0:
             suffix = '_{}_'.format(obj_type)
-            drawDensProfs(VIZ_DEST, self.SNAP, idx_cat[select[0]:select[1]+1], self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            drawDensProfs(VIZ_DEST, self.SNAP, idx_cat[select[0]:select[1]+1], self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, select, self.start_time, self.MASS_UNIT, suffix = suffix)
             del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
 
 cdef class DensShapeProfsHDF5(DensProfsHDF5):
