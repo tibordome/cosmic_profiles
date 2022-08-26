@@ -5,8 +5,8 @@ python3 setup.py build_ext --inplace
 cd ../../docs
 sphinx-build -b html source build
 cd ../cosmic_profiles/for_docs/common
-rm profile_classes.c
-rm profile_classes.so
+rm cosmic_base_class.c
+rm cosmic_base_class.so
 rm -r __pycache__
 rm -r build
 cd ../cython_helpers
@@ -20,11 +20,15 @@ rm gen_catalogues.so
 rm -r __pycache__
 rm -r build
 cd ../shape_profs
+rm shape_profs_classes.c
+rm shape_profs_classes.so
 rm shape_profs_algos.c
 rm shape_profs_algos.so
 rm -r __pycache__
 rm -r build
 cd ../dens_profs
+rm dens_profs_classes.c
+rm dens_profs_classes.so
 rm dens_profs_algos.c
 rm dens_profs_algos.so
 rm -r __pycache__

@@ -57,7 +57,7 @@ def getHDF5SHGxData(HDF5_GROUP_DEST):
         
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
     :type HDF5_GROUP_DEST: string
-     :return: nb_shs (# subhalos in each FoF-halo), sh_len (star particle size of each SH), 
+    :return: nb_shs (# subhalos in each FoF-halo), sh_len (star particle size of each SH), 
         fof_gx_sizes (star particle size of each FoF-halo)
     :rtype: int arrays"""
     return

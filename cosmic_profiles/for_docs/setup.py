@@ -95,8 +95,8 @@ setup(
 )
 
 extension5 = [Extension(
-                "common.profile_classes",
-                sources=['common/profile_classes.pyx'],
+                "common.cosmic_base_class",
+                sources=['common/cosmic_base_class.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -107,4 +107,34 @@ extension5 = [Extension(
 setup(
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     ext_modules = cythonize(extension5)
+)
+
+extension6 = [Extension(
+                "dens_profs.dens_profs_classes",
+                sources=['dens_profs/dens_profs_classes.pyx'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            )]
+    
+
+
+setup(
+    cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
+    ext_modules = cythonize(extension6)
+)
+
+extension7 = [Extension(
+                "shape_profs.shape_profs_classes",
+                sources=['shape_profs/shape_profs_classes.pyx'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            )]
+    
+
+
+setup(
+    cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
+    ext_modules = cythonize(extension7)
 )

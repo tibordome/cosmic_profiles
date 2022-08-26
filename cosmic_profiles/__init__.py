@@ -27,9 +27,12 @@ from .mock_tools.mock_halo_gen import (
     genHalo
 )
 
-from .common.profile_classes import (
+from .dens_profs.dens_profs_classes import (
     DensProfs,
+    DensProfsHDF5
+)
+
+from .shape_profs.shape_profs_classes import (
     DensShapeProfs,
-    DensProfsHDF5,
     DensShapeProfsHDF5
 )

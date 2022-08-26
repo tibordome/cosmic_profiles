@@ -60,8 +60,20 @@ ext_modules=[Extension(
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
             ), Extension(
-                "cosmic_profiles.common.profile_classes",
-                sources=['cosmic_profiles/common/profile_classes.c'],
+                "cosmic_profiles.common.cosmic_base_class",
+                sources=['cosmic_profiles/common/cosmic_base_class.c'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            ), Extension(
+                "cosmic_profiles.dens_profs.dens_profs_classes",
+                sources=['cosmic_profiles/dens_profs/dens_profs_classes.c'],
+                extra_compile_args=["-fopenmp"],
+                extra_link_args=["-fopenmp"],
+                include_dirs=[np.get_include(), '.']
+            ), Extension(
+                "cosmic_profiles.shape_profs.shape_profs_classes",
+                sources=['cosmic_profiles/shape_profs/shape_profs_classes.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']

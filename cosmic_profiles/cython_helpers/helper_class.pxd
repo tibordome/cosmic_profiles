@@ -1,9 +1,6 @@
 #cython: language_level=3
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Mar 13 17:28:18 2022
-"""
 
 cdef class CythonHelpers:
 

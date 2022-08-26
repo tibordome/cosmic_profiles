@@ -71,7 +71,7 @@ def linkcode_resolve(domain, info):
     
     if domain not in ['py'] or not info['module']:
         return None
-    if 'gen_catalogues' in info['module'] or 'helper_class' in info['module'] or 'profile_classes' in info['module'] or 'shape_profs_algos' in info['module'] or 'dens_profs_algos' in info['module']:
+    if 'gen_catalogues' in info['module'] or 'helper_class' in info['module'] or 'cosmic_base_class' in info['module'] or 'shape_profs_algos' in info['module'] or 'shape_profs_classes' in info['module'] or 'dens_profs_algos' in info['module'] or 'dens_profs_classes' in info['module']:
         extension = '.pyx'
     else:
         extension = '.py'

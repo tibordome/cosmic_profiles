@@ -3,6 +3,16 @@
 Common Functionalities
 =======================
 
+Base Profiling Class
+*********************
+
+The ``cosmic_base_class`` module defines the ``CosmicBase`` class that constitutes the parent class of many profiling classes in the *CosmicProfiles* package.
+
+.. automodule:: common.cosmic_base_class
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Cosmo Tools
 **************
 

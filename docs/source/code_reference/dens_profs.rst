@@ -1,6 +1,15 @@
-Density Profile Functions
+Density Profiling
 ===========================
 
+Classes for Density Profiling
+******************************
+
+The ``dens_profs_classes`` module defines the ``DensProfs`` and ``DensProfsHDF5`` classes that provide density profiling capabilities. They inherit from the ``CosmicBase`` class.
+
+.. automodule:: dens_profs.dens_profs_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Density profile estimation algorithms
 ***************************************
