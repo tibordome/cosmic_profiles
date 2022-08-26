@@ -75,8 +75,8 @@ def test_densities_ex_script():
         dens_profs_db = dens_profs_db[0]
         dens_profs_kb = dens_profs_kb[0]
         plt.figure()
-        plt.loglog(r_over_rvir, dens_profs_db[0], 'o--', label='direct binning', markersize = 3)
-        plt.loglog(r_over_rvir, dens_profs_kb[0], 'o--', label='kernel-based', markersize = 3)
+        plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='direct binning', markersize = 3)
+        plt.loglog(r_over_rvir, dens_profs_kb, 'o--', label='kernel-based', markersize = 3)
         plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], model_pars), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} cMpc/h'.format(alpha, r_s))
         plt.xlabel(r'r/$R_{\mathrm{vir}}$')
         plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")

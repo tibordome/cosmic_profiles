@@ -73,15 +73,14 @@ def test_densities():
     halos_select = [0, 5]
     dens_profs_db = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
     dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = False) # These estimates will be kernel-based
-    idx_cat = cprofiles.getIdxCat()
     if rank == 0:
-        nb_sel_suff_res = np.sum([1 if idx_cat[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])
-        assert dens_profs_db.shape[0] == nb_sel_suff_res
+        nb_suff_res = halos_select[1]-halos_select[0]+1
+        assert dens_profs_db.shape[0] == nb_suff_res
         assert dens_profs_db.shape[1] == r_over_rvir.shape[0]
-        assert dens_profs_kb.shape[0] == nb_sel_suff_res
+        assert dens_profs_kb.shape[0] == nb_suff_res
         assert dens_profs_kb.shape[1] == r_over_rvir.shape[0]
     else:
-        dens_profs_db = np.zeros((nb_sel_suff_res, r_over_rvir.shape[0]), dtype = np.float32)
+        dens_profs_db = np.zeros((nb_suff_res, r_over_rvir.shape[0]), dtype = np.float32)
     comm.Bcast(dens_profs_db, root = 0)
     
     ############################## Fit Density Profile ###############################################
@@ -89,5 +88,5 @@ def test_densities():
     dens_profs_db = dens_profs_db[:,10:]
     best_fits = cprofiles.fitDensProfs(dens_profs_db, r_over_rvir, method = method, select = halos_select)
     if rank == 0:
-        assert best_fits.shape[0] == nb_sel_suff_res
+        assert best_fits.shape[0] == nb_suff_res
         assert best_fits.shape[1] == nb_model_pars[method]

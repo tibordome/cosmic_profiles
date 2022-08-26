@@ -82,7 +82,7 @@ cdef class DensProfs(CosmicBase):
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
         if rank == 0:
-            centers, ms = self.getMassesCentersBase(self.xyz.base, self.masses.base, self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.MIN_NUMBER_PTCS)
+            centers, ms = self.getMassesCentersBase(self.xyz.base, self.masses.base, self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1])
             return centers, ms
         else:
             return None, None

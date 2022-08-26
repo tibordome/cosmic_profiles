@@ -88,15 +88,15 @@ def test_shapes():
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(select = halos_select, reduced = False, shell_based = False)
     
     if rank == 0:
-        nb_sel_suff_res = np.sum([1 if idx_cat[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])   
-        assert obj_masses.shape[0] == nb_sel_suff_res
-        assert obj_centers.shape[0] == nb_sel_suff_res
-        assert d.shape[0] == nb_sel_suff_res
-        assert q.shape[0] == nb_sel_suff_res
-        assert s.shape[0] == nb_sel_suff_res
-        assert minor.shape[0] == nb_sel_suff_res
-        assert inter.shape[0] == nb_sel_suff_res
-        assert major.shape[0] == nb_sel_suff_res
+        nb_suff_res = halos_select[1]-halos_select[0]+1
+        assert obj_masses.shape[0] == nb_suff_res
+        assert obj_centers.shape[0] == nb_suff_res
+        assert d.shape[0] == nb_suff_res
+        assert q.shape[0] == nb_suff_res
+        assert s.shape[0] == nb_suff_res
+        assert minor.shape[0] == nb_suff_res
+        assert inter.shape[0] == nb_suff_res
+        assert major.shape[0] == nb_suff_res
         assert d.shape[1] == D_BINS+1
         assert q.shape[1] == D_BINS+1
         assert s.shape[1] == D_BINS+1
