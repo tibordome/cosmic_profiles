@@ -23,7 +23,7 @@ def calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int c
     :type csh_size: (N2,) ints
     :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
     :type MIN_NUMBER_DM_PTCS: int
-    :return: h_idxs filled partially with indices (+1, to allow 0 to be interpreted as no index)
+    :return: h_idxs filled partially with indices
     :rtype: int array"""
     return
 
@@ -42,7 +42,7 @@ def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBE
     :type fof_gx_size: (N1,) ints
     :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid
     :type MIN_NUMBER_STAR_PTCS: int
-    :return: gx_cat: indices (+1, to allow 0 to be interpreted as no index),
+    :return: gx_cat: indices,
         gx_size: number of particles in each object
     :rtype: int array, int array"""
     return
@@ -66,7 +66,7 @@ def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group
     :type halo_masses: (N1,) floats
     :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
     :type MIN_NUMBER_DM_PTCS: int
-    :return: h_cat: indices (+1, to allow 0 to be interpreted as no index),
+    :return: h_cat: indices,
         h_r200: R200-radii, h_size: number of particles in each object
     :rtype: int array, float array, int array"""
     return

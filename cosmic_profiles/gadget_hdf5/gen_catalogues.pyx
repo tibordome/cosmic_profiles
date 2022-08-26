@@ -24,7 +24,7 @@ cdef int[:] calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_sh
     :type csh_size: (N2,) ints
     :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
     :type MIN_NUMBER_DM_PTCS: int
-    :return: h_idxs filled partially with indices (+1, to allow 0 to be interpreted as no index)
+    :return: h_idxs filled partially with indices
     :rtype: int array"""
     
     cdef int l
@@ -33,13 +33,13 @@ cdef int[:] calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_sh
             l = start_idx
             if fof_dm_size >= MIN_NUMBER_DM_PTCS: # Only add halos that have sufficient resolution
                 while l < start_idx+fof_dm_size: # Add content of inner fuzz (after last Subfind, but since there is no Subfind, all of FOF)
-                    h_idxs[l-start_idx] = l+1
+                    h_idxs[l-start_idx] = l
                     l += 1
     else:
         l = start_idx
         if csh_size >= MIN_NUMBER_DM_PTCS: # Only add halos that have sufficient resolution
             while l < start_idx+csh_size: # Add content of Halo = Subfind 0 == CSH
-                h_idxs[l-start_idx] = l+1
+                h_idxs[l-start_idx] = l
                 l += 1
     return h_idxs
 
@@ -58,7 +58,7 @@ def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBE
     :type fof_gx_size: (N1,) ints
     :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid
     :type MIN_NUMBER_STAR_PTCS: int
-    :return: gx_cat: indices (+1, to allow 0 to be interpreted as no index),
+    :return: gx_cat: indices,
         gx_size: number of particles in each object
     :rtype: int array, int array"""
     def inner(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
@@ -121,7 +121,7 @@ def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group
     :type halo_masses: (N1,) floats
     :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
     :type MIN_NUMBER_DM_PTCS: int
-    :return: h_cat: indices (+1, to allow 0 to be interpreted as no index),
+    :return: h_cat: indices,
         h_r200: R200-radii, h_size: number of particles in each object
     :rtype: int array, float array, int array"""
     def inner(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
