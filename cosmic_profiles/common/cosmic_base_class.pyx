@@ -69,7 +69,7 @@ cdef class CosmicBase:
         :type obj_size: (N1,) integers
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
-        centers, m = calcMassesCenters(xyz.base, masses.base, idx_cat, obj_size, self.L_BOX, self.CENTER)
+        centers, m = calcMassesCenters(xyz.base, masses.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
         return centers, m
     
     def getShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
