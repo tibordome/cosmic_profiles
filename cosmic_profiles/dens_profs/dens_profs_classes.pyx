@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from common.cosmic_base_class cimport CosmicBase
+from cosmic_profiles.common.cosmic_base_class cimport CosmicBase
 from cosmic_profiles.common.python_routines import print_status, isValidSelection, getIdxCorr
 from cosmic_profiles.dens_profs.dens_profs_tools import drawDensProfs
 from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData

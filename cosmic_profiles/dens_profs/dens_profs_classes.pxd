@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from common.cosmic_base_class cimport CosmicBase
+from cosmic_profiles.common.cosmic_base_class cimport CosmicBase
 
 cdef class DensProfs(CosmicBase):
     

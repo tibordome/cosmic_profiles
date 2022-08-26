@@ -35,8 +35,8 @@ class BuildExtWithoutPlatformSuffix(build_ext):
         return get_ext_filename_without_platform_suffix(filename)
 
 extension1 = [Extension(
-                "cython_helpers.helper_class",
-                sources=['cython_helpers/helper_class.pyx'],
+                "cosmic_profiles.cython_helpers.helper_class",
+                sources=['cosmic_profiles/cython_helpers/helper_class.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -50,8 +50,8 @@ setup(
 )
 
 extension2 = [Extension(
-                "gadget_hdf5.gen_catalogues",
-                sources=['gadget_hdf5/gen_catalogues.pyx'],
+                "cosmic_profiles.gadget_hdf5.gen_catalogues",
+                sources=['cosmic_profiles/gadget_hdf5/gen_catalogues.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -65,8 +65,8 @@ setup(
 )
 
 extension3 = [Extension(
-                "dens_profs.dens_profs_algos",
-                sources=['dens_profs/dens_profs_algos.pyx'],
+                "cosmic_profiles.dens_profs.dens_profs_algos",
+                sources=['cosmic_profiles/dens_profs/dens_profs_algos.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -80,8 +80,8 @@ setup(
 )
 
 extension4 = [Extension(
-                "shape_profs.shape_profs_algos",
-                sources=['shape_profs/shape_profs_algos.pyx'],
+                "cosmic_profiles.shape_profs.shape_profs_algos",
+                sources=['cosmic_profiles/shape_profs/shape_profs_algos.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -95,8 +95,8 @@ setup(
 )
 
 extension5 = [Extension(
-                "common.cosmic_base_class",
-                sources=['common/cosmic_base_class.pyx'],
+                "cosmic_profiles.common.cosmic_base_class",
+                sources=['cosmic_profiles/common/cosmic_base_class.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -110,8 +110,8 @@ setup(
 )
 
 extension6 = [Extension(
-                "dens_profs.dens_profs_classes",
-                sources=['dens_profs/dens_profs_classes.pyx'],
+                "cosmic_profiles.dens_profs.dens_profs_classes",
+                sources=['cosmic_profiles/dens_profs/dens_profs_classes.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
@@ -125,8 +125,8 @@ setup(
 )
 
 extension7 = [Extension(
-                "shape_profs.shape_profs_classes",
-                sources=['shape_profs/shape_profs_classes.pyx'],
+                "cosmic_profiles.shape_profs.shape_profs_classes",
+                sources=['cosmic_profiles/shape_profs/shape_profs_classes.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
