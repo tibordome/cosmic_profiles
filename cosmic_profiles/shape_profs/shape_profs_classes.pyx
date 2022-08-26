@@ -254,7 +254,7 @@ cdef class DensShapeProfs(DensProfs):
 
         if rank == 0:
             # Retrieve shape information
-            d, q, s, minor, inter, major, centers, obj_masses = self.getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat.base, self.MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            d, q, s, minor, inter, major, centers, obj_masses = self.getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat.base, self.obj_size.base, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             del obj_masses                        
             for obj_number in obj_numbers:
                 if obj_number >= d.shape[0]:
