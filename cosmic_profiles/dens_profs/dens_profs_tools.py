@@ -75,7 +75,7 @@ def getHernquistProf(r, model_pars):
     r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
-def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, start_time, MASS_UNIT, suffix = '_'):
+def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, start_time, MASS_UNIT, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -85,8 +85,6 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param cat: catalogue of objects (halos/gxs)
-    :type cat: N2-long list of lists of ints, N2 > N
     :param r200s: catalogue of virial radii (of parent halos in case of gxs)
     :type r200s: N2-long float array
     :param dens_profs_fit: density profiles, defined at ``ROverR200``, in M_sun*h^2/(Mpc)**3
@@ -130,38 +128,31 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
         # Mass splitting
         max_min_m, obj_m_groups, obj_center_groups, idx_groups = M_split(MASS_UNIT*obj_masses, obj_centers, start_time, NB_BINS = nb_bins)
         del obj_centers; del obj_center_groups; del idx_groups
-        obj_pass = np.int32(np.array([1 if x != [] else 0 for x in cat]))
-        idxs_compr = np.zeros((len(cat),), dtype = np.int32)
-        idxs_compr[obj_pass.nonzero()[0]] = np.arange(np.sum(obj_pass)) 
-        print_status(rank, start_time, "The number of objects considered is {0}".format(np.sum(obj_pass)))
-        print_status(rank, start_time, "The mass bins (except maybe last) have size {0}".format(np.sum(np.int32([1 if (obj_pass[i] == 1 and obj_masses[idxs_compr[i]]*MASS_UNIT > max_min_m[0] and obj_masses[idxs_compr[i]]*MASS_UNIT < max_min_m[1]) else 0 for i in range(len(cat))]))))
+        print_status(rank, start_time, "The number of objects considered is {0}".format(r200s.shape[0]))
+        print_status(rank, start_time, "The mass bins (except maybe last) have size {0}".format(np.sum(np.int32([1 if (obj_masses[i]*MASS_UNIT > max_min_m[0] and obj_masses[i]*MASS_UNIT < max_min_m[1]) else 0 for i in range(r200s.shape[0])]))))
         print_status(rank, start_time, "The number of mass bins is {0}".format(len(obj_m_groups)))
         prof_models = {'einasto': getEinastoProf, 'alpha_beta_gamma': getAlphaBetaGammaProf, 'nfw': getNFWProf, 'hernquist': getHernquistProf}
         model_name = {'einasto': 'Einasto', 'alpha_beta_gamma': r'\alpha \beta \gamma', 'nfw': 'NFW', 'hernquist': 'Hernquist'}
         
         # Average over all objects' density profiles
-        if np.sum(obj_pass) > 0:
-            dens_prof_ = dens_profs[idxs_compr[np.nonzero(obj_pass > 0)[0]]]
-        else:
-            dens_prof_ = np.zeros((0,ROverR200.shape[0]), dtype = np.float32)
-        y = [list(dens_prof_[:,i]) for i in range(ROverR200.shape[0])]
+        if r200s.shape[0] == 0:
+            dens_profs = np.zeros((0,ROverR200.shape[0]), dtype = np.float32)
+        y = [list(dens_profs[:,i]) for i in range(ROverR200.shape[0])]
         prof_median = np.array([np.median(z) if z != [] else np.nan for z in y])
         err_low = np.array([np.quantile(np.array(z), 0.25)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
         err_high = np.array([np.quantile(np.array(z), 0.75)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
-        r200 = np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]])
+        r200 = np.average(r200s[np.arange(r200s.shape[0])])
         # Prepare median for fitting
-        if np.sum(obj_pass) > 0:
-            dens_prof_fit = dens_profs_fit[idxs_compr[np.nonzero(obj_pass > 0)[0]]]
-        else:
-            dens_prof_fit = np.zeros((0,ROverR200_fit.shape[0]), dtype = np.float32)
-        y = [list(dens_prof_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
+        if r200s.shape[0] == 0:
+            dens_profs_fit = np.zeros((0,ROverR200_fit.shape[0]), dtype = np.float32)
+        y = [list(dens_profs_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
         prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
         best_fit, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200, 0)) # Fit median
         best_fit_dict = getModelParsDict(best_fit, method)
         del r200
         # Plotting
         plt.figure()
-        plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass.nonzero()[0]]]), best_fit_dict), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
+        plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])]), best_fit_dict), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
         plt.loglog(ROverR200, prof_median, color = 'blue')
         plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"All objects")
         plt.xlabel(r"$r/R_{200}$")
@@ -170,15 +161,15 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
         plt.savefig("{}/RhoProf_{}.pdf".format(VIZ_DEST, SNAP), bbox_inches="tight")
         
         for group in range(len(obj_m_groups)):
-            obj_pass_m = np.int32([1 if (obj_pass[i] == 1 and obj_masses[idxs_compr[i]]*MASS_UNIT > max_min_m[group] and obj_masses[idxs_compr[i]]*MASS_UNIT < max_min_m[group+1]) else 0 for i in range(len(cat))])
+            obj_pass_m = np.int32([1 if (obj_masses[i]*MASS_UNIT > max_min_m[group] and obj_masses[i]*MASS_UNIT < max_min_m[group+1]) else 0 for i in range(r200s.shape[0])])
             # Find profile median
-            y = [list(dens_prof_[idxs_compr[np.nonzero(obj_pass_m > 0)[0]],i]) for i in range(ROverR200.shape[0])]
+            y = [list(dens_profs[:,i]) for i in range(ROverR200.shape[0])]
             prof_median = np.array([np.median(z) if z != [] else np.nan for z in y])
             err_low = np.array([np.quantile(np.array(z), 0.25)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
             err_high = np.array([np.quantile(np.array(z), 0.75)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
             r200_m = np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]])
             # Prepare median for fitting
-            y = [list(dens_prof_fit[idxs_compr[np.nonzero(obj_pass_m > 0)[0]],i]) for i in range(ROverR200_fit.shape[0])]
+            y = [list(dens_profs_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
             prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
             best_fit_m, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200_m, 0))
             best_fit_m_dict = getModelParsDict(best_fit_m, method)
@@ -191,7 +182,7 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
             plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
             plt.legend(loc="upper right", fontsize="x-small")
             plt.savefig("{}/RhoProfM{:.2f}_{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), SNAP), bbox_inches="tight")
-        del obj_pass; del y; del err_low; del err_high
+        del y; del err_low; del err_high
         return
 
 def fitDensProf(ROverR200, method, median_r200_obj_nb):

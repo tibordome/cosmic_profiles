@@ -996,11 +996,12 @@ struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs {
   __Pyx_memviewslice xyz;
   __Pyx_memviewslice masses;
   PyObject *idx_cat;
+  __Pyx_memviewslice obj_size;
 };
 
 
-/* "dens_profs/dens_profs_classes.pxd":13
- *     cdef object idx_cat
+/* "dens_profs/dens_profs_classes.pxd":14
+ *     cdef int[:] obj_size
  * 
  * cdef class DensProfsHDF5(CosmicBase):             # <<<<<<<<<<<<<<
  * 
@@ -1787,6 +1788,13 @@ static int __Pyx_ValidateAndInit_memviewslice(
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_float(PyObject *, int writable_flag);
 
+/* MemviewDtypeToObject.proto */
+static CYTHON_INLINE PyObject *__pyx_memview_get_int(const char *itemp);
+static CYTHON_INLINE int __pyx_memview_set_int(const char *itemp, PyObject *obj);
+
+/* ObjectToMemviewSlice.proto */
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_int(PyObject *, int writable_flag);
+
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_float(PyObject *, int writable_flag);
 
@@ -1887,6 +1895,7 @@ static void __pyx_memoryview_slice_assign_scalar(__Pyx_memviewslice *, int, size
 static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize_t *, int, size_t, void *); /*proto*/
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_float = { "float", NULL, sizeof(float), { 0 }, 0, 'R', 0, 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), { 0 }, 0, IS_UNSIGNED(int) ? 'U' : 'I', IS_UNSIGNED(int), 0 };
 #define __Pyx_MODULE_NAME "shape_profs.shape_profs_classes"
 extern int __pyx_module_is_main_shape_profs__shape_profs_classes;
 int __pyx_module_is_main_shape_profs__shape_profs_classes = 0;
@@ -2023,7 +2032,7 @@ static const char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create 
 static const char __pyx_k_Cannot_assign_to_read_only_memor[] = "Cannot assign to read-only memoryview";
 static const char __pyx_k_Cannot_create_writable_memory_vi[] = "Cannot create writable memory view from read-only memoryview";
 static const char __pyx_k_Empty_shape_tuple_for_cython_arr[] = "Empty shape tuple for cython.array";
-static const char __pyx_k_Incompatible_checksums_s_vs_0x28[] = "Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))";
+static const char __pyx_k_Incompatible_checksums_s_vs_0x82[] = "Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible checksums (%s vs 0xb068931 = (name))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0xc6[] = "Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))";
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
@@ -2057,7 +2066,7 @@ static PyObject *__pyx_n_s_HIST_NB_BINS;
 static PyObject *__pyx_n_s_IT_MIN;
 static PyObject *__pyx_n_s_IT_TOL;
 static PyObject *__pyx_n_s_IT_WALL;
-static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x28;
+static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x82;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xb0;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xc6;
 static PyObject *__pyx_n_s_IndexError;
@@ -2255,7 +2264,7 @@ static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject 
 static PyObject *__pyx_tp_new__memoryviewslice(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
-static PyObject *__pyx_int_42433304;
+static PyObject *__pyx_int_136800287;
 static PyObject *__pyx_int_184977713;
 static PyObject *__pyx_int_207900485;
 static PyObject *__pyx_int_neg_1;
@@ -4493,9 +4502,10 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
   PyObject *__pyx_t_13 = NULL;
   PyObject *__pyx_t_14 = NULL;
   PyObject *__pyx_t_15 = NULL;
-  int __pyx_t_16;
+  PyObject *__pyx_t_16 = NULL;
   int __pyx_t_17;
   int __pyx_t_18;
+  int __pyx_t_19;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -4504,7 +4514,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.r200, self.start_time, self.xyz)             # <<<<<<<<<<<<<<
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.obj_size, self.r200, self.start_time, self.xyz)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:
  */
@@ -4531,53 +4541,58 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
   if (unlikely(!__pyx_v_self->__pyx_base.masses.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(1, 5, __pyx_L1_error)}
   __pyx_t_11 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.masses, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  if (unlikely(!__pyx_v_self->__pyx_base.__pyx_base.r200.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(1, 5, __pyx_L1_error)}
-  __pyx_t_12 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.__pyx_base.r200, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 5, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->__pyx_base.obj_size.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(1, 5, __pyx_L1_error)}
+  __pyx_t_12 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.obj_size, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_13 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.__pyx_base.start_time); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 5, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->__pyx_base.__pyx_base.r200.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(1, 5, __pyx_L1_error)}
+  __pyx_t_13 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.__pyx_base.r200, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
-  if (unlikely(!__pyx_v_self->__pyx_base.xyz.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(1, 5, __pyx_L1_error)}
-  __pyx_t_14 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.xyz, 2, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __pyx_t_14 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.__pyx_base.start_time); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_14);
-  __pyx_t_15 = PyTuple_New(17); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 5, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->__pyx_base.xyz.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(1, 5, __pyx_L1_error)}
+  __pyx_t_15 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.xyz, 2, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_15);
+  __pyx_t_16 = PyTuple_New(18); if (unlikely(!__pyx_t_16)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_16);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base.CENTER);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base.CENTER);
-  PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_v_self->__pyx_base.__pyx_base.CENTER);
+  PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_v_self->__pyx_base.__pyx_base.CENTER);
   __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_16, 1, __pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_15, 2, __pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_16, 2, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
-  PyTuple_SET_ITEM(__pyx_t_15, 3, __pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_16, 3, __pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
-  PyTuple_SET_ITEM(__pyx_t_15, 4, __pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_16, 4, __pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_5);
-  PyTuple_SET_ITEM(__pyx_t_15, 5, __pyx_t_5);
+  PyTuple_SET_ITEM(__pyx_t_16, 5, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_6);
-  PyTuple_SET_ITEM(__pyx_t_15, 6, __pyx_t_6);
+  PyTuple_SET_ITEM(__pyx_t_16, 6, __pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_15, 7, __pyx_t_7);
+  PyTuple_SET_ITEM(__pyx_t_16, 7, __pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_8);
-  PyTuple_SET_ITEM(__pyx_t_15, 8, __pyx_t_8);
+  PyTuple_SET_ITEM(__pyx_t_16, 8, __pyx_t_8);
   __Pyx_GIVEREF(__pyx_t_9);
-  PyTuple_SET_ITEM(__pyx_t_15, 9, __pyx_t_9);
+  PyTuple_SET_ITEM(__pyx_t_16, 9, __pyx_t_9);
   __Pyx_GIVEREF(__pyx_t_10);
-  PyTuple_SET_ITEM(__pyx_t_15, 10, __pyx_t_10);
+  PyTuple_SET_ITEM(__pyx_t_16, 10, __pyx_t_10);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base.SNAP);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base.SNAP);
-  PyTuple_SET_ITEM(__pyx_t_15, 11, __pyx_v_self->__pyx_base.__pyx_base.SNAP);
+  PyTuple_SET_ITEM(__pyx_t_16, 11, __pyx_v_self->__pyx_base.__pyx_base.SNAP);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.idx_cat);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.idx_cat);
-  PyTuple_SET_ITEM(__pyx_t_15, 12, __pyx_v_self->__pyx_base.idx_cat);
+  PyTuple_SET_ITEM(__pyx_t_16, 12, __pyx_v_self->__pyx_base.idx_cat);
   __Pyx_GIVEREF(__pyx_t_11);
-  PyTuple_SET_ITEM(__pyx_t_15, 13, __pyx_t_11);
+  PyTuple_SET_ITEM(__pyx_t_16, 13, __pyx_t_11);
   __Pyx_GIVEREF(__pyx_t_12);
-  PyTuple_SET_ITEM(__pyx_t_15, 14, __pyx_t_12);
+  PyTuple_SET_ITEM(__pyx_t_16, 14, __pyx_t_12);
   __Pyx_GIVEREF(__pyx_t_13);
-  PyTuple_SET_ITEM(__pyx_t_15, 15, __pyx_t_13);
+  PyTuple_SET_ITEM(__pyx_t_16, 15, __pyx_t_13);
   __Pyx_GIVEREF(__pyx_t_14);
-  PyTuple_SET_ITEM(__pyx_t_15, 16, __pyx_t_14);
+  PyTuple_SET_ITEM(__pyx_t_16, 16, __pyx_t_14);
+  __Pyx_GIVEREF(__pyx_t_15);
+  PyTuple_SET_ITEM(__pyx_t_16, 17, __pyx_t_15);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
@@ -4592,31 +4607,32 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
   __pyx_t_12 = 0;
   __pyx_t_13 = 0;
   __pyx_t_14 = 0;
-  __pyx_v_state = ((PyObject*)__pyx_t_15);
   __pyx_t_15 = 0;
+  __pyx_v_state = ((PyObject*)__pyx_t_16);
+  __pyx_t_16 = 0;
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.r200, self.start_time, self.xyz)
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.obj_size, self.r200, self.start_time, self.xyz)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None:
  *         state += (_dict,)
  */
-  __pyx_t_15 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_n_s_dict, Py_None); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __pyx_v__dict = __pyx_t_15;
-  __pyx_t_15 = 0;
+  __pyx_t_16 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_n_s_dict, Py_None); if (unlikely(!__pyx_t_16)) __PYX_ERR(1, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_16);
+  __pyx_v__dict = __pyx_t_16;
+  __pyx_t_16 = 0;
 
   /* "(tree fragment)":7
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.r200, self.start_time, self.xyz)
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.obj_size, self.r200, self.start_time, self.xyz)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
  *         use_setstate = True
  */
-  __pyx_t_16 = (__pyx_v__dict != Py_None);
-  __pyx_t_17 = (__pyx_t_16 != 0);
-  if (__pyx_t_17) {
+  __pyx_t_17 = (__pyx_v__dict != Py_None);
+  __pyx_t_18 = (__pyx_t_17 != 0);
+  if (__pyx_t_18) {
 
     /* "(tree fragment)":8
  *     _dict = getattr(self, '__dict__', None)
@@ -4625,16 +4641,16 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
  *         use_setstate = True
  *     else:
  */
-    __pyx_t_15 = PyTuple_New(1); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_16 = PyTuple_New(1); if (unlikely(!__pyx_t_16)) __PYX_ERR(1, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
     __Pyx_INCREF(__pyx_v__dict);
     __Pyx_GIVEREF(__pyx_v__dict);
-    PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_v__dict);
-    __pyx_t_14 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_15); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_14);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_14));
-    __pyx_t_14 = 0;
+    PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_v__dict);
+    __pyx_t_15 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_16); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_15));
+    __pyx_t_15 = 0;
 
     /* "(tree fragment)":9
  *     if _dict is not None:
@@ -4646,7 +4662,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.r200, self.start_time, self.xyz)
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.SAFE, self.SNAP, self.idx_cat, self.masses, self.obj_size, self.r200, self.start_time, self.xyz)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -4660,28 +4676,28 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
  *     else:
  *         use_setstate = self.CENTER is not None or self.SNAP is not None or self.idx_cat is not None             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, None), state
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, None), state
  */
   /*else*/ {
-    __pyx_t_16 = (__pyx_v_self->__pyx_base.__pyx_base.CENTER != ((PyObject*)Py_None));
-    __pyx_t_18 = (__pyx_t_16 != 0);
-    if (!__pyx_t_18) {
+    __pyx_t_17 = (__pyx_v_self->__pyx_base.__pyx_base.CENTER != ((PyObject*)Py_None));
+    __pyx_t_19 = (__pyx_t_17 != 0);
+    if (!__pyx_t_19) {
     } else {
-      __pyx_t_17 = __pyx_t_18;
+      __pyx_t_18 = __pyx_t_19;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_18 = (__pyx_v_self->__pyx_base.__pyx_base.SNAP != ((PyObject*)Py_None));
-    __pyx_t_16 = (__pyx_t_18 != 0);
-    if (!__pyx_t_16) {
+    __pyx_t_19 = (__pyx_v_self->__pyx_base.__pyx_base.SNAP != ((PyObject*)Py_None));
+    __pyx_t_17 = (__pyx_t_19 != 0);
+    if (!__pyx_t_17) {
     } else {
-      __pyx_t_17 = __pyx_t_16;
+      __pyx_t_18 = __pyx_t_17;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_16 = (__pyx_v_self->__pyx_base.idx_cat != Py_None);
-    __pyx_t_18 = (__pyx_t_16 != 0);
-    __pyx_t_17 = __pyx_t_18;
+    __pyx_t_17 = (__pyx_v_self->__pyx_base.idx_cat != Py_None);
+    __pyx_t_19 = (__pyx_t_17 != 0);
+    __pyx_t_18 = __pyx_t_19;
     __pyx_L4_bool_binop_done:;
-    __pyx_v_use_setstate = __pyx_t_17;
+    __pyx_v_use_setstate = __pyx_t_18;
   }
   __pyx_L3:;
 
@@ -4689,89 +4705,89 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
  *     else:
  *         use_setstate = self.CENTER is not None or self.SNAP is not None or self.idx_cat is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, None), state
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, None), state
  *     else:
  */
-  __pyx_t_17 = (__pyx_v_use_setstate != 0);
-  if (__pyx_t_17) {
+  __pyx_t_18 = (__pyx_v_use_setstate != 0);
+  if (__pyx_t_18) {
 
     /* "(tree fragment)":13
  *         use_setstate = self.CENTER is not None or self.SNAP is not None or self.idx_cat is not None
  *     if use_setstate:
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, state)
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, state)
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_pyx_unpickle_DensShapeProfs); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_15 = PyTuple_New(3); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_pyx_unpickle_DensShapeProfs); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_16 = PyTuple_New(3); if (unlikely(!__pyx_t_16)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    PyTuple_SET_ITEM(__pyx_t_15, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    __Pyx_INCREF(__pyx_int_42433304);
-    __Pyx_GIVEREF(__pyx_int_42433304);
-    PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_int_42433304);
+    PyTuple_SET_ITEM(__pyx_t_16, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    __Pyx_INCREF(__pyx_int_136800287);
+    __Pyx_GIVEREF(__pyx_int_136800287);
+    PyTuple_SET_ITEM(__pyx_t_16, 1, __pyx_int_136800287);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    PyTuple_SET_ITEM(__pyx_t_15, 2, Py_None);
-    __pyx_t_13 = PyTuple_New(3); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_GIVEREF(__pyx_t_14);
-    PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_14);
+    PyTuple_SET_ITEM(__pyx_t_16, 2, Py_None);
+    __pyx_t_14 = PyTuple_New(3); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_14);
     __Pyx_GIVEREF(__pyx_t_15);
-    PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_t_15);
+    PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_15);
+    __Pyx_GIVEREF(__pyx_t_16);
+    PyTuple_SET_ITEM(__pyx_t_14, 1, __pyx_t_16);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    PyTuple_SET_ITEM(__pyx_t_13, 2, __pyx_v_state);
-    __pyx_t_14 = 0;
+    PyTuple_SET_ITEM(__pyx_t_14, 2, __pyx_v_state);
     __pyx_t_15 = 0;
-    __pyx_r = __pyx_t_13;
-    __pyx_t_13 = 0;
+    __pyx_t_16 = 0;
+    __pyx_r = __pyx_t_14;
+    __pyx_t_14 = 0;
     goto __pyx_L0;
 
     /* "(tree fragment)":12
  *     else:
  *         use_setstate = self.CENTER is not None or self.SNAP is not None or self.idx_cat is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, None), state
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, None), state
  *     else:
  */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, None), state
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, None), state
  *     else:
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_DensShapeProfs__set_state(self, __pyx_state)
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_pyx_unpickle_DensShapeProfs); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_15 = PyTuple_New(3); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
+    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_pyx_unpickle_DensShapeProfs); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_14);
+    __pyx_t_16 = PyTuple_New(3); if (unlikely(!__pyx_t_16)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    PyTuple_SET_ITEM(__pyx_t_15, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    __Pyx_INCREF(__pyx_int_42433304);
-    __Pyx_GIVEREF(__pyx_int_42433304);
-    PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_int_42433304);
+    PyTuple_SET_ITEM(__pyx_t_16, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    __Pyx_INCREF(__pyx_int_136800287);
+    __Pyx_GIVEREF(__pyx_int_136800287);
+    PyTuple_SET_ITEM(__pyx_t_16, 1, __pyx_int_136800287);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    PyTuple_SET_ITEM(__pyx_t_15, 2, __pyx_v_state);
-    __pyx_t_14 = PyTuple_New(2); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_14);
-    __Pyx_GIVEREF(__pyx_t_13);
-    PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_13);
-    __Pyx_GIVEREF(__pyx_t_15);
-    PyTuple_SET_ITEM(__pyx_t_14, 1, __pyx_t_15);
-    __pyx_t_13 = 0;
-    __pyx_t_15 = 0;
-    __pyx_r = __pyx_t_14;
+    PyTuple_SET_ITEM(__pyx_t_16, 2, __pyx_v_state);
+    __pyx_t_15 = PyTuple_New(2); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __Pyx_GIVEREF(__pyx_t_14);
+    PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_14);
+    __Pyx_GIVEREF(__pyx_t_16);
+    PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_t_16);
     __pyx_t_14 = 0;
+    __pyx_t_16 = 0;
+    __pyx_r = __pyx_t_15;
+    __pyx_t_15 = 0;
     goto __pyx_L0;
   }
 
@@ -4798,6 +4814,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
   __Pyx_XDECREF(__pyx_t_13);
   __Pyx_XDECREF(__pyx_t_14);
   __Pyx_XDECREF(__pyx_t_15);
+  __Pyx_XDECREF(__pyx_t_16);
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfs.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -4810,7 +4827,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, state)
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_DensShapeProfs__set_state(self, __pyx_state)
  */
@@ -4838,7 +4855,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_3
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, state)
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_DensShapeProfs__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
  */
@@ -4849,7 +4866,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_3
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x2877b18, state)
+ *         return __pyx_unpickle_DensShapeProfs, (type(self), 0x827681f, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_DensShapeProfs__set_state(self, __pyx_state)
  */
@@ -8334,18 +8351,18 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_Den
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0x2877b18:             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum != 0x827681f:             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))" % __pyx_checksum)
  */
-  __pyx_t_1 = ((__pyx_v___pyx_checksum != 0x2877b18) != 0);
+  __pyx_t_1 = ((__pyx_v___pyx_checksum != 0x827681f) != 0);
   if (__pyx_t_1) {
 
     /* "(tree fragment)":5
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0x2877b18:
+ *     if __pyx_checksum != 0x827681f:
  *         from pickle import PickleError as __pyx_PickleError             # <<<<<<<<<<<<<<
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfs.__new__(__pyx_type)
  */
     __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 5, __pyx_L1_error)
@@ -8364,15 +8381,15 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_Den
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":6
- *     if __pyx_checksum != 0x2877b18:
+ *     if __pyx_checksum != 0x827681f:
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))" % __pyx_checksum)             # <<<<<<<<<<<<<<
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))" % __pyx_checksum)             # <<<<<<<<<<<<<<
  *     __pyx_result = DensShapeProfs.__new__(__pyx_type)
  *     if __pyx_state is not None:
  */
     __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v___pyx_checksum); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 6, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_Incompatible_checksums_s_vs_0x28, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 6, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_Incompatible_checksums_s_vs_0x82, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 6, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_INCREF(__pyx_v___pyx_PickleError);
@@ -8399,15 +8416,15 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_Den
     /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0x2877b18:             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum != 0x827681f:             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))" % __pyx_checksum)
  */
   }
 
   /* "(tree fragment)":7
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfs.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_DensShapeProfs__set_state(<DensShapeProfs> __pyx_result, __pyx_state)
@@ -8433,7 +8450,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_Den
   __pyx_t_3 = 0;
 
   /* "(tree fragment)":8
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfs.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_DensShapeProfs__set_state(<DensShapeProfs> __pyx_result, __pyx_state)
@@ -8456,7 +8473,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_Den
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":8
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x2877b18 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, r200, start_time, xyz))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfs.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_DensShapeProfs__set_state(<DensShapeProfs> __pyx_result, __pyx_state)
@@ -8469,7 +8486,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_Den
  *         __pyx_unpickle_DensShapeProfs__set_state(<DensShapeProfs> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_DensShapeProfs__set_state(DensShapeProfs __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -8502,8 +8519,8 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_Den
  *         __pyx_unpickle_DensShapeProfs__set_state(<DensShapeProfs> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_DensShapeProfs__set_state(DensShapeProfs __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
  */
 
 static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_DensShapeProfs__set_state(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfs *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
@@ -8513,15 +8530,16 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   int __pyx_t_2;
   float __pyx_t_3;
   __Pyx_memviewslice __pyx_t_4 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  double __pyx_t_5;
-  __Pyx_memviewslice __pyx_t_6 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_t_7;
-  Py_ssize_t __pyx_t_8;
-  int __pyx_t_9;
+  __Pyx_memviewslice __pyx_t_5 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_t_6;
+  __Pyx_memviewslice __pyx_t_7 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_8;
+  Py_ssize_t __pyx_t_9;
   int __pyx_t_10;
-  PyObject *__pyx_t_11 = NULL;
+  int __pyx_t_11;
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -8530,9 +8548,9 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_DensShapeProfs__set_state(DensShapeProfs __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]             # <<<<<<<<<<<<<<
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[17])
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]             # <<<<<<<<<<<<<<
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[18])
  */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -8677,6 +8695,18 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   }
   __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 14, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __PYX_XDEC_MEMVIEW(&__pyx_v___pyx_result->__pyx_base.obj_size, 0);
+  __pyx_v___pyx_result->__pyx_base.obj_size = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(1, 12, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 15, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v___pyx_result->__pyx_base.__pyx_base.r200, 0);
@@ -8687,86 +8717,86 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 15, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 16, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v___pyx_result->__pyx_base.__pyx_base.start_time = __pyx_t_5;
+  __pyx_v___pyx_result->__pyx_base.__pyx_base.start_time = __pyx_t_6;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 16, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 17, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_7.memview)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v___pyx_result->__pyx_base.xyz, 0);
-  __pyx_v___pyx_result->__pyx_base.xyz = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
+  __pyx_v___pyx_result->__pyx_base.xyz = __pyx_t_7;
+  __pyx_t_7.memview = NULL;
+  __pyx_t_7.data = NULL;
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_DensShapeProfs__set_state(DensShapeProfs __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[17])
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[18])
  */
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
     __PYX_ERR(1, 13, __pyx_L1_error)
   }
-  __pyx_t_8 = PyTuple_GET_SIZE(__pyx_v___pyx_state); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
-  __pyx_t_9 = ((__pyx_t_8 > 17) != 0);
-  if (__pyx_t_9) {
+  __pyx_t_9 = PyTuple_GET_SIZE(__pyx_v___pyx_state); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
+  __pyx_t_10 = ((__pyx_t_9 > 18) != 0);
+  if (__pyx_t_10) {
   } else {
-    __pyx_t_7 = __pyx_t_9;
+    __pyx_t_8 = __pyx_t_10;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_9 = __Pyx_HasAttr(((PyObject *)__pyx_v___pyx_result), __pyx_n_s_dict); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
-  __pyx_t_10 = (__pyx_t_9 != 0);
-  __pyx_t_7 = __pyx_t_10;
+  __pyx_t_10 = __Pyx_HasAttr(((PyObject *)__pyx_v___pyx_result), __pyx_n_s_dict); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
+  __pyx_t_11 = (__pyx_t_10 != 0);
+  __pyx_t_8 = __pyx_t_11;
   __pyx_L4_bool_binop_done:;
-  if (__pyx_t_7) {
+  if (__pyx_t_8) {
 
     /* "(tree fragment)":14
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
- *         __pyx_result.__dict__.update(__pyx_state[17])             # <<<<<<<<<<<<<<
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
+ *         __pyx_result.__dict__.update(__pyx_state[18])             # <<<<<<<<<<<<<<
  */
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v___pyx_result), __pyx_n_s_dict); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 14, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_update); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 14, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v___pyx_result), __pyx_n_s_dict); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_update); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 14, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_13);
+    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     if (unlikely(__pyx_v___pyx_state == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(1, 14, __pyx_L1_error)
     }
-    __pyx_t_11 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 17, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 14, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_13 = NULL;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_12))) {
-      __pyx_t_13 = PyMethod_GET_SELF(__pyx_t_12);
-      if (likely(__pyx_t_13)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-        __Pyx_INCREF(__pyx_t_13);
+    __pyx_t_12 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 18, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 14, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __pyx_t_14 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_13))) {
+      __pyx_t_14 = PyMethod_GET_SELF(__pyx_t_13);
+      if (likely(__pyx_t_14)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_13);
+        __Pyx_INCREF(__pyx_t_14);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_12, function);
+        __Pyx_DECREF_SET(__pyx_t_13, function);
       }
     }
-    __pyx_t_1 = (__pyx_t_13) ? __Pyx_PyObject_Call2Args(__pyx_t_12, __pyx_t_13, __pyx_t_11) : __Pyx_PyObject_CallOneArg(__pyx_t_12, __pyx_t_11);
-    __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_t_1 = (__pyx_t_14) ? __Pyx_PyObject_Call2Args(__pyx_t_13, __pyx_t_14, __pyx_t_12) : __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_t_12);
+    __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 14, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "(tree fragment)":13
  * cdef __pyx_unpickle_DensShapeProfs__set_state(DensShapeProfs __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
- *         __pyx_result.__dict__.update(__pyx_state[17])
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
+ *         __pyx_result.__dict__.update(__pyx_state[18])
  */
   }
 
@@ -8774,8 +8804,8 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
  *         __pyx_unpickle_DensShapeProfs__set_state(<DensShapeProfs> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_DensShapeProfs__set_state(DensShapeProfs __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
  */
 
   /* function exit code */
@@ -8784,10 +8814,11 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
-  __Pyx_XDECREF(__pyx_t_11);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
   __Pyx_XDECREF(__pyx_t_12);
   __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.__pyx_unpickle_DensShapeProfs__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -23390,7 +23421,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_IT_MIN, __pyx_k_IT_MIN, sizeof(__pyx_k_IT_MIN), 0, 0, 1, 1},
   {&__pyx_n_s_IT_TOL, __pyx_k_IT_TOL, sizeof(__pyx_k_IT_TOL), 0, 0, 1, 1},
   {&__pyx_n_s_IT_WALL, __pyx_k_IT_WALL, sizeof(__pyx_k_IT_WALL), 0, 0, 1, 1},
-  {&__pyx_kp_s_Incompatible_checksums_s_vs_0x28, __pyx_k_Incompatible_checksums_s_vs_0x28, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x28), 0, 0, 1, 0},
+  {&__pyx_kp_s_Incompatible_checksums_s_vs_0x82, __pyx_k_Incompatible_checksums_s_vs_0x82, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x82), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0xb0, __pyx_k_Incompatible_checksums_s_vs_0xb0, sizeof(__pyx_k_Incompatible_checksums_s_vs_0xb0), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0xc6, __pyx_k_Incompatible_checksums_s_vs_0xc6, sizeof(__pyx_k_Incompatible_checksums_s_vs_0xc6), 0, 0, 1, 0},
   {&__pyx_n_s_IndexError, __pyx_k_IndexError, sizeof(__pyx_k_IndexError), 0, 0, 1, 1},
@@ -23802,7 +23833,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_42433304 = PyInt_FromLong(42433304L); if (unlikely(!__pyx_int_42433304)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_136800287 = PyInt_FromLong(136800287L); if (unlikely(!__pyx_int_136800287)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_184977713 = PyInt_FromLong(184977713L); if (unlikely(!__pyx_int_184977713)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_207900485 = PyInt_FromLong(207900485L); if (unlikely(!__pyx_int_207900485)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_neg_1 = PyInt_FromLong(-1); if (unlikely(!__pyx_int_neg_1)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -24291,8 +24322,8 @@ if (!__Pyx_RefNanny) {
  *         __pyx_unpickle_DensShapeProfs__set_state(<DensShapeProfs> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_DensShapeProfs__set_state(DensShapeProfs __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.r200 = __pyx_state[14]; __pyx_result.start_time = __pyx_state[15]; __pyx_result.xyz = __pyx_state[16]
- *     if len(__pyx_state) > 17 and hasattr(__pyx_result, '__dict__'):
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.IT_MIN = __pyx_state[4]; __pyx_result.IT_TOL = __pyx_state[5]; __pyx_result.IT_WALL = __pyx_state[6]; __pyx_result.L_BOX = __pyx_state[7]; __pyx_result.MASS_UNIT = __pyx_state[8]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[9]; __pyx_result.SAFE = __pyx_state[10]; __pyx_result.SNAP = __pyx_state[11]; __pyx_result.idx_cat = __pyx_state[12]; __pyx_result.masses = __pyx_state[13]; __pyx_result.obj_size = __pyx_state[14]; __pyx_result.r200 = __pyx_state[15]; __pyx_result.start_time = __pyx_state[16]; __pyx_result.xyz = __pyx_state[17]
+ *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11shape_profs_19shape_profs_classes_3__pyx_unpickle_DensShapeProfsHDF5, NULL, __pyx_n_s_shape_profs_shape_profs_classes); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -27616,6 +27647,41 @@ no_fail:
     retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
                                                  PyBUF_RECORDS_RO | writable_flag, 1,
                                                  &__Pyx_TypeInfo_float, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
+
+/* MemviewDtypeToObject */
+  static CYTHON_INLINE PyObject *__pyx_memview_get_int(const char *itemp) {
+    return (PyObject *) __Pyx_PyInt_From_int(*(int *) itemp);
+}
+static CYTHON_INLINE int __pyx_memview_set_int(const char *itemp, PyObject *obj) {
+    int value = __Pyx_PyInt_As_int(obj);
+    if ((value == (int)-1) && PyErr_Occurred())
+        return 0;
+    *(int *) itemp = value;
+    return 1;
+}
+
+/* ObjectToMemviewSlice */
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_int(PyObject *obj, int writable_flag) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
+                                                 PyBUF_RECORDS_RO | writable_flag, 1,
+                                                 &__Pyx_TypeInfo_int, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))
         goto __pyx_fail;

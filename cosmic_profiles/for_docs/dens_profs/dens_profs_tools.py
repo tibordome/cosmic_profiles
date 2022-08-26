@@ -63,7 +63,7 @@ def getHernquistProf(r, model_pars):
     r_s = model_pars['r_s']
     return rho_s/((r/r_s)*(1+r/r_s)**3)
 
-def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, start_time, MASS_UNIT, suffix = '_'):
+def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, start_time, MASS_UNIT, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -73,8 +73,6 @@ def drawDensProfs(VIZ_DEST, SNAP, cat, r200s, dens_profs_fit, ROverR200_fit, den
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param cat: catalogue of objects (halos/gxs)
-    :type cat: N2-long list of lists of ints, N2 > N
     :param r200s: catalogue of virial radii (of parent halos in case of gxs)
     :type r200s: N2-long float array
     :param dens_profs_fit: density profiles, defined at ``ROverR200``, in M_sun*h^2/(Mpc)**3

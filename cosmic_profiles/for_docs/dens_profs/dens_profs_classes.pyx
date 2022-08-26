@@ -3,6 +3,7 @@
 # -*- coding: utf-8 -*-
 
 from common.cosmic_base_class cimport CosmicBase
+import numpy as np
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -38,22 +39,33 @@ cdef class DensProfs(CosmicBase):
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
         self.xyz = xyz.base
         self.masses = masses.base
-        self.idx_cat = idx_cat
-        self.r200 = r200.base
+        cdef int nb_objs = len(idx_cat)
+        cdef int p
+        cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
+        cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
+        for p in range(nb_objs):
+            if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
+                obj_pass[p] = 1      
+                obj_size[p] = len(idx_cat[p]) 
+        cdef int nb_pass = np.sum(obj_pass.base)
+        cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
+        cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
+        idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
+        for p in range(nb_objs):
+            if obj_pass[p] == 1:
+                cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(idx_cat[p])
+        self.idx_cat = cat_arr.base
+        self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
+        self.r200 = r200.base[obj_pass.base.nonzero()[0]]
        
     def getIdxCat(self):
         """ Fetch catalogue
         
-        :return cat: list of indices defining the objects
-        :rtype: list of length N1, each consisting of a list of int indices"""
+        :return idx_cat: each row contains indices of particles belonging to an object,
+            obj_size: number of particles in each object
+        :rtype: (N1, N3) integers and (N1,) integers"""
         return
     
-    def getIdxCatSuffRes(self):
-        """ Fetch catalogue, objects with insufficient resolution are set to empty list []
-        
-        :return cat: list of indices defining the objects
-        :rtype: list of length N1, each consisting of a list of int indices"""
-        return
     
     def getMassesCenters(self, list select):
         """ Calculate total mass and centers of objects
@@ -193,8 +205,9 @@ cdef class DensProfsHDF5(CosmicBase):
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
-        :return cat: list of indices defining the objects
-        :rtype: list of length N1, each consisting of a list of int indices"""
+        :return idx_cat: each row contains indices of particles belonging to an object,
+            obj_size: number of particles in each object
+        :rtype: (N1, N3) integers and (N1,) integers"""
         return
     
     def getMassesCenters(self, list select, str obj_type = 'dm'):

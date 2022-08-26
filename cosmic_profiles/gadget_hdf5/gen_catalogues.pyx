@@ -58,8 +58,9 @@ def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBE
     :type fof_gx_size: (N1,) ints
     :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid
     :type MIN_NUMBER_STAR_PTCS: int
-    :return: galaxy catalogue, containing indices of star particles belong to each galaxy
-    :rtype: list of N1 int lists containing indices"""
+    :return: gx_cat: indices (+1, to allow 0 to be interpreted as no index),
+        gx_size: number of particles in each object
+    :rtype: int array, int array"""
     def inner(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
         cdef int nb_halos = len(nb_shs)
         cdef int[:] gx_pass = np.zeros((nb_halos,), dtype = np.int32)
@@ -94,7 +95,7 @@ def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBE
                     idx_sum = idx_sum+nb_shs[q]
                     start_idx = start_idx+fof_gx_size[q]
                 gx_cat[idxs_compr[p]] = calcCSHIdxs(gx_cat[idxs_compr[p]], start_idx, fof_gx_size[p], nb_shs[p], sh_len_gx[idx_sum], MIN_NUMBER_STAR_PTCS)
-        return gx_cat.base, gx_pass.base
+        return gx_cat.base, gx_size.base[gx_pass.base.nonzero()[0]]
     if(not hasattr(calcGxCat, "inner")):
         calcGxCat.inner = np_cache_factory(3,0)(inner)
     calcGxCat.inner(nb_shs.base, sh_len_gx.base, fof_gx_size.base, MIN_NUMBER_STAR_PTCS)
@@ -121,7 +122,7 @@ def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group
     :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
     :type MIN_NUMBER_DM_PTCS: int
     :return: h_cat: indices (+1, to allow 0 to be interpreted as no index),
-        h_r200: R200-radii, h_pass: passed `MIN_NUMBER_DM_PTCS`-threshold or not
+        h_r200: R200-radii, h_size: number of particles in each object
     :rtype: int array, float array, int array"""
     def inner(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
         cdef int nb_halos = len(nb_shs)
@@ -157,7 +158,7 @@ def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group
                     idx_sum = idx_sum+nb_shs[q]
                     start_idx = start_idx+fof_dm_sizes[q]
                 h_cat[idxs_compr[p]] = calcCSHIdxs(h_cat[idxs_compr[p]], start_idx, fof_dm_sizes[p], nb_shs[p], sh_len[idx_sum], MIN_NUMBER_DM_PTCS)
-        return h_cat.base, h_r200.base, h_pass.base
+        return h_cat.base, h_r200.base[h_pass.base.nonzero()[0]], h_size.base[h_pass.base.nonzero()[0]]
     if(not hasattr(calcCSHCat, "inner")):
         calcCSHCat.inner = np_cache_factory(5,0)(inner)
     calcCSHCat.inner(nb_shs.base, sh_len.base, fof_dm_sizes.base, group_r200.base, halo_masses.base, MIN_NUMBER_DM_PTCS)

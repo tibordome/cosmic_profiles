@@ -25,10 +25,10 @@ def calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int c
     :type MIN_NUMBER_DM_PTCS: int
     :return: h_idxs filled partially with indices (+1, to allow 0 to be interpreted as no index)
     :rtype: int array"""
-    
     return
 
 @cython.embedsignature(True)
+@cython.binding(True)
 def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
     """ Construct galaxy catalogue
     
@@ -42,11 +42,13 @@ def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBE
     :type fof_gx_size: (N1,) ints
     :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid
     :type MIN_NUMBER_STAR_PTCS: int
-    :return: galaxy catalogue, containing indices of star particles belong to each galaxy
-    :rtype: list of N1 int lists containing indices"""
+    :return: gx_cat: indices (+1, to allow 0 to be interpreted as no index),
+        gx_size: number of particles in each object
+    :rtype: int array, int array"""
     return
 
 @cython.embedsignature(True)
+@cython.binding(True)
 def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
     """ Construct central subhalo (CSH) catalogue from FoF/SH info
     
@@ -65,6 +67,6 @@ def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group
     :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
     :type MIN_NUMBER_DM_PTCS: int
     :return: h_cat: indices (+1, to allow 0 to be interpreted as no index),
-        h_r200: R200-radii, h_pass: passed `MIN_NUMBER_DM_PTCS`-threshold or not
+        h_r200: R200-radii, h_size: number of particles in each object
     :rtype: int array, float array, int array"""
     return

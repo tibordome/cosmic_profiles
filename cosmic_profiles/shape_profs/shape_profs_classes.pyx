@@ -99,16 +99,16 @@ cdef class DensShapeProfs(DensProfs):
         :return: density profiles
         :rtype: (N2, r_res) floats"""
         print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
-        isValidSelection(select, len(self.idx_cat))
+        isValidSelection(select, self.idx_cat.shape[0])
         if rank == 0:
             if direct_binning:
                 if spherical == False:
-                    d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-                    dens_profs = self.getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                    dens_profs = self.getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
                 else:
-                    dens_profs = self.getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, np.float32(ROverR200))
+                    dens_profs = self.getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             else:
-                dens_profs = self.getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, np.float32(ROverR200))
+                dens_profs = self.getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             return dens_profs
         else:
             return None
@@ -128,7 +128,7 @@ cdef class DensShapeProfs(DensProfs):
             (number_of_objs,3) float array, (number_of_objs,) float array"""
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
@@ -147,7 +147,7 @@ cdef class DensShapeProfs(DensProfs):
         """
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
@@ -169,13 +169,11 @@ cdef class DensShapeProfs(DensProfs):
             # Retrieve shape information
             d, q, s, minor, inter, major, centers, obj_masses = self.getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat, self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del obj_masses
-            idx_cat_suff = self.getIdxCatSuffRes()
-            idx_cat_suff = [x for x in idx_cat_suff if x != []]
-            
+                                    
             # Viz all objects under 'obj_numbers'
             for obj_number in obj_numbers:
                 if obj_number >= d.shape[0]:
-                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects. Skip.".format(obj_number, d.shape[0]))
+                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects of sufficient resolution. Skip.".format(obj_number, d.shape[0]))
                 else:
                     major_obj = major[obj_number]
                     inter_obj = inter[obj_number]
@@ -184,9 +182,9 @@ cdef class DensShapeProfs(DensProfs):
                     q_obj = q[obj_number]
                     s_obj = s[obj_number]
                     center = centers[obj_number]
-                    obj = np.zeros((len(idx_cat_suff[obj_number]),3), dtype = np.float32)
-                    masses_obj = np.zeros((len(idx_cat_suff[obj_number]),), dtype = np.float32)
-                    for idx, ptc in enumerate(idx_cat_suff[obj_number]):
+                    obj = np.zeros((len(self.idx_cat[obj_number]),3), dtype = np.float32)
+                    masses_obj = np.zeros((len(self.idx_cat[obj_number]),), dtype = np.float32)
+                    for idx, ptc in enumerate(self.idx_cat[obj_number]):
                         obj[idx] = self.xyz.base[ptc]
                         masses_obj[idx] = self.masses.base[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
@@ -257,13 +255,10 @@ cdef class DensShapeProfs(DensProfs):
         if rank == 0:
             # Retrieve shape information
             d, q, s, minor, inter, major, centers, obj_masses = self.getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat, self.MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            del obj_masses
-            idx_cat_suff = self.getIdxCatSuffRes()
-            idx_cat_suff = [x for x in idx_cat_suff if x != []]
-            
+            del obj_masses                        
             for obj_number in obj_numbers:
                 if obj_number >= d.shape[0]:
-                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects. Skip.".format(obj_number, d.shape[0]))
+                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects of sufficient resolution. Skip.".format(obj_number, d.shape[0]))
                 else:
                     major_obj = major[obj_number]
                     inter_obj = inter[obj_number]
@@ -272,9 +267,9 @@ cdef class DensShapeProfs(DensProfs):
                     q_obj = q[obj_number]
                     s_obj = s[obj_number]
                     center = centers[obj_number]
-                    obj = np.zeros((len(idx_cat_suff[obj_number]),3), dtype = np.float32)
-                    masses_obj = np.zeros((len(idx_cat_suff[obj_number]),), dtype = np.float32)
-                    for idx, ptc in enumerate(idx_cat_suff[obj_number]):
+                    obj = np.zeros((len(self.idx_cat[obj_number]),3), dtype = np.float32)
+                    masses_obj = np.zeros((len(self.idx_cat[obj_number]),), dtype = np.float32)
+                    for idx, ptc in enumerate(self.idx_cat[obj_number]):
                         obj[idx] = self.xyz.base[ptc]
                         masses_obj[idx] = self.masses.base[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
@@ -325,10 +320,8 @@ cdef class DensShapeProfs(DensProfs):
         
         if rank == 0:
             suffix = '_'
-            idx_cat_suff = self.getIdxCatSuffRes()
-            getGlobalEpsHist(self.xyz.base, self.masses.base, idx_cat_suff[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
-            del idx_cat_suff
-    
+            getGlobalEpsHist(self.xyz.base, self.masses.base, self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+        
     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select):
         """ Plot local ellipticity histogram at depth ``frac_r200``
         
@@ -344,9 +337,7 @@ cdef class DensShapeProfs(DensProfs):
         
         if rank == 0:
             suffix = '_'
-            idx_cat_suff = self.getIdxCatSuffRes()
-            getLocalEpsHist(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], idx_cat_suff[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
-            del idx_cat_suff
+            getLocalEpsHist(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
     
     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False):
         """ Plot local triaxiality histogram at depth ``frac_r200``
@@ -366,7 +357,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting plotLocalTHist() with snap {0}'.format(self.SNAP))
         if rank == 0:
             suffix = '_'
-            self.plotLocalTHistBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
+            self.plotLocalTHistBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
     
     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False):
         """ Plot global triaxiality histogram
@@ -382,7 +373,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting plotGlobalTHist() with snap {0}'.format(self.SNAP))
         if rank == 0:
             suffix = '_'
-            self.plotGlobalTHistBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
+            self.plotGlobalTHistBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
     
     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False):
         """ Draws shape profiles, also mass bin-decomposed ones
@@ -400,7 +391,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting plotShapeProfs() with snap {0}'.format(self.SNAP))
         if rank == 0:
             suffix = '_'
-            self.plotShapeProfsBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
+            self.plotShapeProfsBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
     
     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):
         """ Dumps all relevant local shape data into ``CAT_DEST``
@@ -416,7 +407,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting dumpShapeCatLocal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             suffix = '_'
-            self.dumpShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            self.dumpShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
     
     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False):
         """ Dumps all relevant global shape data into ``CAT_DEST``
@@ -430,13 +421,13 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting dumpShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             suffix = '_'
-            self.dumpShapeCatGlobalBase(self.xyz.base, self.masses.base, self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            self.dumpShapeCatGlobalBase(self.xyz.base, self.masses.base, self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
     
     def getObjInfo(self):
         """ Print basic info about the objects"""
         print_status(rank,self.start_time,'Starting getObjInfo() with snap {0}'.format(self.SNAP))
         obj_type = 'unspecified'
-        self.getObjInfoBase(self.xyz.base, self.masses.base, self.idx_cat, self.MIN_NUMBER_PTCS, obj_type)
+        self.getObjInfoBase(self.xyz.base, self.masses.base, self.idx_cat, obj_type)
 
 cdef class DensShapeProfsHDF5(DensProfsHDF5):
     """ Class for density profile and shape profile calculations for Gadget-style HDF5 data
@@ -522,18 +513,17 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            isValidSelection(select, len(idx_cat))
+            isValidSelection(select, len(self.getIdxCat(obj_type)[0]))
             if direct_binning:
                 if spherical:
-                    dens_profs = self.getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, np.float32(ROverR200))
+                    dens_profs = self.getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], np.float32(ROverR200))
                 else:
-                    d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-                    dens_profs = self.getDensProfsEllDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                    dens_profs = self.getDensProfsEllDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
                     del d; del q; del s; del minor; del inter; del major
             else:
-                dens_profs = self.getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, np.float32(ROverR200))
-            del xyz; del masses; del idx_cat
+                dens_profs = self.getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], np.float32(ROverR200))
+            del xyz; del masses
             return dens_profs
         else:
             del xyz; del masses
@@ -558,9 +548,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
             
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            del xyz; del masses; del idx_cat
+            self.getIdxCat(obj_type)[0]
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            del xyz; del masses
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             del xyz; del masses
@@ -583,9 +573,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            del xyz; del masses; del idx_cat
+            self.getIdxCat(obj_type)[0]
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            del xyz; del masses
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             del xyz; del masses
@@ -603,16 +593,16 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
         :return: d, q, s, minor, inter, major, obj_center, obj_m
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
+        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays,
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
             (number_of_objs,3) float array, (number_of_objs,) float array"""
         print_status(rank,self.start_time,'Starting getShapeCatVelLocal() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         velxyz = self.getVelXYZ(obj_type)
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            del xyz; del velxyz; del masses; del idx_cat
+            self.getIdxCat(obj_type)[0]
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            del xyz; del velxyz; del masses
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             del xyz; del velxyz; del masses
@@ -636,9 +626,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         velxyz = self.getVelXYZ(obj_type)
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
-            del xyz; del velxyz; del masses; del idx_cat
+            self.getIdxCat(obj_type)[0]
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self.getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
+            del xyz; del velxyz; del masses
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             del xyz; del velxyz; del masses
@@ -664,9 +654,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             # Retrieve shape information
-            idx_cat = self.getIdxCat(obj_type)
-            d, q, s, minor, inter, major, centers, obj_m = self.getShapeCatLocalBase(xyz, masses, self.r200.base, idx_cat, MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            idx_cat = [x for x in idx_cat if x != []]
+            d, q, s, minor, inter, major, centers, obj_m = self.getShapeCatLocalBase(xyz, masses, self.r200.base, self.getIdxCat(obj_type)[0], self.getIdxCat(obj_type)[1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del obj_m
                         
             # Viz all objects under 'obj_numbers'
@@ -681,9 +669,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                     q_obj = q[obj_number]
                     s_obj = s[obj_number]
                     center = centers[obj_number]
-                    obj = np.zeros((len(idx_cat[obj_number]),3), dtype = np.float32)
-                    masses_obj = np.zeros((len(idx_cat[obj_number]),), dtype = np.float32)
-                    for idx, ptc in enumerate(idx_cat[obj_number]):
+                    obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),3), dtype = np.float32)
+                    masses_obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),), dtype = np.float32)
+                    for idx, ptc in enumerate(self.getIdxCat(obj_type)[0][obj_number]):
                         obj[idx] = xyz[ptc]
                         masses_obj[idx] = masses[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
@@ -757,10 +745,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
             # Retrieve shape information
-            d, q, s, minor, inter, major, centers, obj_m = self.getShapeCatGlobalBase(xyz, masses, self.r200.base, idx_cat, MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            idx_cat = [x for x in idx_cat if x != []]
+            d, q, s, minor, inter, major, centers, obj_m = self.getShapeCatGlobalBase(xyz, masses, self.r200.base, self.getIdxCat(obj_type)[0], self.getIdxCat(obj_type)[1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             del obj_m
                       
             # Viz all objects under 'obj_numbers'
@@ -775,9 +761,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                     q_obj = q[obj_number]
                     s_obj = s[obj_number]
                     center = centers[obj_number]
-                    obj = np.zeros((len(idx_cat[obj_number]),3), dtype = np.float32)
-                    masses_obj = np.zeros((len(idx_cat[obj_number]),), dtype = np.float32)
-                    for idx, ptc in enumerate(idx_cat[obj_number]):
+                    obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),3), dtype = np.float32)
+                    masses_obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),), dtype = np.float32)
+                    for idx, ptc in enumerate(self.getIdxCat(obj_type)[0][obj_number]):
                         obj[idx] = xyz[ptc]
                         masses_obj[idx] = masses[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
@@ -834,9 +820,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            getGlobalEpsHist(xyz, masses, idx_cat[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
-            del idx_cat; del xyz; del masses
+            self.getIdxCat(obj_type)[0]
+            getGlobalEpsHist(xyz, masses, self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            del xyz; del masses
 
     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):
         """ Plot local ellipticity histogram at depth ``frac_r200``
@@ -859,9 +845,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
             
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            getLocalEpsHist(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
-            del idx_cat; del xyz; del masses
+            self.getIdxCat(obj_type)[0]
+            getLocalEpsHist(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            del xyz; del masses
     
     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Plot local triaxiality histogram at depth ``frac_r200``
@@ -888,9 +874,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
             
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.plotLocalTHistBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
-            del idx_cat; del xyz; del masses
+            self.getIdxCat(obj_type)[0]
+            self.plotLocalTHistBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
+            del xyz; del masses
     
     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False, str obj_type = 'dm'):
         """ Plot global triaxiality histogram
@@ -915,9 +901,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
             
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.plotGlobalTHistBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
-            del idx_cat; del xyz; del masses
+            self.getIdxCat(obj_type)[0]
+            self.plotGlobalTHistBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
+            del xyz; del masses
         
     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Draws shape profiles, also mass bin-decomposed ones
@@ -942,9 +928,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.plotShapeProfsBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
-            del idx_cat; del xyz; del masses
+            self.getIdxCat(obj_type)[0]
+            self.plotShapeProfsBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
+            del xyz; del masses
 
     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Dumps all relevant local shape data into ``CAT_DEST``
@@ -967,9 +953,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.dumpShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
-            del idx_cat; del xyz; del masses
+            self.getIdxCat(obj_type)[0]
+            self.dumpShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            del xyz; del masses
 
     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):
         """ Dumps all relevant global shape data into ``CAT_DEST``
@@ -990,9 +976,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_{}_'.format(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.dumpShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
-            del idx_cat; del xyz; del masses
+            self.getIdxCat(obj_type)[0]
+            self.dumpShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            del xyz; del masses
 
     def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
@@ -1016,9 +1002,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_v{}_'.format(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.dumpShapeVelCatLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
-            del idx_cat; del xyz; del velxyz; del masses
+            self.getIdxCat(obj_type)[0]
+            self.dumpShapeVelCatLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            del xyz; del velxyz; del masses
 
     def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
@@ -1040,9 +1026,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         suffix = '_v{}_'.format(obj_type)
         
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.dumpShapeVelCatGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
-            del idx_cat; del xyz; del velxyz; del masses
+            self.getIdxCat(obj_type)[0]
+            self.dumpShapeVelCatGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            del xyz; del velxyz; del masses
 
     def getObjInfo(self, str obj_type = 'dm'):
         """ Print basic info about the objects used for local shape estimation such as number of converged objects"""
@@ -1052,27 +1038,24 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank != 0:
             del xyz; del masses
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            self.getObjInfoBase(xyz, masses, idx_cat, MIN_NUMBER_PTCS, obj_type)
+            self.getObjInfoBase(xyz, masses, self.getIdxCat(obj_type)[0], obj_type)
             if obj_type == 'dm':
                 nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
                 nb_shs_vec = np.array(nb_shs)
-                idx_cat = self.getIdxCat(obj_type)
                 print_status(rank, self.start_time, "More detailed info on central subhalo catalogue. The total number of halos with > 0 SHs is {0}".format(nb_shs_vec[nb_shs_vec != 0].shape[0]))
                 print_status(rank, self.start_time, "The total number of halos is {0}".format(len(nb_shs)))
                 print_status(rank, self.start_time, "The total number of SHs (subhalos) is {0}".format(len(sh_len)))
                 print_status(rank, self.start_time, "The number of halos that have no SH is {0}".format(nb_shs_vec[nb_shs_vec == 0].shape[0]))
-                print_status(rank, self.start_time, "The total number of halos (CSH) that have sufficient resolution is {0}".format(len([x for x in idx_cat if x != []])))
+                print_status(rank, self.start_time, "The total number of halos (CSH) that have sufficient resolution is {0}".format(len([x for x in self.getIdxCat(obj_type)[0] if x != []])))
                 del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses
             else:
                 nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST)
                 nb_shs_vec = np.array(nb_shs)
-                idx_cat = self.getIdxCat(obj_type)
                 print_status(rank, self.start_time, "More detailed info on galaxy catalogue. The total number of halos with > 0 SHs containing star particles is {0}".format(nb_shs_vec[nb_shs_vec != 0].shape[0]))
                 print_status(rank, self.start_time, "The total number of halos is {0}".format(len(nb_shs)))
                 print_status(rank, self.start_time, "The total number of SHs (subhalos) containing star particles is {0}".format(len(sh_len_gx)))
                 print_status(rank, self.start_time, "The number of halos that have no SH containing star particles is {0}".format(nb_shs_vec[nb_shs_vec == 0].shape[0]))
-                print_status(rank, self.start_time, "The number of valid gxs (after discarding low-resolution ones) is {0}.".format(np.array([0 for x in idx_cat if x != []]).shape[0]))
+                print_status(rank, self.start_time, "The number of valid gxs (after discarding low-resolution ones) is {0}.".format(np.array([0 for x in self.getIdxCat(obj_type)[0] if x != []]).shape[0]))
                 del nb_shs; del sh_len_gx; del fof_gx_sizes
                 
-            del idx_cat; del xyz; del masses
+            del xyz; del masses

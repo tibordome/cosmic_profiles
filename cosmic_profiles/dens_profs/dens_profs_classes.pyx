@@ -44,24 +44,32 @@ cdef class DensProfs(CosmicBase):
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
         self.xyz = xyz.base
         self.masses = masses.base
-        self.idx_cat = idx_cat
-        self.r200 = r200.base
+        cdef int nb_objs = len(idx_cat)
+        cdef int p
+        cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
+        cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
+        for p in range(nb_objs):
+            if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
+                obj_pass[p] = 1      
+                obj_size[p] = len(idx_cat[p]) 
+        cdef int nb_pass = np.sum(obj_pass.base)
+        cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
+        cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
+        idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
+        for p in range(nb_objs):
+            if obj_pass[p] == 1:
+                cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(idx_cat[p])
+        self.idx_cat = cat_arr.base
+        self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
+        self.r200 = r200.base[obj_pass.base.nonzero()[0]]
        
     def getIdxCat(self):
         """ Fetch catalogue
         
-        :return cat: list of indices defining the objects
-        :rtype: list of length N1, each consisting of a list of int indices"""
-        return self.idx_cat
-    
-    def getIdxCatSuffRes(self):
-        """ Fetch catalogue, objects with insufficient resolution are set to empty list []
-        
-        :return cat: list of indices defining the objects
-        :rtype: list of length N1, each consisting of a list of int indices"""
-        idx_cat = self.idx_cat
-        idx_cat = [x if len(x) >= self.MIN_NUMBER_PTCS else [] for x in idx_cat]
-        return idx_cat
+        :return idx_cat: each row contains indices of particles belonging to an object,
+            obj_size: number of particles in each object
+        :rtype: (N1, N3) integers and (N1,) integers"""
+        return self.idx_cat, self.obj_size
     
     def getMassesCenters(self, list select):
         """ Calculate total mass and centers of objects
@@ -71,7 +79,7 @@ cdef class DensProfs(CosmicBase):
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
         if rank == 0:
-            centers, ms = self.getMassesCentersBase(self.xyz.base, self.masses.base, self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS)
+            centers, ms = self.getMassesCentersBase(self.xyz.base, self.masses.base, self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.MIN_NUMBER_PTCS)
             return centers, ms
         else:
             return None, None
@@ -92,15 +100,15 @@ cdef class DensProfs(CosmicBase):
         :return: density profiles
         :rtype: (N2, r_res) floats"""
         print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
-        isValidSelection(select, len(self.idx_cat))
+        isValidSelection(select, self.idx_cat.shape[0])
         if direct_binning == True and spherical == False:
             print_status(rank,self.start_time,'DensProfs objects cannot call estDensProfs(ROverR200, spherical) with spherical == False. Use DensShapeProfs instead.')
             return None
         if rank == 0:
             if direct_binning:
-                dens_profs = self.getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, np.float32(ROverR200))
+                dens_profs = self.getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             else:
-                dens_profs = self.getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, np.float32(ROverR200))
+                dens_profs = self.getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             return dens_profs
         else:
             return None
@@ -122,7 +130,7 @@ cdef class DensProfs(CosmicBase):
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `fitDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         if rank == 0:
-            best_fits = self.getDensProfsBestFitsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, method)
+            best_fits = self.getDensProfsBestFitsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
             return best_fits
         else:
             return None
@@ -145,7 +153,7 @@ cdef class DensProfs(CosmicBase):
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `estConcentrations()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         if rank == 0:
-            cs = self.getConcentrationsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.MIN_NUMBER_PTCS, method)
+            cs = self.getConcentrationsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
             return cs
         else:
             return None
@@ -177,7 +185,7 @@ cdef class DensProfs(CosmicBase):
         
         if rank == 0:
             suffix = '_'
-            drawDensProfs(VIZ_DEST, self.SNAP, self.idx_cat[select[0]:select[1]+1], self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, np.float32(ROverR200), obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            drawDensProfs(VIZ_DEST, self.SNAP, self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, np.float32(ROverR200), obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
             del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
         else:
             del obj_centers; del obj_masses
@@ -257,43 +265,42 @@ cdef class DensProfsHDF5(CosmicBase):
         else:
             del velxyz
             return None
-    
+        
     def getIdxCat(self, str obj_type = 'dm'):
         """ Fetch catalogue
         
         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
         :type obj_type: string
-        :return cat: list of indices defining the objects
-        :rtype: list of length N1, each consisting of a list of int indices"""
+        :return idx_cat: each row contains indices of particles belonging to an object,
+            obj_size: number of particles in each object
+        :rtype: (N1, N3) integers and (N1,) integers"""
         
         if rank != 0:
             return None
         if obj_type == 'dm':
             # Import hdf5 data
             nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
+            print_status(rank,self.start_time,"Gotten getHDF5SHDMData")
             # Construct catalogue
-            h_cat, h_r200, h_pass = calcCSHCat(np.array(nb_shs), np.array(sh_len), np.array(fof_dm_sizes), group_r200, halo_masses, self.MIN_NUMBER_PTCS)
-            nb_shs_vec = np.array(nb_shs)
-            h_cat_l = [(np.ma.masked_where(h_cat[i-getIdxCorr(h_pass, i)] == 0, h_cat[i-getIdxCorr(h_pass, i)]).compressed()-1).tolist() if h_pass[i] == 1 else [] for i in range(len(nb_shs))]
+            h_cat, h_r200, h_size = calcCSHCat(np.array(nb_shs), np.array(sh_len), np.array(fof_dm_sizes), group_r200, halo_masses, self.MIN_NUMBER_PTCS)
+            print_status(rank,self.start_time,"Gotten calcCSHCat")
             self.r200 = h_r200
-            del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del h_cat; del halo_masses; del h_r200; del h_pass
-            return h_cat_l
+            del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses; del h_r200
+            return h_cat, h_size
         else:
             if self.r200 is None:
                 # Import hdf5 data
                 nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
                 # Construct catalogue
                 h_cat, h_r200, h_pass = calcCSHCat(np.array(nb_shs), np.array(sh_len), np.array(fof_dm_sizes), group_r200, halo_masses, self.MIN_NUMBER_PTCS)
-                nb_shs_vec = np.array(nb_shs)         
                 self.r200 = h_r200
                 del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del h_cat; del halo_masses; del h_r200
             # Import hdf5 data
             nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST)
             # Construct catalogue
-            gx_cat, gx_pass = calcGxCat(np.array(nb_shs), np.array(sh_len_gx), np.array(fof_gx_sizes), self.MIN_NUMBER_STAR_PTCS)
-            gx_cat_l = [(np.ma.masked_where(gx_cat[i-getIdxCorr(gx_pass, i)] == 0, gx_cat[i-getIdxCorr(gx_pass, i)]).compressed()-1).tolist() if gx_pass[i] == 1 else [] for i in range(len(nb_shs))]
-            del nb_shs; del sh_len_gx; del fof_gx_sizes; del gx_cat; del gx_pass
-            return gx_cat_l
+            gx_cat, gx_size = calcGxCat(np.array(nb_shs), np.array(sh_len_gx), np.array(fof_gx_sizes), self.MIN_NUMBER_STAR_PTCS)
+            del nb_shs; del sh_len_gx; del fof_gx_sizes
+            return gx_cat, gx_size
     
     def getMassesCenters(self, list select, str obj_type = 'dm'):
         """ Calculate total mass and centers of objects
@@ -306,8 +313,7 @@ cdef class DensProfsHDF5(CosmicBase):
         :rtype: (N,3) and (N,) floats"""
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            centers, ms = self.getMassesCentersBase(xyz, masses, idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS)
+            centers, ms = self.getMassesCentersBase(xyz, masses, self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1])
             del xyz; del masses
             return centers, ms
         else:
@@ -336,14 +342,17 @@ cdef class DensProfsHDF5(CosmicBase):
             print_status(rank,self.start_time,'DensProfsHDF5 objects cannot call estDensProfs(ROverR200, spherical) with spherical == False. Use DensShapeProfs instead.')
             return None
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
+        print_status(rank,self.start_time,"Gotten xyz etc")
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            isValidSelection(select, len(idx_cat))
+            idx_cat_len = self.getIdxCat(obj_type)[0].shape[0]
+            print_status(rank,self.start_time,"Gotten idx_cat")
+            isValidSelection(select, idx_cat_len)
             if direct_binning:
-                dens_profs = self.getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, np.float32(ROverR200))
+                dens_profs = self.getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], np.float32(ROverR200))
             else:
-                dens_profs = self.getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, np.float32(ROverR200))
-            del xyz; del masses; del idx_cat
+                dens_profs = self.getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], np.float32(ROverR200))
+            print_status(rank,self.start_time,"Finished dens_profs estimation")
+            del xyz; del masses
             return dens_profs
         else:
             del xyz; del masses
@@ -369,9 +378,8 @@ cdef class DensProfsHDF5(CosmicBase):
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `fitDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            best_fits = self.getDensProfsBestFitsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, method)
-            del xyz; del masses; del idx_cat
+            best_fits = self.getDensProfsBestFitsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
+            del xyz; del masses
             return best_fits
         else:
             del xyz; del masses
@@ -397,9 +405,8 @@ cdef class DensProfsHDF5(CosmicBase):
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `estConcentrations()` function. Please double-check and use the same `select` as used for the density profile estimation!")
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
         if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            cs = self.getConcentrationsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], MIN_NUMBER_PTCS, method)
-            del xyz; del masses; del idx_cat
+            cs = self.getConcentrationsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
+            del xyz; del masses
             return cs
         else:
             del xyz; del masses
@@ -430,15 +437,9 @@ cdef class DensProfsHDF5(CosmicBase):
         print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0} for obj_type {1}'.format(self.SNAP, obj_type))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        if rank == 0:
-            idx_cat = self.getIdxCat(obj_type)
-            idx_cat_len = len(idx_cat)
-        else:
-            idx_cat_len = None
-        idx_cat_len = comm.bcast(idx_cat_len, root = 0)
         obj_centers, obj_masses = self.getMassesCenters(select = select, obj_type = obj_type)
         
         if rank == 0:
             suffix = '_{}_'.format(obj_type)
-            drawDensProfs(VIZ_DEST, self.SNAP, idx_cat[select[0]:select[1]+1], self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            drawDensProfs(VIZ_DEST, self.SNAP, self.r200.base[select[0]:select[1]+1], dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
             del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200

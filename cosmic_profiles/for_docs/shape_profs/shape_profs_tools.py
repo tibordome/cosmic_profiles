@@ -6,13 +6,15 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def getEpsilon(idx_cat, xyz, masses, L_BOX, CENTER, angle=0.0):
+def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
     """ Calculate the complex ellipticity (z-projected)
     
     It is obtained from the shape tensor = centred (wrt mode) second mass moment tensor
     
-    :param idx_cat: catalogue of objects (halos/gxs)
-    :type idx_cat: list of lists of ints
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4
@@ -131,7 +133,7 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type suffix: string
     """    
     return
-     
+
 def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
     
@@ -160,17 +162,19 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
     :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
     """    
-    return     
+    return
 
-def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
+def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, internal units
     :type masses: (N^3x1) floats
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -186,7 +190,7 @@ def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix
     :type HIST_NB_BINS: int"""
     return
         
-def getLocalEpsHist(xyz, masses, r200, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
+def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
     :param xyz: coordinates of particles of type 1 or type 4, in Mpc/h
@@ -195,8 +199,10 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, f
     :type masses: (N^3x1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)

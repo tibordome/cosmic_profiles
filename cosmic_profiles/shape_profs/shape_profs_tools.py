@@ -11,13 +11,15 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def getEpsilon(idx_cat, xyz, masses, L_BOX, CENTER, angle=0.0):
+def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
     """ Calculate the complex ellipticity (z-projected)
     
     It is obtained from the shape tensor = centred (wrt mode) second mass moment tensor
     
-    :param idx_cat: catalogue of objects (halos/gxs)
-    :type idx_cat: list of lists of ints
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4
@@ -35,14 +37,14 @@ def getEpsilon(idx_cat, xyz, masses, L_BOX, CENTER, angle=0.0):
     if rank == 0:
         eps = []
         rot_matrix = R.from_rotvec(angle * np.array([0, 0, 1])).as_matrix()
-        for obj in idx_cat:
+        for p, obj in enumerate(idx_cat):
             if obj != []:
-                xyz_ = respectPBCNoRef(xyz[obj], L_BOX)
+                xyz_ = respectPBCNoRef(xyz[obj[:obj_size[p]]], L_BOX)
                 if CENTER == 'mode':
-                    center = calcMode(xyz_, masses[obj], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
+                    center = calcMode(xyz_, masses[obj[:obj_size[p]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
                 else:
-                    center = calcCoM(xyz_, masses[obj])
-                masses_ = masses[obj]
+                    center = calcCoM(xyz_, masses[obj[:obj_size[p]]])
+                masses_ = masses[obj[:obj_size[p]]]
                 xyz_new = np.zeros((xyz_.shape[0],3))
                 for i in range(xyz_new.shape[0]):
                     xyz_new[i] = np.dot(rot_matrix, xyz_[i]-center)
@@ -347,15 +349,17 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
         print_status(rank, start_time, "The number of objects considered is {0}. The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
      
 
-def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
+def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, internal units
     :type masses: (N^3x1) floats
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -371,7 +375,7 @@ def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix
     :type HIST_NB_BINS: int"""
     
     if rank == 0:
-        eps = getEpsilon(idx_cat, xyz, masses, L_BOX, CENTER)
+        eps = getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER)
         plt.figure()
         n, bins, patches = plt.hist(x=abs(eps), bins = np.linspace(0, 1, HIST_NB_BINS), alpha=0.7, density=True)
         plt.xlabel(r"$\epsilon$")
@@ -380,7 +384,7 @@ def getGlobalEpsHist(xyz, masses, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, suffix
         plt.xlim(0.0, 1.0)
         plt.savefig("{0}/EpsCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
         
-def getLocalEpsHist(xyz, masses, r200, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
+def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
     :param xyz: coordinates of particles of type 1 or type 4, in Mpc/h
@@ -389,8 +393,10 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, f
     :type masses: (N^3x1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param idx_cat: catalogue of objects (objs/gxs)
-    :type idx_cat: list of lists of ints
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -409,10 +415,10 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, L_BOX, CENTER, VIZ_DEST, SNAP, f
     
     if rank == 0:
         # Update h_cat so that only particles within r200 are considered
-        idx_cat_new = getCatWithinFracR200(idx_cat, xyz, L_BOX, CENTER, r200, frac_r200)
+        idx_cat_new, obj_size_new = getCatWithinFracR200(idx_cat, obj_size, xyz, L_BOX, CENTER, r200, frac_r200)
         
         # Direct fitting result prep, needed for both D and A
-        eps = getEpsilon(idx_cat_new, xyz, masses, L_BOX, CENTER)
+        eps = getEpsilon(idx_cat_new, obj_size_new, xyz, masses, L_BOX, CENTER)
         plt.figure()
         n, bins, patches = plt.hist(x=abs(eps), bins = np.linspace(0, 1, HIST_NB_BINS), alpha=0.7, density=True)
         plt.xlabel(r"$\epsilon$")

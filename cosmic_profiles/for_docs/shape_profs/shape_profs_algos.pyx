@@ -210,7 +210,7 @@ def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, floa
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local shape catalogue
     
     Calls ``calcObjMorphLocal()`` in a parallelized manner.\n
@@ -222,12 +222,12 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
     :type masses: (N2 x 1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N1
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
-    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
-    :type MIN_NUMBER_PTCS: int
     :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
     :type D_LOGSTART: int
     :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -256,7 +256,7 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
     """ Calculates the overall shape catalogue
     
     Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n
@@ -268,12 +268,12 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L
     :type masses: (N2 x 1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N1
+    :param idx_cat: each row contains indices of particles belonging to an object
+    :type idx_cat: (N1, N3) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
-    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
-    :type MIN_NUMBER_PTCS: int
     :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
     :type IT_TOL: float
@@ -297,7 +297,7 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, cat, float L
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local velocity dispersion shape catalogue
     
     Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n
@@ -344,7 +344,7 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, cat, float L_BOX, int MIN_NUMBER_PTCS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
     """ Calculates the global velocity dipsersion shape catalogue
     
     Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n

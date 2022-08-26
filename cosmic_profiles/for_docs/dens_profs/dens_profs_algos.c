@@ -1727,6 +1727,9 @@ static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_f
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_float(PyObject *, int writable_flag);
 
 /* ObjectToMemviewSlice.proto */
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_int(PyObject *, int writable_flag);
+
+/* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_int(PyObject *, int writable_flag);
 
 /* ObjectToMemviewSlice.proto */
@@ -1885,7 +1888,7 @@ static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_itemsize[] = "itemsize";
-static const char __pyx_k_obj_keep[] = "obj_keep";
+static const char __pyx_k_obj_size[] = "obj_size";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_ROverR200[] = "ROverR200";
@@ -1903,7 +1906,6 @@ static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_MIN_NUMBER_PTCS[] = "MIN_NUMBER_PTCS";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
@@ -1956,7 +1958,6 @@ static PyObject *__pyx_kp_s_Indirect_dimensions_not_supporte;
 static PyObject *__pyx_kp_s_Invalid_mode_expected_c_or_fortr;
 static PyObject *__pyx_kp_s_Invalid_shape_in_axis_d_d;
 static PyObject *__pyx_n_s_L_BOX;
-static PyObject *__pyx_n_s_MIN_NUMBER_PTCS;
 static PyObject *__pyx_n_s_MemoryError;
 static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
@@ -2015,7 +2016,7 @@ static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_np;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_obj;
-static PyObject *__pyx_n_s_obj_keep;
+static PyObject *__pyx_n_s_obj_size;
 static PyObject *__pyx_n_s_pack;
 static PyObject *__pyx_n_s_pickle;
 static PyObject *__pyx_n_s_pyx_PickleError;
@@ -2049,10 +2050,10 @@ static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_xyz;
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_a, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_b, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_c, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_major, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_inter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_minor, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_a, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_b, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_c, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_major, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_inter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_minor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2141,20 +2142,20 @@ static PyObject *__pyx_codeobj__33;
 /* "dens_profs/dens_profs_algos.pyx":10
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcMassesCenters(float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculate total mass and centers of objects
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_16dens_profs_algos_calcMassesCenters[] = "calcMassesCenters(float[:, :] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, unicode CENTER)\n Calculate total mass and centers of objects\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param idx_cat: list of indices defining the objects\n    :type idx_cat: list of length N1, each consisting of a list of int indices\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n    :type MIN_NUMBER_PTCS: int\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :return centers, m: centers and masses\n    :rtype: (N,3) and (N,) floats";
+static char __pyx_doc_10dens_profs_16dens_profs_algos_calcMassesCenters[] = "calcMassesCenters(float[:, :] xyz, float[:] masses, int[:, :] idx_cat, int[:] obj_size, float L_BOX, unicode CENTER)\n Calculate total mass and centers of objects\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param idx_cat: each row contains indices of particles belonging to an object\n    :type idx_cat: (N1, N3) integers\n    :param obj_size: indicates how many particles are in each object\n    :type obj_size: (N1,) integers\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :return centers, m: centers and masses\n    :rtype: (N,3) and (N,) floats";
 static PyMethodDef __pyx_mdef_10dens_profs_16dens_profs_algos_1calcMassesCenters = {"calcMassesCenters", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_16dens_profs_algos_calcMassesCenters};
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED PyObject *__pyx_v_idx_cat = 0;
-  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED float __pyx_v_L_BOX;
   CYTHON_UNUSED PyObject *__pyx_v_CENTER = 0;
   int __pyx_lineno = 0;
@@ -2164,7 +2165,7 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters(PyO
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMassesCenters (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_masses,&__pyx_n_s_idx_cat,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_masses,&__pyx_n_s_idx_cat,&__pyx_n_s_obj_size,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
     PyObject* values[6] = {0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -2204,7 +2205,7 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters(PyO
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_size)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("calcMassesCenters", 1, 6, 6, 3); __PYX_ERR(0, 10, __pyx_L3_error)
         }
@@ -2236,8 +2237,8 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters(PyO
     }
     __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 10, __pyx_L3_error)
     __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 10, __pyx_L3_error)
-    __pyx_v_idx_cat = values[2];
-    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 10, __pyx_L3_error)
+    __pyx_v_idx_cat = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_idx_cat.memview)) __PYX_ERR(0, 10, __pyx_L3_error)
+    __pyx_v_obj_size = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_size.memview)) __PYX_ERR(0, 10, __pyx_L3_error)
     __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[4]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 10, __pyx_L3_error)
     __pyx_v_CENTER = ((PyObject*)values[5]);
   }
@@ -2250,7 +2251,7 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters(PyO
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 10, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_idx_cat, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_L_BOX, __pyx_v_CENTER);
+  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_idx_cat, __pyx_v_obj_size, __pyx_v_L_BOX, __pyx_v_CENTER);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2261,7 +2262,7 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_1calcMassesCenters(PyO
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcMassesCenters", 0);
@@ -2280,7 +2281,7 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(CYTH
   /* "dens_profs/dens_profs_algos.pyx":10
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcMassesCenters(float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculate total mass and centers of objects
  * 
  */
@@ -2289,6 +2290,8 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(CYTH
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_idx_cat, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_size, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -2297,23 +2300,22 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_calcMassesCenters(CYTH
 /* "dens_profs/dens_profs_algos.pyx":32
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsSphDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirectBinning(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning[] = "calcDensProfsSphDirectBinning(float[:, :] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, unicode CENTER)\n Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`    \n    \n    Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForce()`` instead of ``CythonHelpers.calcDensProfBruteForce()``\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param obj_keep: which objects among the N1 different ones to consider. 1: keep, 0: ignore\n        This can be used to select objects within a certain mass range, for instance. Having\n        a 1 where `idx_cat` has an empty list entry is not permitted.\n    :type obj_keep: (N1,) ints\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param r200s: R200 values of the objects\n    :type r200s: (N1,) floats\n    :param ROverR200: radii at which the density profiles should be calculated,\n        normalized by R200\n    :type ROverR200: (r_res,) float array\n    :param idx_cat: list of indices defining the objects\n    :type idx_cat: list of length N1, each consisting of a list of int indices\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for density profile calculation\n    :type MIN_NUMBER_PTCS: int\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :return: density profiles defined at ROverR200\n    :rtype: (nb_keep, r_res) float array";
+static char __pyx_doc_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning[] = "calcDensProfsSphDirectBinning(float[:, :] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:, :] idx_cat, int[:] obj_size, float L_BOX, unicode CENTER)\n Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`    \n    \n    Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForce()`` instead of ``CythonHelpers.calcDensProfBruteForce()``\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param r200s: R200 values of the objects\n    :type r200s: (N1,) floats\n    :param ROverR200: radii at which the density profiles should be calculated,\n        normalized by R200\n    :type ROverR200: (r_res,) float array\n    :param idx_cat: each row contains indices of particles belonging to an object\n    :type idx_cat: (N1, N3) integers\n    :param obj_size: indicates how many particles are in each object\n    :type obj_size: (N1,) integers\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :return: density profiles defined at ROverR200\n    :rtype: (N1, r_res) float array";
 static PyMethodDef __pyx_mdef_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirectBinning = {"calcDensProfsSphDirectBinning", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirectBinning, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning};
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirectBinning(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED PyObject *__pyx_v_idx_cat = 0;
-  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED float __pyx_v_L_BOX;
   CYTHON_UNUSED PyObject *__pyx_v_CENTER = 0;
   int __pyx_lineno = 0;
@@ -2323,14 +2325,12 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirec
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfsSphDirectBinning (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_obj_keep,&__pyx_n_s_masses,&__pyx_n_s_r200s,&__pyx_n_s_ROverR200,&__pyx_n_s_idx_cat,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
-    PyObject* values[9] = {0,0,0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_masses,&__pyx_n_s_r200s,&__pyx_n_s_ROverR200,&__pyx_n_s_idx_cat,&__pyx_n_s_obj_size,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
+    PyObject* values[8] = {0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
-        CYTHON_FALLTHROUGH;
         case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
         CYTHON_FALLTHROUGH;
         case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
@@ -2357,57 +2357,51 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirec
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_keep)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 1); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, 1); __PYX_ERR(0, 32, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200s)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 2); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, 2); __PYX_ERR(0, 32, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200s)) != 0)) kw_args--;
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 3); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, 3); __PYX_ERR(0, 32, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 4); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, 4); __PYX_ERR(0, 32, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 5); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, 5); __PYX_ERR(0, 32, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
-        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 6); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, 6); __PYX_ERR(0, 32, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
-        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 7); __PYX_ERR(0, 32, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  8:
-        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, 8); __PYX_ERR(0, 32, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, 7); __PYX_ERR(0, 32, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfsSphDirectBinning") < 0)) __PYX_ERR(0, 32, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 9) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -2418,28 +2412,26 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirec
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
       values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
       values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
-      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
     }
     __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_obj_keep = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_keep.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_r200s = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200s.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_idx_cat = values[5];
-    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[7]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_CENTER = ((PyObject*)values[8]);
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
+    __pyx_v_r200s = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200s.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
+    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
+    __pyx_v_idx_cat = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_idx_cat.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
+    __pyx_v_obj_size = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_size.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
+    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[6]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 32, __pyx_L3_error)
+    __pyx_v_CENTER = ((PyObject*)values[7]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 9, 9, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 32, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcDensProfsSphDirectBinning", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 32, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_algos.calcDensProfsSphDirectBinning", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 32, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning(__pyx_self, __pyx_v_xyz, __pyx_v_obj_keep, __pyx_v_masses, __pyx_v_r200s, __pyx_v_ROverR200, __pyx_v_idx_cat, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_L_BOX, __pyx_v_CENTER);
+  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_r200s, __pyx_v_ROverR200, __pyx_v_idx_cat, __pyx_v_obj_size, __pyx_v_L_BOX, __pyx_v_CENTER);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2450,14 +2442,14 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_3calcDensProfsSphDirec
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfsSphDirectBinning", 0);
 
-  /* "dens_profs/dens_profs_algos.pyx":61
+  /* "dens_profs/dens_profs_algos.pyx":57
  *     :return: density profiles defined at ROverR200
- *     :rtype: (nb_keep, r_res) float array"""
+ *     :rtype: (N1, r_res) float array"""
  *     return             # <<<<<<<<<<<<<<
  * 
  * @cython.embedsignature(True)
@@ -2469,7 +2461,7 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirec
   /* "dens_profs/dens_profs_algos.pyx":32
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsSphDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
@@ -2477,30 +2469,30 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_2calcDensProfsSphDirec
   /* function exit code */
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_keep, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_r200s, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_ROverR200, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_idx_cat, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_size, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_algos.pyx":65
+/* "dens_profs/dens_profs_algos.pyx":61
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsEllDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirectBinning(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning[] = "calcDensProfsEllDirectBinning(float[:, :] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float[:, :] a, float[:, :] b, float[:, :] c, float[:, :, :] major, float[:, :, :] inter, float[:, :, :] minor, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, unicode CENTER)\n Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`    \n    \n    Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForceEll()`` instead of ``CythonHelpers.calcDensProfBruteForceEll()``\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param obj_keep: which objects among the N1 different ones to consider. 1: keep, 0: ignore\n        This can be used to select objects within a certain mass range, for instance. Having\n        a 1 where `idx_cat` has an empty list entry is not permitted.\n    :type obj_keep: (N1,) ints\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param r200s: R200 values of the objects\n    :type r200s: (N1,) floats\n    :param ROverR200: radii at which the density profiles should be calculated,\n        normalized by R200\n    :type ROverR200: (r_res,) float array\n    :param idx_cat: list of indices defining the objects\n    :type idx_cat: list of length N1, each consisting of a list of int indices\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for density profile calculation\n    :type MIN_NUMBER_PTCS: int\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param a: major axis eigenvalues\n    :type a: (N1,D_BINS+1,) floats\n    :param b: intermediate axis eigenvalues\n    :type b: (N1,D_BINS+1,) floats\n    :param c: minor axis eigenvalues\n    :type c: (N1,D_B""INS+1,) floats\n    :param major: major axis eigenvectors\n    :type major: (N1,D_BINS+1,3) floats\n    :param inter: inter axis eigenvectors\n    :type inter: (N1,D_BINS+1,3) floats\n    :param minor: minor axis eigenvectors\n    :type minor: (N1,D_BINS+1,3) floats\n    :return: density profiles defined at ROverR200\n    :rtype: (nb_keep, r_res) float array";
+static char __pyx_doc_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning[] = "calcDensProfsEllDirectBinning(float[:, :] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:, :] a, float[:, :] b, float[:, :] c, float[:, :, :] major, float[:, :, :] inter, float[:, :, :] minor, int[:, :] idx_cat, int[:] obj_size, float L_BOX, unicode CENTER)\n Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`    \n    \n    Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForceEll()`` instead of ``CythonHelpers.calcDensProfBruteForceEll()``\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param r200s: R200 values of the objects\n    :type r200s: (N1,) floats\n    :param ROverR200: radii at which the density profiles should be calculated,\n        normalized by R200\n    :type ROverR200: (r_res,) float array\n    :param idx_cat: each row contains indices of particles belonging to an object\n    :type idx_cat: (N1, N3) integers\n    :param obj_size: indicates how many particles are in each object\n    :type obj_size: (N1,) integers\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :param a: major axis eigenvalues\n    :type a: (N1,D_BINS+1,) floats\n    :param b: intermediate axis eigenvalues\n    :type b: (N1,D_BINS+1,) floats\n    :param c: minor axis eigenvalues\n    :type c: (N1,D_BINS+1,) floats\n    :param major: major axis eigenvectors\n    :type major: (N1,D_BINS+1,3) floats\n    :param inter: inter axis eigenvectors\n    :type inter: (N1,D_BINS+1,3) floats\n    :param minor: minor axis eigenvectors\n    :type minor: (N1,D_BINS+1,3) floats\n    :return: density profiles defined at ROverR200\n    :rtype: (N1, r_res) float array";
 static PyMethodDef __pyx_mdef_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirectBinning = {"calcDensProfsEllDirectBinning", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirectBinning, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning};
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirectBinning(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2510,8 +2502,8 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirec
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_major = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_inter = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_minor = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED PyObject *__pyx_v_idx_cat = 0;
-  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED float __pyx_v_L_BOX;
   CYTHON_UNUSED PyObject *__pyx_v_CENTER = 0;
   int __pyx_lineno = 0;
@@ -2521,14 +2513,12 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirec
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfsEllDirectBinning (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_obj_keep,&__pyx_n_s_masses,&__pyx_n_s_r200s,&__pyx_n_s_ROverR200,&__pyx_n_s_a,&__pyx_n_s_b,&__pyx_n_s_c,&__pyx_n_s_major,&__pyx_n_s_inter,&__pyx_n_s_minor,&__pyx_n_s_idx_cat,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
-    PyObject* values[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_masses,&__pyx_n_s_r200s,&__pyx_n_s_ROverR200,&__pyx_n_s_a,&__pyx_n_s_b,&__pyx_n_s_c,&__pyx_n_s_major,&__pyx_n_s_inter,&__pyx_n_s_minor,&__pyx_n_s_idx_cat,&__pyx_n_s_obj_size,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
+    PyObject* values[14] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case 15: values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
-        CYTHON_FALLTHROUGH;
         case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
         CYTHON_FALLTHROUGH;
         case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
@@ -2567,93 +2557,87 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirec
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_keep)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 1); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 1); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200s)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 2); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 2); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200s)) != 0)) kw_args--;
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 3); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 3); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 4); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 4); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_b)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 5); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 5); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
-        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_b)) != 0)) kw_args--;
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 6); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 6); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
-        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_major)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 7); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 7); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  8:
-        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_major)) != 0)) kw_args--;
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_inter)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 8); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 8); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  9:
-        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_inter)) != 0)) kw_args--;
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_minor)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 9); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 9); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 10:
-        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_minor)) != 0)) kw_args--;
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 10); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 10); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 11:
-        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 11); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 11); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 12:
-        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 12); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 12); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 13:
-        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 13); __PYX_ERR(0, 65, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case 14:
-        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, 14); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, 13); __PYX_ERR(0, 61, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfsEllDirectBinning") < 0)) __PYX_ERR(0, 65, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfsEllDirectBinning") < 0)) __PYX_ERR(0, 61, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 15) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 14) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -2670,34 +2654,32 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirec
       values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
       values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
       values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
-      values[14] = PyTuple_GET_ITEM(__pyx_args, 14);
     }
-    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_obj_keep = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_keep.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_r200s = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200s.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_a = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_a.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_b = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_b.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_c = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_major = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_major.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_inter = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_inter.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_minor = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_minor.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_idx_cat = values[11];
-    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[12]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[13]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_CENTER = ((PyObject*)values[14]);
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_r200s = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200s.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_a = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_a.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_b = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_b.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_c = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[6], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_major = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(values[7], PyBUF_WRITABLE); if (unlikely(!__pyx_v_major.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_inter = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(values[8], PyBUF_WRITABLE); if (unlikely(!__pyx_v_inter.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_minor = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(values[9], PyBUF_WRITABLE); if (unlikely(!__pyx_v_minor.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_idx_cat = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[10], PyBUF_WRITABLE); if (unlikely(!__pyx_v_idx_cat.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_obj_size = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[11], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_size.memview)) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[12]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_CENTER = ((PyObject*)values[13]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 15, 15, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 65, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcDensProfsEllDirectBinning", 1, 14, 14, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 61, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_algos.calcDensProfsEllDirectBinning", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 65, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning(__pyx_self, __pyx_v_xyz, __pyx_v_obj_keep, __pyx_v_masses, __pyx_v_r200s, __pyx_v_ROverR200, __pyx_v_a, __pyx_v_b, __pyx_v_c, __pyx_v_major, __pyx_v_inter, __pyx_v_minor, __pyx_v_idx_cat, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_L_BOX, __pyx_v_CENTER);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 61, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_r200s, __pyx_v_ROverR200, __pyx_v_a, __pyx_v_b, __pyx_v_c, __pyx_v_major, __pyx_v_inter, __pyx_v_minor, __pyx_v_idx_cat, __pyx_v_obj_size, __pyx_v_L_BOX, __pyx_v_CENTER);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2708,14 +2690,14 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirec
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_a, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_b, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_c, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_major, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_inter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_minor, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirectBinning(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_a, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_b, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_c, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_major, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_inter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_minor, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfsEllDirectBinning", 0);
 
-  /* "dens_profs/dens_profs_algos.pyx":106
+  /* "dens_profs/dens_profs_algos.pyx":98
  *     :return: density profiles defined at ROverR200
- *     :rtype: (nb_keep, r_res) float array"""
+ *     :rtype: (N1, r_res) float array"""
  *     return             # <<<<<<<<<<<<<<
  * 
  * @cython.embedsignature(True)
@@ -2724,10 +2706,10 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirec
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_algos.pyx":65
+  /* "dens_profs/dens_profs_algos.pyx":61
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsEllDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
@@ -2735,7 +2717,6 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirec
   /* function exit code */
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_keep, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_r200s, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_ROverR200, 1);
@@ -2745,31 +2726,32 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_4calcDensProfsEllDirec
   __PYX_XDEC_MEMVIEW(&__pyx_v_major, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_inter, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_minor, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_idx_cat, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_size, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_algos.pyx":110
+/* "dens_profs/dens_profs_algos.pyx":102
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsKernelBased(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBased(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased[] = "calcDensProfsKernelBased(float[:, :] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, unicode CENTER)\n Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`\n    \n    Note: For background on this kernel-based method consult Reed et al. 2003, https://arxiv.org/abs/astro-ph/0312544.\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param obj_keep: which objects among the N1 different ones to consider. 1: keep, 0: ignore\n        This can be used to select objects within a certain mass range, for instance. Having\n        a 1 where `idx_cat` has an empty list entry is not permitted.\n    :type obj_keep: (N1,) ints\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param r200s: R200 values of the objects\n    :type r200s: (N1,) floats\n    :param ROverR200: radii at which the density profiles should be calculated,\n        normalized by R200\n    :type ROverR200: (r_res,) float array\n    :param idx_cat: list of indices defining the objects\n    :type idx_cat: list of length N1, each consisting of a list of int indices\n    :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for density profile calculation\n    :type MIN_NUMBER_PTCS: int\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :return: density profiles defined at ROverR200\n    :rtype: (nb_keep, r_res) float array";
+static char __pyx_doc_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased[] = "calcDensProfsKernelBased(float[:, :] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:, :] idx_cat, int[:] obj_size, float L_BOX, unicode CENTER)\n Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`\n    \n    Note: For background on this kernel-based method consult Reed et al. 2003, https://arxiv.org/abs/astro-ph/0312544.\n    \n    :param xyz: positions of all simulation particles\n    :type xyz: (N2,3) floats, N2 >> N1\n    :param masses: masses of all simulation particles\n    :type masses: (N2,) floats\n    :param r200s: R200 values of the objects\n    :type r200s: (N1,) floats\n    :param ROverR200: radii at which the density profiles should be calculated,\n        normalized by R200\n    :type ROverR200: (r_res,) float array\n    :param idx_cat: each row contains indices of particles belonging to an object\n    :type idx_cat: (N1, N3) integers\n    :param obj_size: indicates how many particles are in each object\n    :type obj_size: (N1,) integers\n    :param L_BOX: box size\n    :type L_BOX: float\n    :param CENTER: density profiles will be calculated with respect to CENTER = 'mode' (point of highest density)\n        or 'com' (center of mass) of each halo\n    :type CENTER: str\n    :return: density profiles defined at ROverR200\n    :rtype: (N1, r_res) float array";
 static PyMethodDef __pyx_mdef_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBased = {"calcDensProfsKernelBased", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBased, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased};
 static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBased(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED PyObject *__pyx_v_idx_cat = 0;
-  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS;
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED float __pyx_v_L_BOX;
   CYTHON_UNUSED PyObject *__pyx_v_CENTER = 0;
   int __pyx_lineno = 0;
@@ -2779,14 +2761,12 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBa
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfsKernelBased (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_obj_keep,&__pyx_n_s_masses,&__pyx_n_s_r200s,&__pyx_n_s_ROverR200,&__pyx_n_s_idx_cat,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
-    PyObject* values[9] = {0,0,0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_masses,&__pyx_n_s_r200s,&__pyx_n_s_ROverR200,&__pyx_n_s_idx_cat,&__pyx_n_s_obj_size,&__pyx_n_s_L_BOX,&__pyx_n_s_CENTER,0};
+    PyObject* values[8] = {0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
-        CYTHON_FALLTHROUGH;
         case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
         CYTHON_FALLTHROUGH;
         case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
@@ -2813,57 +2793,51 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBa
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_keep)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 1); __PYX_ERR(0, 110, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, 1); __PYX_ERR(0, 102, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200s)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 2); __PYX_ERR(0, 110, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, 2); __PYX_ERR(0, 102, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200s)) != 0)) kw_args--;
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 3); __PYX_ERR(0, 110, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, 3); __PYX_ERR(0, 102, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 4); __PYX_ERR(0, 110, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, 4); __PYX_ERR(0, 102, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 5); __PYX_ERR(0, 110, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, 5); __PYX_ERR(0, 102, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
-        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 6); __PYX_ERR(0, 110, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, 6); __PYX_ERR(0, 102, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
-        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 7); __PYX_ERR(0, 110, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  8:
-        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, 8); __PYX_ERR(0, 110, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, 7); __PYX_ERR(0, 102, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfsKernelBased") < 0)) __PYX_ERR(0, 110, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcDensProfsKernelBased") < 0)) __PYX_ERR(0, 102, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 9) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -2874,28 +2848,26 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBa
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
       values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
       values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
-      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
     }
-    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
-    __pyx_v_obj_keep = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_keep.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
-    __pyx_v_r200s = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200s.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
-    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 110, __pyx_L3_error)
-    __pyx_v_idx_cat = values[5];
-    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 110, __pyx_L3_error)
-    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[7]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 110, __pyx_L3_error)
-    __pyx_v_CENTER = ((PyObject*)values[8]);
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 102, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 102, __pyx_L3_error)
+    __pyx_v_r200s = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200s.memview)) __PYX_ERR(0, 102, __pyx_L3_error)
+    __pyx_v_ROverR200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_ROverR200.memview)) __PYX_ERR(0, 102, __pyx_L3_error)
+    __pyx_v_idx_cat = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_idx_cat.memview)) __PYX_ERR(0, 102, __pyx_L3_error)
+    __pyx_v_obj_size = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_size.memview)) __PYX_ERR(0, 102, __pyx_L3_error)
+    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[6]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L3_error)
+    __pyx_v_CENTER = ((PyObject*)values[7]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 9, 9, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 110, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcDensProfsKernelBased", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 102, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_algos.calcDensProfsKernelBased", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 110, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased(__pyx_self, __pyx_v_xyz, __pyx_v_obj_keep, __pyx_v_masses, __pyx_v_r200s, __pyx_v_ROverR200, __pyx_v_idx_cat, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_L_BOX, __pyx_v_CENTER);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased(__pyx_self, __pyx_v_xyz, __pyx_v_masses, __pyx_v_r200s, __pyx_v_ROverR200, __pyx_v_idx_cat, __pyx_v_obj_size, __pyx_v_L_BOX, __pyx_v_CENTER);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2906,24 +2878,24 @@ static PyObject *__pyx_pw_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBa
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_keep, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_idx_cat, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
+static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBased(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200s, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED float __pyx_v_L_BOX, CYTHON_UNUSED PyObject *__pyx_v_CENTER) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcDensProfsKernelBased", 0);
 
-  /* "dens_profs/dens_profs_algos.pyx":140
- *     :rtype: (nb_keep, r_res) float array"""
- * 
+  /* "dens_profs/dens_profs_algos.pyx":127
+ *     :return: density profiles defined at ROverR200
+ *     :rtype: (N1, r_res) float array"""
  *     return             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_algos.pyx":110
+  /* "dens_profs/dens_profs_algos.pyx":102
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsKernelBased(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
@@ -2931,10 +2903,11 @@ static PyObject *__pyx_pf_10dens_profs_16dens_profs_algos_6calcDensProfsKernelBa
   /* function exit code */
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_keep, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_r200s, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_ROverR200, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_idx_cat, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_size, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -16734,7 +16707,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Invalid_mode_expected_c_or_fortr, __pyx_k_Invalid_mode_expected_c_or_fortr, sizeof(__pyx_k_Invalid_mode_expected_c_or_fortr), 0, 0, 1, 0},
   {&__pyx_kp_s_Invalid_shape_in_axis_d_d, __pyx_k_Invalid_shape_in_axis_d_d, sizeof(__pyx_k_Invalid_shape_in_axis_d_d), 0, 0, 1, 0},
   {&__pyx_n_s_L_BOX, __pyx_k_L_BOX, sizeof(__pyx_k_L_BOX), 0, 0, 1, 1},
-  {&__pyx_n_s_MIN_NUMBER_PTCS, __pyx_k_MIN_NUMBER_PTCS, sizeof(__pyx_k_MIN_NUMBER_PTCS), 0, 0, 1, 1},
   {&__pyx_n_s_MemoryError, __pyx_k_MemoryError, sizeof(__pyx_k_MemoryError), 0, 0, 1, 1},
   {&__pyx_kp_s_MemoryView_of_r_at_0x_x, __pyx_k_MemoryView_of_r_at_0x_x, sizeof(__pyx_k_MemoryView_of_r_at_0x_x), 0, 0, 1, 0},
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
@@ -16793,7 +16765,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_n_s_obj, __pyx_k_obj, sizeof(__pyx_k_obj), 0, 0, 1, 1},
-  {&__pyx_n_s_obj_keep, __pyx_k_obj_keep, sizeof(__pyx_k_obj_keep), 0, 0, 1, 1},
+  {&__pyx_n_s_obj_size, __pyx_k_obj_size, sizeof(__pyx_k_obj_size), 0, 0, 1, 1},
   {&__pyx_n_s_pack, __pyx_k_pack, sizeof(__pyx_k_pack), 0, 0, 1, 1},
   {&__pyx_n_s_pickle, __pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_PickleError, __pyx_k_pyx_PickleError, sizeof(__pyx_k_pyx_PickleError), 0, 0, 1, 1},
@@ -17042,11 +17014,11 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "dens_profs/dens_profs_algos.pyx":10
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcMassesCenters(float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculate total mass and centers of objects
  * 
  */
-  __pyx_tuple__19 = PyTuple_Pack(6, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_idx_cat, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(6, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_idx_cat, __pyx_n_s_obj_size, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
   __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(6, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_dens_profs_dens_profs_algos_pyx, __pyx_n_s_calcMassesCenters, 10, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 10, __pyx_L1_error)
@@ -17054,38 +17026,38 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "dens_profs/dens_profs_algos.pyx":32
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsSphDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
-  __pyx_tuple__21 = PyTuple_Pack(9, __pyx_n_s_xyz, __pyx_n_s_obj_keep, __pyx_n_s_masses, __pyx_n_s_r200s, __pyx_n_s_ROverR200, __pyx_n_s_idx_cat, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(8, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_r200s, __pyx_n_s_ROverR200, __pyx_n_s_idx_cat, __pyx_n_s_obj_size, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(9, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_dens_profs_dens_profs_algos_pyx, __pyx_n_s_calcDensProfsSphDirectBinning, 32, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(8, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_dens_profs_dens_profs_algos_pyx, __pyx_n_s_calcDensProfsSphDirectBinning, 32, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 32, __pyx_L1_error)
 
-  /* "dens_profs/dens_profs_algos.pyx":65
+  /* "dens_profs/dens_profs_algos.pyx":61
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsEllDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
-  __pyx_tuple__23 = PyTuple_Pack(15, __pyx_n_s_xyz, __pyx_n_s_obj_keep, __pyx_n_s_masses, __pyx_n_s_r200s, __pyx_n_s_ROverR200, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_c, __pyx_n_s_major, __pyx_n_s_inter, __pyx_n_s_minor, __pyx_n_s_idx_cat, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_tuple__23 = PyTuple_Pack(14, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_r200s, __pyx_n_s_ROverR200, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_c, __pyx_n_s_major, __pyx_n_s_inter, __pyx_n_s_minor, __pyx_n_s_idx_cat, __pyx_n_s_obj_size, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__23);
   __Pyx_GIVEREF(__pyx_tuple__23);
-  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(15, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_dens_profs_dens_profs_algos_pyx, __pyx_n_s_calcDensProfsEllDirectBinning, 65, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(14, 0, 14, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_dens_profs_dens_profs_algos_pyx, __pyx_n_s_calcDensProfsEllDirectBinning, 61, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 61, __pyx_L1_error)
 
-  /* "dens_profs/dens_profs_algos.pyx":110
+  /* "dens_profs/dens_profs_algos.pyx":102
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsKernelBased(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
-  __pyx_tuple__25 = PyTuple_Pack(9, __pyx_n_s_xyz, __pyx_n_s_obj_keep, __pyx_n_s_masses, __pyx_n_s_r200s, __pyx_n_s_ROverR200, __pyx_n_s_idx_cat, __pyx_n_s_MIN_NUMBER_PTCS, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __pyx_tuple__25 = PyTuple_Pack(8, __pyx_n_s_xyz, __pyx_n_s_masses, __pyx_n_s_r200s, __pyx_n_s_ROverR200, __pyx_n_s_idx_cat, __pyx_n_s_obj_size, __pyx_n_s_L_BOX, __pyx_n_s_CENTER); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__25);
   __Pyx_GIVEREF(__pyx_tuple__25);
-  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(9, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_dens_profs_dens_profs_algos_pyx, __pyx_n_s_calcDensProfsKernelBased, 110, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(8, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_dens_profs_dens_profs_algos_pyx, __pyx_n_s_calcDensProfsKernelBased, 102, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 102, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -17513,7 +17485,7 @@ if (!__Pyx_RefNanny) {
   /* "dens_profs/dens_profs_algos.pyx":10
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcMassesCenters(float[:,:] xyz, float[:] masses, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculate total mass and centers of objects
  * 
  */
@@ -17525,7 +17497,7 @@ if (!__Pyx_RefNanny) {
   /* "dens_profs/dens_profs_algos.pyx":32
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsSphDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
@@ -17534,28 +17506,28 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcDensProfsSphDirectBinning, __pyx_t_1) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "dens_profs/dens_profs_algos.pyx":65
+  /* "dens_profs/dens_profs_algos.pyx":61
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsEllDirectBinning(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirectBinning, 0, __pyx_n_s_calcDensProfsEllDirectBinning, NULL, __pyx_n_s_dens_profs_dens_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_10dens_profs_16dens_profs_algos_5calcDensProfsEllDirectBinning, 0, __pyx_n_s_calcDensProfsEllDirectBinning, NULL, __pyx_n_s_dens_profs_dens_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcDensProfsEllDirectBinning, __pyx_t_1) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcDensProfsEllDirectBinning, __pyx_t_1) < 0) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "dens_profs/dens_profs_algos.pyx":110
+  /* "dens_profs/dens_profs_algos.pyx":102
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcDensProfsKernelBased(float[:,:] xyz, int[:] obj_keep, float[:] masses, float[:] r200s, float[:] ROverR200, idx_cat, int MIN_NUMBER_PTCS, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
+ * def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):             # <<<<<<<<<<<<<<
  *     """ Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBased, 0, __pyx_n_s_calcDensProfsKernelBased, NULL, __pyx_n_s_dens_profs_dens_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_10dens_profs_16dens_profs_algos_7calcDensProfsKernelBased, 0, __pyx_n_s_calcDensProfsKernelBased, NULL, __pyx_n_s_dens_profs_dens_profs_algos, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcDensProfsKernelBased, __pyx_t_1) < 0) __PYX_ERR(0, 110, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcDensProfsKernelBased, __pyx_t_1) < 0) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "dens_profs/dens_profs_algos.pyx":1
@@ -21381,27 +21353,28 @@ __pyx_fail:
     return result;
 }
 
-/* CIntFromPyVerify */
-  #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
-#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
-#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
-    {\
-        func_type value = func_value;\
-        if (sizeof(target_type) < sizeof(func_type)) {\
-            if (unlikely(value != (func_type) (target_type) value)) {\
-                func_type zero = 0;\
-                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
-                    return (target_type) -1;\
-                if (is_unsigned && unlikely(value < zero))\
-                    goto raise_neg_overflow;\
-                else\
-                    goto raise_overflow;\
-            }\
-        }\
-        return (target_type) value;\
+/* ObjectToMemviewSlice */
+  static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_int(PyObject *obj, int writable_flag) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
     }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
+                                                 PyBUF_RECORDS_RO | writable_flag, 2,
+                                                 &__Pyx_TypeInfo_int, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
 
 /* ObjectToMemviewSlice */
   static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_int(PyObject *obj, int writable_flag) {
@@ -21515,6 +21488,28 @@ no_fail:
     __Pyx_RefNannyFinishContext();
     return new_mvs;
 }
+
+/* CIntFromPyVerify */
+  #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
+#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
+#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
+    {\
+        func_type value = func_value;\
+        if (sizeof(target_type) < sizeof(func_type)) {\
+            if (unlikely(value != (func_type) (target_type) value)) {\
+                func_type zero = 0;\
+                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
+                    return (target_type) -1;\
+                if (is_unsigned && unlikely(value < zero))\
+                    goto raise_neg_overflow;\
+                else\
+                    goto raise_overflow;\
+            }\
+        }\
+        return (target_type) value;\
+    }
 
 /* CIntFromPy */
   static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {

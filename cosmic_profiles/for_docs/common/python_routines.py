@@ -537,11 +537,13 @@ def calcCoM(xyz, masses):
         com[2] += masses[run]*xyz[run,2]/mass_total
     return com
 
-def getCatWithinFracR200(cat_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
+def getCatWithinFracR200(cat_in, obj_size_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
     """ Cleanse index catalogue ``cat_in`` of particles beyond R200 ``r200``
     
-    :param cat_in: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat_in: list of length N1, N1 << N2
+    :param idx_cat_in: each row contains indices of particles belonging to an object
+    :type idx_cat_in: (N1, N3) integers
+    :param obj_size_in: indicates how many particles are in each object
+    :type obj_size_in: (N1,) integers
     :param xyz: coordinates of particles of type 1 or type 4
     :type xyz: (N2,3) floats
     :param masses: masses of the particles
@@ -555,28 +557,28 @@ def getCatWithinFracR200(cat_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
     :type r200: (N1,) floats
     :param frac_r200: depth of objects to plot ellipticity, in units of R200
     :type frac_r200: float
-    :return cat_out: updated cat_in, with particles beyond R200 ``r200`` removed
+    :return cat_out, obj_size_out: updated cat_in and obj_size_out, with particles
+        beyond R200 ``r200`` removed
     :rtype: list of length N1"""
-    cat_out = [[] for i in range(len(cat_in))]
-    idxs_compr = np.zeros((len(cat_in),), dtype = np.int32)
-    h_pass = np.array([1 if x != [] else 0 for x in cat_in])
-    idxs_compr[h_pass.nonzero()[0]] = np.arange(np.sum(h_pass))
+    cat_out = np.zeros((len(cat_in),np.max(obj_size_in)), dtype = np.int32)
+    obj_size_out = np.zeros((len(cat_in),), dtype = np.int32)
     centers = np.zeros((len(cat_in),3), dtype = np.float32)
     for idx in range(len(cat_in)): # Calculate centers of objects
-        if cat_in[idx] != []:
-            xyz_ = respectPBCNoRef(xyz[cat_in[idxs_compr[idx]]], L_BOX)
-            if CENTER == 'mode':
-                centers.base[idx] = calcMode(xyz_, masses[cat_in[idxs_compr[idx]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
-            else:
-                centers.base[idx] = calcCoM(xyz_, masses[cat_in[idxs_compr[idx]]])
+        xyz_ = respectPBCNoRef(xyz[cat_in[idx,:obj_size_in[idx]]], L_BOX)
+        if CENTER == 'mode':
+            centers.base[idx] = calcMode(xyz_, masses[cat_in[idx,:obj_size_in[idx]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
+        else:
+            centers.base[idx] = calcCoM(xyz_, masses[cat_in[idx,:obj_size_in[idx]]])
+    remnant = []
     for idx, obj in enumerate(cat_in):
-        if obj != []:
-            xyz_ = respectPBCNoRef(xyz[obj])
-            tree = cKDTree(xyz_, leafsize=2, balanced_tree = False)
-            all_nn_idxs = tree.query_ball_point(centers[idxs_compr[idx]], r=r200[idx]*frac_r200, n_jobs=-1)
-            if all_nn_idxs != []:
-                cat_out[idx] = list(np.array(obj)[all_nn_idxs])
-    return cat_out
+        xyz_ = respectPBCNoRef(xyz[obj[:obj_size_in[idx]]])
+        tree = cKDTree(xyz_, leafsize=2, balanced_tree = False)
+        all_nn_idxs = tree.query_ball_point(centers[idx], r=r200[idx]*frac_r200, n_jobs=-1)
+        if all_nn_idxs != []:
+            cat_out[idx] = list(np.array(obj[:obj_size_in[idx]])[all_nn_idxs])
+            obj_size_out[idx] = len(all_nn_idxs)
+            remnant.append(idx)            
+    return cat_out[remnant], obj_size_out[remnant]
 
 def isValidSelection(select, nb_objects):
     """ Trivial function to check whether selection of objects is valid
@@ -595,17 +597,3 @@ def isValidSelection(select, nb_objects):
     if select[0] >= nb_objects or select[1] >= nb_objects:
         raise ValueError("Index / indices in `select` list too large. There aren't that many objects in the inventory.")
     return True
-
-def getIdxCorr(obj_pass, obj_idx):
-    """ Calculate index correction when constructing index list from index array
-    
-    Note that the correction comes from poorly resolved objects
-    
-    :param obj_pass: 1 for sufficiently resolved object, 0 otherwise
-    :type obj_pass: (N1,) integers
-    :param obj_idx: index of object for which correction shall be calculated
-    :type obj_idx: integer
-    :return corr: correction
-    :type corr: integer"""
-    corr = np.int32(np.sum([1 if obj_pass[i] != 1 else 0 for i in range(obj_idx) ]))
-    return corr
