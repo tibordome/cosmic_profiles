@@ -12,7 +12,7 @@ size = comm.Get_size()
 cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
-    Its public methods are ``getIdxCat()``, ``getIdxCatSuffRes()``,
+    Its public methods are ``getIdxCat()``,
     ``getMassesCenters()``, ``estDensProfs``, ``fitDensProfs()``, ``estConcentrations()``, 
     ``plotDensProfs()``."""
     

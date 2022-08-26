@@ -4,7 +4,7 @@
 
 import numpy as np
 from cosmic_profiles.common.cosmic_base_class cimport CosmicBase
-from cosmic_profiles.common.python_routines import print_status, isValidSelection, getIdxCorr
+from cosmic_profiles.common.python_routines import print_status, isValidSelection
 from cosmic_profiles.dens_profs.dens_profs_tools import drawDensProfs
 from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5GxData, getHDF5SHDMData, getHDF5SHGxData, getHDF5DMData
 from cosmic_profiles.gadget_hdf5.gen_catalogues import calcCSHCat, calcGxCat
@@ -17,7 +17,7 @@ size = comm.Get_size()
 cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
-    Its public methods are ``getIdxCat()``, ``getIdxCatSuffRes()``,
+    Its public methods are ``getIdxCat()``,
     ``getMassesCenters()``, ``estDensProfs``, ``fitDensProfs()``, ``estConcentrations()``, 
     ``plotDensProfs()``."""
     
@@ -69,7 +69,10 @@ cdef class DensProfs(CosmicBase):
         :return idx_cat: each row contains indices of particles belonging to an object,
             obj_size: number of particles in each object
         :rtype: (N1, N3) integers and (N1,) integers"""
-        return self.idx_cat, self.obj_size
+        if rank == 0:
+            return self.idx_cat, self.obj_size
+        else:
+            return None, None
     
     def getMassesCenters(self, list select):
         """ Calculate total mass and centers of objects
@@ -276,7 +279,7 @@ cdef class DensProfsHDF5(CosmicBase):
         :rtype: (N1, N3) integers and (N1,) integers"""
         
         if rank != 0:
-            return None
+            return None, None
         if obj_type == 'dm':
             # Import hdf5 data
             nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)

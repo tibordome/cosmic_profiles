@@ -17,6 +17,10 @@ subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import genHalo, DensProfs
+from mpi4py import MPI
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
 def test_densities():
     #################################### Parameters #################################################
@@ -60,25 +64,30 @@ def test_densities():
     
     ######################### Extract R_vir, halo indices and halo sizes #############################
     mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
-    idx_cat = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
+    idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define DensProfs object ##############################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER)
     
     ############################## Estimate Density Profiles #########################################
     halos_select = [0, 5]
     dens_profs_db = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
     dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = False) # These estimates will be kernel-based
-    idx_cat_suff = cprofiles.getIdxCatSuffRes()
-    nb_sel_suff_res = np.sum([1 if idx_cat_suff[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])
-    assert dens_profs_db.shape[0] == nb_sel_suff_res
-    assert dens_profs_db.shape[1] == r_over_rvir.shape[0]
-    assert dens_profs_kb.shape[0] == nb_sel_suff_res
-    assert dens_profs_kb.shape[1] == r_over_rvir.shape[0]
+    idx_cat = cprofiles.getIdxCat()
+    if rank == 0:
+        nb_sel_suff_res = np.sum([1 if idx_cat[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])
+        assert dens_profs_db.shape[0] == nb_sel_suff_res
+        assert dens_profs_db.shape[1] == r_over_rvir.shape[0]
+        assert dens_profs_kb.shape[0] == nb_sel_suff_res
+        assert dens_profs_kb.shape[1] == r_over_rvir.shape[0]
+    else:
+        dens_profs_db = np.zeros((nb_sel_suff_res, r_over_rvir.shape[0]), dtype = np.float32)
+    comm.Bcast(dens_profs_db, root = 0)
     
     ############################## Fit Density Profile ###############################################
     r_over_rvir = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db = dens_profs_db[:,10:]
     best_fits = cprofiles.fitDensProfs(dens_profs_db, r_over_rvir, method = method, select = halos_select)
-    assert best_fits.shape[0] == nb_sel_suff_res
-    assert best_fits.shape[1] == nb_model_pars[method]
+    if rank == 0:
+        assert best_fits.shape[0] == nb_sel_suff_res
+        assert best_fits.shape[1] == nb_model_pars[method]

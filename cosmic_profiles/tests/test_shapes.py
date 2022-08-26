@@ -17,6 +17,10 @@ subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import genHalo, DensShapeProfs
+from mpi4py import MPI
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
 def test_shapes():
     #################################### Parameters ################################################
@@ -66,41 +70,42 @@ def test_shapes():
     
     ######################### Extract R_vir, halo indices and halo sizes ##########################
     mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
-    idx_cat = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
+    idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
     
-    assert idx_cat == cprofiles.getIdxCat()
+    idx_cat = cprofiles.getIdxCat()
     halos_select = [0, 5]
     centers, ms = cprofiles.getMassesCenters(halos_select)
-    assert centers.shape == (halos_select[1] - halos_select[0] + 1,3)
-    assert ms.shape == (halos_select[1] - halos_select[0] + 1,)
+    if rank == 0:
+        assert len(idx_cat) <= len(idx_cat_in) # Note: idx_cat only contains objects with sufficient resolution
+        assert centers.shape == (halos_select[1] - halos_select[0] + 1,3)
+        assert ms.shape == (halos_select[1] - halos_select[0] + 1,)
     
     ######################### Calculating Local Morphological Properties #############################
     # Create halo shape catalogue
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(select = halos_select, reduced = False, shell_based = False)
     
-    idx_cat_suff = cprofiles.getIdxCatSuffRes()
-    nb_sel_suff_res = np.sum([1 if idx_cat_suff[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])
-        
-    assert obj_masses.shape[0] == nb_sel_suff_res
-    assert obj_centers.shape[0] == nb_sel_suff_res
-    assert d.shape[0] == nb_sel_suff_res
-    assert q.shape[0] == nb_sel_suff_res
-    assert s.shape[0] == nb_sel_suff_res
-    assert minor.shape[0] == nb_sel_suff_res
-    assert inter.shape[0] == nb_sel_suff_res
-    assert major.shape[0] == nb_sel_suff_res
-    assert d.shape[1] == D_BINS+1
-    assert q.shape[1] == D_BINS+1
-    assert s.shape[1] == D_BINS+1
-    assert minor.shape[1] == D_BINS + 1
-    assert minor.shape[2] == 3
-    assert inter.shape[1] == D_BINS + 1
-    assert inter.shape[2] == 3
-    assert major.shape[1] == D_BINS + 1
-    assert major.shape[2] == 3
+    if rank == 0:
+        nb_sel_suff_res = np.sum([1 if idx_cat[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])   
+        assert obj_masses.shape[0] == nb_sel_suff_res
+        assert obj_centers.shape[0] == nb_sel_suff_res
+        assert d.shape[0] == nb_sel_suff_res
+        assert q.shape[0] == nb_sel_suff_res
+        assert s.shape[0] == nb_sel_suff_res
+        assert minor.shape[0] == nb_sel_suff_res
+        assert inter.shape[0] == nb_sel_suff_res
+        assert major.shape[0] == nb_sel_suff_res
+        assert d.shape[1] == D_BINS+1
+        assert q.shape[1] == D_BINS+1
+        assert s.shape[1] == D_BINS+1
+        assert minor.shape[1] == D_BINS + 1
+        assert minor.shape[2] == 3
+        assert inter.shape[1] == D_BINS + 1
+        assert inter.shape[2] == 3
+        assert major.shape[1] == D_BINS + 1
+        assert major.shape[2] == 3
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
     cprofiles.plotShapeProfs(nb_bins = 2, VIZ_DEST = VIZ_DEST, select = halos_select, reduced = True, shell_based = True)
@@ -113,26 +118,27 @@ def test_shapes():
     
     ######################### Calculating Global Morphological Properties ############################
     halos_select = [0, N-1]
-    nb_sel_suff_res = np.sum([1 if idx_cat_suff[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(select = halos_select, reduced = False)
     
-    assert obj_masses.shape[0] == nb_sel_suff_res
-    assert obj_centers.shape[0] == nb_sel_suff_res
-    assert d.shape[0] == nb_sel_suff_res
-    assert q.shape[0] == nb_sel_suff_res
-    assert s.shape[0] == nb_sel_suff_res
-    assert minor.shape[0] == nb_sel_suff_res
-    assert inter.shape[0] == nb_sel_suff_res
-    assert major.shape[0] == nb_sel_suff_res
-    assert d.shape[1] == 1
-    assert q.shape[1] == 1
-    assert s.shape[1] == 1
-    assert minor.shape[1] == 1
-    assert minor.shape[2] == 3
-    assert inter.shape[1] == 1
-    assert inter.shape[2] == 3
-    assert major.shape[1] == 1
-    assert major.shape[2] == 3
+    if rank == 0:
+        nb_sel_suff_res = np.sum([1 if idx_cat[halos_select[0]:halos_select[1]+1][obj] != [] else 0 for obj in range(len(idx_cat[halos_select[0]:halos_select[1]+1]))])
+        assert obj_masses.shape[0] == nb_sel_suff_res
+        assert obj_centers.shape[0] == nb_sel_suff_res
+        assert d.shape[0] == nb_sel_suff_res
+        assert q.shape[0] == nb_sel_suff_res
+        assert s.shape[0] == nb_sel_suff_res
+        assert minor.shape[0] == nb_sel_suff_res
+        assert inter.shape[0] == nb_sel_suff_res
+        assert major.shape[0] == nb_sel_suff_res
+        assert d.shape[1] == 1
+        assert q.shape[1] == 1
+        assert s.shape[1] == 1
+        assert minor.shape[1] == 1
+        assert minor.shape[2] == 3
+        assert inter.shape[1] == 1
+        assert inter.shape[2] == 3
+        assert major.shape[1] == 1
+        assert major.shape[2] == 3
     
     # Plot halo ellipticity histogram
     cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST, select = halos_select)
