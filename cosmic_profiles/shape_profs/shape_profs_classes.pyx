@@ -1041,20 +1041,18 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             self.getObjInfoBase(xyz, masses, self.getIdxCat(obj_type)[0], obj_type)
             if obj_type == 'dm':
                 nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
-                nb_shs_vec = np.array(nb_shs)
-                print_status(rank, self.start_time, "More detailed info on central subhalo catalogue. The total number of halos with > 0 SHs is {0}".format(nb_shs_vec[nb_shs_vec != 0].shape[0]))
+                print_status(rank, self.start_time, "More detailed info on central subhalo catalogue. The total number of halos with > 0 SHs is {0}".format(nb_shs[nb_shs != 0].shape[0]))
                 print_status(rank, self.start_time, "The total number of halos is {0}".format(len(nb_shs)))
                 print_status(rank, self.start_time, "The total number of SHs (subhalos) is {0}".format(len(sh_len)))
-                print_status(rank, self.start_time, "The number of halos that have no SH is {0}".format(nb_shs_vec[nb_shs_vec == 0].shape[0]))
+                print_status(rank, self.start_time, "The number of halos that have no SH is {0}".format(nb_shs[nb_shs == 0].shape[0]))
                 print_status(rank, self.start_time, "The total number of halos (CSH) that have sufficient resolution is {0}".format(len([x for x in self.getIdxCat(obj_type)[0] if x != []])))
                 del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses
             else:
                 nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST)
-                nb_shs_vec = np.array(nb_shs)
-                print_status(rank, self.start_time, "More detailed info on galaxy catalogue. The total number of halos with > 0 SHs containing star particles is {0}".format(nb_shs_vec[nb_shs_vec != 0].shape[0]))
+                print_status(rank, self.start_time, "More detailed info on galaxy catalogue. The total number of halos with > 0 SHs containing star particles is {0}".format(nb_shs[nb_shs != 0].shape[0]))
                 print_status(rank, self.start_time, "The total number of halos is {0}".format(len(nb_shs)))
                 print_status(rank, self.start_time, "The total number of SHs (subhalos) containing star particles is {0}".format(len(sh_len_gx)))
-                print_status(rank, self.start_time, "The number of halos that have no SH containing star particles is {0}".format(nb_shs_vec[nb_shs_vec == 0].shape[0]))
+                print_status(rank, self.start_time, "The number of halos that have no SH containing star particles is {0}".format(nb_shs[nb_shs == 0].shape[0]))
                 print_status(rank, self.start_time, "The number of valid gxs (after discarding low-resolution ones) is {0}.".format(np.array([0 for x in self.getIdxCat(obj_type)[0] if x != []]).shape[0]))
                 del nb_shs; del sh_len_gx; del fof_gx_sizes
                 

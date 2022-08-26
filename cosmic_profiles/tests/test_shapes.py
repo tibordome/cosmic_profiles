@@ -121,6 +121,7 @@ def test_shapes():
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(select = halos_select, reduced = False)
     
     if rank == 0:
+        nb_suff_res = halos_select[1]-halos_select[0]+1
         assert obj_masses.shape[0] == nb_suff_res
         assert obj_centers.shape[0] == nb_suff_res
         assert d.shape[0] == nb_suff_res

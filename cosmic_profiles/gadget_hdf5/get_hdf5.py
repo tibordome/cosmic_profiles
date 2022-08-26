@@ -228,35 +228,97 @@ def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
             with respect to the virial radius R_vir or the overdensity radius R_200
     :type WANT_RVIR: boolean
     :return: nb_shs (# subhalos in each FoF-halo), sh_len (size of each SH), 
-        fof_dm_sizes (size of each FoF-halo), group_r200 (R200 radius of each FoF-halo), 
+        fof_dm_sizes (size of each FoF-halo), group_r200 (R200 radius of each FoF-halo),
         fof_masses (mass of each FoF-halo)
     :rtype: float and int arrays"""
     def inner(HDF5_GROUP_DEST, WANT_RVIR):
-        fof_dm_sizes = []
-        nb_shs = []
-        sh_len = []
+        fof_dm_sizes = np.empty(0, dtype = np.int32)
+        nb_shs = np.empty(0, dtype = np.int32)
+        sh_len = np.empty(0, dtype = np.int32)
         group_r200 = np.empty(0, dtype = np.float32)
         fof_masses = np.empty(0, dtype = np.float32)
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
-        for fname in hdf5GroupFilenamesList:
-            g = h5py.File(r'{}'.format(fname), 'r')
+        nb_jobs_to_do = len(hdf5GroupFilenamesList)
+        perrank = nb_jobs_to_do//size + (nb_jobs_to_do//size == 0)*1
+        do_sth = rank <= nb_jobs_to_do-1
+        if size <= nb_jobs_to_do:
+            last = rank == size - 1 # Whether or not last process
+        else:
+            last = rank == nb_jobs_to_do - 1
+        count_fof = 0
+        count_sh = 0
+        for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
+            g = h5py.File(r'{}'.format(hdf5GroupFilenamesList[snap_run]), 'r')
             if 'Group/GroupLenType' in g:
-                to_be_appended = [np.int32(g['Group/GroupLenType'][i,1]) for i in range(g['Group/GroupLenType'].shape[0])]
+                fof_dm_sizes = np.hstack((fof_dm_sizes, np.int32([np.int32(g['Group/GroupLenType'][i,1]) for i in range(g['Group/GroupLenType'].shape[0])])))
                 if WANT_RVIR:
                     group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_TopHat200'][:]/1000)))
                 else:
                     group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_Mean200'][:]/1000)))
                 fof_masses = np.hstack((fof_masses, np.float32(g['Group/GroupMassType'][:,1])))
-                nb_shs.append([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])
-            else:
-                to_be_appended = []
+                nb_shs = np.hstack((nb_shs, np.int32([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])))
+                count_fof += g['Group/GroupLenType'].shape[0]
             if 'Subhalo/SubhaloLenType' in g:
-                sh_len.append([np.int32(g['Subhalo/SubhaloLenType'][i,1]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])
-            fof_dm_sizes.append(to_be_appended)
-        fof_dm_sizes = list(itertools.chain.from_iterable(fof_dm_sizes)) # Simple list, not nested list
-        nb_shs = list(itertools.chain.from_iterable(nb_shs))
-        sh_len = list(itertools.chain.from_iterable(sh_len))
-    
+                sh_len = np.hstack((sh_len, np.int32([np.int32(g['Subhalo/SubhaloLenType'][i,1]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])))        
+                count_sh += g['Subhalo/SubhaloLenType'].shape[0]
+        
+        count_fof_new = comm.gather(count_fof, root=0)
+        count_fof_new = comm.bcast(count_fof_new, root = 0)
+        nb_fof = np.sum(np.array(count_fof_new))
+        comm.Barrier()
+        recvcounts_fof = np.array(count_fof_new)
+        rdispls_fof = np.zeros_like(recvcounts_fof)
+        for j in range(rdispls_fof.shape[0]):
+            rdispls_fof[j] = np.sum(recvcounts_fof[:j])
+        count_sh_new = comm.gather(count_sh, root=0)
+        count_sh_new = comm.bcast(count_sh_new, root = 0)
+        nb_sh = np.sum(np.array(count_sh_new))
+        comm.Barrier()
+        recvcounts_sh = np.array(count_sh_new)
+        rdispls_sh = np.zeros_like(recvcounts_sh)
+        for j in range(rdispls_sh.shape[0]):
+            rdispls_sh[j] = np.sum(recvcounts_sh[:j])
+            
+        fof_dm_sizes_total = np.empty(nb_fof, dtype = np.int32)
+        fof_masses_total = np.empty(nb_fof, dtype = np.float32)
+        group_r200_total = np.empty(nb_fof, dtype = np.float32)
+        nb_shs_total = np.empty(nb_fof, dtype = np.int32)
+        sh_len_total = np.empty(nb_sh, dtype = np.int32)
+        
+        comm.Gatherv(fof_dm_sizes, [fof_dm_sizes_total, recvcounts_fof, rdispls_fof, MPI.INT], root = 0)
+        comm.Gatherv(fof_masses, [fof_masses_total, recvcounts_fof, rdispls_fof, MPI.FLOAT], root = 0)
+        comm.Gatherv(group_r200, [group_r200_total, recvcounts_fof, rdispls_fof, MPI.FLOAT], root = 0)
+        comm.Gatherv(nb_shs, [nb_shs_total, recvcounts_fof, rdispls_fof, MPI.INT], root = 0)
+        comm.Gatherv(sh_len, [sh_len_total, recvcounts_sh, rdispls_sh, MPI.INT], root = 0)
+        
+        pieces = 1 + (nb_fof>=3*10**8)*nb_fof//(3*10**8) # Not too high since this is a slow-down!
+        chunk = nb_fof//pieces
+        fof_dm_sizes = np.empty(0, dtype = np.int32)
+        fof_masses = np.empty(0, dtype = np.float32)
+        group_r200 = np.empty(0, dtype = np.float32)
+        nb_shs = np.empty(0, dtype = np.int32)
+        for i in range(pieces):
+            to_bcast = fof_dm_sizes_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fof-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            fof_dm_sizes = np.hstack((fof_dm_sizes, to_bcast))
+            to_bcast = fof_masses_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fof-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            fof_masses = np.hstack((fof_masses, to_bcast))
+            to_bcast = group_r200_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fof-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            group_r200 = np.hstack((group_r200, to_bcast))
+            to_bcast = nb_shs_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fof-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            nb_shs = np.hstack((nb_shs, to_bcast))
+            
+        pieces = 1 + (nb_sh>=3*10**8)*nb_sh//(3*10**8) # Not too high since this is a slow-down!
+        chunk = nb_sh//pieces
+        sh_len = np.empty(0, dtype = np.int32)
+        for i in range(pieces):
+            to_bcast = sh_len_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_sh-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            sh_len = np.hstack((sh_len, to_bcast))
+        
         return nb_shs, sh_len, fof_dm_sizes, group_r200, fof_masses
     if(not hasattr(getHDF5SHDMData, "inner")):
         getHDF5SHDMData.inner = np_cache_factory(0,0)(inner)
@@ -272,25 +334,75 @@ def getHDF5SHGxData(HDF5_GROUP_DEST):
         fof_gx_sizes (star particle size of each FoF-halo)
     :rtype: int arrays"""
     def inner(HDF5_GROUP_DEST):
-        nb_shs = []
-        fof_gx_sizes = []
-        sh_len_gx = []
+        fof_gx_sizes = np.empty(0, dtype = np.int32)
+        nb_shs = np.empty(0, dtype = np.int32)
+        sh_len = np.empty(0, dtype = np.int32)
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
-        for fname in hdf5GroupFilenamesList:
-            g = h5py.File(r'{}'.format(fname), 'r')
+        nb_jobs_to_do = len(hdf5GroupFilenamesList)
+        perrank = nb_jobs_to_do//size + (nb_jobs_to_do//size == 0)*1
+        do_sth = rank <= nb_jobs_to_do-1
+        if size <= nb_jobs_to_do:
+            last = rank == size - 1 # Whether or not last process
+        else:
+            last = rank == nb_jobs_to_do - 1
+        count_fof = 0
+        count_sh = 0
+        for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
+            g = h5py.File(r'{}'.format(hdf5GroupFilenamesList[snap_run]), 'r')
             if 'Group/GroupLenType' in g:
-                nb_shs.append([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])
-                to_be_appended = [np.int32(g['Group/GroupLenType'][i,4]) for i in range(g['Group/GroupLenType'].shape[0])]
-            else:
-                to_be_appended = []
+                fof_gx_sizes = np.hstack((fof_gx_sizes, np.int32([np.int32(g['Group/GroupLenType'][i,4]) for i in range(g['Group/GroupLenType'].shape[0])])))
+                nb_shs = np.hstack((nb_shs, np.int32([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])))
+                count_fof += g['Group/GroupLenType'].shape[0]
             if 'Subhalo/SubhaloLenType' in g:
-                sh_len_gx.append([np.int32(g['Subhalo/SubhaloLenType'][i,4]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])
-            fof_gx_sizes.append(to_be_appended)
-        nb_shs = list(itertools.chain.from_iterable(nb_shs))
-        fof_gx_sizes = list(itertools.chain.from_iterable(fof_gx_sizes)) # Simple list, not nested list
-        sh_len_gx = list(itertools.chain.from_iterable(sh_len_gx))
-    
-        return nb_shs, sh_len_gx, fof_gx_sizes
+                sh_len = np.hstack((sh_len, np.int32([np.int32(g['Subhalo/SubhaloLenType'][i,4]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])))        
+                count_sh += g['Subhalo/SubhaloLenType'].shape[0]
+        
+        count_fof_new = comm.gather(count_fof, root=0)
+        count_fof_new = comm.bcast(count_fof_new, root = 0)
+        nb_fof = np.sum(np.array(count_fof_new))
+        comm.Barrier()
+        recvcounts_fof = np.array(count_fof_new)
+        rdispls_fof = np.zeros_like(recvcounts_fof)
+        for j in range(rdispls_fof.shape[0]):
+            rdispls_fof[j] = np.sum(recvcounts_fof[:j])
+        count_sh_new = comm.gather(count_sh, root=0)
+        count_sh_new = comm.bcast(count_sh_new, root = 0)
+        nb_sh = np.sum(np.array(count_sh_new))
+        comm.Barrier()
+        recvcounts_sh = np.array(count_sh_new)
+        rdispls_sh = np.zeros_like(recvcounts_sh)
+        for j in range(rdispls_sh.shape[0]):
+            rdispls_sh[j] = np.sum(recvcounts_sh[:j])
+            
+        fof_gx_sizes_total = np.empty(nb_fof, dtype = np.int32)
+        nb_shs_total = np.empty(nb_fof, dtype = np.int32)
+        sh_len_total = np.empty(nb_sh, dtype = np.int32)
+        
+        comm.Gatherv(fof_gx_sizes, [fof_gx_sizes_total, recvcounts_fof, rdispls_fof, MPI.INT], root = 0)
+        comm.Gatherv(nb_shs, [nb_shs_total, recvcounts_fof, rdispls_fof, MPI.INT], root = 0)
+        comm.Gatherv(sh_len, [sh_len_total, recvcounts_sh, rdispls_sh, MPI.INT], root = 0)
+        
+        pieces = 1 + (nb_fof>=3*10**8)*nb_fof//(3*10**8) # Not too high since this is a slow-down!
+        chunk = nb_fof//pieces
+        fof_gx_sizes = np.empty(0, dtype = np.int32)
+        nb_shs = np.empty(0, dtype = np.int32)
+        for i in range(pieces):
+            to_bcast = fof_gx_sizes_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fof-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            fof_gx_sizes = np.hstack((fof_gx_sizes, to_bcast))
+            to_bcast = nb_shs_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_fof-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            nb_shs = np.hstack((nb_shs, to_bcast))
+            
+        pieces = 1 + (nb_sh>=3*10**8)*nb_sh//(3*10**8) # Not too high since this is a slow-down!
+        chunk = nb_sh//pieces
+        sh_len = np.empty(0, dtype = np.int32)
+        for i in range(pieces):
+            to_bcast = sh_len_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_sh-pieces*chunk)]
+            comm.Bcast(to_bcast, root=0)
+            sh_len = np.hstack((sh_len, to_bcast))
+        
+        return nb_shs, sh_len, fof_gx_sizes
     if(not hasattr(getHDF5SHGxData, "inner")):
         getHDF5SHGxData.inner = np_cache_factory(0,0)(inner)
     getHDF5SHGxData.inner(HDF5_GROUP_DEST)

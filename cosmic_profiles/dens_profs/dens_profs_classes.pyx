@@ -285,7 +285,7 @@ cdef class DensProfsHDF5(CosmicBase):
             nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
             print_status(rank,self.start_time,"Gotten getHDF5SHDMData")
             # Construct catalogue
-            h_cat, h_r200, h_size = calcCSHCat(np.array(nb_shs), np.array(sh_len), np.array(fof_dm_sizes), group_r200, halo_masses, self.MIN_NUMBER_PTCS)
+            h_cat, h_r200, h_size = calcCSHCat(nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, self.MIN_NUMBER_PTCS)
             print_status(rank,self.start_time,"Gotten calcCSHCat")
             self.r200 = h_r200
             del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses; del h_r200
@@ -295,13 +295,13 @@ cdef class DensProfsHDF5(CosmicBase):
                 # Import hdf5 data
                 nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
                 # Construct catalogue
-                h_cat, h_r200, h_pass = calcCSHCat(np.array(nb_shs), np.array(sh_len), np.array(fof_dm_sizes), group_r200, halo_masses, self.MIN_NUMBER_PTCS)
+                h_cat, h_r200, h_pass = calcCSHCat(nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, self.MIN_NUMBER_PTCS)
                 self.r200 = h_r200
                 del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del h_cat; del halo_masses; del h_r200
             # Import hdf5 data
             nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST)
             # Construct catalogue
-            gx_cat, gx_size = calcGxCat(np.array(nb_shs), np.array(sh_len_gx), np.array(fof_gx_sizes), self.MIN_NUMBER_STAR_PTCS)
+            gx_cat, gx_size = calcGxCat(nb_shs, sh_len_gx, fof_gx_sizes, self.MIN_NUMBER_STAR_PTCS)
             del nb_shs; del sh_len_gx; del fof_gx_sizes
             return gx_cat, gx_size
     
