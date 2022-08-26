@@ -70,7 +70,7 @@ cdef class DensProfs(CosmicBase):
             obj_size: number of particles in each object
         :rtype: (N1, N3) integers and (N1,) integers"""
         if rank == 0:
-            return self.idx_cat, self.obj_size
+            return self.idx_cat.base, self.obj_size.base
         else:
             return None, None
     
@@ -82,7 +82,7 @@ cdef class DensProfs(CosmicBase):
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
         if rank == 0:
-            centers, ms = self.getMassesCentersBase(self.xyz.base, self.masses.base, self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], self.MIN_NUMBER_PTCS)
+            centers, ms = self.getMassesCentersBase(self.xyz.base, self.masses.base, self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.MIN_NUMBER_PTCS)
             return centers, ms
         else:
             return None, None
@@ -109,9 +109,9 @@ cdef class DensProfs(CosmicBase):
             return None
         if rank == 0:
             if direct_binning:
-                dens_profs = self.getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], np.float32(ROverR200))
+                dens_profs = self.getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
             else:
-                dens_profs = self.getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat[select[0]:select[1]+1], self.obj_size[select[0]:select[1]+1], np.float32(ROverR200))
+                dens_profs = self.getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
             return dens_profs
         else:
             return None

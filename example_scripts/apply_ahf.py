@@ -183,7 +183,11 @@ def AHFEx():
     
     ############## Run cosmic_profiles: define DensShapeProfs object ############################################
     cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
-    h_idx_cat_len = len(cprofiles.getIdxCat())
+    if rank == 0:
+        h_idx_cat_len = len(cprofiles.getIdxCat())
+    else:
+        h_idx_cat_len = None
+    h_idx_cat_len = comm.bcast(h_idx_cat_len, root = 0)
     halos_select = [0, h_idx_cat_len//2]
     
     ############## Create local halo shape catalogue ############################################################

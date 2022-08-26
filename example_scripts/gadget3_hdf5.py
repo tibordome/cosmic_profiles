@@ -38,11 +38,17 @@ HIST_NB_BINS = 11 # Number of bins used for e.g. ellipticity histogram
 frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf. plotLocalTHist())
 
 def HDF5Ex():
-
+    
     # Define DensShapeProfsHDF5 object
     cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, WANT_RVIR)
-    h_idx_cat_len = len(cprofiles.getIdxCat(obj_type = 'dm'))
-    gx_idx_cat_len = len(cprofiles.getIdxCat(obj_type = 'gx'))
+    if rank == 0:
+        h_idx_cat_len = len(cprofiles.getIdxCat(obj_type = 'dm'))
+        gx_idx_cat_len = len(cprofiles.getIdxCat(obj_type = 'gx'))
+    else:
+        h_idx_cat_len = None
+        gx_idx_cat_len = None
+    h_idx_cat_len = comm.bcast(h_idx_cat_len, root = 0)
+    gx_idx_cat_len = comm.bcast(gx_idx_cat_len, root = 0)
     halos_select = [0, h_idx_cat_len//2]
     gx_select = [0, gx_idx_cat_len//2]
     
