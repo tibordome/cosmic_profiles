@@ -184,7 +184,7 @@ cdef class DensShapeProfs(DensProfs):
                     center = centers[obj_number]
                     obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
                     masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
-                    for idx, ptc in enumerate(self.idx_cat.base[obj_number]):
+                    for idx, ptc in enumerate(self.idx_cat.base[obj_number,:self.obj_size[obj_number]]):
                         obj[idx] = self.xyz.base[ptc]
                         masses_obj[idx] = self.masses.base[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
@@ -269,7 +269,7 @@ cdef class DensShapeProfs(DensProfs):
                     center = centers[obj_number]
                     obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
                     masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
-                    for idx, ptc in enumerate(self.idx_cat.base[obj_number]):
+                    for idx, ptc in enumerate(self.idx_cat.base[obj_number,:self.obj_size[obj_number]]):
                         obj[idx] = self.xyz.base[ptc]
                         masses_obj[idx] = self.masses.base[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
@@ -669,9 +669,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                     q_obj = q[obj_number]
                     s_obj = s[obj_number]
                     center = centers[obj_number]
-                    obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),3), dtype = np.float32)
-                    masses_obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),), dtype = np.float32)
-                    for idx, ptc in enumerate(self.getIdxCat(obj_type)[0][obj_number]):
+                    obj = np.zeros((self.getIdxCat(obj_type)[1][obj_number],3), dtype = np.float32)
+                    masses_obj = np.zeros((self.getIdxCat(obj_type)[1][obj_number],), dtype = np.float32)
+                    for idx, ptc in enumerate(self.getIdxCat(obj_type)[0][obj_number,:self.getIdxCat(obj_type)[1][obj_number]]):
                         obj[idx] = xyz[ptc]
                         masses_obj[idx] = masses[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
@@ -761,9 +761,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                     q_obj = q[obj_number]
                     s_obj = s[obj_number]
                     center = centers[obj_number]
-                    obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),3), dtype = np.float32)
-                    masses_obj = np.zeros((len(self.getIdxCat(obj_type)[0][obj_number]),), dtype = np.float32)
-                    for idx, ptc in enumerate(self.getIdxCat(obj_type)[0][obj_number]):
+                    obj = np.zeros((self.getIdxCat(obj_type)[1][obj_number],3), dtype = np.float32)
+                    masses_obj = np.zeros((self.getIdxCat(obj_type)[1][obj_number],), dtype = np.float32)
+                    for idx, ptc in enumerate(self.getIdxCat(obj_type)[0][obj_number,:self.getIdxCat(obj_type)[1][obj_number]]):
                         obj[idx] = xyz[ptc]
                         masses_obj[idx] = masses[ptc]
                     obj = respectPBCNoRef(obj, self.L_BOX)
