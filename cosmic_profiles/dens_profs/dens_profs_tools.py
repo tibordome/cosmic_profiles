@@ -163,13 +163,13 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
         for group in range(len(obj_m_groups)):
             obj_pass_m = np.int32([1 if (obj_masses[i]*MASS_UNIT > max_min_m[group] and obj_masses[i]*MASS_UNIT < max_min_m[group+1]) else 0 for i in range(r200s.shape[0])])
             # Find profile median
-            y = [list(dens_profs[:,i]) for i in range(ROverR200.shape[0])]
+            y = [list(dens_profs[np.nonzero(obj_pass_m > 0)[0],i]) for i in range(ROverR200.shape[0])]
             prof_median = np.array([np.median(z) if z != [] else np.nan for z in y])
             err_low = np.array([np.quantile(np.array(z), 0.25)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
             err_high = np.array([np.quantile(np.array(z), 0.75)/(np.sqrt(len(z))) if z != [] else np.nan for z in y])
             r200_m = np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]])
             # Prepare median for fitting
-            y = [list(dens_profs_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
+            y = [list(dens_profs_fit[np.nonzero(obj_pass_m > 0)[0],i]) for i in range(ROverR200_fit.shape[0])]
             prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
             best_fit_m, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200_m, 0))
             best_fit_m_dict = getModelParsDict(best_fit_m, method)
