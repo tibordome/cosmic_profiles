@@ -278,32 +278,38 @@ cdef class DensProfsHDF5(CosmicBase):
             obj_size: number of particles in each object
         :rtype: (N1, N3) integers and (N1,) integers"""
         
-        if rank != 0:
-            return None, None
         if obj_type == 'dm':
             # Import hdf5 data
             nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
-            print_status(rank,self.start_time,"Gotten getHDF5SHDMData")
-            # Construct catalogue
-            h_cat, h_r200, h_size = calcCSHCat(nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, self.MIN_NUMBER_PTCS)
-            print_status(rank,self.start_time,"Gotten calcCSHCat")
-            self.r200 = h_r200
-            del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses; del h_r200
-            return h_cat, h_size
+            if rank == 0:
+                # Construct catalogue
+                h_cat, h_r200, h_size = calcCSHCat(nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, self.MIN_NUMBER_PTCS)
+                self.r200 = h_r200
+                del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses
+                return h_cat, h_size
+            else:
+                del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses
+                return None, None
         else:
             if self.r200 is None:
                 # Import hdf5 data
                 nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses = getHDF5SHDMData(self.HDF5_GROUP_DEST, self.WANT_RVIR)
-                # Construct catalogue
-                h_cat, h_r200, h_pass = calcCSHCat(nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, self.MIN_NUMBER_PTCS)
-                self.r200 = h_r200
-                del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del h_cat; del halo_masses; del h_r200
+                if rank == 0:
+                    # Construct catalogue
+                    h_cat, h_r200, h_pass = calcCSHCat(nb_shs, sh_len, fof_dm_sizes, group_r200, halo_masses, self.MIN_NUMBER_PTCS)
+                    self.r200 = h_r200
+                    del h_cat; del h_pass
+                del nb_shs; del sh_len; del fof_dm_sizes; del group_r200; del halo_masses
             # Import hdf5 data
             nb_shs, sh_len_gx, fof_gx_sizes = getHDF5SHGxData(self.HDF5_GROUP_DEST)
-            # Construct catalogue
-            gx_cat, gx_size = calcGxCat(nb_shs, sh_len_gx, fof_gx_sizes, self.MIN_NUMBER_STAR_PTCS)
-            del nb_shs; del sh_len_gx; del fof_gx_sizes
-            return gx_cat, gx_size
+            if rank == 0:
+                # Construct catalogue
+                gx_cat, gx_size = calcGxCat(nb_shs, sh_len_gx, fof_gx_sizes, self.MIN_NUMBER_STAR_PTCS)
+                del nb_shs; del sh_len_gx; del fof_gx_sizes
+                return gx_cat, gx_size
+            else:
+                del nb_shs; del sh_len_gx; del fof_gx_sizes
+                return None, None
     
     def getMassesCenters(self, list select, str obj_type = 'dm'):
         """ Calculate total mass and centers of objects
@@ -315,9 +321,12 @@ cdef class DensProfsHDF5(CosmicBase):
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
+        idx_cat, obj_size = self.getIdxCat(obj_type)
         if rank == 0:
-            centers, ms = self.getMassesCentersBase(xyz, masses, self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1])
-            del xyz; del masses
+            idx_cat_len = len(idx_cat)
+            isValidSelection(select, idx_cat_len)
+            centers, ms = self.getMassesCentersBase(xyz, masses, idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1])
+            del xyz; del masses; del idx_cat; del obj_size
             return centers, ms
         else:
             del xyz; del masses
@@ -345,16 +354,15 @@ cdef class DensProfsHDF5(CosmicBase):
             print_status(rank,self.start_time,'DensProfsHDF5 objects cannot call estDensProfs(ROverR200, spherical) with spherical == False. Use DensShapeProfs instead.')
             return None
         xyz, masses, MIN_NUMBER_PTCS = self.getXYZMasses(obj_type)
-        print_status(rank,self.start_time,"Gotten xyz etc")
+        idx_cat, obj_size = self.getIdxCat(obj_type)
         if rank == 0:
-            idx_cat_len = self.getIdxCat(obj_type)[0].shape[0]
-            print_status(rank,self.start_time,"Gotten idx_cat")
+            idx_cat_len = len(idx_cat)
             isValidSelection(select, idx_cat_len)
+        if rank == 0:
             if direct_binning:
-                dens_profs = self.getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], np.float32(ROverR200))
+                dens_profs = self.getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             else:
-                dens_profs = self.getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], self.getIdxCat(obj_type)[0][select[0]:select[1]+1], self.getIdxCat(obj_type)[1][select[0]:select[1]+1], np.float32(ROverR200))
-            print_status(rank,self.start_time,"Finished dens_profs estimation")
+                dens_profs = self.getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             del xyz; del masses
             return dens_profs
         else:
