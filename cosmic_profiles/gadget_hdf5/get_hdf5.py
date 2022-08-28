@@ -251,7 +251,7 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
             g = h5py.File(r'{}'.format(hdf5GroupFilenamesList[snap_run]), 'r')
             if 'Group/GroupLenType' in g:
-                fof_sizes = np.hstack((fof_sizes, np.int32([np.int32(g['Group/GroupLenType'][i,1]) for i in range(g['Group/GroupLenType'].shape[0])])))
+                fof_sizes = np.hstack((fof_sizes, np.int32([np.int32(g['Group/GroupLenType'][i,PART_TYPE]) for i in range(g['Group/GroupLenType'].shape[0])])))
                 if RVIR_OR_R200 == 'Rvir':
                     group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_TopHat200'][:]/1000)))
                 elif RVIR_OR_R200 == 'R200':
@@ -261,7 +261,7 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
                 nb_shs = np.hstack((nb_shs, np.int32([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])))
                 count_fof += g['Group/GroupLenType'].shape[0]
             if 'Subhalo/SubhaloLenType' in g:
-                sh_len = np.hstack((sh_len, np.int32([np.int32(g['Subhalo/SubhaloLenType'][i,1]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])))        
+                sh_len = np.hstack((sh_len, np.int32([np.int32(g['Subhalo/SubhaloLenType'][i,PART_TYPE]) for i in range(g['Subhalo/SubhaloLenType'].shape[0])])))        
                 count_sh += g['Subhalo/SubhaloLenType'].shape[0]
         
         count_fof_new = comm.gather(count_fof, root=0)
@@ -321,14 +321,17 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
     getHDF5SHData.inner(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE)
     return getHDF5SHData.inner(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE)
 
-def getHDF5DMData(HDF5_SNAP_DEST):
+def getHDF5ObjData(HDF5_SNAP_DEST, PART_TYPE):
     """ Retrieve DM HDF5 data from the simulation box
         
     :param HDF5_SNAP_DEST: path to snapshot, particle data
     :type HDF5_SNAP_DEST: string
-    :return: dm_xyz (DM ptc positions), dm_masses (mass of each DM ptc),
-        dm_velxyz (velocity of each DM ptc)
-    :rtype: float and int arrays"""
+    :param PART_TYPE: which simulation particles to consider, 0 for gas, 1 for DM,
+        4 for stars
+    :type PART_TYPE: int
+    :return: obj_xyz (ptc positions), obj_masses (mass of each ptc),
+        obj_velxyz (velocity of each ptc)
+    :rtype: float arrays"""
     def inner(HDF5_SNAP_DEST):
         dm_x = np.empty(0, dtype = np.float32)
         dm_y = np.empty(0, dtype = np.float32)
@@ -348,14 +351,17 @@ def getHDF5DMData(HDF5_SNAP_DEST):
             last = rank == nb_jobs_to_do - 1
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
             f = h5py.File(r'{}'.format(hdf5SnapFilenamesList[snap_run]), 'r')
-            dm_x = np.hstack((dm_x, np.float32(f['PartType1/Coordinates'][:,0]/1000))) # in Mpc = 3.085678e+27 cm
-            dm_y = np.hstack((dm_y, np.float32(f['PartType1/Coordinates'][:,1]/1000)))
-            dm_z = np.hstack((dm_z, np.float32(f['PartType1/Coordinates'][:,2]/1000)))
-            dm_velx = np.hstack((dm_velx, np.float32(f['PartType1/Velocities'][:,0]))) # in km/s
-            dm_vely = np.hstack((dm_vely, np.float32(f['PartType1/Velocities'][:,1])))
-            dm_velz = np.hstack((dm_velz, np.float32(f['PartType1/Velocities'][:,2])))
-            dm_masses = np.hstack((dm_masses, np.ones((f['PartType1/Coordinates'][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]))) # in 1.989e+43 g
-            count += f['PartType1/Coordinates'][:].shape[0]
+            dm_x = np.hstack((dm_x, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,0]/1000))) # in Mpc = 3.085678e+27 cm
+            dm_y = np.hstack((dm_y, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,1]/1000)))
+            dm_z = np.hstack((dm_z, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,2]/1000)))
+            dm_velx = np.hstack((dm_velx, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,0]))) # in km/s
+            dm_vely = np.hstack((dm_vely, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,1])))
+            dm_velz = np.hstack((dm_velz, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,2])))
+            if PART_TYPE == 1:
+                dm_masses = np.hstack((dm_masses, np.ones((f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]))) # in 1.989e+43 g
+            else:
+                dm_masses = np.hstack((dm_masses, np.float32(f['PartType{0}/Masses'.format(PART_TYPE)][:]))) # in 1.989e+43 g
+            count += f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0]
         count_new = comm.gather(count, root=0)
         count_new = comm.bcast(count_new, root = 0)
         nb_dm_ptcs = np.sum(np.array(count_new))
@@ -416,7 +422,7 @@ def getHDF5DMData(HDF5_SNAP_DEST):
         dm_velxyz = np.hstack((np.reshape(dm_velx, (dm_velx.shape[0],1)), np.reshape(dm_vely, (dm_vely.shape[0],1)), np.reshape(dm_velz, (dm_velz.shape[0],1))))
     
         return dm_xyz, dm_masses, dm_velxyz
-    if(not hasattr(getHDF5DMData, "inner")):
-        getHDF5DMData.inner = np_cache_factory(0,0)(inner)
-    getHDF5DMData.inner(HDF5_SNAP_DEST)
-    return getHDF5DMData.inner(HDF5_SNAP_DEST)
+    if(not hasattr(getHDF5ObjData, "inner")):
+        getHDF5ObjData.inner = np_cache_factory(0,0)(inner)
+    getHDF5ObjData.inner(HDF5_SNAP_DEST, PART_TYPE)
+    return getHDF5ObjData.inner(HDF5_SNAP_DEST, PART_TYPE)

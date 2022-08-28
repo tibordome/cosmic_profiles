@@ -6,7 +6,7 @@ import numpy as np
 from cosmic_profiles.common.cosmic_base_class cimport CosmicBase
 from cosmic_profiles.common.python_routines import print_status, isValidSelection
 from cosmic_profiles.dens_profs.dens_profs_tools import drawDensProfs
-from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5GxData, getHDF5SHData, getHDF5ObjData
+from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5SHData, getHDF5ObjData
 from cosmic_profiles.gadget_hdf5.gen_catalogues import calcObjCat
 import time
 from mpi4py import MPI
@@ -237,7 +237,7 @@ cdef class DensProfsHDF5(CosmicBase):
         elif self.OBJ_TYPE == 'stars':
             return 4
         else:
-            assert self.OBJ_TYPE == 'gas'
+            assert self.OBJ_TYPE == 'gas', "Please specify either 'dm', 'gas' or 'stars' for OBJ_TYPE"
             return 0
         
     def getXYZMasses(self):
