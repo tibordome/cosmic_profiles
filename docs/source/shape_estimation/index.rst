@@ -66,7 +66,10 @@ To calculate shape profiles with *Cosmic Profiles*, let us assume we are dealing
     # Instantiate object
     cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE)
 
-with arguments explained in detail in :ref:`the code reference<Cosmic Profiles Code Reference>` but summarized here for completeness:
+with arguments explained in detail in :ref:`the code reference<Cosmic Profiles Code Reference>` but summarized here for completeness.
+
+.. dropdown:: User Parameters
+
   * ``HDF5_GROUP_DEST`` and ``HDF5_SNAP_DEST``: path to simulation snapshot
   * ``D_LOGSTART`` and ``D_LOGEND``: logarithm of minimum and maximum ellipsoidal radius of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo
   * ``D_BINS``: number of bins to consider for shape profiling 
@@ -122,16 +125,18 @@ For post-processing purposes, one can dump the converged shape profiles in a des
     
     cprofiles.dumpShapeCatLocal(CAT_DEST, select = [0, 9], reduced = False, shell_based = False),
 
-where ``CAT_DEST`` is a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. '/path/to/cat'. The files added are
+where ``CAT_DEST`` is a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. '/path/to/cat'.
 
-* ``d_local_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): ellipsoidal radii
-* ``q_local_x.txt`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): q shape parameter
-* ``s_local_x.txt`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): s shape parameter
-* ``minor_local_x.txt`` of shape (:math:`N_{\text{pass}}`, (``D_BINS`` + 1) * 3): minor axes vs :math:`r_{\text{ell}}`, have to apply ``minor_local_x.reshape(minor_local_x.shape[0], minor_local_x.shape[1]//3, 3)`` after loading with np.loadtxt()
-* ``inter_local_x.txt`` of shape (:math:`N_{\text{pass}}`, (``D_BINS`` + 1) * 3): intermediate axes vs :math:`r_{\text{ell}}`, same here
-* ``major_local_x.txt`` of shape (:math:`N_{\text{pass}}`, (``D_BINS`` + 1) * 3): major axes vs :math:`r_{\text{ell}}`, same here
-* ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
-* ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
+.. dropdown:: Shape Profiles, Dumped Files
+
+    * ``d_local_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): ellipsoidal radii
+    * ``q_local_x.txt`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): q shape parameter
+    * ``s_local_x.txt`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): s shape parameter
+    * ``minor_local_x.txt`` of shape (:math:`N_{\text{pass}}`, (``D_BINS`` + 1) * 3): minor axes vs :math:`r_{\text{ell}}`, have to apply ``minor_local_x.reshape(minor_local_x.shape[0], minor_local_x.shape[1]//3, 3)`` after loading with np.loadtxt()
+    * ``inter_local_x.txt`` of shape (:math:`N_{\text{pass}}`, (``D_BINS`` + 1) * 3): intermediate axes vs :math:`r_{\text{ell}}`, same here
+    * ``major_local_x.txt`` of shape (:math:`N_{\text{pass}}`, (``D_BINS`` + 1) * 3): major axes vs :math:`r_{\text{ell}}`, same here
+    * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
+    * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
 .. note:: In case of a Gadget-style HDF5 snapshot output, specify ``OBJ_TYPE = 'dm'`` to calculate local dark matter halo shapes (only the dark matter component of halos), ``OBJ_TYPE = 'gas'`` to calculate the local shapes of gas particles inside halos and ``OBJ_TYPE = 'stars'`` to calculate the local shapes of star particles inside halos. The suffix of the output files will be modified accordingly to e.g. ``d_local_gas_x.txt``.
 
@@ -147,16 +152,18 @@ If a global shape calculations does not converge (which is rare), the correspond
 
     cprofiles.dumpShapeCatGlobal(CAT_DEST, reduced = False),
 
-which will add the following files to the destination folder:
+which will some files to the destination folder.
 
-* ``d_global_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
-* ``q_global_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter
-* ``s_global_x.txt`` of shape (:math:`N_{\text{pass}}`,): s shape parameter
-* ``minor_global_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): minor axis
-* ``inter_global_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): intermediate axis
-* ``major_global_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): major axis
-* ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
-* ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
+.. dropdown:: Global Shapes, Dumped Files
+
+    * ``d_global_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
+    * ``q_global_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter
+    * ``s_global_x.txt`` of shape (:math:`N_{\text{pass}}`,): s shape parameter
+    * ``minor_global_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): minor axis
+    * ``inter_global_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): intermediate axis
+    * ``major_global_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): major axis
+    * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
+    * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
 .. note:: As previously, :math:`N_{\text{pass}}` denotes the number of halos that have been selected with the ``select`` argument *and* pass the ``MIN_NUMBER_PTCS``-threshold. If the global shape determination for a sufficiently resolved object does not converge, it will appear as NaNs in the output.
 
@@ -168,16 +175,18 @@ For Gadget-style HDF5 snapshot outputs one can calculate the velocity dispersion
 
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatVelLocal(select = [0, 9], reduced = False, shell_based = False)
 
-for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(select = [0, 9], reduced = False)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(CAT_DEST, select = [0, 9], reduced = False)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``CAT_DEST``:
+for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(select = [0, 9], reduced = False)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(CAT_DEST, select = [0, 9], reduced = False)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``CAT_DEST``.
 
-* ``d_global_vdm_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
-* ``q_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter
-* ``s_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): s shape parameter
-* ``minor_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): minor axis
-* ``inter_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): intermediate axis
-* ``major_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): major axis
-* ``m_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
-* ``centers_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
+.. dropdown:: Velocity Shapes, Dumped Files
+
+    * ``d_global_vdm_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
+    * ``q_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter
+    * ``s_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): s shape parameter
+    * ``minor_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): minor axis
+    * ``inter_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): intermediate axis
+    * ``major_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`, 3): major axis
+    * ``m_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
+    * ``centers_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
 The ``cprofiles.dumpShapeCatVelLocal(CAT_DEST, select = [0, 9], reduced = False)`` command will dump files named ``d_local_vdm_x.txt`` etc.
 
