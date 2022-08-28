@@ -7,6 +7,7 @@ import h5py
 from cosmic_profiles.common.caching import np_cache_factory
 import glob
 from mpi4py import MPI
+import re
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
@@ -37,7 +38,11 @@ def getHDF5Data(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
         nb_shs = []
         sh_len = []
         hdf5SnapFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_SNAP_DEST))
+        snapfile_argsort = np.argsort(np.array([np.int32(re.split('(\d+)', file)[-4]) for file in hdf5SnapFilenamesList]))
+        hdf5SnapFilenamesList = np.array(hdf5SnapFilenamesList)[snapfile_argsort]
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
+        groupfile_argsort = np.argsort(np.array([np.int32(re.split('(\d+)', file)[-4]) for file in hdf5GroupFilenamesList]))
+        hdf5GroupFilenamesList = np.array(hdf5GroupFilenamesList)[groupfile_argsort]
         for fname in hdf5GroupFilenamesList:
             g = h5py.File(r'{}'.format(fname), 'r')
             if 'Group/GroupLenType' in g:
@@ -100,6 +105,8 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
         
         # Snap data
         hdf5SnapFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_SNAP_DEST))
+        snapfile_argsort = np.argsort(np.array([np.int32(re.split('(\d+)', file)[-4]) for file in hdf5SnapFilenamesList]))
+        hdf5SnapFilenamesList = np.array(hdf5SnapFilenamesList)[snapfile_argsort]
         nb_jobs_to_do = len(hdf5SnapFilenamesList)
         perrank = nb_jobs_to_do//size + (nb_jobs_to_do//size == 0)*1
         do_sth = rank <= nb_jobs_to_do-1
@@ -225,7 +232,7 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
     :type HDF5_GROUP_DEST: string
     :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
-            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
+        with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
     :type RVIR_OR_R200: str
     :param PART_TYPE: which simulation particles to consider, 0 for gas, 1 for DM,
         4 for stars
@@ -239,6 +246,8 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
         sh_len = np.empty(0, dtype = np.int32)
         group_r200 = np.empty(0, dtype = np.float32)
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
+        groupfile_argsort = np.argsort(np.array([np.int32(re.split('(\d+)', file)[-4]) for file in hdf5GroupFilenamesList]))
+        hdf5GroupFilenamesList = np.array(hdf5GroupFilenamesList)[groupfile_argsort]
         nb_jobs_to_do = len(hdf5GroupFilenamesList)
         perrank = nb_jobs_to_do//size + (nb_jobs_to_do//size == 0)*1
         do_sth = rank <= nb_jobs_to_do-1
@@ -332,15 +341,17 @@ def getHDF5ObjData(HDF5_SNAP_DEST, PART_TYPE):
     :return: obj_xyz (ptc positions), obj_masses (mass of each ptc),
         obj_velxyz (velocity of each ptc)
     :rtype: float arrays"""
-    def inner(HDF5_SNAP_DEST):
-        dm_x = np.empty(0, dtype = np.float32)
-        dm_y = np.empty(0, dtype = np.float32)
-        dm_z = np.empty(0, dtype = np.float32)
-        dm_velx = np.empty(0, dtype = np.float32)
-        dm_vely = np.empty(0, dtype = np.float32)
-        dm_velz = np.empty(0, dtype = np.float32)
-        dm_masses = np.empty(0, dtype = np.float32)
+    def inner(HDF5_SNAP_DEST, PART_TYPE):
+        obj_x = np.empty(0, dtype = np.float32)
+        obj_y = np.empty(0, dtype = np.float32)
+        obj_z = np.empty(0, dtype = np.float32)
+        obj_velx = np.empty(0, dtype = np.float32)
+        obj_vely = np.empty(0, dtype = np.float32)
+        obj_velz = np.empty(0, dtype = np.float32)
+        obj_masses = np.empty(0, dtype = np.float32)
         hdf5SnapFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_SNAP_DEST))
+        snapfile_argsort = np.argsort(np.array([np.int32(re.split('(\d+)', file)[-4]) for file in hdf5SnapFilenamesList]))
+        hdf5SnapFilenamesList = np.array(hdf5SnapFilenamesList)[snapfile_argsort]
         nb_jobs_to_do = len(hdf5SnapFilenamesList)
         perrank = nb_jobs_to_do//size + (nb_jobs_to_do//size == 0)*1
         do_sth = rank <= nb_jobs_to_do-1
@@ -351,77 +362,77 @@ def getHDF5ObjData(HDF5_SNAP_DEST, PART_TYPE):
             last = rank == nb_jobs_to_do - 1
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
             f = h5py.File(r'{}'.format(hdf5SnapFilenamesList[snap_run]), 'r')
-            dm_x = np.hstack((dm_x, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,0]/1000))) # in Mpc = 3.085678e+27 cm
-            dm_y = np.hstack((dm_y, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,1]/1000)))
-            dm_z = np.hstack((dm_z, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,2]/1000)))
-            dm_velx = np.hstack((dm_velx, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,0]))) # in km/s
-            dm_vely = np.hstack((dm_vely, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,1])))
-            dm_velz = np.hstack((dm_velz, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,2])))
+            obj_x = np.hstack((obj_x, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,0]/1000))) # in Mpc = 3.085678e+27 cm
+            obj_y = np.hstack((obj_y, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,1]/1000)))
+            obj_z = np.hstack((obj_z, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,2]/1000)))
+            obj_velx = np.hstack((obj_velx, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,0]))) # in km/s
+            obj_vely = np.hstack((obj_vely, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,1])))
+            obj_velz = np.hstack((obj_velz, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,2])))
             if PART_TYPE == 1:
-                dm_masses = np.hstack((dm_masses, np.ones((f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]))) # in 1.989e+43 g
+                obj_masses = np.hstack((obj_masses, np.ones((f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]))) # in 1.989e+43 g
             else:
-                dm_masses = np.hstack((dm_masses, np.float32(f['PartType{0}/Masses'.format(PART_TYPE)][:]))) # in 1.989e+43 g
+                obj_masses = np.hstack((obj_masses, np.float32(f['PartType{0}/Masses'.format(PART_TYPE)][:]))) # in 1.989e+43 g
             count += f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0]
         count_new = comm.gather(count, root=0)
         count_new = comm.bcast(count_new, root = 0)
-        nb_dm_ptcs = np.sum(np.array(count_new))
+        nb_obj_ptcs = np.sum(np.array(count_new))
         comm.Barrier()
         recvcounts = np.array(count_new)
         rdispls = np.zeros_like(recvcounts)
         for j in range(rdispls.shape[0]):
             rdispls[j] = np.sum(recvcounts[:j])
-        dm_x_total = np.empty(nb_dm_ptcs, dtype = np.float32)
-        dm_y_total = np.empty(nb_dm_ptcs, dtype = np.float32)
-        dm_z_total = np.empty(nb_dm_ptcs, dtype = np.float32)
-        dm_velx_total = np.empty(nb_dm_ptcs, dtype = np.float32)
-        dm_vely_total = np.empty(nb_dm_ptcs, dtype = np.float32)
-        dm_velz_total = np.empty(nb_dm_ptcs, dtype = np.float32)
-        dm_masses_total = np.empty(nb_dm_ptcs, dtype = np.float32)
+        obj_x_total = np.empty(nb_obj_ptcs, dtype = np.float32)
+        obj_y_total = np.empty(nb_obj_ptcs, dtype = np.float32)
+        obj_z_total = np.empty(nb_obj_ptcs, dtype = np.float32)
+        obj_velx_total = np.empty(nb_obj_ptcs, dtype = np.float32)
+        obj_vely_total = np.empty(nb_obj_ptcs, dtype = np.float32)
+        obj_velz_total = np.empty(nb_obj_ptcs, dtype = np.float32)
+        obj_masses_total = np.empty(nb_obj_ptcs, dtype = np.float32)
         
-        comm.Gatherv(dm_x, [dm_x_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
-        comm.Gatherv(dm_y, [dm_y_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
-        comm.Gatherv(dm_z, [dm_z_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
-        comm.Gatherv(dm_velx, [dm_velx_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
-        comm.Gatherv(dm_vely, [dm_vely_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
-        comm.Gatherv(dm_velz, [dm_velz_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
-        comm.Gatherv(dm_masses, [dm_masses_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+        comm.Gatherv(obj_x, [obj_x_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+        comm.Gatherv(obj_y, [obj_y_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+        comm.Gatherv(obj_z, [obj_z_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+        comm.Gatherv(obj_velx, [obj_velx_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+        comm.Gatherv(obj_vely, [obj_vely_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+        comm.Gatherv(obj_velz, [obj_velz_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
+        comm.Gatherv(obj_masses, [obj_masses_total, recvcounts, rdispls, MPI.FLOAT], root = 0)
         
-        pieces = 1 + (nb_dm_ptcs>=3*10**8)*nb_dm_ptcs//(3*10**8) # Not too high since this is a slow-down!
-        chunk = nb_dm_ptcs//pieces
-        dm_x = np.empty(0, dtype = np.float32)
-        dm_y = np.empty(0, dtype = np.float32)
-        dm_z = np.empty(0, dtype = np.float32)
-        dm_velx = np.empty(0, dtype = np.float32)
-        dm_vely = np.empty(0, dtype = np.float32)
-        dm_velz = np.empty(0, dtype = np.float32)
-        dm_masses = np.empty(0, dtype = np.float32)
+        pieces = 1 + (nb_obj_ptcs>=3*10**8)*nb_obj_ptcs//(3*10**8) # Not too high since this is a slow-down!
+        chunk = nb_obj_ptcs//pieces
+        obj_x = np.empty(0, dtype = np.float32)
+        obj_y = np.empty(0, dtype = np.float32)
+        obj_z = np.empty(0, dtype = np.float32)
+        obj_velx = np.empty(0, dtype = np.float32)
+        obj_vely = np.empty(0, dtype = np.float32)
+        obj_velz = np.empty(0, dtype = np.float32)
+        obj_masses = np.empty(0, dtype = np.float32)
         for i in range(pieces):
-            to_bcast = dm_x_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_dm_ptcs-pieces*chunk)]
+            to_bcast = obj_x_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_obj_ptcs-pieces*chunk)]
             comm.Bcast(to_bcast, root=0)
-            dm_x = np.hstack((dm_x, to_bcast))
-            to_bcast = dm_y_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_dm_ptcs-pieces*chunk)]
+            obj_x = np.hstack((obj_x, to_bcast))
+            to_bcast = obj_y_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_obj_ptcs-pieces*chunk)]
             comm.Bcast(to_bcast, root=0)
-            dm_y = np.hstack((dm_y, to_bcast))
-            to_bcast = dm_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_dm_ptcs-pieces*chunk)]
+            obj_y = np.hstack((obj_y, to_bcast))
+            to_bcast = obj_z_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_obj_ptcs-pieces*chunk)]
             comm.Bcast(to_bcast, root=0)
-            dm_z = np.hstack((dm_z, to_bcast))
-            to_bcast = dm_velx_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_dm_ptcs-pieces*chunk)]
+            obj_z = np.hstack((obj_z, to_bcast))
+            to_bcast = obj_velx_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_obj_ptcs-pieces*chunk)]
             comm.Bcast(to_bcast, root=0)
-            dm_velx = np.hstack((dm_velx, to_bcast))
-            to_bcast = dm_vely_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_dm_ptcs-pieces*chunk)]
+            obj_velx = np.hstack((obj_velx, to_bcast))
+            to_bcast = obj_vely_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_obj_ptcs-pieces*chunk)]
             comm.Bcast(to_bcast, root=0)
-            dm_vely = np.hstack((dm_vely, to_bcast))
-            to_bcast = dm_velz_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_dm_ptcs-pieces*chunk)]
+            obj_vely = np.hstack((obj_vely, to_bcast))
+            to_bcast = obj_velz_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_obj_ptcs-pieces*chunk)]
             comm.Bcast(to_bcast, root=0)
-            dm_velz = np.hstack((dm_velz, to_bcast))
-            to_bcast = dm_masses_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_dm_ptcs-pieces*chunk)]
+            obj_velz = np.hstack((obj_velz, to_bcast))
+            to_bcast = obj_masses_total[i*chunk:(i+1)*chunk+(i==(pieces-1))*(nb_obj_ptcs-pieces*chunk)]
             comm.Bcast(to_bcast, root=0)
-            dm_masses = np.hstack((dm_masses, to_bcast))
+            obj_masses = np.hstack((obj_masses, to_bcast))
     
-        dm_xyz = np.hstack((np.reshape(dm_x, (dm_x.shape[0],1)), np.reshape(dm_y, (dm_y.shape[0],1)), np.reshape(dm_z, (dm_z.shape[0],1))))
-        dm_velxyz = np.hstack((np.reshape(dm_velx, (dm_velx.shape[0],1)), np.reshape(dm_vely, (dm_vely.shape[0],1)), np.reshape(dm_velz, (dm_velz.shape[0],1))))
+        obj_xyz = np.hstack((np.reshape(obj_x, (obj_x.shape[0],1)), np.reshape(obj_y, (obj_y.shape[0],1)), np.reshape(obj_z, (obj_z.shape[0],1))))
+        obj_velxyz = np.hstack((np.reshape(obj_velx, (obj_velx.shape[0],1)), np.reshape(obj_vely, (obj_vely.shape[0],1)), np.reshape(obj_velz, (obj_velz.shape[0],1))))
     
-        return dm_xyz, dm_masses, dm_velxyz
+        return obj_xyz, obj_masses, obj_velxyz
     if(not hasattr(getHDF5ObjData, "inner")):
         getHDF5ObjData.inner = np_cache_factory(0,0)(inner)
     getHDF5ObjData.inner(HDF5_SNAP_DEST, PART_TYPE)

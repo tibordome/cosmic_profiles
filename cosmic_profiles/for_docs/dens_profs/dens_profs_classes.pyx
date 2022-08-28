@@ -154,7 +154,7 @@ cdef class DensProfsHDF5(CosmicBase):
     ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,
     ``plotDensProfs()``."""
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str OBJ_TYPE, str CENTER, str RVIR_OR_R200):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -173,7 +173,9 @@ cdef class DensProfsHDF5(CosmicBase):
         :type CENTER: str
         :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
-        :type RVIR_OR_R200: str"""
+        :type RVIR_OR_R200: str
+        :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
+        :type OBJ_TYPE: str"""
         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST

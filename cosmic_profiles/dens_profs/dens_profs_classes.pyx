@@ -184,7 +184,7 @@ cdef class DensProfs(CosmicBase):
         print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0}'.format(self.SNAP))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        obj_centers, obj_masses = self.getMassesCenters(select = select)
+        obj_centers, obj_masses = self.getMassesCenters(select)
         
         if rank == 0:
             suffix = '_'
@@ -201,7 +201,7 @@ cdef class DensProfsHDF5(CosmicBase):
     ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,
     ``plotDensProfs()``."""
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str OBJ_TYPE, str CENTER, str RVIR_OR_R200):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -220,7 +220,9 @@ cdef class DensProfsHDF5(CosmicBase):
         :type CENTER: str
         :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
-        :type RVIR_OR_R200: str"""
+        :type RVIR_OR_R200: str
+        :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
+        :type OBJ_TYPE: str"""
         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
@@ -245,7 +247,7 @@ cdef class DensProfsHDF5(CosmicBase):
         
         :return xyz, masses: positions and masses
         :rtype: (N2,3) floats, (N2,) floats"""
-        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, self.getPartType(self.OBJ_TYPE))
+        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, self.getPartType())
         del velxyz
         if rank == 0:
             return xyz, masses
@@ -258,7 +260,7 @@ cdef class DensProfsHDF5(CosmicBase):
         
         :return velxyz: velocity array
         :rtype: (N2,3) floats"""
-        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, self.getPartType(self.OBJ_TYPE))
+        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, self.getPartType())
         del masses; del xyz
         if rank == 0:
             return velxyz
@@ -273,11 +275,12 @@ cdef class DensProfsHDF5(CosmicBase):
         :rtype: (N1,) floats"""
         
         # Import hdf5 data
-        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType(self.OBJ_TYPE))
+        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType())
         if rank == 0:
             # Construct catalogue
             obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, self.MIN_NUMBER_PTCS)
             del nb_shs; del sh_len; del fof_sizes; del group_r200; del obj_cat; del obj_size
+            self.r200 = obj_r200
             return obj_r200
         else:
             del nb_shs; del sh_len; del fof_sizes; del group_r200
@@ -291,11 +294,12 @@ cdef class DensProfsHDF5(CosmicBase):
         :rtype: (N1, N3) integers and (N1,) integers"""
         
         # Import hdf5 data
-        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType(self.OBJ_TYPE))
+        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType())
         if rank == 0:
             # Construct catalogue
             obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, self.MIN_NUMBER_PTCS)
-            del nb_shs; del sh_len; del fof_sizes; del group_r200; del obj_r200
+            self.r200 = obj_r200
+            del nb_shs; del sh_len; del fof_sizes; del group_r200
             return obj_cat, obj_size
         else:
             del nb_shs; del sh_len; del fof_sizes; del group_r200
@@ -428,7 +432,7 @@ cdef class DensProfsHDF5(CosmicBase):
         print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0}'.format(self.SNAP))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        obj_centers, obj_masses = self.getMassesCenters(select = select)
+        obj_centers, obj_masses = self.getMassesCenters(select)
         
         if rank == 0:
             suffix = '_{}_'.format(self.OBJ_TYPE)

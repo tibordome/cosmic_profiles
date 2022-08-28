@@ -16,7 +16,24 @@ We have added density profile estimation capabilities. We contend ourselves with
 
 where :math:`(x,y,z)` are the coordinates of a point cloud particle in some coordinate system centered on either the center of mass or the mode of the cloud. The density profile describes the radial mass distribution of the points in the cloud in units of :math:`M_{\odot}h^2/(\mathrm{Mpc})^3`. 
 
-To estimate density profiles with *Cosmic Profiles*, we first instantiate a ``DensProfs`` object called ``cprofiles``, similar to what we saw in the :ref:`Shape Estimation section<Shape Estimation>`. Now we can simply invoke the command::
+To estimate density profiles with *Cosmic Profiles*, we first instantiate a ``DensProfs`` object called ``cprofiles`` via::
+
+    from cosmic_profiles import DensProfsHDF5
+    
+    # Parameters
+    L_BOX = np.float32(10) # cMpc/h
+    HDF5_GROUP_DEST = "/path/to/groups_035"
+    HDF5_SNAP_DEST = "/path/to/snapdir_035"
+    SNAP = '035'
+    CENTER = 'mode'
+    MIN_NUMBER_PTCS = 200
+    RVIR_OR_R200 = 'R200'
+    OBJ_TYPE = 'dm'
+
+    # Instantiate object
+    cprofiles = DensProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200, OBJ_TYPE)
+
+with arguments identical to those we saw in the :ref:`Shape Estimation section<Shape Estimation>`, except that the parameters ``D_LOGSTART``, ``D_LOGEND``, ``D_BINS``, ``IT_TOL``, ``IT_WALL`` and ``IT_MIN`` that control the behavior of the shape estimation algorithm are absent. Now we can simply invoke the command::
 
     dens_profs_db = cprofiles.estDensProfs(r_over_r200, select = [0, 9], direct_binning = True, spherical = True),
 

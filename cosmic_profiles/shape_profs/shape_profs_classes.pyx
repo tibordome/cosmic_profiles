@@ -445,7 +445,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
     cdef int IT_WALL
     cdef int IT_MIN
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str RVIR_OR_R200):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str RVIR_OR_R200, str OBJ_TYPE):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -478,8 +478,10 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type CENTER: str
         :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
-        :type RVIR_OR_R200: str"""
-        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200)
+        :type RVIR_OR_R200: str
+        :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
+        :type OBJ_TYPE: str"""
+        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200, OBJ_TYPE)
         self.D_LOGSTART = D_LOGSTART
         self.D_LOGEND = D_LOGEND
         self.D_BINS = D_BINS
@@ -1045,7 +1047,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         self.getObjInfoBase(idx_cat, self.OBJ_TYPE)
-        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType(self.OBJ_TYPE))
+        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType())
         print_status(rank, self.start_time, "More detailed info on central subhalo catalogue. The total number of objects with > 0 SHs is {0}".format(nb_shs[nb_shs != 0].shape[0]))
         print_status(rank, self.start_time, "The total number of objects is {0}".format(len(nb_shs)))
         print_status(rank, self.start_time, "The total number of SHs (subhalos) is {0}".format(len(sh_len)))

@@ -666,12 +666,7 @@ cdef class CosmicBase:
         :rtype: (N2, r_res) floats"""
                 
         if rank == 0:
-            print("obj_size.base[:40] is", obj_size.base[:40])
-            print("idx_cat.base[:40] is", idx_cat.base[:40])
-            print("r200.base[:40] is", r200.base[:40])
             dens_profs = calcDensProfsSphDirectBinning(xyz.base, masses.base, r200.base, ROverR200.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
-            print("dens_profs[:,0]", dens_profs[:,0])
-            print("dens_profs[:,1]", dens_profs[:,1])
             return dens_profs*self.MASS_UNIT
         else:
             return None
