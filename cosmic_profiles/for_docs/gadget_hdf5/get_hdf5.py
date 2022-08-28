@@ -54,12 +54,15 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
     :rtype: float and int arrays"""
     return
 
-def getHDF5DMData(HDF5_SNAP_DEST):
+def getHDF5ObjData(HDF5_SNAP_DEST, PART_TYPE):
     """ Retrieve DM HDF5 data from the simulation box
         
     :param HDF5_SNAP_DEST: path to snapshot, particle data
     :type HDF5_SNAP_DEST: string
-    :return: dm_xyz (DM ptc positions), dm_masses (mass of each DM ptc),
-        dm_velxyz (velocity of each DM ptc)
-    :rtype: float and int arrays"""
+    :param PART_TYPE: which simulation particles to consider, 0 for gas, 1 for DM,
+        4 for stars
+    :type PART_TYPE: int
+    :return: obj_xyz (ptc positions), obj_masses (mass of each ptc),
+        obj_velxyz (velocity of each ptc)
+    :rtype: float arrays"""
     return

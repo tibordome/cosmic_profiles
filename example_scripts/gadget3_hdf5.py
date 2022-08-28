@@ -30,8 +30,7 @@ IT_WALL = 100
 IT_MIN = 10
 SNAP = '035'
 CENTER = 'mode'
-MIN_NUMBER_DM_PTCS = 200
-MIN_NUMBER_STAR_PTCS = 100
+MIN_NUMBER_PTCS = 200
 RVIR_OR_R200 = 'R200' # Whether or not we want quantities (e.g. D_LOGSTART) expressed with respect to the virial radius Rvir or the overdensity radius R200
 OBJ_TYPE = 'dm' # Which simulation particles to consider, 'dm', 'gas' or 'stars'
 ROverR200 = np.logspace(-1.5,0,70)
@@ -41,7 +40,7 @@ frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf
 def HDF5Ex():
     
     # Define DensShapeProfsHDF5 object
-    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE)
+    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE)
     if rank == 0:
         h_idx_cat_len = len(cprofiles.getIdxCat()[0])
     else:

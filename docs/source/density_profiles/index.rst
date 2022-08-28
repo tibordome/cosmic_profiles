@@ -22,8 +22,6 @@ To estimate density profiles with *Cosmic Profiles*, we first instantiate a ``De
 
 where the float array ``dens_profs_db`` of shape :math:`(N_{\text{pass}}, N_r)` contains the estimated density profiles. The ``select`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. As in the :ref:`Shape Estimation section<Shape Estimation>`, :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``select`` argument and in addition are sufficiently resolved. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice.
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, you may want to additionally specify ``obj_type = 'dm'`` or ``'gx'`` to ``estDensProfs()`` in order to have the density profiles calculated for either dark matter halos or galaxies.
-
 As the naming suggests, with ``direct_binning = True`` we estimate density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. The user also has the liberty to invoke an ellipsoidal shell-based density profile estimation algorithm by setting the boolean ``spherical = False``. Note, however, that this necessitates that ``cprofiles`` is an object of the class ``DensShapeProfs`` or ``DensShapeProfsHDF5``, providing access to shape profiling capabilities.
 
 .. note:: If ``spherical = False``, the user also has the discretion to set 2 keyword arguments, namely the booleans ``reduced`` and ``shell_based`` that are explained in the :ref:`Shape Estimation section<Shape Estimation>`.
@@ -72,8 +70,6 @@ with :math:`r_s` the characteristic or scale radius of the corresponding density
     cs = cprofiles.estConcentrations(dens_profs_fit, r_over_r200_fit, method, select = [0, 9]),
 
 which will return a float array ``cs`` of shape (:math:`N_{\text{pass}},`).
-
-.. note:: In case of a Gadget-style HDF5 snapshot output, you may want to additionally specify ``obj_type = 'dm'`` or ``'gx'`` to ``getDensProfsBestFits()`` in order to have the density profiles fits for either dark matter halos or galaxies.
 
 The density profiles, for instance ``dens_profs_db``, and their fits can be visualized using::
 

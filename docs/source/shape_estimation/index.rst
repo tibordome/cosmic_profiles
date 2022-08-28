@@ -51,7 +51,6 @@ To calculate shape profiles with *Cosmic Profiles*, let us assume we are dealing
     L_BOX = np.float32(10) # cMpc/h
     HDF5_GROUP_DEST = "/path/to/groups_035"
     HDF5_SNAP_DEST = "/path/to/snapdir_035"
-    SNAP_MAX = 16
     D_LOGSTART = -2
     D_LOGEND = 1
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
@@ -60,14 +59,25 @@ To calculate shape profiles with *Cosmic Profiles*, let us assume we are dealing
     IT_MIN = 10
     SNAP = '035'
     CENTER = 'mode'
-    MIN_NUMBER_DM_PTCS = 200
-    MIN_NUMBER_STAR_PTCS = 100
-    WANT_RVIR = False # Whether or not we want quantities (e.g. D_LOGSTART) expressed with respect to the virial radius R_vir or overdensity radius R_200
+    MIN_NUMBER_PTCS = 200
+    RVIR_OR_R200 = 'R200'
+    OBJ_TYPE = 'dm' # Which simulation particles to consider, 'dm', 'gas' or 'stars'
 
     # Instantiate object
-    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, SNAP_MAX, L_BOX, MIN_NUMBER_DM_PTCS, MIN_NUMBER_STAR_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, WANT_RVIR)
+    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE)
 
-with arguments explained in :ref:`the code reference<Cosmic Profiles Code Reference>`.
+with arguments explained in detail in :ref:`the code reference<Cosmic Profiles Code Reference>` but summarized here for completeness:
+  * ``HDF5_GROUP_DEST`` and ``HDF5_SNAP_DEST``: path to simulation snapshot
+  * ``D_LOGSTART`` and ``D_LOGEND``: logarithm of minimum and maximum ellipsoidal radius of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo
+  * ``D_BINS``: number of bins to consider for shape profiling 
+  * ``IT_TOL``: convergence tolerance in shape estimation algorithm, eigenvalue fractions must differ by less than ``IT_TOL`` for algorithm to halt
+  * ``IT_WALL``: maximum permissible number of iterations in shape estimation algorithm
+  * ``IT_MIN``: minimum number of particles (DM, gas or star particles depending on ``OBJ_TYPE``) in any iteration, if undercut, shape is unclassified
+  * ``SNAP``: snapshot identifier, used when dumping files etc.
+  * ``CENTER``: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density) or 'com' (center of mass) of each object (= DM halo, gas halo or star particle halo)
+  * ``MIN_NUMBER_PTCS``: minimum number of particles for objects to qualify for analyses (e.g. shape analysis)
+  * ``RVIR_OR_R200``: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
+  * ``OBJ_TYPE``: which simulation particles to consider, 'dm', 'gas' or 'stars'
 
 * a very general assortment of point clouds. There is no requirement on the nature of the point clouds whatsoever, yet the shape determination algorithm will perform better the closer the point clouds are to being truly ellipsoidal. Often, the process of identifying such point clouds in a simulation can be challenging, which is why we provide an :ref:`interface<AHF example>` showcasing how to use the 'Amiga Halo Finder' (AHF) via ``pynbody``. For now, we assume that we have identified the point clouds already and that ``idx_cat`` (list of lists) stores the indices of the particles belonging to the point clouds::
     
@@ -108,8 +118,6 @@ The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter``, ``ma
 * ``obj_centers`` of shape (:math:`N_{\text{pass}}`,3): centers of objects 
 * ``obj_masses`` of shape (:math:`N_{\text{pass}}`,): masses of objects.
 
-.. note:: In the case of a ``DensShapeProfs`` object, there will be :math:`N_{\text{pass}}` objects with certain indices `obj` for which ``len(idx_cat[obj]) > MIN_NUMBER_PTCS``. In case of a ``DensShapeProfsHDF5`` object, the same holds true when identifying ``idx_cat`` with ``idx_cat = cprofiles.getIdxCat(obj_type = 'dm')`` and replacing ``MIN_NUMBER_PTCS`` by ``MIN_NUMBER_DM_PTCS``, and analogously for star particles in galaxies.
-
 For post-processing purposes, one can dump the converged shape profiles in a destination ``CAT_DEST`` of choice via::
     
     cprofiles.dumpShapeCatLocal(CAT_DEST, select = [0, 9], reduced = False, shell_based = False),
@@ -125,7 +133,7 @@ where ``CAT_DEST`` is a string describing the absolute (or relative with respect
 * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
 * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, specify ``cprofiles.getShapeCatLocal(select = [0, 9], reduced = False, shell_based = False, obj_type = 'dm')`` to calculate local halo (only the dark matter component of halos) shapes and ``cprofiles.getShapeCatLocal(select = [0, 9], reduced = False, shell_based = False, obj_type = 'gx')`` to calculate local galaxy shapes. The suffix of the output files when calling e.g. ``cprofiles.dumpShapeCatLocal(CAT_DEST, select = [0, 9], reduced = False, shell_based = False, obj_type = 'dm')`` will be modified accordingly to ``d_local_dm_x.txt``.
+.. note:: In case of a Gadget-style HDF5 snapshot output, specify ``OBJ_TYPE = 'dm'`` to calculate local dark matter halo shapes (only the dark matter component of halos), ``OBJ_TYPE = 'gas'`` to calculate the local shapes of gas particles inside halos and ``OBJ_TYPE = 'stars'`` to calculate the local shapes of star particles inside halos. The suffix of the output files will be modified accordingly to e.g. ``d_local_gas_x.txt``.
 
 ***************
 Global Shapes
@@ -135,7 +143,7 @@ Instead of shape profiles one might also be interested in obtaining the shape pa
 
     d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(select = [0, 9], reduced = False).
 
-If a global shape calculations does not converge (which is rare), the corresponding entry in ``q`` etc. will feature a NaN. The index catalogue ``idx_cat = cprofiles.getIdxCat(obj_type)`` will have an empty entry at the corresponding location in the HDF5 case. In the generic point particle case, ``idx_cat = cprofiles.getIdxCat()`` will just return the ``idx_cat`` that is provided by the user, even if some entries have insufficient resolution. As with shape profiles, we can dump the global shape catalogue in a destination ``CAT_DEST`` of choice via::
+If a global shape calculations does not converge (which is rare), the corresponding entry in ``q`` etc. will feature a NaN. As with shape profiles, we can dump the global shape catalogue in a destination ``CAT_DEST`` of choice via::
 
     cprofiles.dumpShapeCatGlobal(CAT_DEST, reduced = False),
 
@@ -150,9 +158,7 @@ which will add the following files to the destination folder:
 * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
 * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-In case of Gadget-style HDF5 files, invoke ``cprofiles.getShapeCatGlobal(select = [0, 9], reduced = False, obj_type = 'dm')`` to calculate global halo shapes and ``cprofiles.getShapeCatGlobal(select = [0, 9], reduced = False, obj_type = 'gx')`` to calculate global galaxy shapes. To dump the files, call ``cprofiles.dumpShapeCatGlobal(CAT_DEST, select = [0, 9], reduced = False, obj_type = 'dm')`` or ``cprofiles.dumpShapeCatGlobal(CAT_DEST, select = [0, 9], reduced = False, obj_type = 'gx')``.
-
-.. note:: As previously, :math:`N_{\text{pass}}` denotes the number of halos that have been selected with the ``select`` argument *and* pass the ``MIN_NUMBER_PTCS``-threshold (or ``MIN_NUMBER_DM_PTCS``-threshold in case of ``cprofiles.getShapeCatGlobal(select = [0, 9], reduced = False, obj_type = 'dm')`` or ``MIN_NUMBER_STAR_PTCS``-threshold in case of ``cprofiles.getShapeCatGlobal(select = [0, 9], reduced = False, obj_type = 'gx')``). If the global shape determination for a sufficiently resolved object does not converge, it will appear as NaNs in the output.
+.. note:: As previously, :math:`N_{\text{pass}}` denotes the number of halos that have been selected with the ``select`` argument *and* pass the ``MIN_NUMBER_PTCS``-threshold. If the global shape determination for a sufficiently resolved object does not converge, it will appear as NaNs in the output.
 
 *************************************
 Velocity Dispersion Tensor Eigenaxes
@@ -160,9 +166,9 @@ Velocity Dispersion Tensor Eigenaxes
 
 For Gadget-style HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling::
 
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatVelLocal(select = [0, 9], reduced = False, shell_based = False, obj_type = 'dm')
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatVelLocal(select = [0, 9], reduced = False, shell_based = False)
 
-for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(select = [0, 9], reduced = False, obj_type = 'dm')`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(CAT_DEST, select = [0, 9], reduced = False, obj_type = 'dm')``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``CAT_DEST``:
+for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(select = [0, 9], reduced = False)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(CAT_DEST, select = [0, 9], reduced = False)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``CAT_DEST``:
 
 * ``d_global_vdm_x.txt`` (``x`` being the snap string ``SNAP``) of shape (:math:`N_{\text{pass}}`,): ellipsoidal radii
 * ``q_global_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): q shape parameter
@@ -173,4 +179,18 @@ for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(select = [0, 9], r
 * ``m_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
 * ``centers_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-The ``cprofiles.dumpShapeCatVelGlobal(CAT_DEST, select = [0, 9], reduced = False, obj_type = 'dm')`` command will dump files named ``d_local_vdm_x.txt`` etc.
+The ``cprofiles.dumpShapeCatVelLocal(CAT_DEST, select = [0, 9], reduced = False)`` command will dump files named ``d_local_vdm_x.txt`` etc.
+
+*************************************
+Visualizations
+*************************************
+
+Shape profiles can be visualized using::
+
+    cprofiles.plotShapeProfs(nb_bins = 2, VIZ_DEST = VIZ_DEST, select = [0, 9], reduced = False, shell_based = False)
+
+which draws median shape profiles and also mass bin-decomposed ones. ``nb_bins`` stand for the number of mass bins to plot density profiles for. 3D visualizations of individual halos can be accomplished using::
+ 
+    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
+
+which for instance would visualize the 3D distribution of particles as well as the eigenaxes at two different ellipsoidal radii in the first three objects that have sufficient resolution.
