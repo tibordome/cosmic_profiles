@@ -9,102 +9,34 @@ from cython.parallel import prange
 from cosmic_profiles.common.caching import np_cache_factory
 
 @cython.embedsignature(True) 
-cdef int[:] calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS) nogil:
-    """ Return the indices of the DM particles that belong to the CSH
+cdef int[:] calcCSHIdxs(int[:] obj_idxs, int start_idx, int nb_shs, int csh_size, int MIN_NUMBER_PTCS) nogil:
+    """ Return the indices of the particles that belong to the CSH
     
-    :param h_idxs: array to store the indices
-    :type h_idxs: int array
+    :param obj_idxs: array to store the indices
+    :type obj_idxs: int array
     :param start_idx: first index that belongs to this CSH
     :type start_idx: int
-    :param fof_dm_size: number of DM particles in the FoF-halos
-    :type fof_dm_size: (N1,) ints
     :param nb_shs: number of SHs in each FoF-halo
     :type nb_shs: (N1,) ints
     :param csh_size: number of DM particles in the SHs
     :type csh_size: (N2,) ints
-    :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
-    :type MIN_NUMBER_DM_PTCS: int
-    :return: h_idxs filled partially with indices
+    :param MIN_NUMBER_PTCS: minimum number of particles for CSH to be valid
+    :type MIN_NUMBER_PTCS: int
+    :return: obj_idxs filled partially with indices
     :rtype: int array"""
     
     cdef int l
-    if nb_shs == 0: # There is no Halo, so add all the "inner fuzz" to the catalogue
-        if fof_dm_size != 0: # If there is not even any "inner fuzz", return nothing
-            l = start_idx
-            if fof_dm_size >= MIN_NUMBER_DM_PTCS: # Only add halos that have sufficient resolution
-                while l < start_idx+fof_dm_size: # Add content of inner fuzz (after last Subfind, but since there is no Subfind, all of FOF)
-                    h_idxs[l-start_idx] = l
-                    l += 1
-    else:
+    if nb_shs > 0:
         l = start_idx
-        if csh_size >= MIN_NUMBER_DM_PTCS: # Only add halos that have sufficient resolution
-            while l < start_idx+csh_size: # Add content of Halo = Subfind 0 == CSH
-                h_idxs[l-start_idx] = l
+        if csh_size >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
+            while l < start_idx+csh_size: # Add content of Object = Subfind 0 == CSH
+                obj_idxs[l-start_idx] = l
                 l += 1
-    return h_idxs
+    return obj_idxs
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
-    """ Construct galaxy catalogue
-    
-     Note that the indices returned in each gx are 'true index + 1'
-    
-    :param nb_shs: number of SHs in each FoF-halo
-    :type nb_shs: (N1,) ints
-    :param sh_len_gx: number of star particles in each subhalo
-    :type sh_len_gx: (N2,) ints, N2>N1
-    :param fof_gx_size: number of star particles in the FoF-halos
-    :type fof_gx_size: (N1,) ints
-    :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid
-    :type MIN_NUMBER_STAR_PTCS: int
-    :return: gx_cat: indices,
-        gx_size: number of particles in each object
-    :rtype: int array, int array"""
-    def inner(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):
-        cdef int nb_halos = len(nb_shs)
-        cdef int[:] gx_pass = np.zeros((nb_halos,), dtype = np.int32)
-        cdef int[:] gx_size = np.zeros((nb_halos,), dtype = np.int32) # Either CSH or halo size (if no SHs exist)
-        cdef int p
-        cdef int q
-        cdef int idx_sum
-        cdef int start_idx
-        for p in prange(nb_halos, schedule = 'dynamic', nogil = True):
-            if nb_shs[p] == 0: # There is no Halo, so add all the "inner fuzz" to the catalogue
-                if fof_gx_size[p] != 0: # If there is not even any "inner fuzz", return nothing
-                    if fof_gx_size[p] >= MIN_NUMBER_STAR_PTCS: # Only add gxs that have sufficient resolution
-                        gx_pass[p] = 1
-                        gx_size[p] = fof_gx_size[p]
-            else:
-                idx_sum = 0
-                for q in range(p):
-                    idx_sum = idx_sum+nb_shs[q]
-                if sh_len_gx[idx_sum] >= MIN_NUMBER_STAR_PTCS: # Only add gxs that have sufficient resolution
-                    gx_pass[p] = 1
-                    gx_size[p] = sh_len_gx[idx_sum]
-        if nb_halos == 0:
-            return np.zeros((0,0), dtype = np.int32), np.zeros((0,), dtype = np.float32)
-        cdef int[:,:] gx_cat = np.zeros((np.sum(gx_pass.base),np.max(gx_size.base)), dtype = np.int32) # Gx catalogue, empty list entry [] if gx has too low resolution
-        cdef int[:] idxs_compr = np.zeros((nb_halos,), dtype = np.int32)
-        idxs_compr.base[gx_pass.base.nonzero()[0]] = np.arange(np.sum(gx_pass.base))
-        for p in prange(nb_halos, schedule = 'dynamic', nogil = True):
-            if gx_pass[p] == 1:
-                idx_sum = 0
-                start_idx = 0
-                for q in range(p):
-                    idx_sum = idx_sum+nb_shs[q]
-                    start_idx = start_idx+fof_gx_size[q]
-                gx_cat[idxs_compr[p]] = calcCSHIdxs(gx_cat[idxs_compr[p]], start_idx, fof_gx_size[p], nb_shs[p], sh_len_gx[idx_sum], MIN_NUMBER_STAR_PTCS)
-        return gx_cat.base, gx_size.base[gx_pass.base.nonzero()[0]]
-    if(not hasattr(calcGxCat, "inner")):
-        calcGxCat.inner = np_cache_factory(3,0)(inner)
-    calcGxCat.inner(nb_shs.base, sh_len_gx.base, fof_gx_size.base, MIN_NUMBER_STAR_PTCS)
-    return calcGxCat.inner(nb_shs.base, sh_len_gx.base, fof_gx_size.base, MIN_NUMBER_STAR_PTCS)
-
-
-@cython.embedsignature(True)
-@cython.binding(True)
-def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
+def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS):
     """ Construct central subhalo (CSH) catalogue from FoF/SH info
     
     Note that the indices returned in each CSH are 'true index + 1'
@@ -113,53 +45,46 @@ def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group
     :type nb_shs: (N1,) ints
     :param sh_len: number of DM particles in each subhalo
     :type sh_len: (N2,) ints, N2>N1
-    :param fof_dm_size: number of particles in the FoF-halos
-    :type fof_dm_size: (N1,) ints
+    :param fof_sizes: number of particles in the FoF-halos
+    :type fof_sizes: (N1,) ints
     :param group_r200: R200-radius of FoF-halos
     :type group_r200: (N1,) floats
-    :param halo_masses: masses of FoF-halos
-    :type halo_masses: (N1,) floats
-    :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid
-    :type MIN_NUMBER_DM_PTCS: int
-    :return: h_cat: indices,
-        h_r200: R200-radii, h_size: number of particles in each object
+    :param MIN_NUMBER_PTCS: minimum number of particles for CSH to be valid
+    :type MIN_NUMBER_PTCS: int
+    :return: obj_cat: indices,
+        obj_r200: R200-radii, obj_size: number of particles in each object
     :rtype: int array, float array, int array"""
-    def inner(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):
+    def inner(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS):
         cdef int nb_halos = len(nb_shs)
-        cdef int[:] h_pass = np.zeros((nb_halos,), dtype = np.int32)
-        cdef int[:] h_size = np.zeros((nb_halos,), dtype = np.int32) # Either CSH or halo size (if no SHs exist)
-        cdef float[:] h_r200 = np.zeros((nb_halos,), dtype = np.float32) # H R_200 (mean, not critical) values. Note: = 0.0 for halo that lacks SHs
+        cdef int[:] obj_pass = np.zeros((nb_halos,), dtype = np.int32)
+        cdef int[:] obj_size = np.zeros((nb_halos,), dtype = np.int32) # CSH size
+        cdef float[:] h_r200 = np.zeros((nb_halos,), dtype = np.float32) # Note: = 0.0 for object that lacks SHs
         cdef int p
         cdef int q
         cdef int idx_sum
         cdef int start_idx
         for p in prange(nb_halos, schedule = 'dynamic', nogil = True):
-            if nb_shs[p] == 0: # There is no Halo, so add all the "inner fuzz" to the catalogue
-                if fof_dm_sizes[p] != 0: # If there is not even any "inner fuzz", return nothing
-                    if fof_dm_sizes[p] >= MIN_NUMBER_DM_PTCS: # Only add halos that have sufficient resolution
-                        h_pass[p] = 1
-                        h_size[p] = fof_dm_sizes[p]
-            else:
+            if nb_shs[p] > 0: # There is at least 1 subhalo, which is needed for R200 to be non-zero
                 idx_sum = 0
                 for q in range(p):
                     idx_sum = idx_sum+nb_shs[q]
-                if sh_len[idx_sum] >= MIN_NUMBER_DM_PTCS: # Only add halos that have sufficient resolution
-                    h_pass[p] = 1
-                    h_size[p] = sh_len[idx_sum]
+                if sh_len[idx_sum] >= MIN_NUMBER_PTCS: # Only add halos that have sufficient resolution
+                    obj_pass[p] = 1
+                    obj_size[p] = sh_len[idx_sum]
             h_r200[p] = group_r200[p]
-        cdef int[:,:] h_cat = np.zeros((np.sum(h_pass.base),np.max(h_size.base)), dtype = np.int32) # Halo catalogue (1 halo ~ Halo is the unit), DM particle indices in each Halo, empty list entry [] if Halo is empty 
+        cdef int[:,:] obj_cat = np.zeros((np.sum(obj_pass.base),np.max(obj_size.base)), dtype = np.int32) # Object catalogue (1 halo ~ Halo is the unit), particle indices in each object, empty list entry [] if object is empty 
         cdef int[:] idxs_compr = np.zeros((nb_halos,), dtype = np.int32)
-        idxs_compr.base[h_pass.base.nonzero()[0]] = np.arange(np.sum(h_pass.base))
+        idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
         for p in prange(nb_halos, schedule = 'dynamic', nogil = True):
-            if h_pass[p] == 1:
+            if obj_pass[p] == 1:
                 idx_sum = 0
                 start_idx = 0
                 for q in range(p):
                     idx_sum = idx_sum+nb_shs[q]
-                    start_idx = start_idx+fof_dm_sizes[q]
-                h_cat[idxs_compr[p]] = calcCSHIdxs(h_cat[idxs_compr[p]], start_idx, fof_dm_sizes[p], nb_shs[p], sh_len[idx_sum], MIN_NUMBER_DM_PTCS)
-        return h_cat.base, h_r200.base[h_pass.base.nonzero()[0]], h_size.base[h_pass.base.nonzero()[0]]
-    if(not hasattr(calcCSHCat, "inner")):
-        calcCSHCat.inner = np_cache_factory(5,0)(inner)
-    calcCSHCat.inner(nb_shs.base, sh_len.base, fof_dm_sizes.base, group_r200.base, halo_masses.base, MIN_NUMBER_DM_PTCS)
-    return calcCSHCat.inner(nb_shs.base, sh_len.base, fof_dm_sizes.base, group_r200.base, halo_masses.base, MIN_NUMBER_DM_PTCS)
+                    start_idx = start_idx+fof_sizes[q]
+                obj_cat[idxs_compr[p]] = calcCSHIdxs(obj_cat[idxs_compr[p]], start_idx, nb_shs[p], sh_len[idx_sum], MIN_NUMBER_PTCS)
+        return obj_cat.base, h_r200.base[obj_pass.base.nonzero()[0]], obj_size.base[obj_pass.base.nonzero()[0]]
+    if(not hasattr(calcObjCat, "inner")):
+        calcObjCat.inner = np_cache_factory(4,0)(inner)
+    calcObjCat.inner(nb_shs.base, sh_len.base, fof_sizes.base, group_r200.base, MIN_NUMBER_PTCS)
+    return calcObjCat.inner(nb_shs.base, sh_len.base, fof_sizes.base, group_r200.base, MIN_NUMBER_PTCS)

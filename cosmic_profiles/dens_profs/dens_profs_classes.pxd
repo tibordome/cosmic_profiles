@@ -15,5 +15,5 @@ cdef class DensProfsHDF5(CosmicBase):
     
     cdef str HDF5_SNAP_DEST
     cdef str HDF5_GROUP_DEST
-    cdef int MIN_NUMBER_STAR_PTCS
-    cdef bint WANT_RVIR
+    cdef str RVIR_OR_R200
+    cdef str OBJ_TYPE

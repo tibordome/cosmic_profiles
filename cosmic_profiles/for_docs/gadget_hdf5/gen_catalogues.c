@@ -1860,7 +1860,6 @@ static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_start[] = "start";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_format[] = "format";
-static const char __pyx_k_h_idxs[] = "h_idxs";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_name_2[] = "__name__";
 static const char __pyx_k_nb_shs[] = "nb_shs";
@@ -1876,42 +1875,37 @@ static const char __pyx_k_Ellipsis[] = "Ellipsis";
 static const char __pyx_k_csh_size[] = "csh_size";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_itemsize[] = "itemsize";
+static const char __pyx_k_obj_idxs[] = "obj_idxs";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_TypeError[] = "TypeError";
-static const char __pyx_k_calcGxCat[] = "calcGxCat";
 static const char __pyx_k_enumerate[] = "enumerate";
+static const char __pyx_k_fof_sizes[] = "fof_sizes";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
-static const char __pyx_k_sh_len_gx[] = "sh_len_gx";
 static const char __pyx_k_start_idx[] = "start_idx";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
-static const char __pyx_k_calcCSHCat[] = "calcCSHCat";
+static const char __pyx_k_calcObjCat[] = "calcObjCat";
 static const char __pyx_k_group_r200[] = "group_r200";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_calcCSHIdxs[] = "calcCSHIdxs";
-static const char __pyx_k_fof_dm_size[] = "fof_dm_size";
-static const char __pyx_k_fof_gx_size[] = "fof_gx_size";
-static const char __pyx_k_halo_masses[] = "halo_masses";
-static const char __pyx_k_fof_dm_sizes[] = "fof_dm_sizes";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
+static const char __pyx_k_MIN_NUMBER_PTCS[] = "MIN_NUMBER_PTCS";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
-static const char __pyx_k_MIN_NUMBER_DM_PTCS[] = "MIN_NUMBER_DM_PTCS";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
-static const char __pyx_k_MIN_NUMBER_STAR_PTCS[] = "MIN_NUMBER_STAR_PTCS";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
@@ -1950,8 +1944,7 @@ static PyObject *__pyx_n_s_IndexError;
 static PyObject *__pyx_kp_s_Indirect_dimensions_not_supporte;
 static PyObject *__pyx_kp_s_Invalid_mode_expected_c_or_fortr;
 static PyObject *__pyx_kp_s_Invalid_shape_in_axis_d_d;
-static PyObject *__pyx_n_s_MIN_NUMBER_DM_PTCS;
-static PyObject *__pyx_n_s_MIN_NUMBER_STAR_PTCS;
+static PyObject *__pyx_n_s_MIN_NUMBER_PTCS;
 static PyObject *__pyx_n_s_MemoryError;
 static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
@@ -1966,9 +1959,8 @@ static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
-static PyObject *__pyx_n_s_calcCSHCat;
 static PyObject *__pyx_n_s_calcCSHIdxs;
-static PyObject *__pyx_n_s_calcGxCat;
+static PyObject *__pyx_n_s_calcObjCat;
 static PyObject *__pyx_n_s_class;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
@@ -1980,9 +1972,7 @@ static PyObject *__pyx_n_s_encode;
 static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_error;
 static PyObject *__pyx_n_s_flags;
-static PyObject *__pyx_n_s_fof_dm_size;
-static PyObject *__pyx_n_s_fof_dm_sizes;
-static PyObject *__pyx_n_s_fof_gx_size;
+static PyObject *__pyx_n_s_fof_sizes;
 static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_fortran;
 static PyObject *__pyx_n_u_fortran;
@@ -1991,8 +1981,6 @@ static PyObject *__pyx_kp_s_gadget_hdf5_gen_catalogues_pyx;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
 static PyObject *__pyx_n_s_group_r200;
-static PyObject *__pyx_n_s_h_idxs;
-static PyObject *__pyx_n_s_halo_masses;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_itemsize;
@@ -2009,6 +1997,7 @@ static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_np;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_obj;
+static PyObject *__pyx_n_s_obj_idxs;
 static PyObject *__pyx_n_s_pack;
 static PyObject *__pyx_n_s_pickle;
 static PyObject *__pyx_n_s_pyx_PickleError;
@@ -2026,7 +2015,6 @@ static PyObject *__pyx_n_s_reduce_ex;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_sh_len;
-static PyObject *__pyx_n_s_sh_len_gx;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_size;
 static PyObject *__pyx_n_s_start;
@@ -2043,9 +2031,8 @@ static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
-static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_calcCSHIdxs(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_h_idxs, CYTHON_UNUSED int __pyx_v_start_idx, CYTHON_UNUSED int __pyx_v_fof_dm_size, CYTHON_UNUSED int __pyx_v_nb_shs, CYTHON_UNUSED int __pyx_v_csh_size, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_DM_PTCS); /* proto */
-static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_2calcGxCat(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len_gx, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_gx_size, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_STAR_PTCS); /* proto */
-static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_4calcCSHCat(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_dm_sizes, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_group_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_halo_masses, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_DM_PTCS); /* proto */
+static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_calcCSHIdxs(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_idxs, CYTHON_UNUSED int __pyx_v_start_idx, CYTHON_UNUSED int __pyx_v_nb_shs, CYTHON_UNUSED int __pyx_v_csh_size, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS); /* proto */
+static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_2calcObjCat(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_sizes, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_group_r200, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2117,37 +2104,34 @@ static PyObject *__pyx_tuple__18;
 static PyObject *__pyx_tuple__19;
 static PyObject *__pyx_tuple__21;
 static PyObject *__pyx_tuple__23;
+static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_tuple__25;
 static PyObject *__pyx_tuple__26;
 static PyObject *__pyx_tuple__27;
 static PyObject *__pyx_tuple__28;
-static PyObject *__pyx_tuple__29;
-static PyObject *__pyx_tuple__30;
 static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__22;
-static PyObject *__pyx_codeobj__24;
-static PyObject *__pyx_codeobj__31;
+static PyObject *__pyx_codeobj__29;
 /* Late includes */
 
 /* "gadget_hdf5/gen_catalogues.pyx":11
  * 
  * @cython.embedsignature(True)
- * def calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
- *     """ Return the indices of the DM particles that belong to the CSH
+ * def calcCSHIdxs(int[:] obj_idxs, int start_idx, int nb_shs, int csh_size, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
+ *     """ Return the indices of the particles that belong to the CSH
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11gadget_hdf5_14gen_catalogues_calcCSHIdxs[] = "calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS)\n Return the indices of the DM particles that belong to the CSH\n    \n    :param h_idxs: array to store the indices\n    :type h_idxs: int array\n    :param start_idx: first index that belongs to this CSH\n    :type start_idx: int\n    :param fof_dm_size: number of DM particles in the FoF-halos\n    :type fof_dm_size: (N1,) ints\n    :param nb_shs: number of SHs in each FoF-halo\n    :type nb_shs: (N1,) ints\n    :param csh_size: number of DM particles in the SHs\n    :type csh_size: (N2,) ints\n    :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid\n    :type MIN_NUMBER_DM_PTCS: int\n    :return: h_idxs filled partially with indices (+1, to allow 0 to be interpreted as no index)\n    :rtype: int array";
+static char __pyx_doc_11gadget_hdf5_14gen_catalogues_calcCSHIdxs[] = "calcCSHIdxs(int[:] obj_idxs, int start_idx, int nb_shs, int csh_size, int MIN_NUMBER_PTCS)\n Return the indices of the particles that belong to the CSH\n    \n    :param obj_idxs: array to store the indices\n    :type obj_idxs: int array\n    :param start_idx: first index that belongs to this CSH\n    :type start_idx: int\n    :param nb_shs: number of SHs in each FoF-halo\n    :type nb_shs: (N1,) ints\n    :param csh_size: number of DM particles in the SHs\n    :type csh_size: (N2,) ints\n    :param MIN_NUMBER_PTCS: minimum number of particles for CSH to be valid\n    :type MIN_NUMBER_PTCS: int\n    :return: obj_idxs filled partially with indices\n    :rtype: int array";
 static PyMethodDef __pyx_mdef_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs = {"calcCSHIdxs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11gadget_hdf5_14gen_catalogues_calcCSHIdxs};
 static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_h_idxs = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_idxs = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED int __pyx_v_start_idx;
-  CYTHON_UNUSED int __pyx_v_fof_dm_size;
   CYTHON_UNUSED int __pyx_v_nb_shs;
   CYTHON_UNUSED int __pyx_v_csh_size;
-  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_DM_PTCS;
+  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -2155,14 +2139,12 @@ static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs(PyObject *
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcCSHIdxs (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_h_idxs,&__pyx_n_s_start_idx,&__pyx_n_s_fof_dm_size,&__pyx_n_s_nb_shs,&__pyx_n_s_csh_size,&__pyx_n_s_MIN_NUMBER_DM_PTCS,0};
-    PyObject* values[6] = {0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_obj_idxs,&__pyx_n_s_start_idx,&__pyx_n_s_nb_shs,&__pyx_n_s_csh_size,&__pyx_n_s_MIN_NUMBER_PTCS,0};
+    PyObject* values[5] = {0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
-        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -2179,43 +2161,37 @@ static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs(PyObject *
       kw_args = PyDict_Size(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_h_idxs)) != 0)) kw_args--;
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_idxs)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_start_idx)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 6, 6, 1); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 5, 5, 1); __PYX_ERR(0, 11, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fof_dm_size)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_nb_shs)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 6, 6, 2); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 5, 5, 2); __PYX_ERR(0, 11, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_nb_shs)) != 0)) kw_args--;
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_csh_size)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 6, 6, 3); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 5, 5, 3); __PYX_ERR(0, 11, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_csh_size)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 6, 6, 4); __PYX_ERR(0, 11, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_DM_PTCS)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 6, 6, 5); __PYX_ERR(0, 11, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 5, 5, 4); __PYX_ERR(0, 11, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcCSHIdxs") < 0)) __PYX_ERR(0, 11, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -2223,37 +2199,35 @@ static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs(PyObject *
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_h_idxs = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_h_idxs.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_obj_idxs = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_obj_idxs.memview)) __PYX_ERR(0, 11, __pyx_L3_error)
     __pyx_v_start_idx = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_start_idx == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_fof_dm_size = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_fof_dm_size == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_nb_shs = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_nb_shs == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_csh_size = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_csh_size == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
-    __pyx_v_MIN_NUMBER_DM_PTCS = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_MIN_NUMBER_DM_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_nb_shs = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_nb_shs == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_csh_size = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_csh_size == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
+    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 11, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcCSHIdxs", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 11, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("gadget_hdf5.gen_catalogues.calcCSHIdxs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_11gadget_hdf5_14gen_catalogues_calcCSHIdxs(__pyx_self, __pyx_v_h_idxs, __pyx_v_start_idx, __pyx_v_fof_dm_size, __pyx_v_nb_shs, __pyx_v_csh_size, __pyx_v_MIN_NUMBER_DM_PTCS);
+  __pyx_r = __pyx_pf_11gadget_hdf5_14gen_catalogues_calcCSHIdxs(__pyx_self, __pyx_v_obj_idxs, __pyx_v_start_idx, __pyx_v_nb_shs, __pyx_v_csh_size, __pyx_v_MIN_NUMBER_PTCS);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_calcCSHIdxs(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_h_idxs, CYTHON_UNUSED int __pyx_v_start_idx, CYTHON_UNUSED int __pyx_v_fof_dm_size, CYTHON_UNUSED int __pyx_v_nb_shs, CYTHON_UNUSED int __pyx_v_csh_size, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_DM_PTCS) {
+static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_calcCSHIdxs(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_idxs, CYTHON_UNUSED int __pyx_v_start_idx, CYTHON_UNUSED int __pyx_v_nb_shs, CYTHON_UNUSED int __pyx_v_csh_size, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calcCSHIdxs", 0);
 
-  /* "gadget_hdf5/gen_catalogues.pyx":28
- *     :return: h_idxs filled partially with indices (+1, to allow 0 to be interpreted as no index)
+  /* "gadget_hdf5/gen_catalogues.pyx":26
+ *     :return: obj_idxs filled partially with indices
  *     :rtype: int array"""
  *     return             # <<<<<<<<<<<<<<
  * 
@@ -2266,183 +2240,50 @@ static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_calcCSHIdxs(CYTHON_UNUS
   /* "gadget_hdf5/gen_catalogues.pyx":11
  * 
  * @cython.embedsignature(True)
- * def calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
- *     """ Return the indices of the DM particles that belong to the CSH
+ * def calcCSHIdxs(int[:] obj_idxs, int start_idx, int nb_shs, int csh_size, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
+ *     """ Return the indices of the particles that belong to the CSH
  * 
  */
 
   /* function exit code */
   __pyx_L0:;
-  __PYX_XDEC_MEMVIEW(&__pyx_v_h_idxs, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_obj_idxs, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "gadget_hdf5/gen_catalogues.pyx":32
+/* "gadget_hdf5/gen_catalogues.pyx":30
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):             # <<<<<<<<<<<<<<
- *     """ Construct galaxy catalogue
- * 
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_3calcGxCat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11gadget_hdf5_14gen_catalogues_2calcGxCat[] = "calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS)\n Construct galaxy catalogue\n    \n     Note that the indices returned in each gx are 'true index + 1'\n    \n    :param nb_shs: number of SHs in each FoF-halo\n    :type nb_shs: (N1,) ints\n    :param sh_len_gx: number of star particles in each subhalo\n    :type sh_len_gx: (N2,) ints, N2>N1\n    :param fof_gx_size: number of star particles in the FoF-halos\n    :type fof_gx_size: (N1,) ints\n    :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for gx to be valid\n    :type MIN_NUMBER_STAR_PTCS: int\n    :return: gx_cat: indices (+1, to allow 0 to be interpreted as no index),\n        gx_size: number of particles in each object\n    :rtype: int array, int array";
-static PyMethodDef __pyx_mdef_11gadget_hdf5_14gen_catalogues_3calcGxCat = {"calcGxCat", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11gadget_hdf5_14gen_catalogues_3calcGxCat, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11gadget_hdf5_14gen_catalogues_2calcGxCat};
-static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_3calcGxCat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len_gx = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_gx_size = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_STAR_PTCS;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("calcGxCat (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_nb_shs,&__pyx_n_s_sh_len_gx,&__pyx_n_s_fof_gx_size,&__pyx_n_s_MIN_NUMBER_STAR_PTCS,0};
-    PyObject* values[4] = {0,0,0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_nb_shs)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sh_len_gx)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcGxCat", 1, 4, 4, 1); __PYX_ERR(0, 32, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fof_gx_size)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcGxCat", 1, 4, 4, 2); __PYX_ERR(0, 32, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_STAR_PTCS)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcGxCat", 1, 4, 4, 3); __PYX_ERR(0, 32, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcGxCat") < 0)) __PYX_ERR(0, 32, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-    }
-    __pyx_v_nb_shs = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_nb_shs.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_sh_len_gx = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sh_len_gx.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_fof_gx_size = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_fof_gx_size.memview)) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_MIN_NUMBER_STAR_PTCS = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_MIN_NUMBER_STAR_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 32, __pyx_L3_error)
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcGxCat", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 32, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("gadget_hdf5.gen_catalogues.calcGxCat", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_11gadget_hdf5_14gen_catalogues_2calcGxCat(__pyx_self, __pyx_v_nb_shs, __pyx_v_sh_len_gx, __pyx_v_fof_gx_size, __pyx_v_MIN_NUMBER_STAR_PTCS);
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_2calcGxCat(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len_gx, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_gx_size, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_STAR_PTCS) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("calcGxCat", 0);
-
-  /* "gadget_hdf5/gen_catalogues.pyx":48
- *         gx_size: number of particles in each object
- *     :rtype: int array, int array"""
- *     return             # <<<<<<<<<<<<<<
- * 
- * @cython.embedsignature(True)
- */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-
-  /* "gadget_hdf5/gen_catalogues.pyx":32
- * @cython.embedsignature(True)
- * @cython.binding(True)
- * def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):             # <<<<<<<<<<<<<<
- *     """ Construct galaxy catalogue
- * 
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  __PYX_XDEC_MEMVIEW(&__pyx_v_nb_shs, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_sh_len_gx, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_fof_gx_size, 1);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "gadget_hdf5/gen_catalogues.pyx":52
- * @cython.embedsignature(True)
- * @cython.binding(True)
- * def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
+ * def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
  *     """ Construct central subhalo (CSH) catalogue from FoF/SH info
  * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_5calcCSHCat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11gadget_hdf5_14gen_catalogues_4calcCSHCat[] = "calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS)\n Construct central subhalo (CSH) catalogue from FoF/SH info\n    \n    Note that the indices returned in each CSH are 'true index + 1'\n    \n    :param nb_shs: number of SHs in each FoF-halo\n    :type nb_shs: (N1,) ints\n    :param sh_len: number of DM particles in each subhalo\n    :type sh_len: (N2,) ints, N2>N1\n    :param fof_dm_size: number of particles in the FoF-halos\n    :type fof_dm_size: (N1,) ints\n    :param group_r200: R200-radius of FoF-halos\n    :type group_r200: (N1,) floats\n    :param halo_masses: masses of FoF-halos\n    :type halo_masses: (N1,) floats\n    :param MIN_NUMBER_DM_PTCS: minimum number of DM particles for CSH to be valid\n    :type MIN_NUMBER_DM_PTCS: int\n    :return: h_cat: indices (+1, to allow 0 to be interpreted as no index),\n        h_r200: R200-radii, h_size: number of particles in each object\n    :rtype: int array, float array, int array";
-static PyMethodDef __pyx_mdef_11gadget_hdf5_14gen_catalogues_5calcCSHCat = {"calcCSHCat", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11gadget_hdf5_14gen_catalogues_5calcCSHCat, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11gadget_hdf5_14gen_catalogues_4calcCSHCat};
-static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_5calcCSHCat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_3calcObjCat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11gadget_hdf5_14gen_catalogues_2calcObjCat[] = "calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS)\n Construct central subhalo (CSH) catalogue from FoF/SH info\n    \n    Note that the indices returned in each CSH are 'true index + 1'\n    \n    :param nb_shs: number of SHs in each FoF-halo\n    :type nb_shs: (N1,) ints\n    :param sh_len: number of DM particles in each subhalo\n    :type sh_len: (N2,) ints, N2>N1\n    :param fof_sizes: number of particles in the FoF-halos\n    :type fof_sizes: (N1,) ints\n    :param group_r200: R200-radius of FoF-halos\n    :type group_r200: (N1,) floats\n    :param MIN_NUMBER_PTCS: minimum number of particles for CSH to be valid\n    :type MIN_NUMBER_PTCS: int\n    :return: obj_cat: indices,\n        obj_r200: R200-radii, obj_size: number of particles in each object\n    :rtype: int array, float array, int array";
+static PyMethodDef __pyx_mdef_11gadget_hdf5_14gen_catalogues_3calcObjCat = {"calcObjCat", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11gadget_hdf5_14gen_catalogues_3calcObjCat, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11gadget_hdf5_14gen_catalogues_2calcObjCat};
+static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_3calcObjCat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_dm_sizes = { 0, 0, { 0 }, { 0 }, { 0 } };
+  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_sizes = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_group_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_halo_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_DM_PTCS;
+  CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("calcCSHCat (wrapper)", 0);
+  __Pyx_RefNannySetupContext("calcObjCat (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_nb_shs,&__pyx_n_s_sh_len,&__pyx_n_s_fof_dm_sizes,&__pyx_n_s_group_r200,&__pyx_n_s_halo_masses,&__pyx_n_s_MIN_NUMBER_DM_PTCS,0};
-    PyObject* values[6] = {0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_nb_shs,&__pyx_n_s_sh_len,&__pyx_n_s_fof_sizes,&__pyx_n_s_group_r200,&__pyx_n_s_MIN_NUMBER_PTCS,0};
+    PyObject* values[5] = {0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
-        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -2465,37 +2306,31 @@ static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_5calcCSHCat(PyObject *_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sh_len)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHCat", 1, 6, 6, 1); __PYX_ERR(0, 52, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcObjCat", 1, 5, 5, 1); __PYX_ERR(0, 30, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fof_dm_sizes)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fof_sizes)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHCat", 1, 6, 6, 2); __PYX_ERR(0, 52, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcObjCat", 1, 5, 5, 2); __PYX_ERR(0, 30, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_group_r200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHCat", 1, 6, 6, 3); __PYX_ERR(0, 52, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcObjCat", 1, 5, 5, 3); __PYX_ERR(0, 30, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_halo_masses)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHCat", 1, 6, 6, 4); __PYX_ERR(0, 52, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_DM_PTCS)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("calcCSHCat", 1, 6, 6, 5); __PYX_ERR(0, 52, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calcObjCat", 1, 5, 5, 4); __PYX_ERR(0, 30, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcCSHCat") < 0)) __PYX_ERR(0, 52, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calcObjCat") < 0)) __PYX_ERR(0, 30, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -2503,37 +2338,35 @@ static PyObject *__pyx_pw_11gadget_hdf5_14gen_catalogues_5calcCSHCat(PyObject *_
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_nb_shs = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_nb_shs.memview)) __PYX_ERR(0, 52, __pyx_L3_error)
-    __pyx_v_sh_len = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sh_len.memview)) __PYX_ERR(0, 52, __pyx_L3_error)
-    __pyx_v_fof_dm_sizes = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_fof_dm_sizes.memview)) __PYX_ERR(0, 52, __pyx_L3_error)
-    __pyx_v_group_r200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_group_r200.memview)) __PYX_ERR(0, 52, __pyx_L3_error)
-    __pyx_v_halo_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_halo_masses.memview)) __PYX_ERR(0, 52, __pyx_L3_error)
-    __pyx_v_MIN_NUMBER_DM_PTCS = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_MIN_NUMBER_DM_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L3_error)
+    __pyx_v_nb_shs = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_nb_shs.memview)) __PYX_ERR(0, 30, __pyx_L3_error)
+    __pyx_v_sh_len = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_sh_len.memview)) __PYX_ERR(0, 30, __pyx_L3_error)
+    __pyx_v_fof_sizes = __Pyx_PyObject_to_MemoryviewSlice_ds_int(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_fof_sizes.memview)) __PYX_ERR(0, 30, __pyx_L3_error)
+    __pyx_v_group_r200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_group_r200.memview)) __PYX_ERR(0, 30, __pyx_L3_error)
+    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 30, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calcCSHCat", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 52, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calcObjCat", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 30, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("gadget_hdf5.gen_catalogues.calcCSHCat", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("gadget_hdf5.gen_catalogues.calcObjCat", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_11gadget_hdf5_14gen_catalogues_4calcCSHCat(__pyx_self, __pyx_v_nb_shs, __pyx_v_sh_len, __pyx_v_fof_dm_sizes, __pyx_v_group_r200, __pyx_v_halo_masses, __pyx_v_MIN_NUMBER_DM_PTCS);
+  __pyx_r = __pyx_pf_11gadget_hdf5_14gen_catalogues_2calcObjCat(__pyx_self, __pyx_v_nb_shs, __pyx_v_sh_len, __pyx_v_fof_sizes, __pyx_v_group_r200, __pyx_v_MIN_NUMBER_PTCS);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_4calcCSHCat(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_dm_sizes, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_group_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_halo_masses, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_DM_PTCS) {
+static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_2calcObjCat(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_nb_shs, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_sh_len, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_fof_sizes, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_group_r200, CYTHON_UNUSED int __pyx_v_MIN_NUMBER_PTCS) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("calcCSHCat", 0);
+  __Pyx_RefNannySetupContext("calcObjCat", 0);
 
-  /* "gadget_hdf5/gen_catalogues.pyx":72
- *         h_r200: R200-radii, h_size: number of particles in each object
+  /* "gadget_hdf5/gen_catalogues.pyx":48
+ *         obj_r200: R200-radii, obj_size: number of particles in each object
  *     :rtype: int array, float array, int array"""
  *     return             # <<<<<<<<<<<<<<
  */
@@ -2541,10 +2374,10 @@ static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_4calcCSHCat(CYTHON_UNUS
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "gadget_hdf5/gen_catalogues.pyx":52
+  /* "gadget_hdf5/gen_catalogues.pyx":30
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
+ * def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
  *     """ Construct central subhalo (CSH) catalogue from FoF/SH info
  * 
  */
@@ -2553,9 +2386,8 @@ static PyObject *__pyx_pf_11gadget_hdf5_14gen_catalogues_4calcCSHCat(CYTHON_UNUS
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_nb_shs, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_sh_len, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_fof_dm_sizes, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_fof_sizes, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_group_r200, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_halo_masses, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -16353,8 +16185,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Indirect_dimensions_not_supporte, __pyx_k_Indirect_dimensions_not_supporte, sizeof(__pyx_k_Indirect_dimensions_not_supporte), 0, 0, 1, 0},
   {&__pyx_kp_s_Invalid_mode_expected_c_or_fortr, __pyx_k_Invalid_mode_expected_c_or_fortr, sizeof(__pyx_k_Invalid_mode_expected_c_or_fortr), 0, 0, 1, 0},
   {&__pyx_kp_s_Invalid_shape_in_axis_d_d, __pyx_k_Invalid_shape_in_axis_d_d, sizeof(__pyx_k_Invalid_shape_in_axis_d_d), 0, 0, 1, 0},
-  {&__pyx_n_s_MIN_NUMBER_DM_PTCS, __pyx_k_MIN_NUMBER_DM_PTCS, sizeof(__pyx_k_MIN_NUMBER_DM_PTCS), 0, 0, 1, 1},
-  {&__pyx_n_s_MIN_NUMBER_STAR_PTCS, __pyx_k_MIN_NUMBER_STAR_PTCS, sizeof(__pyx_k_MIN_NUMBER_STAR_PTCS), 0, 0, 1, 1},
+  {&__pyx_n_s_MIN_NUMBER_PTCS, __pyx_k_MIN_NUMBER_PTCS, sizeof(__pyx_k_MIN_NUMBER_PTCS), 0, 0, 1, 1},
   {&__pyx_n_s_MemoryError, __pyx_k_MemoryError, sizeof(__pyx_k_MemoryError), 0, 0, 1, 1},
   {&__pyx_kp_s_MemoryView_of_r_at_0x_x, __pyx_k_MemoryView_of_r_at_0x_x, sizeof(__pyx_k_MemoryView_of_r_at_0x_x), 0, 0, 1, 0},
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
@@ -16369,9 +16200,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
-  {&__pyx_n_s_calcCSHCat, __pyx_k_calcCSHCat, sizeof(__pyx_k_calcCSHCat), 0, 0, 1, 1},
   {&__pyx_n_s_calcCSHIdxs, __pyx_k_calcCSHIdxs, sizeof(__pyx_k_calcCSHIdxs), 0, 0, 1, 1},
-  {&__pyx_n_s_calcGxCat, __pyx_k_calcGxCat, sizeof(__pyx_k_calcGxCat), 0, 0, 1, 1},
+  {&__pyx_n_s_calcObjCat, __pyx_k_calcObjCat, sizeof(__pyx_k_calcObjCat), 0, 0, 1, 1},
   {&__pyx_n_s_class, __pyx_k_class, sizeof(__pyx_k_class), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
@@ -16383,9 +16213,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},
   {&__pyx_n_s_flags, __pyx_k_flags, sizeof(__pyx_k_flags), 0, 0, 1, 1},
-  {&__pyx_n_s_fof_dm_size, __pyx_k_fof_dm_size, sizeof(__pyx_k_fof_dm_size), 0, 0, 1, 1},
-  {&__pyx_n_s_fof_dm_sizes, __pyx_k_fof_dm_sizes, sizeof(__pyx_k_fof_dm_sizes), 0, 0, 1, 1},
-  {&__pyx_n_s_fof_gx_size, __pyx_k_fof_gx_size, sizeof(__pyx_k_fof_gx_size), 0, 0, 1, 1},
+  {&__pyx_n_s_fof_sizes, __pyx_k_fof_sizes, sizeof(__pyx_k_fof_sizes), 0, 0, 1, 1},
   {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
   {&__pyx_n_s_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 0, 1, 1},
   {&__pyx_n_u_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 1, 0, 1},
@@ -16394,8 +16222,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
   {&__pyx_n_s_group_r200, __pyx_k_group_r200, sizeof(__pyx_k_group_r200), 0, 0, 1, 1},
-  {&__pyx_n_s_h_idxs, __pyx_k_h_idxs, sizeof(__pyx_k_h_idxs), 0, 0, 1, 1},
-  {&__pyx_n_s_halo_masses, __pyx_k_halo_masses, sizeof(__pyx_k_halo_masses), 0, 0, 1, 1},
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_itemsize, __pyx_k_itemsize, sizeof(__pyx_k_itemsize), 0, 0, 1, 1},
@@ -16412,6 +16238,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_n_s_obj, __pyx_k_obj, sizeof(__pyx_k_obj), 0, 0, 1, 1},
+  {&__pyx_n_s_obj_idxs, __pyx_k_obj_idxs, sizeof(__pyx_k_obj_idxs), 0, 0, 1, 1},
   {&__pyx_n_s_pack, __pyx_k_pack, sizeof(__pyx_k_pack), 0, 0, 1, 1},
   {&__pyx_n_s_pickle, __pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_PickleError, __pyx_k_pyx_PickleError, sizeof(__pyx_k_pyx_PickleError), 0, 0, 1, 1},
@@ -16429,7 +16256,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_sh_len, __pyx_k_sh_len, sizeof(__pyx_k_sh_len), 0, 0, 1, 1},
-  {&__pyx_n_s_sh_len_gx, __pyx_k_sh_len_gx, sizeof(__pyx_k_sh_len_gx), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
@@ -16661,38 +16487,26 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "gadget_hdf5/gen_catalogues.pyx":11
  * 
  * @cython.embedsignature(True)
- * def calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
- *     """ Return the indices of the DM particles that belong to the CSH
+ * def calcCSHIdxs(int[:] obj_idxs, int start_idx, int nb_shs, int csh_size, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
+ *     """ Return the indices of the particles that belong to the CSH
  * 
  */
-  __pyx_tuple__19 = PyTuple_Pack(6, __pyx_n_s_h_idxs, __pyx_n_s_start_idx, __pyx_n_s_fof_dm_size, __pyx_n_s_nb_shs, __pyx_n_s_csh_size, __pyx_n_s_MIN_NUMBER_DM_PTCS); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(5, __pyx_n_s_obj_idxs, __pyx_n_s_start_idx, __pyx_n_s_nb_shs, __pyx_n_s_csh_size, __pyx_n_s_MIN_NUMBER_PTCS); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(6, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_gadget_hdf5_gen_catalogues_pyx, __pyx_n_s_calcCSHIdxs, 11, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_gadget_hdf5_gen_catalogues_pyx, __pyx_n_s_calcCSHIdxs, 11, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 11, __pyx_L1_error)
 
-  /* "gadget_hdf5/gen_catalogues.pyx":32
+  /* "gadget_hdf5/gen_catalogues.pyx":30
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):             # <<<<<<<<<<<<<<
- *     """ Construct galaxy catalogue
- * 
- */
-  __pyx_tuple__21 = PyTuple_Pack(4, __pyx_n_s_nb_shs, __pyx_n_s_sh_len_gx, __pyx_n_s_fof_gx_size, __pyx_n_s_MIN_NUMBER_STAR_PTCS); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 32, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__21);
-  __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_gadget_hdf5_gen_catalogues_pyx, __pyx_n_s_calcGxCat, 32, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 32, __pyx_L1_error)
-
-  /* "gadget_hdf5/gen_catalogues.pyx":52
- * @cython.embedsignature(True)
- * @cython.binding(True)
- * def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
+ * def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
  *     """ Construct central subhalo (CSH) catalogue from FoF/SH info
  * 
  */
-  __pyx_tuple__23 = PyTuple_Pack(6, __pyx_n_s_nb_shs, __pyx_n_s_sh_len, __pyx_n_s_fof_dm_sizes, __pyx_n_s_group_r200, __pyx_n_s_halo_masses, __pyx_n_s_MIN_NUMBER_DM_PTCS); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__23);
-  __Pyx_GIVEREF(__pyx_tuple__23);
-  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(6, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_gadget_hdf5_gen_catalogues_pyx, __pyx_n_s_calcCSHCat, 52, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(5, __pyx_n_s_nb_shs, __pyx_n_s_sh_len, __pyx_n_s_fof_sizes, __pyx_n_s_group_r200, __pyx_n_s_MIN_NUMBER_PTCS); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_gadget_hdf5_gen_catalogues_pyx, __pyx_n_s_calcObjCat, 30, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 30, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -16701,9 +16515,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(1, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__25);
-  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
 
   /* "View.MemoryView":287
  * 
@@ -16712,9 +16526,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(1, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
 
   /* "View.MemoryView":288
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -16723,9 +16537,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__27 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(1, 288, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__27);
-  __Pyx_GIVEREF(__pyx_tuple__27);
+  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
 
   /* "View.MemoryView":291
  * 
@@ -16734,9 +16548,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__28 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(1, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__28);
-  __Pyx_GIVEREF(__pyx_tuple__28);
+  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
 
   /* "View.MemoryView":292
  * 
@@ -16745,19 +16559,19 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(1, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__29);
-  __Pyx_GIVEREF(__pyx_tuple__29);
+  __pyx_tuple__27 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__27);
+  __Pyx_GIVEREF(__pyx_tuple__27);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__30 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__30);
-  __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__28 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__28);
+  __Pyx_GIVEREF(__pyx_tuple__28);
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -17127,8 +16941,8 @@ if (!__Pyx_RefNanny) {
   /* "gadget_hdf5/gen_catalogues.pyx":11
  * 
  * @cython.embedsignature(True)
- * def calcCSHIdxs(int[:] h_idxs, int start_idx, int fof_dm_size, int nb_shs, int csh_size, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
- *     """ Return the indices of the DM particles that belong to the CSH
+ * def calcCSHIdxs(int[:] obj_idxs, int start_idx, int nb_shs, int csh_size, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
+ *     """ Return the indices of the particles that belong to the CSH
  * 
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11gadget_hdf5_14gen_catalogues_1calcCSHIdxs, NULL, __pyx_n_s_gadget_hdf5_gen_catalogues); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
@@ -17136,28 +16950,16 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcCSHIdxs, __pyx_t_1) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "gadget_hdf5/gen_catalogues.pyx":32
+  /* "gadget_hdf5/gen_catalogues.pyx":30
  * @cython.embedsignature(True)
  * @cython.binding(True)
- * def calcGxCat(int[:] nb_shs, int[:] sh_len_gx, int[:] fof_gx_size, int MIN_NUMBER_STAR_PTCS):             # <<<<<<<<<<<<<<
- *     """ Construct galaxy catalogue
- * 
- */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11gadget_hdf5_14gen_catalogues_3calcGxCat, 0, __pyx_n_s_calcGxCat, NULL, __pyx_n_s_gadget_hdf5_gen_catalogues, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcGxCat, __pyx_t_1) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "gadget_hdf5/gen_catalogues.pyx":52
- * @cython.embedsignature(True)
- * @cython.binding(True)
- * def calcCSHCat(int[:] nb_shs, int[:] sh_len, int[:] fof_dm_sizes, float[:] group_r200, float[:] halo_masses, int MIN_NUMBER_DM_PTCS):             # <<<<<<<<<<<<<<
+ * def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS):             # <<<<<<<<<<<<<<
  *     """ Construct central subhalo (CSH) catalogue from FoF/SH info
  * 
  */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11gadget_hdf5_14gen_catalogues_5calcCSHCat, 0, __pyx_n_s_calcCSHCat, NULL, __pyx_n_s_gadget_hdf5_gen_catalogues, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_11gadget_hdf5_14gen_catalogues_3calcObjCat, 0, __pyx_n_s_calcObjCat, NULL, __pyx_n_s_gadget_hdf5_gen_catalogues, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcCSHCat, __pyx_t_1) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_calcObjCat, __pyx_t_1) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "gadget_hdf5/gen_catalogues.pyx":1
@@ -17190,7 +16992,7 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_1);
@@ -17204,7 +17006,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_1);
@@ -17218,7 +17020,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__27, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_1);
@@ -17232,7 +17034,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__28, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_1);
@@ -17246,7 +17048,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__29, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__27, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);

@@ -75,7 +75,7 @@ def test_shapes():
     ########################### Define CosmicProfilesDirect object ###################################
     cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
     
-    idx_cat = cprofiles.getIdxCat()
+    idx_cat = cprofiles.getIdxCat()[0]
     halos_select = [0, 5]
     centers, ms = cprofiles.getMassesCenters(halos_select)
     if rank == 0:

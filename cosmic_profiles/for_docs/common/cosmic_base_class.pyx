@@ -92,8 +92,8 @@ cdef class CosmicBase:
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
         :return: d, q, s, minor, inter, major, obj_center, obj_m
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
+        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays,
+            3 x (number_of_objs, D_BINS+1, 3) float arrays,
             (number_of_objs,3) float array, (number_of_objs,) float array
         """
         return
@@ -557,13 +557,9 @@ cdef class CosmicBase:
         :rtype: (N2, r_res) floats"""
         return
         
-    def getObjInfoBase(self, float[:,:] xyz, float[:] masses, int[:,:] idx_cat, str obj_type):
+    def getObjInfoBase(self, int[:,:] idx_cat, str obj_type):
         """ Print basic info about the objects used for local shape estimation such as number of converged objects
         
-        :param xyz: positions of all simulation particles
-        :type xyz: (N2,3) floats, N2 >> N1
-        :param masses: masses of all simulation particles
-        :type masses: (N2,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param obj_type: either 'dm', 'gx' or 'unspecified', depending on what catalogue we are looking at

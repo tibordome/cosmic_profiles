@@ -1011,8 +1011,8 @@ struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 {
   struct __pyx_obj_6common_17cosmic_base_class_CosmicBase __pyx_base;
   PyObject *HDF5_SNAP_DEST;
   PyObject *HDF5_GROUP_DEST;
-  int MIN_NUMBER_STAR_PTCS;
-  int WANT_RVIR;
+  PyObject *RVIR_OR_R200;
+  PyObject *OBJ_TYPE;
 };
 
 
@@ -1912,7 +1912,6 @@ static PyObject *__pyx_builtin_id;
 static PyObject *__pyx_builtin_IndexError;
 static const char __pyx_k_O[] = "O";
 static const char __pyx_k_c[] = "c";
-static const char __pyx_k_dm[] = "dm";
 static const char __pyx_k_id[] = "id";
 static const char __pyx_k_MPI[] = "MPI";
 static const char __pyx_k_new[] = "__new__";
@@ -1973,12 +1972,10 @@ static const char __pyx_k_Get_size[] = "Get_size";
 static const char __pyx_k_VIZ_DEST[] = "VIZ_DEST";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_itemsize[] = "itemsize";
-static const char __pyx_k_obj_type[] = "obj_type";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_ROverR200[] = "ROverR200";
 static const char __pyx_k_TypeError[] = "TypeError";
-static const char __pyx_k_WANT_RVIR[] = "WANT_RVIR";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_frac_r200[] = "frac_r200";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
@@ -1995,6 +1992,7 @@ static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_obj_numbers[] = "obj_numbers";
 static const char __pyx_k_shell_based[] = "shell_based";
 static const char __pyx_k_HIST_NB_BINS[] = "HIST_NB_BINS";
+static const char __pyx_k_RVIR_OR_R200[] = "RVIR_OR_R200";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
@@ -2013,7 +2011,6 @@ static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_DensShapeProfsHDF5[] = "DensShapeProfsHDF5";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
-static const char __pyx_k_MIN_NUMBER_STAR_PTCS[] = "MIN_NUMBER_STAR_PTCS";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
@@ -2032,9 +2029,9 @@ static const char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create 
 static const char __pyx_k_Cannot_assign_to_read_only_memor[] = "Cannot assign to read-only memoryview";
 static const char __pyx_k_Cannot_create_writable_memory_vi[] = "Cannot create writable memory view from read-only memoryview";
 static const char __pyx_k_Empty_shape_tuple_for_cython_arr[] = "Empty shape tuple for cython.array";
+static const char __pyx_k_Incompatible_checksums_s_vs_0x5a[] = "Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0x82[] = "Incompatible checksums (%s vs 0x827681f = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, SAFE, SNAP, idx_cat, masses, obj_size, r200, start_time, xyz))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible checksums (%s vs 0xb068931 = (name))";
-static const char __pyx_k_Incompatible_checksums_s_vs_0xc6[] = "Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))";
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
@@ -2066,16 +2063,15 @@ static PyObject *__pyx_n_s_HIST_NB_BINS;
 static PyObject *__pyx_n_s_IT_MIN;
 static PyObject *__pyx_n_s_IT_TOL;
 static PyObject *__pyx_n_s_IT_WALL;
+static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x5a;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x82;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xb0;
-static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xc6;
 static PyObject *__pyx_n_s_IndexError;
 static PyObject *__pyx_kp_s_Indirect_dimensions_not_supporte;
 static PyObject *__pyx_kp_s_Invalid_mode_expected_c_or_fortr;
 static PyObject *__pyx_kp_s_Invalid_shape_in_axis_d_d;
 static PyObject *__pyx_n_s_L_BOX;
 static PyObject *__pyx_n_s_MIN_NUMBER_PTCS;
-static PyObject *__pyx_n_s_MIN_NUMBER_STAR_PTCS;
 static PyObject *__pyx_n_s_MPI;
 static PyObject *__pyx_n_s_MemoryError;
 static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
@@ -2084,13 +2080,13 @@ static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_ROverR200;
+static PyObject *__pyx_n_s_RVIR_OR_R200;
 static PyObject *__pyx_n_s_SNAP;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
 static PyObject *__pyx_n_s_VIZ_DEST;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_View_MemoryView;
-static PyObject *__pyx_n_s_WANT_RVIR;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_c;
@@ -2102,7 +2098,6 @@ static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_direct_binning;
-static PyObject *__pyx_n_u_dm;
 static PyObject *__pyx_n_s_dtype_is_object;
 static PyObject *__pyx_n_s_encode;
 static PyObject *__pyx_n_s_enumerate;
@@ -2133,7 +2128,6 @@ static PyObject *__pyx_n_s_new;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_obj;
 static PyObject *__pyx_n_s_obj_numbers;
-static PyObject *__pyx_n_s_obj_type;
 static PyObject *__pyx_n_s_pack;
 static PyObject *__pyx_n_s_pickle;
 static PyObject *__pyx_n_s_pyx_PickleError;
@@ -2192,24 +2186,24 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_2
 static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_26getObjInfo(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfs *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_28__reduce_cython__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfs *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_30__setstate_cython__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfs *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
-static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, int __pyx_v_MIN_NUMBER_STAR_PTCS, int __pyx_v_D_LOGSTART, int __pyx_v_D_LOGEND, int __pyx_v_D_BINS, float __pyx_v_IT_TOL, int __pyx_v_IT_WALL, int __pyx_v_IT_MIN, PyObject *__pyx_v_CENTER, int __pyx_v_WANT_RVIR); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
+static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, int __pyx_v_D_LOGSTART, int __pyx_v_D_LOGEND, int __pyx_v_D_BINS, float __pyx_v_IT_TOL, int __pyx_v_IT_WALL, int __pyx_v_IT_MIN, PyObject *__pyx_v_CENTER, PyObject *__pyx_v_RVIR_OR_R200); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced); /* proto */
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_36__reduce_cython__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_38__setstate_cython__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes___pyx_unpickle_DensShapeProfs(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
@@ -2264,9 +2258,9 @@ static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject 
 static PyObject *__pyx_tp_new__memoryviewslice(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
+static PyObject *__pyx_int_94922227;
 static PyObject *__pyx_int_136800287;
 static PyObject *__pyx_int_184977713;
-static PyObject *__pyx_int_207900485;
 static PyObject *__pyx_int_neg_1;
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
@@ -4887,14 +4881,14 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_14DensShapeProfs_3
 /* "shape_profs/shape_profs_classes.pyx":256
  *     cdef int IT_MIN
  * 
- *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint WANT_RVIR):             # <<<<<<<<<<<<<<
+ *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str RVIR_OR_R200):             # <<<<<<<<<<<<<<
  *         """
  *         :param HDF5_SNAP_DEST: where we can find the snapshot
  */
 
 /* Python wrapper */
 static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__[] = "\n        :param HDF5_SNAP_DEST: where we can find the snapshot\n        :type HDF5_SNAP_DEST: string\n        :param HDF5_GROUP_DEST: where we can find the group files\n        :type HDF5_GROUP_DEST: string\n        :param SNAP: e.g. '024'\n        :type SNAP: string\n        :param SNAP: snapshot identifier, e.g. '024'\n        :type SNAP: string\n        :param L_BOX: simulation box side length\n        :type L_BOX: float, units: Mpc/h\n        :param MIN_NUMBER_PTCS: minimum number of DM particles for halo to qualify for morphology calculation\n        :type MIN_NUMBER_PTCS: int\n        :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for galaxy to qualify for morphology calculation\n        :type MIN_NUMBER_STAR_PTCS: int\n        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGSTART: int\n        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGEND: int\n        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)\n        :type D_BINS: int\n        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``\n            for iteration to stop\n        :type IT_TOL: float\n        :param IT_WALL: maximum permissible number of iterations\n        :type IT_WALL: float\n        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; \n            if undercut, shape is unclassified\n        :type IT_MIN: int\n        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n            or 'com' (center of mass) of each halo\n        :type CENTER: str\n        :param WANT_RVIR: Whether or not we want quantities (e.g. D_LOGSTART) expressed \n            with respect to the virial radius R_vir or the overdensity radius R_200\n        :type WANT_RVIR: boolean";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__[] = "\n        :param HDF5_SNAP_DEST: where we can find the snapshot\n        :type HDF5_SNAP_DEST: string\n        :param HDF5_GROUP_DEST: where we can find the group files\n        :type HDF5_GROUP_DEST: string\n        :param SNAP: e.g. '024'\n        :type SNAP: string\n        :param SNAP: snapshot identifier, e.g. '024'\n        :type SNAP: string\n        :param L_BOX: simulation box side length\n        :type L_BOX: float, units: Mpc/h\n        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n        :type MIN_NUMBER_PTCS: int\n        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGSTART: int\n        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGEND: int\n        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)\n        :type D_BINS: int\n        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``\n            for iteration to stop\n        :type IT_TOL: float\n        :param IT_WALL: maximum permissible number of iterations\n        :type IT_WALL: float\n        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; \n            if undercut, shape is unclassified\n        :type IT_MIN: int\n        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n            or 'com' (center of mass) of each halo\n        :type CENTER: str\n        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed \n            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200\n        :type RVIR_OR_R200: str";
 #if CYTHON_COMPILING_IN_CPYTHON
 struct wrapperbase __pyx_wrapperbase_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__;
 #endif
@@ -4904,7 +4898,6 @@ static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__
   PyObject *__pyx_v_SNAP = 0;
   float __pyx_v_L_BOX;
   int __pyx_v_MIN_NUMBER_PTCS;
-  int __pyx_v_MIN_NUMBER_STAR_PTCS;
   int __pyx_v_D_LOGSTART;
   int __pyx_v_D_LOGEND;
   int __pyx_v_D_BINS;
@@ -4912,7 +4905,7 @@ static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__
   int __pyx_v_IT_WALL;
   int __pyx_v_IT_MIN;
   PyObject *__pyx_v_CENTER = 0;
-  int __pyx_v_WANT_RVIR;
+  PyObject *__pyx_v_RVIR_OR_R200 = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -4920,14 +4913,12 @@ static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HDF5_SNAP_DEST,&__pyx_n_s_HDF5_GROUP_DEST,&__pyx_n_s_SNAP,&__pyx_n_s_L_BOX,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_MIN_NUMBER_STAR_PTCS,&__pyx_n_s_D_LOGSTART,&__pyx_n_s_D_LOGEND,&__pyx_n_s_D_BINS,&__pyx_n_s_IT_TOL,&__pyx_n_s_IT_WALL,&__pyx_n_s_IT_MIN,&__pyx_n_s_CENTER,&__pyx_n_s_WANT_RVIR,0};
-    PyObject* values[14] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HDF5_SNAP_DEST,&__pyx_n_s_HDF5_GROUP_DEST,&__pyx_n_s_SNAP,&__pyx_n_s_L_BOX,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_D_LOGSTART,&__pyx_n_s_D_LOGEND,&__pyx_n_s_D_BINS,&__pyx_n_s_IT_TOL,&__pyx_n_s_IT_WALL,&__pyx_n_s_IT_MIN,&__pyx_n_s_CENTER,&__pyx_n_s_RVIR_OR_R200,0};
+    PyObject* values[13] = {0,0,0,0,0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
-        CYTHON_FALLTHROUGH;
         case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
         CYTHON_FALLTHROUGH;
         case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
@@ -4966,85 +4957,79 @@ static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_HDF5_GROUP_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 1); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 1); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_SNAP)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 2); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 2); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 3); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 3); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 4); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 4); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_STAR_PTCS)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_D_LOGSTART)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 5); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 5); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
-        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_D_LOGSTART)) != 0)) kw_args--;
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_D_LOGEND)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 6); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 6); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
-        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_D_LOGEND)) != 0)) kw_args--;
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_D_BINS)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 7); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 7); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  8:
-        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_D_BINS)) != 0)) kw_args--;
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_IT_TOL)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 8); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 8); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  9:
-        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_IT_TOL)) != 0)) kw_args--;
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_IT_WALL)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 9); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 9); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 10:
-        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_IT_WALL)) != 0)) kw_args--;
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_IT_MIN)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 10); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 10); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 11:
-        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_IT_MIN)) != 0)) kw_args--;
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 11); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 11); __PYX_ERR(0, 256, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 12:
-        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_RVIR_OR_R200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 12); __PYX_ERR(0, 256, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case 13:
-        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_WANT_RVIR)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, 13); __PYX_ERR(0, 256, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, 12); __PYX_ERR(0, 256, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 256, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 14) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 13) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -5060,26 +5045,24 @@ static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__
       values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
       values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
       values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
-      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
     }
     __pyx_v_HDF5_SNAP_DEST = ((PyObject*)values[0]);
     __pyx_v_HDF5_GROUP_DEST = ((PyObject*)values[1]);
     __pyx_v_SNAP = ((PyObject*)values[2]);
     __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
     __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_MIN_NUMBER_STAR_PTCS = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_MIN_NUMBER_STAR_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_D_LOGSTART = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_D_LOGSTART == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_D_LOGEND = __Pyx_PyInt_As_int(values[7]); if (unlikely((__pyx_v_D_LOGEND == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_D_BINS = __Pyx_PyInt_As_int(values[8]); if (unlikely((__pyx_v_D_BINS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_IT_TOL = __pyx_PyFloat_AsFloat(values[9]); if (unlikely((__pyx_v_IT_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_IT_WALL = __Pyx_PyInt_As_int(values[10]); if (unlikely((__pyx_v_IT_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_IT_MIN = __Pyx_PyInt_As_int(values[11]); if (unlikely((__pyx_v_IT_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
-    __pyx_v_CENTER = ((PyObject*)values[12]);
-    __pyx_v_WANT_RVIR = __Pyx_PyObject_IsTrue(values[13]); if (unlikely((__pyx_v_WANT_RVIR == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+    __pyx_v_D_LOGSTART = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_D_LOGSTART == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+    __pyx_v_D_LOGEND = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_D_LOGEND == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+    __pyx_v_D_BINS = __Pyx_PyInt_As_int(values[7]); if (unlikely((__pyx_v_D_BINS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+    __pyx_v_IT_TOL = __pyx_PyFloat_AsFloat(values[8]); if (unlikely((__pyx_v_IT_TOL == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+    __pyx_v_IT_WALL = __Pyx_PyInt_As_int(values[9]); if (unlikely((__pyx_v_IT_WALL == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+    __pyx_v_IT_MIN = __Pyx_PyInt_As_int(values[10]); if (unlikely((__pyx_v_IT_MIN == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+    __pyx_v_CENTER = ((PyObject*)values[11]);
+    __pyx_v_RVIR_OR_R200 = ((PyObject*)values[12]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 14, 14, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 256, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 13, 13, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 256, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5089,7 +5072,8 @@ static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_HDF5_GROUP_DEST), (&PyUnicode_Type), 1, "HDF5_GROUP_DEST", 1))) __PYX_ERR(0, 256, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_SNAP), (&PyUnicode_Type), 1, "SNAP", 1))) __PYX_ERR(0, 256, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 256, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_MIN_NUMBER_STAR_PTCS, __pyx_v_D_LOGSTART, __pyx_v_D_LOGEND, __pyx_v_D_BINS, __pyx_v_IT_TOL, __pyx_v_IT_WALL, __pyx_v_IT_MIN, __pyx_v_CENTER, __pyx_v_WANT_RVIR);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_RVIR_OR_R200), (&PyUnicode_Type), 1, "RVIR_OR_R200", 1))) __PYX_ERR(0, 256, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_D_LOGSTART, __pyx_v_D_LOGEND, __pyx_v_D_BINS, __pyx_v_IT_TOL, __pyx_v_IT_WALL, __pyx_v_IT_MIN, __pyx_v_CENTER, __pyx_v_RVIR_OR_R200);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5100,7 +5084,7 @@ static int __pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_1__
   return __pyx_r;
 }
 
-static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, int __pyx_v_MIN_NUMBER_STAR_PTCS, int __pyx_v_D_LOGSTART, int __pyx_v_D_LOGEND, int __pyx_v_D_BINS, float __pyx_v_IT_TOL, int __pyx_v_IT_WALL, int __pyx_v_IT_MIN, PyObject *__pyx_v_CENTER, int __pyx_v_WANT_RVIR) {
+static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___init__(struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, int __pyx_v_D_LOGSTART, int __pyx_v_D_LOGEND, int __pyx_v_D_BINS, float __pyx_v_IT_TOL, int __pyx_v_IT_WALL, int __pyx_v_IT_MIN, PyObject *__pyx_v_CENTER, PyObject *__pyx_v_RVIR_OR_R200) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5108,23 +5092,21 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
+  int __pyx_t_6;
   PyObject *__pyx_t_7 = NULL;
-  int __pyx_t_8;
-  PyObject *__pyx_t_9 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":292
- *             with respect to the virial radius R_vir or the overdensity radius R_200
- *         :type WANT_RVIR: boolean"""
- *         super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)             # <<<<<<<<<<<<<<
+  /* "shape_profs/shape_profs_classes.pyx":290
+ *             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
+ *         :type RVIR_OR_R200: str"""
+ *         super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200)             # <<<<<<<<<<<<<<
  *         self.D_LOGSTART = D_LOGSTART
  *         self.D_LOGEND = D_LOGEND
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5));
@@ -5132,104 +5114,93 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_2, 1, ((PyObject *)__pyx_v_self));
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_L_BOX); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_L_BOX); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_MIN_NUMBER_PTCS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_MIN_NUMBER_PTCS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_MIN_NUMBER_STAR_PTCS); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyBool_FromLong(__pyx_v_WANT_RVIR); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = NULL;
-  __pyx_t_8 = 0;
+  __pyx_t_5 = NULL;
+  __pyx_t_6 = 0;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_7)) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_5)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_8 = 1;
+      __pyx_t_6 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[9] = {__pyx_t_7, __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_v_CENTER, __pyx_t_6};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 8+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    PyObject *__pyx_temp[8] = {__pyx_t_5, __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_v_CENTER, __pyx_v_RVIR_OR_R200};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 7+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[9] = {__pyx_t_7, __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_v_CENTER, __pyx_t_6};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 8+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    PyObject *__pyx_temp[8] = {__pyx_t_5, __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_v_CENTER, __pyx_v_RVIR_OR_R200};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 7+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   {
-    __pyx_t_9 = PyTuple_New(8+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 292, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    if (__pyx_t_7) {
-      __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
+    __pyx_t_7 = PyTuple_New(7+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    if (__pyx_t_5) {
+      __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
     }
     __Pyx_INCREF(__pyx_v_HDF5_SNAP_DEST);
     __Pyx_GIVEREF(__pyx_v_HDF5_SNAP_DEST);
-    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_8, __pyx_v_HDF5_SNAP_DEST);
+    PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_6, __pyx_v_HDF5_SNAP_DEST);
     __Pyx_INCREF(__pyx_v_HDF5_GROUP_DEST);
     __Pyx_GIVEREF(__pyx_v_HDF5_GROUP_DEST);
-    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_v_HDF5_GROUP_DEST);
+    PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_v_HDF5_GROUP_DEST);
     __Pyx_INCREF(__pyx_v_SNAP);
     __Pyx_GIVEREF(__pyx_v_SNAP);
-    PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_8, __pyx_v_SNAP);
+    PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_6, __pyx_v_SNAP);
     __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_8, __pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_4);
-    PyTuple_SET_ITEM(__pyx_t_9, 4+__pyx_t_8, __pyx_t_4);
-    __Pyx_GIVEREF(__pyx_t_5);
-    PyTuple_SET_ITEM(__pyx_t_9, 5+__pyx_t_8, __pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_7, 4+__pyx_t_6, __pyx_t_4);
     __Pyx_INCREF(__pyx_v_CENTER);
     __Pyx_GIVEREF(__pyx_v_CENTER);
-    PyTuple_SET_ITEM(__pyx_t_9, 6+__pyx_t_8, __pyx_v_CENTER);
-    __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_9, 7+__pyx_t_8, __pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_7, 5+__pyx_t_6, __pyx_v_CENTER);
+    __Pyx_INCREF(__pyx_v_RVIR_OR_R200);
+    __Pyx_GIVEREF(__pyx_v_RVIR_OR_R200);
+    PyTuple_SET_ITEM(__pyx_t_7, 6+__pyx_t_6, __pyx_v_RVIR_OR_R200);
     __pyx_t_3 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_5 = 0;
-    __pyx_t_6 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "shape_profs/shape_profs_classes.pyx":293
- *         :type WANT_RVIR: boolean"""
- *         super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)
+  /* "shape_profs/shape_profs_classes.pyx":291
+ *         :type RVIR_OR_R200: str"""
+ *         super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200)
  *         self.D_LOGSTART = D_LOGSTART             # <<<<<<<<<<<<<<
  *         self.D_LOGEND = D_LOGEND
  *         self.D_BINS = D_BINS
  */
   __pyx_v_self->D_LOGSTART = __pyx_v_D_LOGSTART;
 
-  /* "shape_profs/shape_profs_classes.pyx":294
- *         super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, CENTER, WANT_RVIR)
+  /* "shape_profs/shape_profs_classes.pyx":292
+ *         super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200)
  *         self.D_LOGSTART = D_LOGSTART
  *         self.D_LOGEND = D_LOGEND             # <<<<<<<<<<<<<<
  *         self.D_BINS = D_BINS
@@ -5237,7 +5208,7 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
  */
   __pyx_v_self->D_LOGEND = __pyx_v_D_LOGEND;
 
-  /* "shape_profs/shape_profs_classes.pyx":295
+  /* "shape_profs/shape_profs_classes.pyx":293
  *         self.D_LOGSTART = D_LOGSTART
  *         self.D_LOGEND = D_LOGEND
  *         self.D_BINS = D_BINS             # <<<<<<<<<<<<<<
@@ -5246,7 +5217,7 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
  */
   __pyx_v_self->D_BINS = __pyx_v_D_BINS;
 
-  /* "shape_profs/shape_profs_classes.pyx":296
+  /* "shape_profs/shape_profs_classes.pyx":294
  *         self.D_LOGEND = D_LOGEND
  *         self.D_BINS = D_BINS
  *         self.IT_TOL = IT_TOL             # <<<<<<<<<<<<<<
@@ -5255,7 +5226,7 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
  */
   __pyx_v_self->IT_TOL = __pyx_v_IT_TOL;
 
-  /* "shape_profs/shape_profs_classes.pyx":297
+  /* "shape_profs/shape_profs_classes.pyx":295
  *         self.D_BINS = D_BINS
  *         self.IT_TOL = IT_TOL
  *         self.IT_WALL = IT_WALL             # <<<<<<<<<<<<<<
@@ -5264,19 +5235,19 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
  */
   __pyx_v_self->IT_WALL = __pyx_v_IT_WALL;
 
-  /* "shape_profs/shape_profs_classes.pyx":298
+  /* "shape_profs/shape_profs_classes.pyx":296
  *         self.IT_TOL = IT_TOL
  *         self.IT_WALL = IT_WALL
  *         self.IT_MIN = IT_MIN             # <<<<<<<<<<<<<<
  * 
- *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False):
  */
   __pyx_v_self->IT_MIN = __pyx_v_IT_MIN;
 
   /* "shape_profs/shape_profs_classes.pyx":256
  *     cdef int IT_MIN
  * 
- *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint WANT_RVIR):             # <<<<<<<<<<<<<<
+ *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str RVIR_OR_R200):             # <<<<<<<<<<<<<<
  *         """
  *         :param HDF5_SNAP_DEST: where we can find the snapshot
  */
@@ -5290,9 +5261,7 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
@@ -5300,17 +5269,17 @@ static int __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5___i
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":300
+/* "shape_profs/shape_profs_classes.pyx":298
  *         self.IT_MIN = IT_MIN
  * 
- *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Estimate density profiles
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_3estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs[] = " Estimate density profiles\n        \n        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined\n        :type ROverR200: (r_res,) floats\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param direct_binning: whether or not direct binning approach or\n            kernel-based approach should be used\n        :type direct_binning: boolean\n        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based\n            should be used, ignored if ``direct_binning`` = False\n        :type spherical: boolean\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string\n        :return: density profiles\n        :rtype: (N2, r_res) floats";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs[] = " Estimate density profiles\n        \n        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined\n        :type ROverR200: (r_res,) floats\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param direct_binning: whether or not direct binning approach or\n            kernel-based approach should be used\n        :type direct_binning: boolean\n        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based\n            should be used, ignored if ``direct_binning`` = False\n        :type spherical: boolean\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :return: density profiles\n        :rtype: (N2, r_res) floats";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_3estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
@@ -5318,7 +5287,6 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   CYTHON_UNUSED int __pyx_v_spherical;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5326,15 +5294,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("estDensProfs (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_ROverR200,&__pyx_n_s_select,&__pyx_n_s_direct_binning,&__pyx_n_s_spherical,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[7] = {0,0,0,0,0,0,0};
-    values[6] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_ROverR200,&__pyx_n_s_select,&__pyx_n_s_direct_binning,&__pyx_n_s_spherical,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
-        CYTHON_FALLTHROUGH;
         case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
         CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
@@ -5359,7 +5324,7 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 7, 1); __PYX_ERR(0, 300, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 6, 1); __PYX_ERR(0, 298, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -5385,20 +5350,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[5] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  6:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[6] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estDensProfs") < 0)) __PYX_ERR(0, 300, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estDensProfs") < 0)) __PYX_ERR(0, 298, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
-        CYTHON_FALLTHROUGH;
         case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
         CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
@@ -5416,38 +5373,36 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_ROverR200 = values[0];
     __pyx_v_select = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_direct_binning = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_direct_binning == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 300, __pyx_L3_error)
+      __pyx_v_direct_binning = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_direct_binning == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 298, __pyx_L3_error)
     } else {
       __pyx_v_direct_binning = ((int)1);
     }
     if (values[3]) {
-      __pyx_v_spherical = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_spherical == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 300, __pyx_L3_error)
+      __pyx_v_spherical = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_spherical == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 298, __pyx_L3_error)
     } else {
       __pyx_v_spherical = ((int)1);
     }
     if (values[4]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 300, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 298, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[5]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 300, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 298, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[6]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 300, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 298, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.estDensProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 300, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 300, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_ROverR200, __pyx_v_select, __pyx_v_direct_binning, __pyx_v_spherical, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 298, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_ROverR200, __pyx_v_select, __pyx_v_direct_binning, __pyx_v_spherical, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5458,26 +5413,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_2estDensProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("estDensProfs", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":321
+  /* "shape_profs/shape_profs_classes.pyx":317
  *         :return: density profiles
  *         :rtype: (N2, r_res) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":300
+  /* "shape_profs/shape_profs_classes.pyx":298
  *         self.IT_MIN = IT_MIN
  * 
- *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Estimate density profiles
  * 
  */
@@ -5489,22 +5444,21 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":323
+/* "shape_profs/shape_profs_classes.pyx":319
  *         return
  * 
- *     def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant local shape data
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_5getShapeCatLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal[] = " Get all relevant local shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal[] = " Get all relevant local shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_5getShapeCatLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5512,15 +5466,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatLocal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -5547,20 +5498,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[2] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[3] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatLocal") < 0)) __PYX_ERR(0, 323, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatLocal") < 0)) __PYX_ERR(0, 319, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -5572,28 +5515,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     }
     __pyx_v_select = ((PyObject*)values[0]);
     if (values[1]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 323, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 319, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[2]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 323, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 319, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[3]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getShapeCatLocal", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 323, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("getShapeCatLocal", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 319, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.getShapeCatLocal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 323, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 323, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 319, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5604,26 +5545,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_4getShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatLocal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":338
+  /* "shape_profs/shape_profs_classes.pyx":332
  *             3 x (number_of_objs, D_BINS+1, 3) float arrays,
  *             (number_of_objs,3) float array, (number_of_objs,) float array"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def getShapeCatGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):
+ *     def getShapeCatGlobal(self, list select, bint reduced = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":323
+  /* "shape_profs/shape_profs_classes.pyx":319
  *         return
  * 
- *     def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant local shape data
  * 
  */
@@ -5635,21 +5576,20 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":340
+/* "shape_profs/shape_profs_classes.pyx":334
  *         return
  * 
- *     def getShapeCatGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatGlobal(self, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant global shape data
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_7getShapeCatGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal[] = " Get all relevant global shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal[] = " Get all relevant global shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_7getShapeCatGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5657,15 +5597,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatGlobal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_obj_type,0};
-    PyObject* values[3] = {0,0,0};
-    values[2] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,0};
+    PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -5684,20 +5621,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced);
           if (value) { values[1] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  2:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[2] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatGlobal") < 0)) __PYX_ERR(0, 340, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatGlobal") < 0)) __PYX_ERR(0, 334, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -5707,23 +5636,21 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     }
     __pyx_v_select = ((PyObject*)values[0]);
     if (values[1]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 340, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 334, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[2]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getShapeCatGlobal", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 340, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("getShapeCatGlobal", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 334, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.getShapeCatGlobal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 340, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 340, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 334, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5734,26 +5661,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_6getShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatGlobal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":353
+  /* "shape_profs/shape_profs_classes.pyx":345
  *             3 x (number_of_objs, D_BINS+1, 3) float arrays,
  *             (number_of_objs,3) float array, (number_of_objs,) float array"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":340
+  /* "shape_profs/shape_profs_classes.pyx":334
  *         return
  * 
- *     def getShapeCatGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatGlobal(self, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant global shape data
  * 
  */
@@ -5765,22 +5692,21 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":355
+/* "shape_profs/shape_profs_classes.pyx":347
  *         return
  * 
- *     def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant local velocity shape data
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_9getShapeCatVelLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal[] = " Get all relevant local velocity shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal[] = " Get all relevant local velocity shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays,\n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_9getShapeCatVelLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5788,15 +5714,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatVelLocal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -5823,20 +5746,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[2] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[3] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatVelLocal") < 0)) __PYX_ERR(0, 355, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatVelLocal") < 0)) __PYX_ERR(0, 347, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -5848,28 +5763,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     }
     __pyx_v_select = ((PyObject*)values[0]);
     if (values[1]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 355, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 347, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[2]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 355, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 347, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[3]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getShapeCatVelLocal", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 355, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("getShapeCatVelLocal", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 347, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.getShapeCatVelLocal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 355, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 355, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5880,26 +5793,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_8getShapeCatVelLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatVelLocal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":370
+  /* "shape_profs/shape_profs_classes.pyx":360
  *             3 x (number_of_objs, D_BINS+1, 3) float arrays,
  *             (number_of_objs,3) float array, (number_of_objs,) float array"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def getShapeCatVelGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):
+ *     def getShapeCatVelGlobal(self, list select, bint reduced = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":355
+  /* "shape_profs/shape_profs_classes.pyx":347
  *         return
  * 
- *     def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant local velocity shape data
  * 
  */
@@ -5911,21 +5824,20 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":372
+/* "shape_profs/shape_profs_classes.pyx":362
  *         return
  * 
- *     def getShapeCatVelGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatVelGlobal(self, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant global velocity shape data
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_11getShapeCatVelGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal[] = " Get all relevant global velocity shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array,\n        ";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal[] = " Get all relevant global velocity shape data\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array,\n        ";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_11getShapeCatVelGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5933,15 +5845,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatVelGlobal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_obj_type,0};
-    PyObject* values[3] = {0,0,0};
-    values[2] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_select,&__pyx_n_s_reduced,0};
+    PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -5960,20 +5869,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced);
           if (value) { values[1] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  2:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[2] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatVelGlobal") < 0)) __PYX_ERR(0, 372, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getShapeCatVelGlobal") < 0)) __PYX_ERR(0, 362, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -5983,23 +5884,21 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     }
     __pyx_v_select = ((PyObject*)values[0]);
     if (values[1]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 372, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[1]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 362, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[2]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getShapeCatVelGlobal", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 372, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("getShapeCatVelGlobal", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 362, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.getShapeCatVelGlobal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 372, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 372, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_select, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6010,26 +5909,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_10getShapeCatVelGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getShapeCatVelGlobal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":386
+  /* "shape_profs/shape_profs_classes.pyx":374
  *             (number_of_objs,3) float array, (number_of_objs,) float array,
  *         """
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":372
+  /* "shape_profs/shape_profs_classes.pyx":362
  *         return
  * 
- *     def getShapeCatVelGlobal(self, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getShapeCatVelGlobal(self, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Get all relevant global velocity shape data
  * 
  */
@@ -6041,23 +5940,22 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":388
+/* "shape_profs/shape_profs_classes.pyx":376
  *         return
  * 
- *     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Visualize local shape of objects with numbers ``obj_numbers``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_13vizLocalShapes(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes[] = " Visualize local shape of objects with numbers ``obj_numbers``\n        \n        :param obj_numbers: list of object indices for which to visualize local shapes\n        :type obj_numbers: list of int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: strings\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes[] = " Visualize local shape of objects with numbers ``obj_numbers``\n        \n        :param obj_numbers: list of object indices for which to visualize local shapes\n        :type obj_numbers: list of int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: strings\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_13vizLocalShapes(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_obj_numbers = 0;
   CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6065,15 +5963,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("vizLocalShapes (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_obj_numbers,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[5] = {0,0,0,0,0};
-    values[4] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_obj_numbers,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[4] = {0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -6094,7 +5989,7 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("vizLocalShapes", 0, 2, 5, 1); __PYX_ERR(0, 388, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("vizLocalShapes", 0, 2, 4, 1); __PYX_ERR(0, 376, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -6108,20 +6003,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[3] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  4:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[4] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "vizLocalShapes") < 0)) __PYX_ERR(0, 388, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "vizLocalShapes") < 0)) __PYX_ERR(0, 376, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -6135,28 +6022,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_obj_numbers = values[0];
     __pyx_v_VIZ_DEST = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 388, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 376, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[3]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 388, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 376, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[4]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("vizLocalShapes", 0, 2, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 388, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("vizLocalShapes", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 376, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.vizLocalShapes", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 388, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 388, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_obj_numbers, __pyx_v_VIZ_DEST, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 376, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_obj_numbers, __pyx_v_VIZ_DEST, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6167,26 +6052,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_12vizLocalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("vizLocalShapes", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":401
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":387
+ *         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
+ *         :type shell_based: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, str obj_type = 'dm'):
+ *     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":388
+  /* "shape_profs/shape_profs_classes.pyx":376
  *         return
  * 
- *     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Visualize local shape of objects with numbers ``obj_numbers``
  * 
  */
@@ -6198,22 +6083,21 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":403
+/* "shape_profs/shape_profs_classes.pyx":389
  *         return
  * 
- *     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Visualize global shape of objects with numbers ``obj_numbers``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_15vizGlobalShapes(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes[] = " Visualize global shape of objects with numbers ``obj_numbers``\n        \n        :param obj_numbers: list of object indices for which to visualize global shapes\n        :type obj_numbers: list of ints\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes[] = " Visualize global shape of objects with numbers ``obj_numbers``\n        \n        :param obj_numbers: list of object indices for which to visualize global shapes\n        :type obj_numbers: list of ints\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_15vizGlobalShapes(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_obj_numbers = 0;
   CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6221,15 +6105,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("vizGlobalShapes (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_obj_numbers,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_reduced,&__pyx_n_s_obj_type,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_obj_numbers,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_reduced,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -6248,7 +6129,7 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("vizGlobalShapes", 0, 2, 4, 1); __PYX_ERR(0, 403, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("vizGlobalShapes", 0, 2, 3, 1); __PYX_ERR(0, 389, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -6256,20 +6137,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced);
           if (value) { values[2] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[3] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "vizGlobalShapes") < 0)) __PYX_ERR(0, 403, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "vizGlobalShapes") < 0)) __PYX_ERR(0, 389, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -6281,23 +6154,21 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_obj_numbers = values[0];
     __pyx_v_VIZ_DEST = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 403, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[3]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("vizGlobalShapes", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 403, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("vizGlobalShapes", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 389, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.vizGlobalShapes", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 403, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 403, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_obj_numbers, __pyx_v_VIZ_DEST, __pyx_v_reduced, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 389, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_obj_numbers, __pyx_v_VIZ_DEST, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6308,26 +6179,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_14vizGlobalShapes(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("vizGlobalShapes", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":414
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":398
+ *         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
+ *         :type reduced: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):
+ *     def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":403
+  /* "shape_profs/shape_profs_classes.pyx":389
  *         return
  * 
- *     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Visualize global shape of objects with numbers ``obj_numbers``
  * 
  */
@@ -6339,22 +6210,21 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":416
+/* "shape_profs/shape_profs_classes.pyx":400
  *         return
  * 
- *     def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
  *         """ Plot global ellipticity histogram
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_17plotGlobalEpsHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist[] = " Plot global ellipticity histogram\n        \n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist[] = " Plot global ellipticity histogram\n        \n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_17plotGlobalEpsHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS = 0;
   CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6362,15 +6232,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotGlobalEpsHist (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,&__pyx_n_s_obj_type,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -6389,52 +6256,40 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotGlobalEpsHist", 0, 3, 4, 1); __PYX_ERR(0, 416, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotGlobalEpsHist", 1, 3, 3, 1); __PYX_ERR(0, 400, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotGlobalEpsHist", 0, 3, 4, 2); __PYX_ERR(0, 416, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[3] = value; kw_args--; }
+          __Pyx_RaiseArgtupleInvalid("plotGlobalEpsHist", 1, 3, 3, 2); __PYX_ERR(0, 400, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotGlobalEpsHist") < 0)) __PYX_ERR(0, 416, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotGlobalEpsHist") < 0)) __PYX_ERR(0, 400, __pyx_L3_error)
       }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
     } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        break;
-        default: goto __pyx_L5_argtuple_error;
-      }
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_HIST_NB_BINS = values[0];
     __pyx_v_VIZ_DEST = ((PyObject*)values[1]);
     __pyx_v_select = ((PyObject*)values[2]);
-    __pyx_v_obj_type = ((PyObject*)values[3]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plotGlobalEpsHist", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 416, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plotGlobalEpsHist", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 400, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.plotGlobalEpsHist", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 416, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 416, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 416, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_select, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 400, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 400, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6445,26 +6300,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_16plotGlobalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotGlobalEpsHist", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":427
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":409
+ *         :param select: index of first and last object to look at in the format [idx_first, idx_last]
+ *         :type select: list containing two integers"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):
+ *     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":416
+  /* "shape_profs/shape_profs_classes.pyx":400
  *         return
  * 
- *     def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
  *         """ Plot global ellipticity histogram
  * 
  */
@@ -6476,23 +6331,22 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":429
+/* "shape_profs/shape_profs_classes.pyx":411
  *         return
  * 
- *     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
  *         """ Plot local ellipticity histogram at depth ``frac_r200``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_19plotLocalEpsHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist[] = " Plot local ellipticity histogram at depth ``frac_r200``\n        \n        :param frac_r200: depth of objects to plot ellipticity, in units of R200\n        :type frac_r200: float\n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist[] = " Plot local ellipticity histogram at depth ``frac_r200``\n        \n        :param frac_r200: depth of objects to plot ellipticity, in units of R200\n        :type frac_r200: float\n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_19plotLocalEpsHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_frac_r200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS = 0;
   CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6500,15 +6354,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotLocalEpsHist (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_frac_r200,&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,&__pyx_n_s_obj_type,0};
-    PyObject* values[5] = {0,0,0,0,0};
-    values[4] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_frac_r200,&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,0};
+    PyObject* values[4] = {0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -6529,60 +6380,48 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_HIST_NB_BINS)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 0, 4, 5, 1); __PYX_ERR(0, 429, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 1, 4, 4, 1); __PYX_ERR(0, 411, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 0, 4, 5, 2); __PYX_ERR(0, 429, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 1, 4, 4, 2); __PYX_ERR(0, 411, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 0, 4, 5, 3); __PYX_ERR(0, 429, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  4:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[4] = value; kw_args--; }
+          __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 1, 4, 4, 3); __PYX_ERR(0, 411, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotLocalEpsHist") < 0)) __PYX_ERR(0, 429, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotLocalEpsHist") < 0)) __PYX_ERR(0, 411, __pyx_L3_error)
       }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
     } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        break;
-        default: goto __pyx_L5_argtuple_error;
-      }
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
     __pyx_v_frac_r200 = values[0];
     __pyx_v_HIST_NB_BINS = values[1];
     __pyx_v_VIZ_DEST = ((PyObject*)values[2]);
     __pyx_v_select = ((PyObject*)values[3]);
-    __pyx_v_obj_type = ((PyObject*)values[4]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 429, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plotLocalEpsHist", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 411, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.plotLocalEpsHist", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 429, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 429, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 429, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_frac_r200, __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_select, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 411, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 411, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_frac_r200, __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6593,26 +6432,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_18plotLocalEpsHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotLocalEpsHist", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":442
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":422
+ *         :param select: index of first and last object to look at in the format [idx_first, idx_last]
+ *         :type select: list containing two integers"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":429
+  /* "shape_profs/shape_profs_classes.pyx":411
  *         return
  * 
- *     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
  *         """ Plot local ellipticity histogram at depth ``frac_r200``
  * 
  */
@@ -6624,17 +6463,17 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":444
+/* "shape_profs/shape_profs_classes.pyx":424
  *         return
  * 
- *     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Plot local triaxiality histogram at depth ``frac_r200``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_21plotLocalTHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist[] = " Plot local triaxiality histogram at depth ``frac_r200``\n        \n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param frac_r200: depth of objects to plot triaxiality, in units of R200\n        :type frac_r200: float\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist[] = " Plot local triaxiality histogram at depth ``frac_r200``\n        \n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param frac_r200: depth of objects to plot triaxiality, in units of R200\n        :type frac_r200: float\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_21plotLocalTHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS = 0;
   CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST = 0;
@@ -6642,7 +6481,6 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6650,15 +6488,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotLocalTHist (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_frac_r200,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[7] = {0,0,0,0,0,0,0};
-    values[6] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_frac_r200,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
-        CYTHON_FALLTHROUGH;
         case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
         CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
@@ -6683,19 +6518,19 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 7, 1); __PYX_ERR(0, 444, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 6, 1); __PYX_ERR(0, 424, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_frac_r200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 7, 2); __PYX_ERR(0, 444, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 6, 2); __PYX_ERR(0, 424, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 7, 3); __PYX_ERR(0, 444, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 6, 3); __PYX_ERR(0, 424, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
@@ -6709,20 +6544,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[5] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  6:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[6] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotLocalTHist") < 0)) __PYX_ERR(0, 444, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotLocalTHist") < 0)) __PYX_ERR(0, 424, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
-        CYTHON_FALLTHROUGH;
         case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
         CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
@@ -6740,29 +6567,27 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_frac_r200 = values[2];
     __pyx_v_select = ((PyObject*)values[3]);
     if (values[4]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 444, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 424, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[5]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 444, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 424, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[6]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 444, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plotLocalTHist", 0, 4, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 424, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.plotLocalTHist", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 444, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 444, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 444, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_frac_r200, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 424, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 424, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_frac_r200, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6773,26 +6598,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_20plotLocalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_frac_r200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotLocalTHist", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":461
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":439
+ *         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
+ *         :type shell_based: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False, str obj_type = 'dm'):
+ *     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":444
+  /* "shape_profs/shape_profs_classes.pyx":424
  *         return
  * 
- *     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Plot local triaxiality histogram at depth ``frac_r200``
  * 
  */
@@ -6804,23 +6629,22 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":463
+/* "shape_profs/shape_profs_classes.pyx":441
  *         return
  * 
- *     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Plot global triaxiality histogram
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_23plotGlobalTHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist[] = " Plot global triaxiality histogram\n        \n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist[] = " Plot global triaxiality histogram\n        \n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param HIST_NB_BINS: number of histogram bins\n        :type HIST_NB_BINS: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_23plotGlobalTHist(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS = 0;
   CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6828,15 +6652,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotGlobalTHist (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_obj_type,0};
-    PyObject* values[5] = {0,0,0,0,0};
-    values[4] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HIST_NB_BINS,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,0};
+    PyObject* values[4] = {0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -6857,13 +6678,13 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotGlobalTHist", 0, 3, 5, 1); __PYX_ERR(0, 463, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotGlobalTHist", 0, 3, 4, 1); __PYX_ERR(0, 441, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotGlobalTHist", 0, 3, 5, 2); __PYX_ERR(0, 463, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotGlobalTHist", 0, 3, 4, 2); __PYX_ERR(0, 441, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -6871,20 +6692,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced);
           if (value) { values[3] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  4:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[4] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotGlobalTHist") < 0)) __PYX_ERR(0, 463, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotGlobalTHist") < 0)) __PYX_ERR(0, 441, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -6898,24 +6711,22 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_VIZ_DEST = ((PyObject*)values[1]);
     __pyx_v_select = ((PyObject*)values[2]);
     if (values[3]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 463, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 441, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[4]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plotGlobalTHist", 0, 3, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 463, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plotGlobalTHist", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 441, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.plotGlobalTHist", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 463, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 463, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 463, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 441, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 441, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_HIST_NB_BINS, __pyx_v_VIZ_DEST, __pyx_v_select, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6926,26 +6737,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_22plotGlobalTHist(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_HIST_NB_BINS, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotGlobalTHist", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":478
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":454
+ *         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
+ *         :type reduced: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":463
+  /* "shape_profs/shape_profs_classes.pyx":441
  *         return
  * 
- *     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Plot global triaxiality histogram
  * 
  */
@@ -6957,24 +6768,23 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":480
+/* "shape_profs/shape_profs_classes.pyx":456
  *         return
  * 
- *     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Draws shape profiles, also mass bin-decomposed ones
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_25plotShapeProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs[] = " Draws shape profiles, also mass bin-decomposed ones\n        \n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs[] = " Draws shape profiles, also mass bin-decomposed ones\n        \n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_25plotShapeProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED int __pyx_v_nb_bins;
   CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6982,15 +6792,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotShapeProfs (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_nb_bins,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[6] = {0,0,0,0,0,0};
-    values[5] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_nb_bins,&__pyx_n_s_VIZ_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[5] = {0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
-        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -7013,13 +6820,13 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotShapeProfs", 0, 3, 6, 1); __PYX_ERR(0, 480, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotShapeProfs", 0, 3, 5, 1); __PYX_ERR(0, 456, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotShapeProfs", 0, 3, 6, 2); __PYX_ERR(0, 480, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotShapeProfs", 0, 3, 5, 2); __PYX_ERR(0, 456, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -7033,20 +6840,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[4] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  5:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[5] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotShapeProfs") < 0)) __PYX_ERR(0, 480, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotShapeProfs") < 0)) __PYX_ERR(0, 456, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
-        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -7058,33 +6857,31 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_nb_bins = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_nb_bins == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 480, __pyx_L3_error)
+    __pyx_v_nb_bins = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_nb_bins == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 456, __pyx_L3_error)
     __pyx_v_VIZ_DEST = ((PyObject*)values[1]);
     __pyx_v_select = ((PyObject*)values[2]);
     if (values[3]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 480, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 456, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[4]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 480, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 456, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[5]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plotShapeProfs", 0, 3, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 480, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plotShapeProfs", 0, 3, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 456, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.plotShapeProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 480, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 480, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 480, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_nb_bins, __pyx_v_VIZ_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 456, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 456, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_nb_bins, __pyx_v_VIZ_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -7095,26 +6892,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_24plotShapeProfs(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotShapeProfs", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":495
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":469
+ *         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
+ *         :type shell_based: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":480
+  /* "shape_profs/shape_profs_classes.pyx":456
  *         return
  * 
- *     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Draws shape profiles, also mass bin-decomposed ones
  * 
  */
@@ -7126,23 +6923,22 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":497
+/* "shape_profs/shape_profs_classes.pyx":471
  *         return
  * 
- *     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant local shape data into ``CAT_DEST``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_27dumpShapeCatLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal[] = " Dumps all relevant local shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal[] = " Dumps all relevant local shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_27dumpShapeCatLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -7150,15 +6946,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeCatLocal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[5] = {0,0,0,0,0};
-    values[4] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[4] = {0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -7179,7 +6972,7 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("dumpShapeCatLocal", 0, 2, 5, 1); __PYX_ERR(0, 497, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("dumpShapeCatLocal", 0, 2, 4, 1); __PYX_ERR(0, 471, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -7193,20 +6986,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[3] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  4:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[4] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeCatLocal") < 0)) __PYX_ERR(0, 497, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeCatLocal") < 0)) __PYX_ERR(0, 471, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -7220,29 +7005,27 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_CAT_DEST = ((PyObject*)values[0]);
     __pyx_v_select = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 497, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 471, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[3]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 497, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 471, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[4]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("dumpShapeCatLocal", 0, 2, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 497, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("dumpShapeCatLocal", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 471, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.dumpShapeCatLocal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 497, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 497, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 497, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 471, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -7253,26 +7036,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_26dumpShapeCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeCatLocal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":510
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":482
+ *         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
+ *         :type shell_based: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):
+ *     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":497
+  /* "shape_profs/shape_profs_classes.pyx":471
  *         return
  * 
- *     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant local shape data into ``CAT_DEST``
  * 
  */
@@ -7284,22 +7067,21 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":512
+/* "shape_profs/shape_profs_classes.pyx":484
  *         return
  * 
- *     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant global shape data into ``CAT_DEST``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_29dumpShapeCatGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal[] = " Dumps all relevant global shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal[] = " Dumps all relevant global shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_29dumpShapeCatGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -7307,15 +7089,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeCatGlobal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_obj_type,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -7334,7 +7113,7 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("dumpShapeCatGlobal", 0, 2, 4, 1); __PYX_ERR(0, 512, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("dumpShapeCatGlobal", 0, 2, 3, 1); __PYX_ERR(0, 484, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -7342,20 +7121,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced);
           if (value) { values[2] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[3] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeCatGlobal") < 0)) __PYX_ERR(0, 512, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeCatGlobal") < 0)) __PYX_ERR(0, 484, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -7367,24 +7138,22 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_CAT_DEST = ((PyObject*)values[0]);
     __pyx_v_select = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 512, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 484, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[3]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("dumpShapeCatGlobal", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 512, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("dumpShapeCatGlobal", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 484, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.dumpShapeCatGlobal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 512, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 512, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 512, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 484, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 484, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -7395,26 +7164,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeCatGlobal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":523
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":493
+ *         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
+ *         :type reduced: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):
+ *     def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":512
+  /* "shape_profs/shape_profs_classes.pyx":484
  *         return
  * 
- *     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant global shape data into ``CAT_DEST``
  * 
  */
@@ -7426,23 +7195,22 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":525
+/* "shape_profs/shape_profs_classes.pyx":495
  *         return
  * 
- *     def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_31dumpShapeVelCatLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal[] = " Dumps all relevant local velocity shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal[] = " Dumps all relevant local velocity shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_31dumpShapeVelCatLocal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
   CYTHON_UNUSED int __pyx_v_shell_based;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -7450,15 +7218,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeVelCatLocal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,&__pyx_n_s_obj_type,0};
-    PyObject* values[5] = {0,0,0,0,0};
-    values[4] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_shell_based,0};
+    PyObject* values[4] = {0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -7479,7 +7244,7 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatLocal", 0, 2, 5, 1); __PYX_ERR(0, 525, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatLocal", 0, 2, 4, 1); __PYX_ERR(0, 495, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -7493,20 +7258,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shell_based);
           if (value) { values[3] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  4:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[4] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeVelCatLocal") < 0)) __PYX_ERR(0, 525, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeVelCatLocal") < 0)) __PYX_ERR(0, 495, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
@@ -7520,29 +7277,27 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_CAT_DEST = ((PyObject*)values[0]);
     __pyx_v_select = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 525, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 495, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
     if (values[3]) {
-      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 525, __pyx_L3_error)
+      __pyx_v_shell_based = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_shell_based == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 495, __pyx_L3_error)
     } else {
       __pyx_v_shell_based = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[4]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatLocal", 0, 2, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 525, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatLocal", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 495, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.dumpShapeVelCatLocal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 525, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 525, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 525, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 495, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 495, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_shell_based);
 
   /* function exit code */
   goto __pyx_L0;
@@ -7553,26 +7308,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED int __pyx_v_shell_based) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeVelCatLocal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":538
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":506
+ *         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
+ *         :type shell_based: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):
+ *     def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":525
+  /* "shape_profs/shape_profs_classes.pyx":495
  *         return
  * 
- *     def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
  * 
  */
@@ -7584,22 +7339,21 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":540
+/* "shape_profs/shape_profs_classes.pyx":508
  *         return
  * 
- *     def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_33dumpShapeVelCatGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal[] = " Dumps all relevant global velocity shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal[] = " Dumps all relevant global velocity shape data into ``CAT_DEST``\n        \n        :param CAT_DEST: catalogue folder\n        :type CAT_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean";
 static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_33dumpShapeVelCatGlobal(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_reduced;
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -7607,15 +7361,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeVelCatGlobal (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,&__pyx_n_s_obj_type,0};
-    PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_dm);
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_CAT_DEST,&__pyx_n_s_select,&__pyx_n_s_reduced,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -7634,7 +7385,7 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatGlobal", 0, 2, 4, 1); __PYX_ERR(0, 540, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatGlobal", 0, 2, 3, 1); __PYX_ERR(0, 508, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -7642,20 +7393,12 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
           PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reduced);
           if (value) { values[2] = value; kw_args--; }
         }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[3] = value; kw_args--; }
-        }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeVelCatGlobal") < 0)) __PYX_ERR(0, 540, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dumpShapeVelCatGlobal") < 0)) __PYX_ERR(0, 508, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -7667,24 +7410,22 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
     __pyx_v_CAT_DEST = ((PyObject*)values[0]);
     __pyx_v_select = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 540, __pyx_L3_error)
+      __pyx_v_reduced = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_reduced == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 508, __pyx_L3_error)
     } else {
       __pyx_v_reduced = ((int)0);
     }
-    __pyx_v_obj_type = ((PyObject*)values[3]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatGlobal", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 540, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("dumpShapeVelCatGlobal", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 508, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.dumpShapeVelCatGlobal", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 540, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 540, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 540, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced, __pyx_v_obj_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CAT_DEST), (&PyUnicode_Type), 1, "CAT_DEST", 1))) __PYX_ERR(0, 508, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 508, __pyx_L1_error)
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_CAT_DEST, __pyx_v_select, __pyx_v_reduced);
 
   /* function exit code */
   goto __pyx_L0;
@@ -7695,26 +7436,26 @@ static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_CAT_DEST, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_reduced) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dumpShapeVelCatGlobal", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":551
- *         :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
- *         :type obj_type: string"""
+  /* "shape_profs/shape_profs_classes.pyx":517
+ *         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
+ *         :type reduced: boolean"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def getObjInfo(self, str obj_type = 'dm'):
+ *     def getObjInfo(self):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":540
+  /* "shape_profs/shape_profs_classes.pyx":508
  *         return
  * 
- *     def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False):             # <<<<<<<<<<<<<<
  *         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
  * 
  */
@@ -7726,86 +7467,35 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   return __pyx_r;
 }
 
-/* "shape_profs/shape_profs_classes.pyx":553
+/* "shape_profs/shape_profs_classes.pyx":519
  *         return
  * 
- *     def getObjInfo(self, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getObjInfo(self):             # <<<<<<<<<<<<<<
  *         """ Print basic info about the objects used for local shape estimation such as number of converged objects"""
  *         return
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_35getObjInfo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_35getObjInfo(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static char __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo[] = " Print basic info about the objects used for local shape estimation such as number of converged objects";
-static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_35getObjInfo(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
+static PyObject *__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_35getObjInfo(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getObjInfo (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_obj_type,0};
-    PyObject* values[1] = {0};
-    values[0] = ((PyObject*)__pyx_n_u_dm);
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type);
-          if (value) { values[0] = value; kw_args--; }
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getObjInfo") < 0)) __PYX_ERR(0, 553, __pyx_L3_error)
-      }
-    } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-    }
-    __pyx_v_obj_type = ((PyObject*)values[0]);
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getObjInfo", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 553, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.getObjInfo", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 553, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self), __pyx_v_obj_type);
+  __pyx_r = __pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo(((struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *)__pyx_v_self));
 
   /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo(CYTHON_UNUSED struct __pyx_obj_11shape_profs_19shape_profs_classes_DensShapeProfsHDF5 *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getObjInfo", 0);
 
-  /* "shape_profs/shape_profs_classes.pyx":555
- *     def getObjInfo(self, str obj_type = 'dm'):
+  /* "shape_profs/shape_profs_classes.pyx":521
+ *     def getObjInfo(self):
  *         """ Print basic info about the objects used for local shape estimation such as number of converged objects"""
  *         return             # <<<<<<<<<<<<<<
  */
@@ -7813,10 +7503,10 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "shape_profs/shape_profs_classes.pyx":553
+  /* "shape_profs/shape_profs_classes.pyx":519
  *         return
  * 
- *     def getObjInfo(self, str obj_type = 'dm'):             # <<<<<<<<<<<<<<
+ *     def getObjInfo(self):             # <<<<<<<<<<<<<<
  *         """ Print basic info about the objects used for local shape estimation such as number of converged objects"""
  *         return
  */
@@ -7866,11 +7556,9 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
-  PyObject *__pyx_t_14 = NULL;
-  PyObject *__pyx_t_15 = NULL;
+  int __pyx_t_14;
+  int __pyx_t_15;
   int __pyx_t_16;
-  int __pyx_t_17;
-  int __pyx_t_18;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -7879,7 +7567,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.MIN_NUMBER_STAR_PTCS, self.SAFE, self.SNAP, self.WANT_RVIR, self.r200, self.start_time)             # <<<<<<<<<<<<<<
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.OBJ_TYPE, self.RVIR_OR_R200, self.SAFE, self.SNAP, self.r200, self.start_time)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:
  */
@@ -7901,59 +7589,57 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_self->__pyx_base.__pyx_base.MIN_NUMBER_PTCS); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = __Pyx_PyInt_From_int(__pyx_v_self->__pyx_base.MIN_NUMBER_STAR_PTCS); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __pyx_t_10 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.__pyx_base.SAFE); if (unlikely(!__pyx_t_10)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.__pyx_base.SAFE); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 5, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_12 = __Pyx_PyBool_FromLong(__pyx_v_self->__pyx_base.WANT_RVIR); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 5, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_12);
   if (unlikely(!__pyx_v_self->__pyx_base.__pyx_base.r200.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(1, 5, __pyx_L1_error)}
-  __pyx_t_13 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.__pyx_base.r200, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __pyx_t_11 = __pyx_memoryview_fromslice(__pyx_v_self->__pyx_base.__pyx_base.r200, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __pyx_t_12 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.__pyx_base.start_time); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_12);
+  __pyx_t_13 = PyTuple_New(18); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
-  __pyx_t_14 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.__pyx_base.start_time); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 5, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_14);
-  __pyx_t_15 = PyTuple_New(18); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 5, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base.CENTER);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base.CENTER);
-  PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_v_self->__pyx_base.__pyx_base.CENTER);
+  PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_v_self->__pyx_base.__pyx_base.CENTER);
   __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_15, 2, __pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_13, 2, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
-  PyTuple_SET_ITEM(__pyx_t_15, 3, __pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_13, 3, __pyx_t_3);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.HDF5_GROUP_DEST);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.HDF5_GROUP_DEST);
-  PyTuple_SET_ITEM(__pyx_t_15, 4, __pyx_v_self->__pyx_base.HDF5_GROUP_DEST);
+  PyTuple_SET_ITEM(__pyx_t_13, 4, __pyx_v_self->__pyx_base.HDF5_GROUP_DEST);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.HDF5_SNAP_DEST);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.HDF5_SNAP_DEST);
-  PyTuple_SET_ITEM(__pyx_t_15, 5, __pyx_v_self->__pyx_base.HDF5_SNAP_DEST);
+  PyTuple_SET_ITEM(__pyx_t_13, 5, __pyx_v_self->__pyx_base.HDF5_SNAP_DEST);
   __Pyx_GIVEREF(__pyx_t_4);
-  PyTuple_SET_ITEM(__pyx_t_15, 6, __pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_13, 6, __pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_5);
-  PyTuple_SET_ITEM(__pyx_t_15, 7, __pyx_t_5);
+  PyTuple_SET_ITEM(__pyx_t_13, 7, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_6);
-  PyTuple_SET_ITEM(__pyx_t_15, 8, __pyx_t_6);
+  PyTuple_SET_ITEM(__pyx_t_13, 8, __pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_15, 9, __pyx_t_7);
+  PyTuple_SET_ITEM(__pyx_t_13, 9, __pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_8);
-  PyTuple_SET_ITEM(__pyx_t_15, 10, __pyx_t_8);
+  PyTuple_SET_ITEM(__pyx_t_13, 10, __pyx_t_8);
   __Pyx_GIVEREF(__pyx_t_9);
-  PyTuple_SET_ITEM(__pyx_t_15, 11, __pyx_t_9);
+  PyTuple_SET_ITEM(__pyx_t_13, 11, __pyx_t_9);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base.OBJ_TYPE);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base.OBJ_TYPE);
+  PyTuple_SET_ITEM(__pyx_t_13, 12, __pyx_v_self->__pyx_base.OBJ_TYPE);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base.RVIR_OR_R200);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base.RVIR_OR_R200);
+  PyTuple_SET_ITEM(__pyx_t_13, 13, __pyx_v_self->__pyx_base.RVIR_OR_R200);
   __Pyx_GIVEREF(__pyx_t_10);
-  PyTuple_SET_ITEM(__pyx_t_15, 12, __pyx_t_10);
-  __Pyx_GIVEREF(__pyx_t_11);
-  PyTuple_SET_ITEM(__pyx_t_15, 13, __pyx_t_11);
+  PyTuple_SET_ITEM(__pyx_t_13, 14, __pyx_t_10);
   __Pyx_INCREF(__pyx_v_self->__pyx_base.__pyx_base.SNAP);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base.__pyx_base.SNAP);
-  PyTuple_SET_ITEM(__pyx_t_15, 14, __pyx_v_self->__pyx_base.__pyx_base.SNAP);
+  PyTuple_SET_ITEM(__pyx_t_13, 15, __pyx_v_self->__pyx_base.__pyx_base.SNAP);
+  __Pyx_GIVEREF(__pyx_t_11);
+  PyTuple_SET_ITEM(__pyx_t_13, 16, __pyx_t_11);
   __Pyx_GIVEREF(__pyx_t_12);
-  PyTuple_SET_ITEM(__pyx_t_15, 15, __pyx_t_12);
-  __Pyx_GIVEREF(__pyx_t_13);
-  PyTuple_SET_ITEM(__pyx_t_15, 16, __pyx_t_13);
-  __Pyx_GIVEREF(__pyx_t_14);
-  PyTuple_SET_ITEM(__pyx_t_15, 17, __pyx_t_14);
+  PyTuple_SET_ITEM(__pyx_t_13, 17, __pyx_t_12);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
@@ -7966,33 +7652,31 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __pyx_t_10 = 0;
   __pyx_t_11 = 0;
   __pyx_t_12 = 0;
+  __pyx_v_state = ((PyObject*)__pyx_t_13);
   __pyx_t_13 = 0;
-  __pyx_t_14 = 0;
-  __pyx_v_state = ((PyObject*)__pyx_t_15);
-  __pyx_t_15 = 0;
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.MIN_NUMBER_STAR_PTCS, self.SAFE, self.SNAP, self.WANT_RVIR, self.r200, self.start_time)
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.OBJ_TYPE, self.RVIR_OR_R200, self.SAFE, self.SNAP, self.r200, self.start_time)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None:
  *         state += (_dict,)
  */
-  __pyx_t_15 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_n_s_dict, Py_None); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __pyx_v__dict = __pyx_t_15;
-  __pyx_t_15 = 0;
+  __pyx_t_13 = __Pyx_GetAttr3(((PyObject *)__pyx_v_self), __pyx_n_s_dict, Py_None); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __pyx_v__dict = __pyx_t_13;
+  __pyx_t_13 = 0;
 
   /* "(tree fragment)":7
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.MIN_NUMBER_STAR_PTCS, self.SAFE, self.SNAP, self.WANT_RVIR, self.r200, self.start_time)
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.OBJ_TYPE, self.RVIR_OR_R200, self.SAFE, self.SNAP, self.r200, self.start_time)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
  *         use_setstate = True
  */
-  __pyx_t_16 = (__pyx_v__dict != Py_None);
-  __pyx_t_17 = (__pyx_t_16 != 0);
-  if (__pyx_t_17) {
+  __pyx_t_14 = (__pyx_v__dict != Py_None);
+  __pyx_t_15 = (__pyx_t_14 != 0);
+  if (__pyx_t_15) {
 
     /* "(tree fragment)":8
  *     _dict = getattr(self, '__dict__', None)
@@ -8001,28 +7685,28 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
  *         use_setstate = True
  *     else:
  */
-    __pyx_t_15 = PyTuple_New(1); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_13 = PyTuple_New(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_13);
     __Pyx_INCREF(__pyx_v__dict);
     __Pyx_GIVEREF(__pyx_v__dict);
-    PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_v__dict);
-    __pyx_t_14 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_15); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 8, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_14);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_14));
-    __pyx_t_14 = 0;
+    PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_v__dict);
+    __pyx_t_12 = PyNumber_InPlaceAdd(__pyx_v_state, __pyx_t_13); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 8, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __Pyx_DECREF_SET(__pyx_v_state, ((PyObject*)__pyx_t_12));
+    __pyx_t_12 = 0;
 
     /* "(tree fragment)":9
  *     if _dict is not None:
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.SNAP is not None
+ *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.OBJ_TYPE is not None or self.RVIR_OR_R200 is not None or self.SNAP is not None
  */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.MIN_NUMBER_STAR_PTCS, self.SAFE, self.SNAP, self.WANT_RVIR, self.r200, self.start_time)
+ *     state = (self.CENTER, self.D_BINS, self.D_LOGEND, self.D_LOGSTART, self.HDF5_GROUP_DEST, self.HDF5_SNAP_DEST, self.IT_MIN, self.IT_TOL, self.IT_WALL, self.L_BOX, self.MASS_UNIT, self.MIN_NUMBER_PTCS, self.OBJ_TYPE, self.RVIR_OR_R200, self.SAFE, self.SNAP, self.r200, self.start_time)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -8034,127 +7718,141 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.SNAP is not None             # <<<<<<<<<<<<<<
+ *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.OBJ_TYPE is not None or self.RVIR_OR_R200 is not None or self.SNAP is not None             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, None), state
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, None), state
  */
   /*else*/ {
-    __pyx_t_16 = (__pyx_v_self->__pyx_base.__pyx_base.CENTER != ((PyObject*)Py_None));
-    __pyx_t_18 = (__pyx_t_16 != 0);
-    if (!__pyx_t_18) {
-    } else {
-      __pyx_t_17 = __pyx_t_18;
-      goto __pyx_L4_bool_binop_done;
-    }
-    __pyx_t_18 = (__pyx_v_self->__pyx_base.HDF5_GROUP_DEST != ((PyObject*)Py_None));
-    __pyx_t_16 = (__pyx_t_18 != 0);
+    __pyx_t_14 = (__pyx_v_self->__pyx_base.__pyx_base.CENTER != ((PyObject*)Py_None));
+    __pyx_t_16 = (__pyx_t_14 != 0);
     if (!__pyx_t_16) {
     } else {
-      __pyx_t_17 = __pyx_t_16;
+      __pyx_t_15 = __pyx_t_16;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_16 = (__pyx_v_self->__pyx_base.HDF5_SNAP_DEST != ((PyObject*)Py_None));
-    __pyx_t_18 = (__pyx_t_16 != 0);
-    if (!__pyx_t_18) {
+    __pyx_t_16 = (__pyx_v_self->__pyx_base.HDF5_GROUP_DEST != ((PyObject*)Py_None));
+    __pyx_t_14 = (__pyx_t_16 != 0);
+    if (!__pyx_t_14) {
     } else {
-      __pyx_t_17 = __pyx_t_18;
+      __pyx_t_15 = __pyx_t_14;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_18 = (__pyx_v_self->__pyx_base.__pyx_base.SNAP != ((PyObject*)Py_None));
-    __pyx_t_16 = (__pyx_t_18 != 0);
-    __pyx_t_17 = __pyx_t_16;
+    __pyx_t_14 = (__pyx_v_self->__pyx_base.HDF5_SNAP_DEST != ((PyObject*)Py_None));
+    __pyx_t_16 = (__pyx_t_14 != 0);
+    if (!__pyx_t_16) {
+    } else {
+      __pyx_t_15 = __pyx_t_16;
+      goto __pyx_L4_bool_binop_done;
+    }
+    __pyx_t_16 = (__pyx_v_self->__pyx_base.OBJ_TYPE != ((PyObject*)Py_None));
+    __pyx_t_14 = (__pyx_t_16 != 0);
+    if (!__pyx_t_14) {
+    } else {
+      __pyx_t_15 = __pyx_t_14;
+      goto __pyx_L4_bool_binop_done;
+    }
+    __pyx_t_14 = (__pyx_v_self->__pyx_base.RVIR_OR_R200 != ((PyObject*)Py_None));
+    __pyx_t_16 = (__pyx_t_14 != 0);
+    if (!__pyx_t_16) {
+    } else {
+      __pyx_t_15 = __pyx_t_16;
+      goto __pyx_L4_bool_binop_done;
+    }
+    __pyx_t_16 = (__pyx_v_self->__pyx_base.__pyx_base.SNAP != ((PyObject*)Py_None));
+    __pyx_t_14 = (__pyx_t_16 != 0);
+    __pyx_t_15 = __pyx_t_14;
     __pyx_L4_bool_binop_done:;
-    __pyx_v_use_setstate = __pyx_t_17;
+    __pyx_v_use_setstate = __pyx_t_15;
   }
   __pyx_L3:;
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.SNAP is not None
+ *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.OBJ_TYPE is not None or self.RVIR_OR_R200 is not None or self.SNAP is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, None), state
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, None), state
  *     else:
  */
-  __pyx_t_17 = (__pyx_v_use_setstate != 0);
-  if (__pyx_t_17) {
+  __pyx_t_15 = (__pyx_v_use_setstate != 0);
+  if (__pyx_t_15) {
 
     /* "(tree fragment)":13
- *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.SNAP is not None
+ *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.OBJ_TYPE is not None or self.RVIR_OR_R200 is not None or self.SNAP is not None
  *     if use_setstate:
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, state)
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, state)
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_pyx_unpickle_DensShapeProfsHDF); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_15 = PyTuple_New(3); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 13, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    PyTuple_SET_ITEM(__pyx_t_15, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    __Pyx_INCREF(__pyx_int_207900485);
-    __Pyx_GIVEREF(__pyx_int_207900485);
-    PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_int_207900485);
-    __Pyx_INCREF(Py_None);
-    __Pyx_GIVEREF(Py_None);
-    PyTuple_SET_ITEM(__pyx_t_15, 2, Py_None);
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_pyx_unpickle_DensShapeProfsHDF); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_13 = PyTuple_New(3); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_GIVEREF(__pyx_t_14);
-    PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_14);
-    __Pyx_GIVEREF(__pyx_t_15);
-    PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_t_15);
+    __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    PyTuple_SET_ITEM(__pyx_t_13, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    __Pyx_INCREF(__pyx_int_94922227);
+    __Pyx_GIVEREF(__pyx_int_94922227);
+    PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_int_94922227);
+    __Pyx_INCREF(Py_None);
+    __Pyx_GIVEREF(Py_None);
+    PyTuple_SET_ITEM(__pyx_t_13, 2, Py_None);
+    __pyx_t_11 = PyTuple_New(3); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __Pyx_GIVEREF(__pyx_t_12);
+    PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_12);
+    __Pyx_GIVEREF(__pyx_t_13);
+    PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_13);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    PyTuple_SET_ITEM(__pyx_t_13, 2, __pyx_v_state);
-    __pyx_t_14 = 0;
-    __pyx_t_15 = 0;
-    __pyx_r = __pyx_t_13;
+    PyTuple_SET_ITEM(__pyx_t_11, 2, __pyx_v_state);
+    __pyx_t_12 = 0;
     __pyx_t_13 = 0;
+    __pyx_r = __pyx_t_11;
+    __pyx_t_11 = 0;
     goto __pyx_L0;
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.SNAP is not None
+ *         use_setstate = self.CENTER is not None or self.HDF5_GROUP_DEST is not None or self.HDF5_SNAP_DEST is not None or self.OBJ_TYPE is not None or self.RVIR_OR_R200 is not None or self.SNAP is not None
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, None), state
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, None), state
  *     else:
  */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, None), state
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, None), state
  *     else:
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_DensShapeProfsHDF5__set_state(self, __pyx_state)
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_pyx_unpickle_DensShapeProfsHDF); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_pyx_unpickle_DensShapeProfsHDF); if (unlikely(!__pyx_t_11)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_13 = PyTuple_New(3); if (unlikely(!__pyx_t_13)) __PYX_ERR(1, 15, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_15 = PyTuple_New(3); if (unlikely(!__pyx_t_15)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    PyTuple_SET_ITEM(__pyx_t_15, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
-    __Pyx_INCREF(__pyx_int_207900485);
-    __Pyx_GIVEREF(__pyx_int_207900485);
-    PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_int_207900485);
+    PyTuple_SET_ITEM(__pyx_t_13, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
+    __Pyx_INCREF(__pyx_int_94922227);
+    __Pyx_GIVEREF(__pyx_int_94922227);
+    PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_int_94922227);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
-    PyTuple_SET_ITEM(__pyx_t_15, 2, __pyx_v_state);
-    __pyx_t_14 = PyTuple_New(2); if (unlikely(!__pyx_t_14)) __PYX_ERR(1, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_14);
+    PyTuple_SET_ITEM(__pyx_t_13, 2, __pyx_v_state);
+    __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(1, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __Pyx_GIVEREF(__pyx_t_11);
+    PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_13);
-    PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_13);
-    __Pyx_GIVEREF(__pyx_t_15);
-    PyTuple_SET_ITEM(__pyx_t_14, 1, __pyx_t_15);
+    PyTuple_SET_ITEM(__pyx_t_12, 1, __pyx_t_13);
+    __pyx_t_11 = 0;
     __pyx_t_13 = 0;
-    __pyx_t_15 = 0;
-    __pyx_r = __pyx_t_14;
-    __pyx_t_14 = 0;
+    __pyx_r = __pyx_t_12;
+    __pyx_t_12 = 0;
     goto __pyx_L0;
   }
 
@@ -8179,8 +7877,6 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_XDECREF(__pyx_t_11);
   __Pyx_XDECREF(__pyx_t_12);
   __Pyx_XDECREF(__pyx_t_13);
-  __Pyx_XDECREF(__pyx_t_14);
-  __Pyx_XDECREF(__pyx_t_15);
   __Pyx_AddTraceback("shape_profs.shape_profs_classes.DensShapeProfsHDF5.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -8193,7 +7889,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, state)
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_DensShapeProfsHDF5__set_state(self, __pyx_state)
  */
@@ -8221,7 +7917,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, state)
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_DensShapeProfsHDF5__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
  */
@@ -8232,7 +7928,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_18DensShapeProfsHD
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0xc644f45, state)
+ *         return __pyx_unpickle_DensShapeProfsHDF5, (type(self), 0x5a865f3, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_DensShapeProfsHDF5__set_state(self, __pyx_state)
  */
@@ -8928,18 +8624,18 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_2__pyx_unpickle_De
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0xc644f45:             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum != 0x5a865f3:             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))" % __pyx_checksum)
  */
-  __pyx_t_1 = ((__pyx_v___pyx_checksum != 0xc644f45) != 0);
+  __pyx_t_1 = ((__pyx_v___pyx_checksum != 0x5a865f3) != 0);
   if (__pyx_t_1) {
 
     /* "(tree fragment)":5
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0xc644f45:
+ *     if __pyx_checksum != 0x5a865f3:
  *         from pickle import PickleError as __pyx_PickleError             # <<<<<<<<<<<<<<
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfsHDF5.__new__(__pyx_type)
  */
     __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 5, __pyx_L1_error)
@@ -8958,15 +8654,15 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_2__pyx_unpickle_De
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":6
- *     if __pyx_checksum != 0xc644f45:
+ *     if __pyx_checksum != 0x5a865f3:
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))" % __pyx_checksum)             # <<<<<<<<<<<<<<
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))" % __pyx_checksum)             # <<<<<<<<<<<<<<
  *     __pyx_result = DensShapeProfsHDF5.__new__(__pyx_type)
  *     if __pyx_state is not None:
  */
     __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v___pyx_checksum); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 6, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_Incompatible_checksums_s_vs_0xc6, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 6, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_Incompatible_checksums_s_vs_0x5a, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 6, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_INCREF(__pyx_v___pyx_PickleError);
@@ -8993,15 +8689,15 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_2__pyx_unpickle_De
     /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
- *     if __pyx_checksum != 0xc644f45:             # <<<<<<<<<<<<<<
+ *     if __pyx_checksum != 0x5a865f3:             # <<<<<<<<<<<<<<
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))" % __pyx_checksum)
  */
   }
 
   /* "(tree fragment)":7
  *         from pickle import PickleError as __pyx_PickleError
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfsHDF5.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_DensShapeProfsHDF5__set_state(<DensShapeProfsHDF5> __pyx_result, __pyx_state)
@@ -9027,7 +8723,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_2__pyx_unpickle_De
   __pyx_t_3 = 0;
 
   /* "(tree fragment)":8
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfsHDF5.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_DensShapeProfsHDF5__set_state(<DensShapeProfsHDF5> __pyx_result, __pyx_state)
@@ -9050,7 +8746,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_2__pyx_unpickle_De
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
     /* "(tree fragment)":8
- *         raise __pyx_PickleError("Incompatible checksums (%s vs 0xc644f45 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, MIN_NUMBER_STAR_PTCS, SAFE, SNAP, WANT_RVIR, r200, start_time))" % __pyx_checksum)
+ *         raise __pyx_PickleError("Incompatible checksums (%s vs 0x5a865f3 = (CENTER, D_BINS, D_LOGEND, D_LOGSTART, HDF5_GROUP_DEST, HDF5_SNAP_DEST, IT_MIN, IT_TOL, IT_WALL, L_BOX, MASS_UNIT, MIN_NUMBER_PTCS, OBJ_TYPE, RVIR_OR_R200, SAFE, SNAP, r200, start_time))" % __pyx_checksum)
  *     __pyx_result = DensShapeProfsHDF5.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_DensShapeProfsHDF5__set_state(<DensShapeProfsHDF5> __pyx_result, __pyx_state)
@@ -9063,7 +8759,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_2__pyx_unpickle_De
  *         __pyx_unpickle_DensShapeProfsHDF5__set_state(<DensShapeProfsHDF5> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_DensShapeProfsHDF5__set_state(DensShapeProfsHDF5 __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.MIN_NUMBER_STAR_PTCS = __pyx_state[12]; __pyx_result.SAFE = __pyx_state[13]; __pyx_result.SNAP = __pyx_state[14]; __pyx_result.WANT_RVIR = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.OBJ_TYPE = __pyx_state[12]; __pyx_result.RVIR_OR_R200 = __pyx_state[13]; __pyx_result.SAFE = __pyx_state[14]; __pyx_result.SNAP = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -9096,7 +8792,7 @@ static PyObject *__pyx_pf_11shape_profs_19shape_profs_classes_2__pyx_unpickle_De
  *         __pyx_unpickle_DensShapeProfsHDF5__set_state(<DensShapeProfsHDF5> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_DensShapeProfsHDF5__set_state(DensShapeProfsHDF5 __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.MIN_NUMBER_STAR_PTCS = __pyx_state[12]; __pyx_result.SAFE = __pyx_state[13]; __pyx_result.SNAP = __pyx_state[14]; __pyx_result.WANT_RVIR = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.OBJ_TYPE = __pyx_state[12]; __pyx_result.RVIR_OR_R200 = __pyx_state[13]; __pyx_result.SAFE = __pyx_state[14]; __pyx_result.SNAP = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
  *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
  */
 
@@ -9106,9 +8802,9 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   PyObject *__pyx_t_1 = NULL;
   int __pyx_t_2;
   float __pyx_t_3;
-  int __pyx_t_4;
-  __Pyx_memviewslice __pyx_t_5 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  double __pyx_t_6;
+  __Pyx_memviewslice __pyx_t_4 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_t_5;
+  int __pyx_t_6;
   Py_ssize_t __pyx_t_7;
   int __pyx_t_8;
   int __pyx_t_9;
@@ -9123,7 +8819,7 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_DensShapeProfsHDF5__set_state(DensShapeProfsHDF5 __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.MIN_NUMBER_STAR_PTCS = __pyx_state[12]; __pyx_result.SAFE = __pyx_state[13]; __pyx_result.SNAP = __pyx_state[14]; __pyx_result.WANT_RVIR = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]             # <<<<<<<<<<<<<<
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.OBJ_TYPE = __pyx_state[12]; __pyx_result.RVIR_OR_R200 = __pyx_state[13]; __pyx_result.SAFE = __pyx_state[14]; __pyx_result.SNAP = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]             # <<<<<<<<<<<<<<
  *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
  *         __pyx_result.__dict__.update(__pyx_state[18])
  */
@@ -9250,14 +8946,29 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   }
   __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 12, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v___pyx_result->__pyx_base.MIN_NUMBER_STAR_PTCS = __pyx_t_2;
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(1, 12, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.OBJ_TYPE);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.OBJ_TYPE);
+  __pyx_v___pyx_result->__pyx_base.OBJ_TYPE = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
   __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 13, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(1, 12, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base.RVIR_OR_R200);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base.RVIR_OR_R200);
+  __pyx_v___pyx_result->__pyx_base.RVIR_OR_R200 = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+  if (unlikely(__pyx_v___pyx_state == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(1, 12, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 14, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_3 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_3 == (float)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -9266,7 +8977,7 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 14, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 15, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
@@ -9278,36 +8989,27 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 15, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v___pyx_result->__pyx_base.WANT_RVIR = __pyx_t_4;
-  if (unlikely(__pyx_v___pyx_state == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(1, 12, __pyx_L1_error)
-  }
   __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 16, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_4.memview)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v___pyx_result->__pyx_base.__pyx_base.r200, 0);
-  __pyx_v___pyx_result->__pyx_base.__pyx_base.r200 = __pyx_t_5;
-  __pyx_t_5.memview = NULL;
-  __pyx_t_5.data = NULL;
+  __pyx_v___pyx_result->__pyx_base.__pyx_base.r200 = __pyx_t_4;
+  __pyx_t_4.memview = NULL;
+  __pyx_t_4.data = NULL;
   if (unlikely(__pyx_v___pyx_state == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
     __PYX_ERR(1, 12, __pyx_L1_error)
   }
   __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v___pyx_state, 17, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
+  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v___pyx_result->__pyx_base.__pyx_base.start_time = __pyx_t_6;
+  __pyx_v___pyx_result->__pyx_base.__pyx_base.start_time = __pyx_t_5;
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_DensShapeProfsHDF5__set_state(DensShapeProfsHDF5 __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.MIN_NUMBER_STAR_PTCS = __pyx_state[12]; __pyx_result.SAFE = __pyx_state[13]; __pyx_result.SNAP = __pyx_state[14]; __pyx_result.WANT_RVIR = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.OBJ_TYPE = __pyx_state[12]; __pyx_result.RVIR_OR_R200 = __pyx_state[13]; __pyx_result.SAFE = __pyx_state[14]; __pyx_result.SNAP = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
  *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
  *         __pyx_result.__dict__.update(__pyx_state[18])
  */
@@ -9319,17 +9021,17 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   __pyx_t_8 = ((__pyx_t_7 > 18) != 0);
   if (__pyx_t_8) {
   } else {
-    __pyx_t_4 = __pyx_t_8;
+    __pyx_t_6 = __pyx_t_8;
     goto __pyx_L4_bool_binop_done;
   }
   __pyx_t_8 = __Pyx_HasAttr(((PyObject *)__pyx_v___pyx_result), __pyx_n_s_dict); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
   __pyx_t_9 = (__pyx_t_8 != 0);
-  __pyx_t_4 = __pyx_t_9;
+  __pyx_t_6 = __pyx_t_9;
   __pyx_L4_bool_binop_done:;
-  if (__pyx_t_4) {
+  if (__pyx_t_6) {
 
     /* "(tree fragment)":14
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.MIN_NUMBER_STAR_PTCS = __pyx_state[12]; __pyx_result.SAFE = __pyx_state[13]; __pyx_result.SNAP = __pyx_state[14]; __pyx_result.WANT_RVIR = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.OBJ_TYPE = __pyx_state[12]; __pyx_result.RVIR_OR_R200 = __pyx_state[13]; __pyx_result.SAFE = __pyx_state[14]; __pyx_result.SNAP = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
  *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
  *         __pyx_result.__dict__.update(__pyx_state[18])             # <<<<<<<<<<<<<<
  */
@@ -9364,7 +9066,7 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
 
     /* "(tree fragment)":13
  * cdef __pyx_unpickle_DensShapeProfsHDF5__set_state(DensShapeProfsHDF5 __pyx_result, tuple __pyx_state):
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.MIN_NUMBER_STAR_PTCS = __pyx_state[12]; __pyx_result.SAFE = __pyx_state[13]; __pyx_result.SNAP = __pyx_state[14]; __pyx_result.WANT_RVIR = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.OBJ_TYPE = __pyx_state[12]; __pyx_result.RVIR_OR_R200 = __pyx_state[13]; __pyx_result.SAFE = __pyx_state[14]; __pyx_result.SNAP = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
  *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):             # <<<<<<<<<<<<<<
  *         __pyx_result.__dict__.update(__pyx_state[18])
  */
@@ -9374,7 +9076,7 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
  *         __pyx_unpickle_DensShapeProfsHDF5__set_state(<DensShapeProfsHDF5> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_DensShapeProfsHDF5__set_state(DensShapeProfsHDF5 __pyx_result, tuple __pyx_state):             # <<<<<<<<<<<<<<
- *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.MIN_NUMBER_STAR_PTCS = __pyx_state[12]; __pyx_result.SAFE = __pyx_state[13]; __pyx_result.SNAP = __pyx_state[14]; __pyx_result.WANT_RVIR = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
+ *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.D_BINS = __pyx_state[1]; __pyx_result.D_LOGEND = __pyx_state[2]; __pyx_result.D_LOGSTART = __pyx_state[3]; __pyx_result.HDF5_GROUP_DEST = __pyx_state[4]; __pyx_result.HDF5_SNAP_DEST = __pyx_state[5]; __pyx_result.IT_MIN = __pyx_state[6]; __pyx_result.IT_TOL = __pyx_state[7]; __pyx_result.IT_WALL = __pyx_state[8]; __pyx_result.L_BOX = __pyx_state[9]; __pyx_result.MASS_UNIT = __pyx_state[10]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[11]; __pyx_result.OBJ_TYPE = __pyx_state[12]; __pyx_result.RVIR_OR_R200 = __pyx_state[13]; __pyx_result.SAFE = __pyx_state[14]; __pyx_result.SNAP = __pyx_state[15]; __pyx_result.r200 = __pyx_state[16]; __pyx_result.start_time = __pyx_state[17]
  *     if len(__pyx_state) > 18 and hasattr(__pyx_result, '__dict__'):
  */
 
@@ -9383,7 +9085,7 @@ static PyObject *__pyx_f_11shape_profs_19shape_profs_classes___pyx_unpickle_Dens
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
   __Pyx_XDECREF(__pyx_t_10);
   __Pyx_XDECREF(__pyx_t_11);
   __Pyx_XDECREF(__pyx_t_12);
@@ -22561,7 +22263,7 @@ static PyMethodDef __pyx_methods_11shape_profs_19shape_profs_classes_DensShapePr
   {"dumpShapeCatGlobal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_29dumpShapeCatGlobal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_28dumpShapeCatGlobal},
   {"dumpShapeVelCatLocal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_31dumpShapeVelCatLocal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_30dumpShapeVelCatLocal},
   {"dumpShapeVelCatGlobal", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_33dumpShapeVelCatGlobal, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_32dumpShapeVelCatGlobal},
-  {"getObjInfo", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_35getObjInfo, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo},
+  {"getObjInfo", (PyCFunction)__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_35getObjInfo, METH_NOARGS, __pyx_doc_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_34getObjInfo},
   {"__reduce_cython__", (PyCFunction)__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_37__reduce_cython__, METH_NOARGS, 0},
   {"__setstate_cython__", (PyCFunction)__pyx_pw_11shape_profs_19shape_profs_classes_18DensShapeProfsHDF5_39__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
@@ -23421,16 +23123,15 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_IT_MIN, __pyx_k_IT_MIN, sizeof(__pyx_k_IT_MIN), 0, 0, 1, 1},
   {&__pyx_n_s_IT_TOL, __pyx_k_IT_TOL, sizeof(__pyx_k_IT_TOL), 0, 0, 1, 1},
   {&__pyx_n_s_IT_WALL, __pyx_k_IT_WALL, sizeof(__pyx_k_IT_WALL), 0, 0, 1, 1},
+  {&__pyx_kp_s_Incompatible_checksums_s_vs_0x5a, __pyx_k_Incompatible_checksums_s_vs_0x5a, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x5a), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0x82, __pyx_k_Incompatible_checksums_s_vs_0x82, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x82), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0xb0, __pyx_k_Incompatible_checksums_s_vs_0xb0, sizeof(__pyx_k_Incompatible_checksums_s_vs_0xb0), 0, 0, 1, 0},
-  {&__pyx_kp_s_Incompatible_checksums_s_vs_0xc6, __pyx_k_Incompatible_checksums_s_vs_0xc6, sizeof(__pyx_k_Incompatible_checksums_s_vs_0xc6), 0, 0, 1, 0},
   {&__pyx_n_s_IndexError, __pyx_k_IndexError, sizeof(__pyx_k_IndexError), 0, 0, 1, 1},
   {&__pyx_kp_s_Indirect_dimensions_not_supporte, __pyx_k_Indirect_dimensions_not_supporte, sizeof(__pyx_k_Indirect_dimensions_not_supporte), 0, 0, 1, 0},
   {&__pyx_kp_s_Invalid_mode_expected_c_or_fortr, __pyx_k_Invalid_mode_expected_c_or_fortr, sizeof(__pyx_k_Invalid_mode_expected_c_or_fortr), 0, 0, 1, 0},
   {&__pyx_kp_s_Invalid_shape_in_axis_d_d, __pyx_k_Invalid_shape_in_axis_d_d, sizeof(__pyx_k_Invalid_shape_in_axis_d_d), 0, 0, 1, 0},
   {&__pyx_n_s_L_BOX, __pyx_k_L_BOX, sizeof(__pyx_k_L_BOX), 0, 0, 1, 1},
   {&__pyx_n_s_MIN_NUMBER_PTCS, __pyx_k_MIN_NUMBER_PTCS, sizeof(__pyx_k_MIN_NUMBER_PTCS), 0, 0, 1, 1},
-  {&__pyx_n_s_MIN_NUMBER_STAR_PTCS, __pyx_k_MIN_NUMBER_STAR_PTCS, sizeof(__pyx_k_MIN_NUMBER_STAR_PTCS), 0, 0, 1, 1},
   {&__pyx_n_s_MPI, __pyx_k_MPI, sizeof(__pyx_k_MPI), 0, 0, 1, 1},
   {&__pyx_n_s_MemoryError, __pyx_k_MemoryError, sizeof(__pyx_k_MemoryError), 0, 0, 1, 1},
   {&__pyx_kp_s_MemoryView_of_r_at_0x_x, __pyx_k_MemoryView_of_r_at_0x_x, sizeof(__pyx_k_MemoryView_of_r_at_0x_x), 0, 0, 1, 0},
@@ -23439,13 +23140,13 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_ROverR200, __pyx_k_ROverR200, sizeof(__pyx_k_ROverR200), 0, 0, 1, 1},
+  {&__pyx_n_s_RVIR_OR_R200, __pyx_k_RVIR_OR_R200, sizeof(__pyx_k_RVIR_OR_R200), 0, 0, 1, 1},
   {&__pyx_n_s_SNAP, __pyx_k_SNAP, sizeof(__pyx_k_SNAP), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_kp_s_Unable_to_convert_item_to_object, __pyx_k_Unable_to_convert_item_to_object, sizeof(__pyx_k_Unable_to_convert_item_to_object), 0, 0, 1, 0},
   {&__pyx_n_s_VIZ_DEST, __pyx_k_VIZ_DEST, sizeof(__pyx_k_VIZ_DEST), 0, 0, 1, 1},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_View_MemoryView, __pyx_k_View_MemoryView, sizeof(__pyx_k_View_MemoryView), 0, 0, 1, 1},
-  {&__pyx_n_s_WANT_RVIR, __pyx_k_WANT_RVIR, sizeof(__pyx_k_WANT_RVIR), 0, 0, 1, 1},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
@@ -23457,7 +23158,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_direct_binning, __pyx_k_direct_binning, sizeof(__pyx_k_direct_binning), 0, 0, 1, 1},
-  {&__pyx_n_u_dm, __pyx_k_dm, sizeof(__pyx_k_dm), 0, 1, 0, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
   {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
@@ -23488,7 +23188,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
   {&__pyx_n_s_obj, __pyx_k_obj, sizeof(__pyx_k_obj), 0, 0, 1, 1},
   {&__pyx_n_s_obj_numbers, __pyx_k_obj_numbers, sizeof(__pyx_k_obj_numbers), 0, 0, 1, 1},
-  {&__pyx_n_s_obj_type, __pyx_k_obj_type, sizeof(__pyx_k_obj_type), 0, 0, 1, 1},
   {&__pyx_n_s_pack, __pyx_k_pack, sizeof(__pyx_k_pack), 0, 0, 1, 1},
   {&__pyx_n_s_pickle, __pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_PickleError, __pyx_k_pyx_PickleError, sizeof(__pyx_k_pyx_PickleError), 0, 0, 1, 1},
@@ -23833,9 +23532,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_94922227 = PyInt_FromLong(94922227L); if (unlikely(!__pyx_int_94922227)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_136800287 = PyInt_FromLong(136800287L); if (unlikely(!__pyx_int_136800287)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_184977713 = PyInt_FromLong(184977713L); if (unlikely(!__pyx_int_184977713)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_207900485 = PyInt_FromLong(207900485L); if (unlikely(!__pyx_int_207900485)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_neg_1 = PyInt_FromLong(-1); if (unlikely(!__pyx_int_neg_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;

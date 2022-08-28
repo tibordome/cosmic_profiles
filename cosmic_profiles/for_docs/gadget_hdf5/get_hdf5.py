@@ -38,28 +38,20 @@ def getHDF5GxData(HDF5_SNAP_DEST, HDF5_GROUP_DEST):
     :rtype: float and int arrays"""
     return
 
-def getHDF5SHDMData(HDF5_GROUP_DEST, WANT_RVIR):
+def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
     """ Retrieve FoF/SH-related DM HDF5 data from the simulation box
-        
+    
     :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
     :type HDF5_GROUP_DEST: string
-    :param WANT_RVIR: Whether or not we want quantities (e.g. D_LOGSTART) expressed 
-            with respect to the virial radius R_vir or the overdensity radius R_200
-    :type WANT_RVIR: boolean
+    :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
+            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
+    :type RVIR_OR_R200: str
+    :param PART_TYPE: which simulation particles to consider, 0 for gas, 1 for DM,
+        4 for stars
+    :type PART_TYPE: int
     :return: nb_shs (# subhalos in each FoF-halo), sh_len (size of each SH), 
-        fof_dm_sizes (size of each FoF-halo), group_r200 (R200 radius of each FoF-halo), 
-        fof_masses (mass of each FoF-halo)
+        fof_sizes (size of each FoF-halo), group_r200 (R200 radius of each FoF-halo)
     :rtype: float and int arrays"""
-    return
-
-def getHDF5SHGxData(HDF5_GROUP_DEST):
-    """ Retrieve FoF/SH-related gx HDF5 data from the simulation box
-        
-    :param HDF5_GROUP_DEST: path to snapshot, halo/subhalo data
-    :type HDF5_GROUP_DEST: string
-    :return: nb_shs (# subhalos in each FoF-halo), sh_len (star particle size of each SH), 
-        fof_gx_sizes (star particle size of each FoF-halo)
-    :rtype: int arrays"""
     return
 
 def getHDF5DMData(HDF5_SNAP_DEST):

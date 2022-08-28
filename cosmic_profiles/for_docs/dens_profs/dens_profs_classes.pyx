@@ -154,7 +154,7 @@ cdef class DensProfsHDF5(CosmicBase):
     ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,
     ``plotDensProfs()``."""
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int MIN_NUMBER_STAR_PTCS, str CENTER, bint WANT_RVIR):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str OBJ_TYPE, str CENTER, str RVIR_OR_R200):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -166,62 +166,66 @@ cdef class DensProfsHDF5(CosmicBase):
         :type SNAP: string
         :param L_BOX: simulation box side length
         :type L_BOX: float, units: Mpc/h
-        :param MIN_NUMBER_PTCS: minimum number of DM particles for halo to qualify for morphology calculation
+        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
-        :param MIN_NUMBER_STAR_PTCS: minimum number of star particles for galaxy to qualify for morphology calculation
-        :type MIN_NUMBER_STAR_PTCS: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
         :type CENTER: str
-        :param WANT_RVIR: Whether or not we want quantities (e.g. D_LOGSTART) expressed 
-            with respect to the virial radius R_vir or the overdensity radius R_200
-        :type WANT_RVIR: boolean"""
+        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
+            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
+        :type RVIR_OR_R200: str"""
         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
-        self.MIN_NUMBER_STAR_PTCS = MIN_NUMBER_STAR_PTCS
-        self.WANT_RVIR = WANT_RVIR
+        self.RVIR_OR_R200 = RVIR_OR_R200
+        self.OBJ_TYPE = OBJ_TYPE
         
-    def getXYZMasses(self, str obj_type = 'dm'):
-        """ Retrieve positions and masses of DM/gx
+    def getPartType(self):
+        """ Return particle type number
         
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
-        :return xyz, masses, MIN_NUMBER_PTCS: positions, masses, and minimum number of particles
-        :rtype: (N2,3) floats, (N2,) floats, int"""
+        :returns: particle type number
+        :rtype: int"""
+        return
+    
+    def getXYZMasses(self):
+        """ Retrieve positions and masses of objects
+        
+        :return xyz, masses: positions and masses
+        :rtype: (N2,3) floats, (N2,) floats"""
         return
         
-    def getVelXYZ(self, str obj_type = 'dm'):
-        """ Retrieve velocities of DM/gx
+    def getVelXYZ(self):
+        """ Retrieve velocities of objects
         
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
         :return velxyz: velocity array
         :rtype: (N2,3) floats"""
         return
     
-    def getIdxCat(self, str obj_type = 'dm'):
+    def getR200(self):
+        """ Fetch R200 values
+        
+        :return obj_r200: R200 value of parent halos
+        :rtype: (N1,) floats"""
+        return
+    
+    def getIdxCat(self):
         """ Fetch catalogue
         
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
         :return idx_cat: each row contains indices of particles belonging to an object,
             obj_size: number of particles in each object
         :rtype: (N1, N3) integers and (N1,) integers"""
         return
     
-    def getMassesCenters(self, list select, str obj_type = 'dm'):
+    def getMassesCenters(self, list select):
         """ Calculate total mass and centers of objects
         
         :param select: index of first and last object to look at in the format [idx_first, idx_last]
         :type select: list containing two integers
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
         :return centers, m: centers and masses
         :rtype: (N,3) and (N,) floats"""
         return
         
-    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, str obj_type = 'dm'):
+    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):
         """ Estimate density profiles
         
         :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
@@ -234,13 +238,11 @@ cdef class DensProfsHDF5(CosmicBase):
         :param spherical: whether or not spherical shell-based or ellipsoidal shell-based
             should be used, ignored if ``direct_binning`` = False
         :type spherical: boolean
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
         :return: density profiles
         :rtype: (N2, r_res) floats"""
         return
         
-    def fitDensProfs(self, dens_profs, ROverR200, str method, list select, str obj_type = 'dm'):
+    def fitDensProfs(self, dens_profs, ROverR200, str method, list select):
         """ Get best-fit results for density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -251,13 +253,11 @@ cdef class DensProfsHDF5(CosmicBase):
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param select: index of first and last object to look at in the format [idx_first, idx_last]
         :type select: list containing two integers
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
         :return: best-fits for each object
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         return
     
-    def estConcentrations(self, dens_profs, ROverR200, str method, list select, str obj_type = 'dm'):
+    def estConcentrations(self, dens_profs, ROverR200, str method, list select):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -268,13 +268,11 @@ cdef class DensProfsHDF5(CosmicBase):
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param select: index of first and last object to look at in the format [idx_first, idx_last]
         :type select: list containing two integers
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
         return
         
-    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, list select, str obj_type = 'dm'):
+    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, list select):
         """ Draws some simplistic density profiles
         
         :param dens_profs: estimated density profiles, in units of M_sun*h^2/(Mpc)**3
@@ -293,7 +291,5 @@ cdef class DensProfsHDF5(CosmicBase):
         :type VIZ_DEST: string
         :param select: index of first and last object to look at in the format [idx_first, idx_last]
         :type select: list containing two integers
-        :param obj_type: either 'dm' or 'gx', depending on what catalogue we are looking at
-        :type obj_type: string
         """
         return

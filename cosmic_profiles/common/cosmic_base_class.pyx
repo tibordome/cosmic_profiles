@@ -666,7 +666,12 @@ cdef class CosmicBase:
         :rtype: (N2, r_res) floats"""
                 
         if rank == 0:
+            print("obj_size.base[:40] is", obj_size.base[:40])
+            print("idx_cat.base[:40] is", idx_cat.base[:40])
+            print("r200.base[:40] is", r200.base[:40])
             dens_profs = calcDensProfsSphDirectBinning(xyz.base, masses.base, r200.base, ROverR200.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
+            print("dens_profs[:,0]", dens_profs[:,0])
+            print("dens_profs[:,1]", dens_profs[:,1])
             return dens_profs*self.MASS_UNIT
         else:
             return None
@@ -733,13 +738,9 @@ cdef class CosmicBase:
         else:
             return None
         
-    def getObjInfoBase(self, float[:,:] xyz, float[:] masses, int[:,:] idx_cat, str obj_type):
+    def getObjInfoBase(self, int[:,:] idx_cat, str obj_type):
         """ Print basic info about the objects used for local shape estimation such as number of converged objects
         
-        :param xyz: positions of all simulation particles
-        :type xyz: (N2,3) floats, N2 >> N1
-        :param masses: masses of all simulation particles
-        :type masses: (N2,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
         :param obj_type: either 'dm', 'gx' or 'unspecified', depending on what catalogue we are looking at

@@ -2092,7 +2092,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_30getConcentr
 static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_32getDensProfsSphDirectBinningBase(CYTHON_UNUSED struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200); /* proto */
 static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_34getDensProfsEllDirectBinningBase(CYTHON_UNUSED struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_a, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_b, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_c, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_major, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_inter, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_minor); /* proto */
 static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_36getDensProfsKernelBasedBase(CYTHON_UNUSED struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_ROverR200); /* proto */
-static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase(CYTHON_UNUSED struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
+static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase(CYTHON_UNUSED struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED PyObject *__pyx_v_obj_type); /* proto */
 static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_40__reduce_cython__(struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_42__setstate_cython__(struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_6common_17cosmic_base_class___pyx_unpickle_CosmicBase(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
@@ -2616,7 +2616,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_4getMassesCen
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_7getShapeCatLocalBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_6getShapeCatLocalBase[] = "CosmicBase.getShapeCatLocalBase(self, float[:, :] xyz, float[:] masses, float[:] r200, int[:, :] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bool reduced, bool shell_based)\n Get all relevant local shape data\n        \n        :param xyz: positions of all simulation particles\n        :type xyz: (N2,3) floats, N2 >> N1\n        :param masses: masses of all simulation particles\n        :type masses: (N2,) floats\n        :param r200: each entry gives the R_200 radius of the parent halo\n        :type r200: (N1,) floats\n        :param idx_cat: each row contains indices of particles belonging to an object\n        :type idx_cat: (N1, N3) integers\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGSTART: int\n        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGEND: int\n        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)\n        :type D_BINS: int\n        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``\n            for iteration to stop\n        :type IT_TOL: float\n        :param IT_WALL: maximum permissible number of iterations\n        :type IT_WALL: float\n        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; \n            if undercut, shape is unclassified\n        :type IT_MIN: int\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (num""ber_of_objs, D_BINS+1) float arrays, \n            3 x (number_of_objs, D_BINS+1, 3) float arrays, \n            (number_of_objs,3) float array, (number_of_objs,) float array\n        ";
+static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_6getShapeCatLocalBase[] = "CosmicBase.getShapeCatLocalBase(self, float[:, :] xyz, float[:] masses, float[:] r200, int[:, :] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bool reduced, bool shell_based)\n Get all relevant local shape data\n        \n        :param xyz: positions of all simulation particles\n        :type xyz: (N2,3) floats, N2 >> N1\n        :param masses: masses of all simulation particles\n        :type masses: (N2,) floats\n        :param r200: each entry gives the R_200 radius of the parent halo\n        :type r200: (N1,) floats\n        :param idx_cat: each row contains indices of particles belonging to an object\n        :type idx_cat: (N1, N3) integers\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGSTART: int\n        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo\n        :type D_LOGEND: int\n        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)\n        :type D_BINS: int\n        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``\n            for iteration to stop\n        :type IT_TOL: float\n        :param IT_WALL: maximum permissible number of iterations\n        :type IT_WALL: float\n        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; \n            if undercut, shape is unclassified\n        :type IT_MIN: int\n        :param reduced: whether or not reduced shape tensor (1/r^2 factor)\n        :type reduced: boolean\n        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run\n        :type shell_based: boolean\n        :return: d, q, s, minor, inter, major, obj_center, obj_m\n        :rtype: 3 x (num""ber_of_objs, D_BINS+1) float arrays,\n            3 x (number_of_objs, D_BINS+1, 3) float arrays,\n            (number_of_objs,3) float array, (number_of_objs,) float array\n        ";
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_7getShapeCatLocalBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5999,7 +5999,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_36getDensProf
  *         :rtype: (N2, r_res) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def getObjInfoBase(self, float[:,:] xyz, float[:] masses, int[:,:] idx_cat, str obj_type):
+ *     def getObjInfoBase(self, int[:,:] idx_cat, str obj_type):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -6029,17 +6029,15 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_36getDensProf
 /* "common/cosmic_base_class.pyx":560
  *         return
  * 
- *     def getObjInfoBase(self, float[:,:] xyz, float[:] masses, int[:,:] idx_cat, str obj_type):             # <<<<<<<<<<<<<<
+ *     def getObjInfoBase(self, int[:,:] idx_cat, str obj_type):             # <<<<<<<<<<<<<<
  *         """ Print basic info about the objects used for local shape estimation such as number of converged objects
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_39getObjInfoBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase[] = "CosmicBase.getObjInfoBase(self, float[:, :] xyz, float[:] masses, int[:, :] idx_cat, unicode obj_type)\n Print basic info about the objects used for local shape estimation such as number of converged objects\n        \n        :param xyz: positions of all simulation particles\n        :type xyz: (N2,3) floats, N2 >> N1\n        :param masses: masses of all simulation particles\n        :type masses: (N2,) floats\n        :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object\n        :type idx_cat: list of length N1\n        :param obj_type: either 'dm', 'gx' or 'unspecified', depending on what catalogue we are looking at\n        :type obj_type: string";
+static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase[] = "CosmicBase.getObjInfoBase(self, int[:, :] idx_cat, unicode obj_type)\n Print basic info about the objects used for local shape estimation such as number of converged objects\n        \n        :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object\n        :type idx_cat: list of length N1\n        :param obj_type: either 'dm', 'gx' or 'unspecified', depending on what catalogue we are looking at\n        :type obj_type: string";
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_39getObjInfoBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz = { 0, 0, { 0 }, { 0 }, { 0 } };
-  CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED PyObject *__pyx_v_obj_type = 0;
   int __pyx_lineno = 0;
@@ -6049,16 +6047,12 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_39getObjInfoB
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getObjInfoBase (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_xyz,&__pyx_n_s_masses,&__pyx_n_s_idx_cat,&__pyx_n_s_obj_type,0};
-    PyObject* values[4] = {0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_idx_cat,&__pyx_n_s_obj_type,0};
+    PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -6069,53 +6063,37 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_39getObjInfoB
       kw_args = PyDict_Size(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_xyz)) != 0)) kw_args--;
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("getObjInfoBase", 1, 4, 4, 1); __PYX_ERR(0, 560, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("getObjInfoBase", 1, 4, 4, 2); __PYX_ERR(0, 560, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obj_type)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("getObjInfoBase", 1, 4, 4, 3); __PYX_ERR(0, 560, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("getObjInfoBase", 1, 2, 2, 1); __PYX_ERR(0, 560, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "getObjInfoBase") < 0)) __PYX_ERR(0, 560, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
-    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 560, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 560, __pyx_L3_error)
-    __pyx_v_idx_cat = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_idx_cat.memview)) __PYX_ERR(0, 560, __pyx_L3_error)
-    __pyx_v_obj_type = ((PyObject*)values[3]);
+    __pyx_v_idx_cat = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_idx_cat.memview)) __PYX_ERR(0, 560, __pyx_L3_error)
+    __pyx_v_obj_type = ((PyObject*)values[1]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("getObjInfoBase", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 560, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("getObjInfoBase", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 560, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("common.cosmic_base_class.CosmicBase.getObjInfoBase", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_obj_type), (&PyUnicode_Type), 1, "obj_type", 1))) __PYX_ERR(0, 560, __pyx_L1_error)
-  __pyx_r = __pyx_pf_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase(((struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *)__pyx_v_self), __pyx_v_xyz, __pyx_v_masses, __pyx_v_idx_cat, __pyx_v_obj_type);
+  __pyx_r = __pyx_pf_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase(((struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *)__pyx_v_self), __pyx_v_idx_cat, __pyx_v_obj_type);
 
   /* function exit code */
   goto __pyx_L0;
@@ -6126,12 +6104,12 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_39getObjInfoB
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase(CYTHON_UNUSED struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_xyz, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_masses, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
+static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_38getObjInfoBase(CYTHON_UNUSED struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *__pyx_v_self, CYTHON_UNUSED __Pyx_memviewslice __pyx_v_idx_cat, CYTHON_UNUSED PyObject *__pyx_v_obj_type) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getObjInfoBase", 0);
 
-  /* "common/cosmic_base_class.pyx":571
+  /* "common/cosmic_base_class.pyx":567
  *         :param obj_type: either 'dm', 'gx' or 'unspecified', depending on what catalogue we are looking at
  *         :type obj_type: string"""
  *         return             # <<<<<<<<<<<<<<
@@ -6143,15 +6121,13 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_38getObjInfoB
   /* "common/cosmic_base_class.pyx":560
  *         return
  * 
- *     def getObjInfoBase(self, float[:,:] xyz, float[:] masses, int[:,:] idx_cat, str obj_type):             # <<<<<<<<<<<<<<
+ *     def getObjInfoBase(self, int[:,:] idx_cat, str obj_type):             # <<<<<<<<<<<<<<
  *         """ Print basic info about the objects used for local shape estimation such as number of converged objects
  * 
  */
 
   /* function exit code */
   __pyx_L0:;
-  __PYX_XDEC_MEMVIEW(&__pyx_v_xyz, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_masses, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_idx_cat, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
