@@ -3,6 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+from common import config
 cimport cython
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -33,7 +34,7 @@ cdef class CosmicBase:
             or 'com' (center of mass) of each halo
         :type CENTER: str"""
         self.SNAP = SNAP
-        self.L_BOX = L_BOX*InUnitLength_in_cm/3.085678e24 # self.L_BOX will be in Mpc/h
+        self.L_BOX = L_BOX*config.InUnitLength_in_cm/3.085678e24 # self.L_BOX will be in Mpc/h
         self.CENTER = CENTER
         self.MIN_NUMBER_PTCS = MIN_NUMBER_PTCS
         self.start_time = time.time()

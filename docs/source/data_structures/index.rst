@@ -5,7 +5,7 @@ Supported Data Structures
 
 To estimate and fit shape and / or density profiles with *Cosmic Profiles*, at the moment we support the following data structures.
 
-* *GADGET*-style HDF5 snapshot outputs containing particle and halo/subhalo data in folders ``path/to/folder/snapdir_x`` and ``path/to/folder/groups_x`` with ``x`` typically a three-digit snapshot number identifier such as '042', respectively. Note that the HDF5 snapshot of the simulation must have been calculated with FoF / SUBFIND being turned on in the simulation (e.g. *Arepo* or *GADGET-4*), otherwise *Cosmic Profiles* will not know how to identify the central subhalos of dark matter, gas or star particles. To calculate shape profiles, we would instantiate a ``DensShapeProfsHDF5`` object via::
+* *GADGET*-style HDF5 snapshots containing particle and halo/subhalo data in folders ``path/to/folder/snapdir_x`` and ``path/to/folder/groups_x`` with ``x`` typically a three-digit snapshot number identifier such as '042', respectively. Note that the HDF5 snapshot of the simulation must have been calculated with FoF / SUBFIND turned on in the simulation (e.g. *Arepo* or *GADGET-4*), otherwise *Cosmic Profiles* will not know how to identify the central subhalos of dark matter, gas or star particles. To calculate shape profiles, we instantiate a ``DensShapeProfsHDF5`` object via::
 
     from cosmic_profiles import DensShapeProfsHDF5, updateInUnitSystem, updateOutUnitSystem
     
@@ -49,7 +49,25 @@ with arguments and public methods explained in detail in :ref:`the code referenc
 
 .. dropdown:: Public Methods of DensShapeProfsHDF5
 
+  In the following, 'object' refers to either a DM halo, a gas halo or a star particle halo, depending on ``OBJ_TYPE``. The generic public methods are
+
+  * ``getPartType()``: return particle type number in simulation, ``0`` for ``OBJ_TYPE=gas``, ``1`` for ``OBJ_TYPE=dm`` and ``4`` for ``OBJ_TYPE=stars``
+  * ``getXYZMasses()``: retrieve positions in units of ``config.OutUnitLength_in_cm`` and masses of particles in units of ``config.OutUnitMass_in_g``
+  * ``getVelXYZMasses()``: retrieve velocities of particles in units of ``config.OutUnitVelocity_in_cm_per_s``
+  * ``getR200()``: fetch R200 value of all objects (that have sufficient resolution as is implicitly assumed everywhere) in units of ``config.OutUnitLength_in_cm``
+  * ``getIdxCat()``: fetch index catalogue (each row contains indices of particles belonging to an object) and object sizes (number of particles in each object)
+  * ``getMassesCenters(select)``: calculate and return centers (in units of ``config.OutUnitLength_in_cm``) and total masses of objects (in units of ``config.OutUnitMass_in_g``)
+  * ``getObjInfo()``: print basic info such as number of objects with sufficient resolution, number of subhalos, number of objects (halos) that have no subhalos etc.,
+
+  the density profiling-related public methods are
+  
   * ``estDensProfs(ROverR200, select, direct_binning = True, spherical = True, reduced = False, shell_based = False)``: estimate density profiles at normalized radii ``ROverR200``
+  * ``fitDensProfs(dens_profs, ROverR200, method, select)``: get best-fit results for density profile fitting
+  * ``estConcentrations(dens_profs, ROverR200, method, select)``: get best-fit concentration values from density profile fitting
+  * ``plotDensProfs(dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, method, nb_bins, VIZ_DEST, select)``: draw some simplistic density profiles and save in ``VIZ_DEST``
+
+  while the shape profiling-related public methods are
+  
   * ``getShapeCatLocal(select, reduced = False, shell_based = False)``: estimate and return shape profiles  
   * ``getShapeCatGlobal(select, reduced = False)``: estimate and return global shape data
   * ``vizLocalShapes(obj_numbers, VIZ_DEST, reduced = False, shell_based = False)``: visualize shape profiles of objects with numbers ``obj_numbers`` and save in ``VIZ_DEST``
@@ -60,8 +78,7 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``plotGlobalTHist(HIST_NB_BINS, VIZ_DEST, select, reduced = False)``: plot histogram of global triaxiality
   * ``plotShapeProfs(nb_bins, VIZ_DEST, select, reduced = False, shell_based = False)``: plot shape profiles, also mass bin-decomposed ones
   * ``dumpShapeCatLocal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant local shape data into ``CAT_DEST``
-  * ``dumpShapeCatGlobal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant global shape data into ``CAT_DEST``
-  * ``getObjInfo()``: print basic info such as number of objects with sufficient resolution, number of subhalos, number of objects (halos) that have no subhalos etc.
+  * ``dumpShapeCatGlobal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant global shape data into ``CAT_DEST``.
 
 * very general assortments of point clouds. There is no requirement on the nature of the point clouds whatsoever, yet the shape determination algorithm will perform better the closer the point clouds are to being truly ellipsoidal. Often, the process of identifying such point clouds in a simulation can be challenging, which is why we provide an :ref:`interface<AHF example>` showcasing how to use the 'Amiga Halo Finder' (AHF) via ``pynbody``. For now, we assume that we have identified the point clouds already and that ``idx_cat`` (list of lists) stores the indices of the particles belonging to the point clouds::
     
@@ -107,7 +124,23 @@ with arguments and public methods explained in detail in :ref:`the code referenc
 
 .. dropdown:: Public Methods of DensShapeProfs
 
-  * ``estDensProfs(ROverR200, select, direct_binning = True, spherical = True, reduced = False, shell_based = False)``: estimate density profiles at normalized radii ``ROverR200``
+  In the following, 'object' refers to the objects that are defined via the indices ``idx_cat`` provided by the user. The generic public methods are
+  
+  * ``getXYZMasses()``: retrieve positions in units of ``config.OutUnitLength_in_cm`` and masses of particles in units of ``config.OutUnitMass_in_g``
+  * ``getR200()``: fetch R200 value of all objects (that have sufficient resolution as is implicitly assumed everywhere) in units of ``config.OutUnitLength_in_cm``
+  * ``getIdxCat()``: fetch index catalogue (each row contains indices of particles belonging to an object) and object sizes (number of particles in each object)
+  * ``getMassesCenters(select)``: calculate and return centers (in units of ``config.OutUnitLength_in_cm``) and total masses of objects (in units of ``config.OutUnitMass_in_g``)
+  * ``getObjInfo()``: print basic info such as number of objects with sufficient resolution etc.,
+
+  the density profiling-related public methods are
+  
+  * ``estDensProfs(ROverR200, select, direct_binning = True, spherical = True)``: estimate density profiles at normalized radii ``ROverR200``
+  * ``fitDensProfs(dens_profs, ROverR200, method, select)``: get best-fit results for density profile fitting
+  * ``estConcentrations(dens_profs, ROverR200, method, select)``: get best-fit concentration values from density profile fitting
+  * ``plotDensProfs(dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, method, nb_bins, VIZ_DEST, select)``: draw some simplistic density profiles and save in ``VIZ_DEST``
+  
+  while the shape profiling-related public methods are
+  
   * ``getShapeCatLocal(select, reduced = False, shell_based = False)``: estimate and return shape profiles  
   * ``getShapeCatGlobal(select, reduced = False)``: estimate and return global shape data
   * ``vizLocalShapes(obj_numbers, VIZ_DEST, reduced = False, shell_based = False)``: visualize shape profiles of objects with numbers ``obj_numbers`` and save in ``VIZ_DEST``
@@ -118,6 +151,5 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``plotGlobalTHist(HIST_NB_BINS, VIZ_DEST, select, reduced = False)``: plot histogram of global triaxiality
   * ``plotShapeProfs(nb_bins, VIZ_DEST, select, reduced = False, shell_based = False)``: plot shape profiles, also mass bin-decomposed ones
   * ``dumpShapeCatLocal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant local shape data into ``CAT_DEST``
-  * ``dumpShapeCatGlobal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant global shape data into ``CAT_DEST``
-  * ``getObjInfo()``: print basic info such as number of objects with sufficient resolution etc.
+  * ``dumpShapeCatGlobal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant global shape data into ``CAT_DEST``.
 

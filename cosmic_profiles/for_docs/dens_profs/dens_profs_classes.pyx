@@ -4,6 +4,7 @@
 
 from common.cosmic_base_class cimport CosmicBase
 import numpy as np
+from common import config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -12,7 +13,7 @@ size = comm.Get_size()
 cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
-    Its public methods are ``getR200s()``, ``getIdxCat()``,
+    Its public methods are ``getR200()``, ``getIdxCat()``,
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``."""
     
@@ -37,8 +38,8 @@ cdef class DensProfs(CosmicBase):
         :type CENTER: str"""
         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
-        self.xyz = xyz.base*InUnitLength_in_cm/3.085678e24 # self.xyz will be in Mpc/h
-        self.masses = masses.base*InUnitMass_in_g/1.989e43 # self.masses will be in 10^10 M_sun/h
+        self.xyz = xyz.base*config.InUnitLength_in_cm/3.085678e24 # self.xyz will be in Mpc/h
+        self.masses = masses.base*config.InUnitMass_in_g/1.989e43 # self.masses will be in 10^10 M_sun/h
         cdef int nb_objs = len(idx_cat)
         cdef int p
         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
@@ -56,9 +57,9 @@ cdef class DensProfs(CosmicBase):
                 cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(idx_cat[p])
         self.idx_cat = cat_arr.base
         self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
-        self.r200 = r200.base[obj_pass.base.nonzero()[0]]*InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h
+        self.r200 = r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h
        
-    def getR200s(self):
+    def getR200(self):
         """ Get overdensity radii in config.OutUnitLength_in_cm units"""
         return
     

@@ -13,10 +13,10 @@ matplotlib.rcParams.update({'font.size': 13})
 cimport cython
 from cosmic_profiles.dens_profs.dens_profs_classes cimport DensProfs, DensProfsHDF5
 from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, isValidSelection
+from cosmic_profiles.common import config
 from cosmic_profiles.shape_profs.shape_profs_tools import getGlobalEpsHist, getLocalEpsHist
 from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5SHData
 import time
-import config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()

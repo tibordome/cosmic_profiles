@@ -4,12 +4,12 @@
 
 import numpy as np
 from cosmic_profiles.common.cosmic_base_class cimport CosmicBase
+from cosmic_profiles.common import config
 from cosmic_profiles.common.python_routines import print_status, isValidSelection
 from cosmic_profiles.dens_profs.dens_profs_tools import drawDensProfs
 from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5SHData, getHDF5ObjData
 from cosmic_profiles.gadget_hdf5.gen_catalogues import calcObjCat
 import time
-import config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -18,7 +18,7 @@ size = comm.Get_size()
 cdef class DensProfs(CosmicBase):
     """ Class for density profile calculations
     
-    Its public methods are ``getR200s()``, ``getIdxCat()``,
+    Its public methods are ``getR200()``, ``getIdxCat()``,
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``."""
     
@@ -64,9 +64,9 @@ cdef class DensProfs(CosmicBase):
         self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
         self.r200 = r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h
        
-    def getR200s(self): # Public Method
+    def getR200(self): # Public Method
         """ Get overdensity radii in config.OutUnitLength_in_cm units"""
-        print_status(rank,self.start_time,'Starting getR200s() with snap {0}'.format(self.SNAP))
+        print_status(rank,self.start_time,'Starting getR200() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
             return self.r200.base*3.085678e24/config.OutUnitLength_in_cm

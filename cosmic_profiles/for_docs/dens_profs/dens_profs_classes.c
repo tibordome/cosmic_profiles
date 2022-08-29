@@ -1267,32 +1267,6 @@ static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObje
 #define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
 #endif
 
-/* MemviewSliceInit.proto */
-#define __Pyx_BUF_MAX_NDIMS %(BUF_MAX_NDIMS)d
-#define __Pyx_MEMVIEW_DIRECT   1
-#define __Pyx_MEMVIEW_PTR      2
-#define __Pyx_MEMVIEW_FULL     4
-#define __Pyx_MEMVIEW_CONTIG   8
-#define __Pyx_MEMVIEW_STRIDED  16
-#define __Pyx_MEMVIEW_FOLLOW   32
-#define __Pyx_IS_C_CONTIG 1
-#define __Pyx_IS_F_CONTIG 2
-static int __Pyx_init_memviewslice(
-                struct __pyx_memoryview_obj *memview,
-                int ndim,
-                __Pyx_memviewslice *memviewslice,
-                int memview_is_new_reference);
-static CYTHON_INLINE int __pyx_add_acquisition_count_locked(
-    __pyx_atomic_int *acquisition_count, PyThread_type_lock lock);
-static CYTHON_INLINE int __pyx_sub_acquisition_count_locked(
-    __pyx_atomic_int *acquisition_count, PyThread_type_lock lock);
-#define __pyx_get_slice_count_pointer(memview) (memview->acquisition_count_aligned_p)
-#define __pyx_get_slice_count(memview) (*__pyx_get_slice_count_pointer(memview))
-#define __PYX_INC_MEMVIEW(slice, have_gil) __Pyx_INC_MEMVIEW(slice, have_gil, __LINE__)
-#define __PYX_XDEC_MEMVIEW(slice, have_gil) __Pyx_XDEC_MEMVIEW(slice, have_gil, __LINE__)
-static CYTHON_INLINE void __Pyx_INC_MEMVIEW(__Pyx_memviewslice *, int, int);
-static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *, int, int);
-
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1339,6 +1313,32 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 #define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
 #endif
+
+/* MemviewSliceInit.proto */
+#define __Pyx_BUF_MAX_NDIMS %(BUF_MAX_NDIMS)d
+#define __Pyx_MEMVIEW_DIRECT   1
+#define __Pyx_MEMVIEW_PTR      2
+#define __Pyx_MEMVIEW_FULL     4
+#define __Pyx_MEMVIEW_CONTIG   8
+#define __Pyx_MEMVIEW_STRIDED  16
+#define __Pyx_MEMVIEW_FOLLOW   32
+#define __Pyx_IS_C_CONTIG 1
+#define __Pyx_IS_F_CONTIG 2
+static int __Pyx_init_memviewslice(
+                struct __pyx_memoryview_obj *memview,
+                int ndim,
+                __Pyx_memviewslice *memviewslice,
+                int memview_is_new_reference);
+static CYTHON_INLINE int __pyx_add_acquisition_count_locked(
+    __pyx_atomic_int *acquisition_count, PyThread_type_lock lock);
+static CYTHON_INLINE int __pyx_sub_acquisition_count_locked(
+    __pyx_atomic_int *acquisition_count, PyThread_type_lock lock);
+#define __pyx_get_slice_count_pointer(memview) (memview->acquisition_count_aligned_p)
+#define __pyx_get_slice_count(memview) (*__pyx_get_slice_count_pointer(memview))
+#define __PYX_INC_MEMVIEW(slice, have_gil) __Pyx_INC_MEMVIEW(slice, have_gil, __LINE__)
+#define __PYX_XDEC_MEMVIEW(slice, have_gil) __Pyx_XDEC_MEMVIEW(slice, have_gil, __LINE__)
+static CYTHON_INLINE void __Pyx_INC_MEMVIEW(__Pyx_memviewslice *, int, int);
+static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *, int, int);
 
 /* GetItemInt.proto */
 #define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
@@ -1915,6 +1915,8 @@ static const char __pyx_k_super[] = "super";
 static const char __pyx_k_zeros[] = "zeros";
 static const char __pyx_k_CENTER[] = "CENTER";
 static const char __pyx_k_arange[] = "arange";
+static const char __pyx_k_common[] = "common";
+static const char __pyx_k_config[] = "config";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_format[] = "format";
 static const char __pyx_k_import[] = "__import__";
@@ -1968,6 +1970,7 @@ static const char __pyx_k_HDF5_SNAP_DEST[] = "HDF5_SNAP_DEST";
 static const char __pyx_k_dens_profs_fit[] = "dens_profs_fit";
 static const char __pyx_k_direct_binning[] = "direct_binning";
 static const char __pyx_k_HDF5_GROUP_DEST[] = "HDF5_GROUP_DEST";
+static const char __pyx_k_InUnitMass_in_g[] = "InUnitMass_in_g";
 static const char __pyx_k_MIN_NUMBER_PTCS[] = "MIN_NUMBER_PTCS";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
@@ -1975,6 +1978,7 @@ static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
+static const char __pyx_k_InUnitLength_in_cm[] = "InUnitLength_in_cm";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
@@ -2022,6 +2026,8 @@ static PyObject *__pyx_n_s_Get_rank;
 static PyObject *__pyx_n_s_Get_size;
 static PyObject *__pyx_n_s_HDF5_GROUP_DEST;
 static PyObject *__pyx_n_s_HDF5_SNAP_DEST;
+static PyObject *__pyx_n_s_InUnitLength_in_cm;
+static PyObject *__pyx_n_s_InUnitMass_in_g;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x3e;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0x51;
 static PyObject *__pyx_kp_s_Incompatible_checksums_s_vs_0xb0;
@@ -2057,6 +2063,8 @@ static PyObject *__pyx_n_u_c;
 static PyObject *__pyx_n_s_class;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_comm;
+static PyObject *__pyx_n_s_common;
+static PyObject *__pyx_n_s_config;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
 static PyObject *__pyx_n_s_dens_profs;
@@ -2142,27 +2150,33 @@ static PyObject *__pyx_n_s_xyz;
 static PyObject *__pyx_kp_u_xyz_shape_0_must_be_equal_to_mas;
 static PyObject *__pyx_n_s_zeros;
 static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, __Pyx_memviewslice __pyx_v_xyz, __Pyx_memviewslice __pyx_v_masses, PyObject *__pyx_v_idx_cat, __Pyx_memviewslice __pyx_v_r200, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, PyObject *__pyx_v_CENTER); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_14__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_16__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
-static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, PyObject *__pyx_v_OBJ_TYPE, PyObject *__pyx_v_CENTER, PyObject *__pyx_v_RVIR_OR_R200); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getR200(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6getXYZMasses(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10_getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_14fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_16estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_18plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_20__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_22__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
+static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, PyObject *__pyx_v_CENTER, PyObject *__pyx_v_RVIR_OR_R200, PyObject *__pyx_v_OBJ_TYPE); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_2getPartType(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_4getXYZMasses(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6getVelXYZ(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getR200(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6_getXYZMasses(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getVelXYZ(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10_getVelXYZ(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getR200(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18_getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_26plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_28__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_30__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes___pyx_unpickle_DensProfs(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_2__pyx_unpickle_DensProfsHDF5(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -2213,6 +2227,8 @@ static PyObject *__pyx_tp_new_array(PyTypeObject *t, PyObject *a, PyObject *k); 
 static PyObject *__pyx_tp_new_Enum(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new__memoryviewslice(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_float_1_989e43;
+static PyObject *__pyx_float_3_085678e24;
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_65743817;
@@ -2250,17 +2266,17 @@ static PyObject *__pyx_codeobj__22;
 static PyObject *__pyx_codeobj__29;
 /* Late includes */
 
-/* "dens_profs/dens_profs_classes.pyx":19
- *     ``plotDensProfs()``."""
+/* "dens_profs/dens_profs_classes.pyx":20
+ *     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``."""
  * 
  *     def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER):             # <<<<<<<<<<<<<<
  *         """
- *         :param xyz: positions of all simulation particles
+ *         :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
  */
 
 /* Python wrapper */
 static int __pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs___init__[] = "\n        :param xyz: positions of all simulation particles\n        :type xyz: (N2,3) floats, N2 >> N1\n        :param masses: masses of all simulation particles\n        :type masses: (N2,) floats\n        :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object\n        :type idx_cat: list of length N1\n        :param r200: R_200 radii of the parent halos\n        :type r200: (N1,) floats\n        :param SNAP: snapshot identifier, e.g. '024'\n        :type SNAP: string\n        :param L_BOX: simulation box side length\n        :type L_BOX: float, units: Mpc/h\n        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n        :type MIN_NUMBER_PTCS: int\n        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n            or 'com' (center of mass) of each halo\n        :type CENTER: str";
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs___init__[] = "\n        :param xyz: positions of all simulation particles in config.InUnitLength_in_cm\n        :type xyz: (N2,3) floats, N2 >> N1\n        :param masses: masses of all simulation particles in config.InUnitMass_in_g\n        :type masses: (N2,) floats\n        :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object\n        :type idx_cat: list of length N1\n        :param r200: R_200 radii of the parent halos in config.InUnitLength_in_cm\n        :type r200: (N1,) floats\n        :param SNAP: snapshot identifier, e.g. '024'\n        :type SNAP: string\n        :param L_BOX: simulation box side length in config.InUnitLength_in_cm\n        :type L_BOX: float\n        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n        :type MIN_NUMBER_PTCS: int\n        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n            or 'com' (center of mass) of each halo\n        :type CENTER: str";
 #if CYTHON_COMPILING_IN_CPYTHON
 struct wrapperbase __pyx_wrapperbase_10dens_profs_18dens_profs_classes_9DensProfs___init__;
 #endif
@@ -2314,47 +2330,47 @@ static int __pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_1__init__(PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 1); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 1); __PYX_ERR(0, 20, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_idx_cat)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 2); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 2); __PYX_ERR(0, 20, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 3); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 3); __PYX_ERR(0, 20, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_SNAP)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 4); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 4); __PYX_ERR(0, 20, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 5); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 5); __PYX_ERR(0, 20, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 6); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 6); __PYX_ERR(0, 20, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 7); __PYX_ERR(0, 19, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 7); __PYX_ERR(0, 20, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 19, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 20, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
@@ -2368,25 +2384,25 @@ static int __pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_1__init__(PyObj
       values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
       values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
     }
-    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 19, __pyx_L3_error)
-    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 19, __pyx_L3_error)
+    __pyx_v_xyz = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_xyz.memview)) __PYX_ERR(0, 20, __pyx_L3_error)
+    __pyx_v_masses = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_masses.memview)) __PYX_ERR(0, 20, __pyx_L3_error)
     __pyx_v_idx_cat = values[2];
-    __pyx_v_r200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200.memview)) __PYX_ERR(0, 19, __pyx_L3_error)
+    __pyx_v_r200 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200.memview)) __PYX_ERR(0, 20, __pyx_L3_error)
     __pyx_v_SNAP = ((PyObject*)values[4]);
-    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[5]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
-    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
+    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[5]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 20, __pyx_L3_error)
+    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 20, __pyx_L3_error)
     __pyx_v_CENTER = ((PyObject*)values[7]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 19, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 20, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfs.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_SNAP), (&PyUnicode_Type), 1, "SNAP", 1))) __PYX_ERR(0, 19, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 19, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_SNAP), (&PyUnicode_Type), 1, "SNAP", 1))) __PYX_ERR(0, 20, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 20, __pyx_L1_error)
   __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_xyz, __pyx_v_masses, __pyx_v_idx_cat, __pyx_v_r200, __pyx_v_SNAP, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_CENTER);
 
   /* function exit code */
@@ -2431,14 +2447,14 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":38
+  /* "dens_profs/dens_profs_classes.pyx":39
  *             or 'com' (center of mass) of each halo
  *         :type CENTER: str"""
  *         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)             # <<<<<<<<<<<<<<
  *         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
- *         self.xyz = xyz.base
+ *         self.xyz = xyz.base*config.InUnitLength_in_cm/3.085678e24 # self.xyz will be in Mpc/h
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_10dens_profs_18dens_profs_classes_DensProfs));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_10dens_profs_18dens_profs_classes_DensProfs));
@@ -2446,15 +2462,15 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_2, 1, ((PyObject *)__pyx_v_self));
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_L_BOX); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_L_BOX); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_MIN_NUMBER_PTCS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_MIN_NUMBER_PTCS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -2471,7 +2487,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_v_CENTER};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2481,7 +2497,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_v_CENTER};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2489,7 +2505,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 39, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -2506,166 +2522,190 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
     PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_v_CENTER);
     __pyx_t_3 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "dens_profs/dens_profs_classes.pyx":39
+  /* "dens_profs/dens_profs_classes.pyx":40
  *         :type CENTER: str"""
  *         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
  *         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"             # <<<<<<<<<<<<<<
- *         self.xyz = xyz.base
- *         self.masses = masses.base
+ *         self.xyz = xyz.base*config.InUnitLength_in_cm/3.085678e24 # self.xyz will be in Mpc/h
+ *         self.masses = masses.base*config.InUnitMass_in_g/1.989e43 # self.masses will be in 10^10 M_sun/h
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!(((__pyx_v_xyz.shape[0]) == (__pyx_v_masses.shape[0])) != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_xyz_shape_0_must_be_equal_to_mas);
-      __PYX_ERR(0, 39, __pyx_L1_error)
+      __PYX_ERR(0, 40, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "dens_profs/dens_profs_classes.pyx":40
+  /* "dens_profs/dens_profs_classes.pyx":41
  *         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
  *         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
- *         self.xyz = xyz.base             # <<<<<<<<<<<<<<
- *         self.masses = masses.base
+ *         self.xyz = xyz.base*config.InUnitLength_in_cm/3.085678e24 # self.xyz will be in Mpc/h             # <<<<<<<<<<<<<<
+ *         self.masses = masses.base*config.InUnitMass_in_g/1.989e43 # self.masses will be in 10^10 M_sun/h
  *         cdef int nb_objs = len(idx_cat)
  */
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_xyz, 2, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_xyz, 2, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_base); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_base); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(__pyx_t_2, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_config); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_InUnitLength_in_cm); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyNumber_Multiply(__pyx_t_2, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_float_3_085678e24); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(__pyx_t_7, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->xyz, 0);
   __pyx_v_self->xyz = __pyx_t_8;
   __pyx_t_8.memview = NULL;
   __pyx_t_8.data = NULL;
 
-  /* "dens_profs/dens_profs_classes.pyx":41
+  /* "dens_profs/dens_profs_classes.pyx":42
  *         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
- *         self.xyz = xyz.base
- *         self.masses = masses.base             # <<<<<<<<<<<<<<
+ *         self.xyz = xyz.base*config.InUnitLength_in_cm/3.085678e24 # self.xyz will be in Mpc/h
+ *         self.masses = masses.base*config.InUnitMass_in_g/1.989e43 # self.masses will be in 10^10 M_sun/h             # <<<<<<<<<<<<<<
  *         cdef int nb_objs = len(idx_cat)
  *         cdef int p
  */
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_masses, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_masses, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_9.memview)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_config); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_InUnitMass_in_g); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_7, __pyx_float_1_989e43); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_t_2, PyBUF_WRITABLE); if (unlikely(!__pyx_t_9.memview)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->masses, 0);
   __pyx_v_self->masses = __pyx_t_9;
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "dens_profs/dens_profs_classes.pyx":42
- *         self.xyz = xyz.base
- *         self.masses = masses.base
+  /* "dens_profs/dens_profs_classes.pyx":43
+ *         self.xyz = xyz.base*config.InUnitLength_in_cm/3.085678e24 # self.xyz will be in Mpc/h
+ *         self.masses = masses.base*config.InUnitMass_in_g/1.989e43 # self.masses will be in 10^10 M_sun/h
  *         cdef int nb_objs = len(idx_cat)             # <<<<<<<<<<<<<<
  *         cdef int p
  *         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
  */
-  __pyx_t_10 = PyObject_Length(__pyx_v_idx_cat); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_10 = PyObject_Length(__pyx_v_idx_cat); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 43, __pyx_L1_error)
   __pyx_v_nb_objs = __pyx_t_10;
 
-  /* "dens_profs/dens_profs_classes.pyx":44
+  /* "dens_profs/dens_profs_classes.pyx":45
  *         cdef int nb_objs = len(idx_cat)
  *         cdef int p
  *         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)             # <<<<<<<<<<<<<<
  *         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
  *         for p in range(nb_objs):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_nb_objs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_nb_objs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_7);
-  __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 44, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_int32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_int32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 44, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_obj_pass = __pyx_t_11;
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "dens_profs/dens_profs_classes.pyx":45
+  /* "dens_profs/dens_profs_classes.pyx":46
  *         cdef int p
  *         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
  *         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)             # <<<<<<<<<<<<<<
  *         for p in range(nb_objs):
  *             if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 45, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nb_objs); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nb_objs); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_3);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
-  __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
-  __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_int32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 45, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
+  __pyx_t_3 = 0;
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_int32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_obj_size = __pyx_t_11;
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "dens_profs/dens_profs_classes.pyx":46
+  /* "dens_profs/dens_profs_classes.pyx":47
  *         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
  *         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
  *         for p in range(nb_objs):             # <<<<<<<<<<<<<<
@@ -2677,21 +2717,21 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
     __pyx_v_p = __pyx_t_13;
 
-    /* "dens_profs/dens_profs_classes.pyx":47
+    /* "dens_profs/dens_profs_classes.pyx":48
  *         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
  *         for p in range(nb_objs):
  *             if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution             # <<<<<<<<<<<<<<
  *                 obj_pass[p] = 1
  *                 obj_size[p] = len(idx_cat[p])
  */
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 47, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 48, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_10 = PyObject_Length(__pyx_t_4); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 47, __pyx_L1_error)
+    __pyx_t_10 = PyObject_Length(__pyx_t_4); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 48, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_14 = ((__pyx_t_10 >= __pyx_v_MIN_NUMBER_PTCS) != 0);
     if (__pyx_t_14) {
 
-      /* "dens_profs/dens_profs_classes.pyx":48
+      /* "dens_profs/dens_profs_classes.pyx":49
  *         for p in range(nb_objs):
  *             if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
  *                 obj_pass[p] = 1             # <<<<<<<<<<<<<<
@@ -2706,20 +2746,20 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       } else if (unlikely(__pyx_t_15 >= __pyx_v_obj_pass.shape[0])) __pyx_t_16 = 0;
       if (unlikely(__pyx_t_16 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_16);
-        __PYX_ERR(0, 48, __pyx_L1_error)
+        __PYX_ERR(0, 49, __pyx_L1_error)
       }
       *((int *) ( /* dim=0 */ (__pyx_v_obj_pass.data + __pyx_t_15 * __pyx_v_obj_pass.strides[0]) )) = 1;
 
-      /* "dens_profs/dens_profs_classes.pyx":49
+      /* "dens_profs/dens_profs_classes.pyx":50
  *             if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
  *                 obj_pass[p] = 1
  *                 obj_size[p] = len(idx_cat[p])             # <<<<<<<<<<<<<<
  *         cdef int nb_pass = np.sum(obj_pass.base)
  *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
  */
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 49, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 50, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_10 = PyObject_Length(__pyx_t_4); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 49, __pyx_L1_error)
+      __pyx_t_10 = PyObject_Length(__pyx_t_4); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 50, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_15 = __pyx_v_p;
       __pyx_t_16 = -1;
@@ -2729,11 +2769,11 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       } else if (unlikely(__pyx_t_15 >= __pyx_v_obj_size.shape[0])) __pyx_t_16 = 0;
       if (unlikely(__pyx_t_16 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_16);
-        __PYX_ERR(0, 49, __pyx_L1_error)
+        __PYX_ERR(0, 50, __pyx_L1_error)
       }
       *((int *) ( /* dim=0 */ (__pyx_v_obj_size.data + __pyx_t_15 * __pyx_v_obj_size.strides[0]) )) = __pyx_t_10;
 
-      /* "dens_profs/dens_profs_classes.pyx":47
+      /* "dens_profs/dens_profs_classes.pyx":48
  *         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
  *         for p in range(nb_objs):
  *             if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution             # <<<<<<<<<<<<<<
@@ -2743,193 +2783,22 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
     }
   }
 
-  /* "dens_profs/dens_profs_classes.pyx":50
+  /* "dens_profs/dens_profs_classes.pyx":51
  *                 obj_pass[p] = 1
  *                 obj_size[p] = len(idx_cat[p])
  *         cdef int nb_pass = np.sum(obj_pass.base)             # <<<<<<<<<<<<<<
  *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
  *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sum); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_base); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_1)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_1);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_1, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_v_nb_pass = __pyx_t_6;
-
-  /* "dens_profs/dens_profs_classes.pyx":51
- *                 obj_size[p] = len(idx_cat[p])
- *         cdef int nb_pass = np.sum(obj_pass.base)
- *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)             # <<<<<<<<<<<<<<
- *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
- *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_nb_pass); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_max); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  { /* enter inner scope */
-    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __pyx_v_nb_objs;
-    __pyx_t_12 = __pyx_t_6;
-    for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
-      __pyx_7genexpr__pyx_v_p = __pyx_t_13;
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_7genexpr__pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 51, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_10 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 51, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 51, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 51, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    }
-  } /* exit inner scope */
-  __pyx_t_5 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_5)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_5);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_7 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_5, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_4);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
-  __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_7);
-  __pyx_t_4 = 0;
-  __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2);
-  __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_int32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_17.memview)) __PYX_ERR(0, 51, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_cat_arr = __pyx_t_17;
-  __pyx_t_17.memview = NULL;
-  __pyx_t_17.data = NULL;
-
-  /* "dens_profs/dens_profs_classes.pyx":52
- *         cdef int nb_pass = np.sum(obj_pass.base)
- *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
- *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)             # <<<<<<<<<<<<<<
- *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
- *         for p in range(nb_objs):
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_nb_objs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
-  __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_7);
-  __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_int32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_v_idxs_compr = __pyx_t_11;
-  __pyx_t_11.memview = NULL;
-  __pyx_t_11.data = NULL;
-
-  /* "dens_profs/dens_profs_classes.pyx":53
- *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
- *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
- *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))             # <<<<<<<<<<<<<<
- *         for p in range(nb_objs):
- *             if obj_pass[p] == 1:
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_arange); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_sum); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_sum); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -2941,39 +2810,210 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_7 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5);
+  __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_nb_pass = __pyx_t_6;
+
+  /* "dens_profs/dens_profs_classes.pyx":52
+ *                 obj_size[p] = len(idx_cat[p])
+ *         cdef int nb_pass = np.sum(obj_pass.base)
+ *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)             # <<<<<<<<<<<<<<
+ *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
+ *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_nb_pass); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_max); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  { /* enter inner scope */
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_6 = __pyx_v_nb_objs;
+    __pyx_t_12 = __pyx_t_6;
+    for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
+      __pyx_7genexpr__pyx_v_p = __pyx_t_13;
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_7genexpr__pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 52, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_10 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 52, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 52, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 52, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    }
+  } /* exit inner scope */
+  __pyx_t_5 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
     }
   }
-  __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_3, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_idxs_compr, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_base); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_1);
+  __pyx_t_4 = 0;
+  __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_7);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_7);
+  __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_int32); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_17 = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(__pyx_t_2, PyBUF_WRITABLE); if (unlikely(!__pyx_t_17.memview)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_cat_arr = __pyx_t_17;
+  __pyx_t_17.memview = NULL;
+  __pyx_t_17.data = NULL;
+
+  /* "dens_profs/dens_profs_classes.pyx":53
+ *         cdef int nb_pass = np.sum(obj_pass.base)
+ *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
+ *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)             # <<<<<<<<<<<<<<
+ *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
+ *         for p in range(nb_objs):
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_nb_objs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_int32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_idxs_compr = __pyx_t_11;
+  __pyx_t_11.memview = NULL;
+  __pyx_t_11.data = NULL;
+
+  /* "dens_profs/dens_profs_classes.pyx":54
+ *         cdef int[:,:] cat_arr = np.zeros((nb_pass,np.max([len(idx_cat[p]) for p in range(nb_objs)])), dtype = np.int32)
+ *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
+ *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))             # <<<<<<<<<<<<<<
+ *         for p in range(nb_objs):
+ *             if obj_pass[p] == 1:
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_arange); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_sum); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_7)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_7);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_7, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_idxs_compr, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -2986,20 +3026,20 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+  __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_t_3, __pyx_t_4) < 0)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_t_7, __pyx_t_3, __pyx_t_4) < 0)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "dens_profs/dens_profs_classes.pyx":54
+  /* "dens_profs/dens_profs_classes.pyx":55
  *         cdef int[:] idxs_compr = np.zeros((nb_objs,), dtype = np.int32)
  *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
  *         for p in range(nb_objs):             # <<<<<<<<<<<<<<
@@ -3011,7 +3051,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
     __pyx_v_p = __pyx_t_13;
 
-    /* "dens_profs/dens_profs_classes.pyx":55
+    /* "dens_profs/dens_profs_classes.pyx":56
  *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
  *         for p in range(nb_objs):
  *             if obj_pass[p] == 1:             # <<<<<<<<<<<<<<
@@ -3026,46 +3066,46 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
     } else if (unlikely(__pyx_t_15 >= __pyx_v_obj_pass.shape[0])) __pyx_t_16 = 0;
     if (unlikely(__pyx_t_16 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_16);
-      __PYX_ERR(0, 55, __pyx_L1_error)
+      __PYX_ERR(0, 56, __pyx_L1_error)
     }
     __pyx_t_14 = (((*((int *) ( /* dim=0 */ (__pyx_v_obj_pass.data + __pyx_t_15 * __pyx_v_obj_pass.strides[0]) ))) == 1) != 0);
     if (__pyx_t_14) {
 
-      /* "dens_profs/dens_profs_classes.pyx":56
+      /* "dens_profs/dens_profs_classes.pyx":57
  *         for p in range(nb_objs):
  *             if obj_pass[p] == 1:
  *                 cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(idx_cat[p])             # <<<<<<<<<<<<<<
  *         self.idx_cat = cat_arr.base
  *         self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 56, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_idx_cat, __pyx_v_p, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
-        __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_7);
-        if (likely(__pyx_t_1)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-          __Pyx_INCREF(__pyx_t_1);
+      __pyx_t_2 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+        __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
+        if (likely(__pyx_t_2)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+          __Pyx_INCREF(__pyx_t_2);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_7, function);
+          __Pyx_DECREF_SET(__pyx_t_1, function);
         }
       }
-      __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_3);
-      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 56, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_cat_arr, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 56, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_base); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_cat_arr, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_base); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_15 = __pyx_v_p;
       __pyx_t_16 = -1;
       if (__pyx_t_15 < 0) {
@@ -3074,10 +3114,10 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       } else if (unlikely(__pyx_t_15 >= __pyx_v_idxs_compr.shape[0])) __pyx_t_16 = 0;
       if (unlikely(__pyx_t_16 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_16);
-        __PYX_ERR(0, 56, __pyx_L1_error)
+        __PYX_ERR(0, 57, __pyx_L1_error)
       }
-      __pyx_t_7 = __Pyx_PyInt_From_int((*((int *) ( /* dim=0 */ (__pyx_v_idxs_compr.data + __pyx_t_15 * __pyx_v_idxs_compr.strides[0]) )))); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 56, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_1 = __Pyx_PyInt_From_int((*((int *) ( /* dim=0 */ (__pyx_v_idxs_compr.data + __pyx_t_15 * __pyx_v_idxs_compr.strides[0]) )))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_15 = __pyx_v_p;
       __pyx_t_16 = -1;
       if (__pyx_t_15 < 0) {
@@ -3086,27 +3126,27 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       } else if (unlikely(__pyx_t_15 >= __pyx_v_obj_size.shape[0])) __pyx_t_16 = 0;
       if (unlikely(__pyx_t_16 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_16);
-        __PYX_ERR(0, 56, __pyx_L1_error)
+        __PYX_ERR(0, 57, __pyx_L1_error)
       }
-      __pyx_t_1 = __Pyx_PyInt_From_int((*((int *) ( /* dim=0 */ (__pyx_v_obj_size.data + __pyx_t_15 * __pyx_v_obj_size.strides[0]) )))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = PySlice_New(Py_None, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 56, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_int((*((int *) ( /* dim=0 */ (__pyx_v_obj_size.data + __pyx_t_15 * __pyx_v_obj_size.strides[0]) )))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_5 = PySlice_New(Py_None, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_7);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_GIVEREF(__pyx_t_1);
+      PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
       __Pyx_GIVEREF(__pyx_t_5);
-      PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_5);
-      __pyx_t_7 = 0;
+      PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_5);
+      __pyx_t_1 = 0;
       __pyx_t_5 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_t_1, __pyx_t_4) < 0)) __PYX_ERR(0, 56, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_t_2, __pyx_t_4) < 0)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "dens_profs/dens_profs_classes.pyx":55
+      /* "dens_profs/dens_profs_classes.pyx":56
  *         idxs_compr.base[obj_pass.base.nonzero()[0]] = np.arange(np.sum(obj_pass.base))
  *         for p in range(nb_objs):
  *             if obj_pass[p] == 1:             # <<<<<<<<<<<<<<
@@ -3116,42 +3156,42 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
     }
   }
 
-  /* "dens_profs/dens_profs_classes.pyx":57
+  /* "dens_profs/dens_profs_classes.pyx":58
  *             if obj_pass[p] == 1:
  *                 cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(idx_cat[p])
  *         self.idx_cat = cat_arr.base             # <<<<<<<<<<<<<<
  *         self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
- *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]
+ *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h
  */
-  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_cat_arr, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 57, __pyx_L1_error)
+  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_cat_arr, 2, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_base); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
   __Pyx_GOTREF(__pyx_v_self->idx_cat);
   __Pyx_DECREF(__pyx_v_self->idx_cat);
-  __pyx_v_self->idx_cat = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_v_self->idx_cat = __pyx_t_2;
+  __pyx_t_2 = 0;
 
-  /* "dens_profs/dens_profs_classes.pyx":58
+  /* "dens_profs/dens_profs_classes.pyx":59
  *                 cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(idx_cat[p])
  *         self.idx_cat = cat_arr.base
  *         self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]             # <<<<<<<<<<<<<<
- *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]
+ *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h
  * 
  */
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_obj_size, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_base); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_obj_size, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_base); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -3164,43 +3204,43 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+  __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_11 = __Pyx_PyObject_to_MemoryviewSlice_ds_int(__pyx_t_2, PyBUF_WRITABLE); if (unlikely(!__pyx_t_11.memview)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->obj_size, 0);
   __pyx_v_self->obj_size = __pyx_t_11;
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "dens_profs/dens_profs_classes.pyx":59
+  /* "dens_profs/dens_profs_classes.pyx":60
  *         self.idx_cat = cat_arr.base
  *         self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
- *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]             # <<<<<<<<<<<<<<
+ *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h             # <<<<<<<<<<<<<<
  * 
- *     def getIdxCat(self):
+ *     def getR200(self):
  */
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_r200, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_base); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_r200, 1, (PyObject *(*)(char *)) __pyx_memview_get_float, (int (*)(char *, PyObject *)) __pyx_memview_set_float, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_base); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_obj_pass, 1, (PyObject *(*)(char *)) __pyx_memview_get_int, (int (*)(char *, PyObject *)) __pyx_memview_set_int, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_base); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -3213,31 +3253,43 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
       __Pyx_DECREF_SET(__pyx_t_4, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+  __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_9.memview)) __PYX_ERR(0, 59, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_config); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_InUnitLength_in_cm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = PyNumber_Multiply(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_t_4, __pyx_float_3_085678e24); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_ds_float(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_9.memview)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->__pyx_base.r200, 0);
   __pyx_v_self->__pyx_base.r200 = __pyx_t_9;
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "dens_profs/dens_profs_classes.pyx":19
- *     ``plotDensProfs()``."""
+  /* "dens_profs/dens_profs_classes.pyx":20
+ *     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``."""
  * 
  *     def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER):             # <<<<<<<<<<<<<<
  *         """
- *         :param xyz: positions of all simulation particles
+ *         :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
  */
 
   /* function exit code */
@@ -3268,8 +3320,61 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":61
- *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]
+/* "dens_profs/dens_profs_classes.pyx":62
+ *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h
+ * 
+ *     def getR200(self):             # <<<<<<<<<<<<<<
+ *         """ Get overdensity radii in config.OutUnitLength_in_cm units"""
+ *         return
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_3getR200(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_2getR200[] = " Get overdensity radii in config.OutUnitLength_in_cm units";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_3getR200(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("getR200 (wrapper)", 0);
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getR200(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getR200(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("getR200", 0);
+
+  /* "dens_profs/dens_profs_classes.pyx":64
+ *     def getR200(self):
+ *         """ Get overdensity radii in config.OutUnitLength_in_cm units"""
+ *         return             # <<<<<<<<<<<<<<
+ * 
+ *     def getIdxCat(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+
+  /* "dens_profs/dens_profs_classes.pyx":62
+ *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24 # self.r200 will be in Mpc/h
+ * 
+ *     def getR200(self):             # <<<<<<<<<<<<<<
+ *         """ Get overdensity radii in config.OutUnitLength_in_cm units"""
+ *         return
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "dens_profs/dens_profs_classes.pyx":66
+ *         return
  * 
  *     def getIdxCat(self):             # <<<<<<<<<<<<<<
  *         """ Fetch catalogue
@@ -3277,37 +3382,37 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs___init__(struct
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_3getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_2getIdxCat[] = " Fetch catalogue\n        \n        :return idx_cat: each row contains indices of particles belonging to an object,\n            obj_size: number of particles in each object\n        :rtype: (N1, N3) integers and (N1,) integers";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_3getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_5getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_4getIdxCat[] = " Fetch catalogue\n        \n        :return idx_cat: each row contains indices of particles belonging to an object,\n            obj_size: number of particles in each object\n        :rtype: (N1, N3) integers and (N1,) integers";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_5getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getIdxCat (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getIdxCat(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getIdxCat(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getIdxCat", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":67
+  /* "dens_profs/dens_profs_classes.pyx":72
  *             obj_size: number of particles in each object
  *         :rtype: (N1, N3) integers and (N1,) integers"""
  *         return             # <<<<<<<<<<<<<<
  * 
- * 
+ *     def getXYZMasses(self):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":61
- *         self.r200 = r200.base[obj_pass.base.nonzero()[0]]
+  /* "dens_profs/dens_profs_classes.pyx":66
+ *         return
  * 
  *     def getIdxCat(self):             # <<<<<<<<<<<<<<
  *         """ Fetch catalogue
@@ -3321,8 +3426,61 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getIdxCa
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":70
+/* "dens_profs/dens_profs_classes.pyx":74
+ *         return
  * 
+ *     def getXYZMasses(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve positions and masses of particles
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7getXYZMasses(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_6getXYZMasses[] = " Retrieve positions and masses of particles\n        \n        :return xyz, masses: positions in config.OutUnitLength_in_cm and masses \n            in config.OutUnitMass_in_g\n        :rtype: (N2,3) floats, (N2,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7getXYZMasses(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("getXYZMasses (wrapper)", 0);
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6getXYZMasses(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6getXYZMasses(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("getXYZMasses", 0);
+
+  /* "dens_profs/dens_profs_classes.pyx":80
+ *             in config.OutUnitMass_in_g
+ *         :rtype: (N2,3) floats, (N2,) floats"""
+ *         return             # <<<<<<<<<<<<<<
+ * 
+ *     def getMassesCenters(self, list select):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+
+  /* "dens_profs/dens_profs_classes.pyx":74
+ *         return
+ * 
+ *     def getXYZMasses(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve positions and masses of particles
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "dens_profs/dens_profs_classes.pyx":82
+ *         return
  * 
  *     def getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
  *         """ Calculate total mass and centers of objects
@@ -3330,17 +3488,17 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_2getIdxCa
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_5getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_4getMassesCenters[] = " Calculate total mass and centers of objects\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return centers, m: centers and masses\n        :rtype: (N,3) and (N,) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_5getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_8getMassesCenters[] = " Calculate total mass and centers of objects \n        \n        Note that the units will be in config.OutUnitLength_in_cm and config.OutUnitMass_in_g.\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return centers, m: centers in config.OutUnitLength_in_cm and masses in config.OutUnitMass_in_g\n        :rtype: (N,3) and (N,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select) {
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getMassesCenters (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 70, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getMassesCenters(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), ((PyObject*)__pyx_v_select));
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8getMassesCenters(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), ((PyObject*)__pyx_v_select));
 
   /* function exit code */
   goto __pyx_L0;
@@ -3351,24 +3509,24 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_5getMasse
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getMassesCenters", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":77
- *         :return centers, m: centers and masses
+  /* "dens_profs/dens_profs_classes.pyx":91
+ *         :return centers, m: centers in config.OutUnitLength_in_cm and masses in config.OutUnitMass_in_g
  *         :rtype: (N,3) and (N,) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):
+ *     def _getMassesCenters(self, list select):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":70
- * 
+  /* "dens_profs/dens_profs_classes.pyx":82
+ *         return
  * 
  *     def getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
  *         """ Calculate total mass and centers of objects
@@ -3382,7 +3540,68 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getMasse
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":79
+/* "dens_profs/dens_profs_classes.pyx":93
+ *         return
+ * 
+ *     def _getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
+ *         """ Calculate total mass and centers of objects
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11_getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_10_getMassesCenters[] = " Calculate total mass and centers of objects\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return centers, m: centers in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3\n        :rtype: (N,3) and (N,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11_getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select) {
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getMassesCenters (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 93, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10_getMassesCenters(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), ((PyObject*)__pyx_v_select));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10_getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getMassesCenters", 0);
+
+  /* "dens_profs/dens_profs_classes.pyx":100
+ *         :return centers, m: centers in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3
+ *         :rtype: (N,3) and (N,) floats"""
+ *         return             # <<<<<<<<<<<<<<
+ * 
+ *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+
+  /* "dens_profs/dens_profs_classes.pyx":93
+ *         return
+ * 
+ *     def _getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
+ *         """ Calculate total mass and centers of objects
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "dens_profs/dens_profs_classes.pyx":102
  *         return
  * 
  *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):             # <<<<<<<<<<<<<<
@@ -3391,9 +3610,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_4getMasse
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_6estDensProfs[] = " Estimate density profiles\n        \n        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined\n        :type ROverR200: (r_res,) floats\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param direct_binning: whether or not direct binning approach or\n            kernel-based approach should be used\n        :type direct_binning: boolean\n        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based\n            should be used, ignored if ``direct_binning`` = False\n        :type spherical: boolean\n        :return: density profiles\n        :rtype: (N2, r_res) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_12estDensProfs[] = " Estimate density profiles\n        \n        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined\n        :type ROverR200: (r_res,) floats\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param direct_binning: whether or not direct binning approach or\n            kernel-based approach should be used\n        :type direct_binning: boolean\n        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based\n            should be used, ignored if ``direct_binning`` = False\n        :type spherical: boolean\n        :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :rtype: (N2, r_res) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_direct_binning;
@@ -3431,7 +3650,7 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7estDensP
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, 1); __PYX_ERR(0, 79, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, 1); __PYX_ERR(0, 102, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -3447,7 +3666,7 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7estDensP
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estDensProfs") < 0)) __PYX_ERR(0, 79, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estDensProfs") < 0)) __PYX_ERR(0, 102, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3464,26 +3683,26 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7estDensP
     __pyx_v_ROverR200 = values[0];
     __pyx_v_select = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_direct_binning = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_direct_binning == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L3_error)
+      __pyx_v_direct_binning = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_direct_binning == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L3_error)
     } else {
       __pyx_v_direct_binning = ((int)1);
     }
     if (values[3]) {
-      __pyx_v_spherical = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_spherical == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L3_error)
+      __pyx_v_spherical = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_spherical == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L3_error)
     } else {
       __pyx_v_spherical = ((int)1);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 79, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 102, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfs.estDensProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 79, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6estDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_ROverR200, __pyx_v_select, __pyx_v_direct_binning, __pyx_v_spherical);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12estDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_ROverR200, __pyx_v_select, __pyx_v_direct_binning, __pyx_v_spherical);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3494,13 +3713,13 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7estDensP
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("estDensProfs", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":94
- *         :return: density profiles
+  /* "dens_profs/dens_profs_classes.pyx":117
+ *         :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
  *         :rtype: (N2, r_res) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
@@ -3510,7 +3729,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6estDensP
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":79
+  /* "dens_profs/dens_profs_classes.pyx":102
  *         return
  * 
  *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):             # <<<<<<<<<<<<<<
@@ -3525,7 +3744,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6estDensP
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":96
+/* "dens_profs/dens_profs_classes.pyx":119
  *         return
  * 
  *     def fitDensProfs(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -3534,9 +3753,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_6estDensP
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensProfs[] = " Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_15fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_14fitDensProfs[] = " Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_15fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_method = 0;
@@ -3574,23 +3793,23 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9fitDensP
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 1); __PYX_ERR(0, 96, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 1); __PYX_ERR(0, 119, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 2); __PYX_ERR(0, 96, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 2); __PYX_ERR(0, 119, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 3); __PYX_ERR(0, 96, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 3); __PYX_ERR(0, 119, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fitDensProfs") < 0)) __PYX_ERR(0, 96, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fitDensProfs") < 0)) __PYX_ERR(0, 119, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3607,15 +3826,15 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9fitDensP
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 96, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 119, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfs.fitDensProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 96, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 96, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 119, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_14fitDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3626,12 +3845,12 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9fitDensP
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_14fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("fitDensProfs", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":109
+  /* "dens_profs/dens_profs_classes.pyx":132
  *         :return: best-fits for each object
  *         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
  *         return             # <<<<<<<<<<<<<<
@@ -3642,7 +3861,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensP
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":96
+  /* "dens_profs/dens_profs_classes.pyx":119
  *         return
  * 
  *     def fitDensProfs(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -3657,7 +3876,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensP
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":111
+/* "dens_profs/dens_profs_classes.pyx":134
  *         return
  * 
  *     def estConcentrations(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -3666,9 +3885,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensP
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_10estConcentrations[] = " Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles whose concentrations are to be determined, \n            in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_17estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_16estConcentrations[] = " Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles whose concentrations are to be determined, \n            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_17estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_method = 0;
@@ -3706,23 +3925,23 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11estConc
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 1); __PYX_ERR(0, 111, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 1); __PYX_ERR(0, 134, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 2); __PYX_ERR(0, 111, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 2); __PYX_ERR(0, 134, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 3); __PYX_ERR(0, 111, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 3); __PYX_ERR(0, 134, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estConcentrations") < 0)) __PYX_ERR(0, 111, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estConcentrations") < 0)) __PYX_ERR(0, 134, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3739,15 +3958,15 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11estConc
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 111, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 134, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfs.estConcentrations", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 111, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 111, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10estConcentrations(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 134, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_16estConcentrations(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3758,12 +3977,12 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11estConc
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_16estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("estConcentrations", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":125
+  /* "dens_profs/dens_profs_classes.pyx":148
  *         :return: best-fit concentration for each object
  *         :rtype: (N3,) floats"""
  *         return             # <<<<<<<<<<<<<<
@@ -3774,7 +3993,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10estConc
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":111
+  /* "dens_profs/dens_profs_classes.pyx":134
  *         return
  * 
  *     def estConcentrations(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -3789,7 +4008,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10estConc
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":127
+/* "dens_profs/dens_profs_classes.pyx":150
  *         return
  * 
  *     def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
@@ -3798,9 +4017,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_10estConc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_12plotDensProfs[] = " Draws some simplistic density profiles\n        \n        :param dens_profs: estimated density profiles, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N2, r_res) floats\n        :param ROverR200: radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param ROverR200_fit: radii at which best-fits shall be calculated\n        :type ROverR200_fit: (r_res2,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        ";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_19plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_18plotDensProfs[] = " Draws some simplistic density profiles\n        \n        :param dens_profs: estimated density profiles, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N2, r_res) floats\n        :param ROverR200: radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param ROverR200_fit: radii at which best-fits shall be calculated\n        :type ROverR200_fit: (r_res2,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        ";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_19plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit = 0;
@@ -3850,47 +4069,47 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13plotDen
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 1); __PYX_ERR(0, 127, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 1); __PYX_ERR(0, 150, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dens_profs_fit)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 2); __PYX_ERR(0, 127, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 2); __PYX_ERR(0, 150, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200_fit)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 3); __PYX_ERR(0, 127, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 3); __PYX_ERR(0, 150, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 4); __PYX_ERR(0, 127, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 4); __PYX_ERR(0, 150, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_nb_bins)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 5); __PYX_ERR(0, 127, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 5); __PYX_ERR(0, 150, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 6); __PYX_ERR(0, 127, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 6); __PYX_ERR(0, 150, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 7); __PYX_ERR(0, 127, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 7); __PYX_ERR(0, 150, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotDensProfs") < 0)) __PYX_ERR(0, 127, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotDensProfs") < 0)) __PYX_ERR(0, 150, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
@@ -3909,22 +4128,22 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13plotDen
     __pyx_v_dens_profs_fit = values[2];
     __pyx_v_ROverR200_fit = values[3];
     __pyx_v_method = ((PyObject*)values[4]);
-    __pyx_v_nb_bins = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_nb_bins == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 127, __pyx_L3_error)
+    __pyx_v_nb_bins = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_nb_bins == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 150, __pyx_L3_error)
     __pyx_v_VIZ_DEST = ((PyObject*)values[6]);
     __pyx_v_select = ((PyObject*)values[7]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 127, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 150, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfs.plotDensProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 127, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 127, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 127, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12plotDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_dens_profs_fit, __pyx_v_ROverR200_fit, __pyx_v_method, __pyx_v_nb_bins, __pyx_v_VIZ_DEST, __pyx_v_select);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_18plotDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_dens_profs_fit, __pyx_v_ROverR200_fit, __pyx_v_method, __pyx_v_nb_bins, __pyx_v_VIZ_DEST, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3935,12 +4154,12 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13plotDen
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_18plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotDensProfs", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":147
+  /* "dens_profs/dens_profs_classes.pyx":172
  *         :type select: list containing two integers
  *         """
  *         return             # <<<<<<<<<<<<<<
@@ -3951,7 +4170,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12plotDen
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":127
+  /* "dens_profs/dens_profs_classes.pyx":150
  *         return
  * 
  *     def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
@@ -3973,19 +4192,19 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_12plotDen
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_15__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_15__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_21__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_21__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_14__reduce_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_20__reduce_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_14__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_20__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self) {
   PyObject *__pyx_v_state = 0;
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
@@ -4295,19 +4514,19 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_14__reduc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_17__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_17__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_23__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_23__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_16__setstate_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_22__setstate_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_16__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_22__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfs *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4346,17 +4565,17 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_9DensProfs_16__setst
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":157
+/* "dens_profs/dens_profs_classes.pyx":182
  *     ``plotDensProfs()``."""
  * 
- *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str OBJ_TYPE, str CENTER, str RVIR_OR_R200):             # <<<<<<<<<<<<<<
+ *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE):             # <<<<<<<<<<<<<<
  *         """
  *         :param HDF5_SNAP_DEST: where we can find the snapshot
  */
 
 /* Python wrapper */
 static int __pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__[] = "\n        :param HDF5_SNAP_DEST: where we can find the snapshot\n        :type HDF5_SNAP_DEST: string\n        :param HDF5_GROUP_DEST: where we can find the group files\n        :type HDF5_GROUP_DEST: string\n        :param SNAP: e.g. '024'\n        :type SNAP: string\n        :param SNAP: snapshot identifier, e.g. '024'\n        :type SNAP: string\n        :param L_BOX: simulation box side length\n        :type L_BOX: float, units: Mpc/h\n        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n        :type MIN_NUMBER_PTCS: int\n        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n            or 'com' (center of mass) of each halo\n        :type CENTER: str\n        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed \n            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200\n        :type RVIR_OR_R200: str";
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__[] = "\n        :param HDF5_SNAP_DEST: where we can find the snapshot\n        :type HDF5_SNAP_DEST: string\n        :param HDF5_GROUP_DEST: where we can find the group files\n        :type HDF5_GROUP_DEST: string\n        :param SNAP: e.g. '024'\n        :type SNAP: string\n        :param SNAP: snapshot identifier, e.g. '024'\n        :type SNAP: string\n        :param L_BOX: simulation box side length in config.InUnitLength_in_cm\n        :type L_BOX: float\n        :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation\n        :type MIN_NUMBER_PTCS: int\n        :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)\n            or 'com' (center of mass) of each halo\n        :type CENTER: str\n        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed \n            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200\n        :type RVIR_OR_R200: str\n        :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'\n        :type OBJ_TYPE: str";
 #if CYTHON_COMPILING_IN_CPYTHON
 struct wrapperbase __pyx_wrapperbase_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__;
 #endif
@@ -4366,9 +4585,9 @@ static int __pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_1__init__(
   PyObject *__pyx_v_SNAP = 0;
   float __pyx_v_L_BOX;
   int __pyx_v_MIN_NUMBER_PTCS;
-  PyObject *__pyx_v_OBJ_TYPE = 0;
   PyObject *__pyx_v_CENTER = 0;
   PyObject *__pyx_v_RVIR_OR_R200 = 0;
+  PyObject *__pyx_v_OBJ_TYPE = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -4376,7 +4595,7 @@ static int __pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_1__init__(
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HDF5_SNAP_DEST,&__pyx_n_s_HDF5_GROUP_DEST,&__pyx_n_s_SNAP,&__pyx_n_s_L_BOX,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_OBJ_TYPE,&__pyx_n_s_CENTER,&__pyx_n_s_RVIR_OR_R200,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_HDF5_SNAP_DEST,&__pyx_n_s_HDF5_GROUP_DEST,&__pyx_n_s_SNAP,&__pyx_n_s_L_BOX,&__pyx_n_s_MIN_NUMBER_PTCS,&__pyx_n_s_CENTER,&__pyx_n_s_RVIR_OR_R200,&__pyx_n_s_OBJ_TYPE,0};
     PyObject* values[8] = {0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -4410,47 +4629,47 @@ static int __pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_1__init__(
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_HDF5_GROUP_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 1); __PYX_ERR(0, 157, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 1); __PYX_ERR(0, 182, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_SNAP)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 2); __PYX_ERR(0, 157, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 2); __PYX_ERR(0, 182, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_L_BOX)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 3); __PYX_ERR(0, 157, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 3); __PYX_ERR(0, 182, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_MIN_NUMBER_PTCS)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 4); __PYX_ERR(0, 157, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 4); __PYX_ERR(0, 182, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_OBJ_TYPE)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 5); __PYX_ERR(0, 157, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 5); __PYX_ERR(0, 182, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
-        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CENTER)) != 0)) kw_args--;
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_RVIR_OR_R200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 6); __PYX_ERR(0, 157, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 6); __PYX_ERR(0, 182, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
-        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_RVIR_OR_R200)) != 0)) kw_args--;
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_OBJ_TYPE)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 7); __PYX_ERR(0, 157, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, 7); __PYX_ERR(0, 182, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 157, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 182, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
@@ -4467,27 +4686,27 @@ static int __pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_1__init__(
     __pyx_v_HDF5_SNAP_DEST = ((PyObject*)values[0]);
     __pyx_v_HDF5_GROUP_DEST = ((PyObject*)values[1]);
     __pyx_v_SNAP = ((PyObject*)values[2]);
-    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 157, __pyx_L3_error)
-    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 157, __pyx_L3_error)
-    __pyx_v_OBJ_TYPE = ((PyObject*)values[5]);
-    __pyx_v_CENTER = ((PyObject*)values[6]);
-    __pyx_v_RVIR_OR_R200 = ((PyObject*)values[7]);
+    __pyx_v_L_BOX = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_L_BOX == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 182, __pyx_L3_error)
+    __pyx_v_MIN_NUMBER_PTCS = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_MIN_NUMBER_PTCS == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 182, __pyx_L3_error)
+    __pyx_v_CENTER = ((PyObject*)values[5]);
+    __pyx_v_RVIR_OR_R200 = ((PyObject*)values[6]);
+    __pyx_v_OBJ_TYPE = ((PyObject*)values[7]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 157, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 182, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfsHDF5.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_HDF5_SNAP_DEST), (&PyUnicode_Type), 1, "HDF5_SNAP_DEST", 1))) __PYX_ERR(0, 157, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_HDF5_GROUP_DEST), (&PyUnicode_Type), 1, "HDF5_GROUP_DEST", 1))) __PYX_ERR(0, 157, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_SNAP), (&PyUnicode_Type), 1, "SNAP", 1))) __PYX_ERR(0, 157, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_OBJ_TYPE), (&PyUnicode_Type), 1, "OBJ_TYPE", 1))) __PYX_ERR(0, 157, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 157, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_RVIR_OR_R200), (&PyUnicode_Type), 1, "RVIR_OR_R200", 1))) __PYX_ERR(0, 157, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_OBJ_TYPE, __pyx_v_CENTER, __pyx_v_RVIR_OR_R200);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_HDF5_SNAP_DEST), (&PyUnicode_Type), 1, "HDF5_SNAP_DEST", 1))) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_HDF5_GROUP_DEST), (&PyUnicode_Type), 1, "HDF5_GROUP_DEST", 1))) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_SNAP), (&PyUnicode_Type), 1, "SNAP", 1))) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_CENTER), (&PyUnicode_Type), 1, "CENTER", 1))) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_RVIR_OR_R200), (&PyUnicode_Type), 1, "RVIR_OR_R200", 1))) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_OBJ_TYPE), (&PyUnicode_Type), 1, "OBJ_TYPE", 1))) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_HDF5_SNAP_DEST, __pyx_v_HDF5_GROUP_DEST, __pyx_v_SNAP, __pyx_v_L_BOX, __pyx_v_MIN_NUMBER_PTCS, __pyx_v_CENTER, __pyx_v_RVIR_OR_R200, __pyx_v_OBJ_TYPE);
 
   /* function exit code */
   goto __pyx_L0;
@@ -4498,7 +4717,7 @@ static int __pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_1__init__(
   return __pyx_r;
 }
 
-static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, PyObject *__pyx_v_OBJ_TYPE, PyObject *__pyx_v_CENTER, PyObject *__pyx_v_RVIR_OR_R200) {
+static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v_HDF5_SNAP_DEST, PyObject *__pyx_v_HDF5_GROUP_DEST, PyObject *__pyx_v_SNAP, float __pyx_v_L_BOX, int __pyx_v_MIN_NUMBER_PTCS, PyObject *__pyx_v_CENTER, PyObject *__pyx_v_RVIR_OR_R200, PyObject *__pyx_v_OBJ_TYPE) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4513,14 +4732,14 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":177
- *             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
- *         :type RVIR_OR_R200: str"""
+  /* "dens_profs/dens_profs_classes.pyx":204
+ *         :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
+ *         :type OBJ_TYPE: str"""
  *         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)             # <<<<<<<<<<<<<<
  *         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
  *         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_10dens_profs_18dens_profs_classes_DensProfsHDF5));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_10dens_profs_18dens_profs_classes_DensProfsHDF5));
@@ -4528,15 +4747,15 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_2, 1, ((PyObject *)__pyx_v_self));
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_L_BOX); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_L_BOX); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_MIN_NUMBER_PTCS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_MIN_NUMBER_PTCS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -4553,7 +4772,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_v_CENTER};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4563,7 +4782,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_SNAP, __pyx_t_3, __pyx_t_4, __pyx_v_CENTER};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4571,7 +4790,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -4588,15 +4807,15 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
     PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_v_CENTER);
     __pyx_t_3 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "dens_profs/dens_profs_classes.pyx":178
- *         :type RVIR_OR_R200: str"""
+  /* "dens_profs/dens_profs_classes.pyx":205
+ *         :type OBJ_TYPE: str"""
  *         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
  *         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST             # <<<<<<<<<<<<<<
  *         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
@@ -4608,7 +4827,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   __Pyx_DECREF(__pyx_v_self->HDF5_SNAP_DEST);
   __pyx_v_self->HDF5_SNAP_DEST = __pyx_v_HDF5_SNAP_DEST;
 
-  /* "dens_profs/dens_profs_classes.pyx":179
+  /* "dens_profs/dens_profs_classes.pyx":206
  *         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
  *         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
  *         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST             # <<<<<<<<<<<<<<
@@ -4621,7 +4840,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   __Pyx_DECREF(__pyx_v_self->HDF5_GROUP_DEST);
   __pyx_v_self->HDF5_GROUP_DEST = __pyx_v_HDF5_GROUP_DEST;
 
-  /* "dens_profs/dens_profs_classes.pyx":180
+  /* "dens_profs/dens_profs_classes.pyx":207
  *         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
  *         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
  *         self.RVIR_OR_R200 = RVIR_OR_R200             # <<<<<<<<<<<<<<
@@ -4634,7 +4853,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   __Pyx_DECREF(__pyx_v_self->RVIR_OR_R200);
   __pyx_v_self->RVIR_OR_R200 = __pyx_v_RVIR_OR_R200;
 
-  /* "dens_profs/dens_profs_classes.pyx":181
+  /* "dens_profs/dens_profs_classes.pyx":208
  *         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
  *         self.RVIR_OR_R200 = RVIR_OR_R200
  *         self.OBJ_TYPE = OBJ_TYPE             # <<<<<<<<<<<<<<
@@ -4647,10 +4866,10 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   __Pyx_DECREF(__pyx_v_self->OBJ_TYPE);
   __pyx_v_self->OBJ_TYPE = __pyx_v_OBJ_TYPE;
 
-  /* "dens_profs/dens_profs_classes.pyx":157
+  /* "dens_profs/dens_profs_classes.pyx":182
  *     ``plotDensProfs()``."""
  * 
- *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str OBJ_TYPE, str CENTER, str RVIR_OR_R200):             # <<<<<<<<<<<<<<
+ *     def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE):             # <<<<<<<<<<<<<<
  *         """
  *         :param HDF5_SNAP_DEST: where we can find the snapshot
  */
@@ -4672,7 +4891,7 @@ static int __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__(s
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":183
+/* "dens_profs/dens_profs_classes.pyx":210
  *         self.OBJ_TYPE = OBJ_TYPE
  * 
  *     def getPartType(self):             # <<<<<<<<<<<<<<
@@ -4699,7 +4918,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_2get
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getPartType", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":188
+  /* "dens_profs/dens_profs_classes.pyx":215
  *         :returns: particle type number
  *         :rtype: int"""
  *         return             # <<<<<<<<<<<<<<
@@ -4710,7 +4929,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_2get
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":183
+  /* "dens_profs/dens_profs_classes.pyx":210
  *         self.OBJ_TYPE = OBJ_TYPE
  * 
  *     def getPartType(self):             # <<<<<<<<<<<<<<
@@ -4725,17 +4944,17 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_2get
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":190
+/* "dens_profs/dens_profs_classes.pyx":217
  *         return
  * 
  *     def getXYZMasses(self):             # <<<<<<<<<<<<<<
- *         """ Retrieve positions and masses of objects
+ *         """ Retrieve positions and masses of particles
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_5getXYZMasses(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_4getXYZMasses[] = " Retrieve positions and masses of objects\n        \n        :return xyz, masses: positions and masses\n        :rtype: (N2,3) floats, (N2,) floats";
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_4getXYZMasses[] = " Retrieve positions and masses of particles\n        \n        :return xyz, masses: positions in config.OutUnitLength_in_cm and masses \n            in config.OutUnitMass_in_g\n        :rtype: (N2,3) floats, (N2,) floats";
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_5getXYZMasses(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -4752,8 +4971,61 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_4get
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getXYZMasses", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":195
- *         :return xyz, masses: positions and masses
+  /* "dens_profs/dens_profs_classes.pyx":223
+ *             in config.OutUnitMass_in_g
+ *         :rtype: (N2,3) floats, (N2,) floats"""
+ *         return             # <<<<<<<<<<<<<<
+ * 
+ *     def _getXYZMasses(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+
+  /* "dens_profs/dens_profs_classes.pyx":217
+ *         return
+ * 
+ *     def getXYZMasses(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve positions and masses of particles
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "dens_profs/dens_profs_classes.pyx":225
+ *         return
+ * 
+ *     def _getXYZMasses(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve positions and masses of particles
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_7_getXYZMasses(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6_getXYZMasses[] = " Retrieve positions and masses of particles\n        \n        :return xyz, masses: positions in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3\n        :rtype: (N2,3) floats, (N2,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_7_getXYZMasses(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getXYZMasses (wrapper)", 0);
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6_getXYZMasses(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6_getXYZMasses(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getXYZMasses", 0);
+
+  /* "dens_profs/dens_profs_classes.pyx":230
+ *         :return xyz, masses: positions in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3
  *         :rtype: (N2,3) floats, (N2,) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
@@ -4763,11 +5035,11 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_4get
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":190
+  /* "dens_profs/dens_profs_classes.pyx":225
  *         return
  * 
- *     def getXYZMasses(self):             # <<<<<<<<<<<<<<
- *         """ Retrieve positions and masses of objects
+ *     def _getXYZMasses(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve positions and masses of particles
  * 
  */
 
@@ -4778,35 +5050,88 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_4get
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":197
+/* "dens_profs/dens_profs_classes.pyx":232
  *         return
  * 
  *     def getVelXYZ(self):             # <<<<<<<<<<<<<<
- *         """ Retrieve velocities of objects
+ *         """ Retrieve velocities of particles
  * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_7getVelXYZ(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6getVelXYZ[] = " Retrieve velocities of objects\n        \n        :return velxyz: velocity array\n        :rtype: (N2,3) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_7getVelXYZ(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_9getVelXYZ(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getVelXYZ[] = " Retrieve velocities of particles\n        \n        :return velxyz: velocity array in config.OutUnitVelocity_in_cm_per_s\n        :rtype: (N2,3) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_9getVelXYZ(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getVelXYZ (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6getVelXYZ(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getVelXYZ(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6getVelXYZ(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getVelXYZ(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getVelXYZ", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":202
- *         :return velxyz: velocity array
+  /* "dens_profs/dens_profs_classes.pyx":237
+ *         :return velxyz: velocity array in config.OutUnitVelocity_in_cm_per_s
+ *         :rtype: (N2,3) floats"""
+ *         return             # <<<<<<<<<<<<<<
+ * 
+ *     def _getVelXYZ(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+
+  /* "dens_profs/dens_profs_classes.pyx":232
+ *         return
+ * 
+ *     def getVelXYZ(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve velocities of particles
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "dens_profs/dens_profs_classes.pyx":239
+ *         return
+ * 
+ *     def _getVelXYZ(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve velocities of particles
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_11_getVelXYZ(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10_getVelXYZ[] = " Retrieve velocities of particles\n        \n        :return velxyz: velocity array in km/s\n        :rtype: (N2,3) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_11_getVelXYZ(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getVelXYZ (wrapper)", 0);
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10_getVelXYZ(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10_getVelXYZ(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getVelXYZ", 0);
+
+  /* "dens_profs/dens_profs_classes.pyx":244
+ *         :return velxyz: velocity array in km/s
  *         :rtype: (N2,3) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
@@ -4816,11 +5141,11 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6get
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":197
+  /* "dens_profs/dens_profs_classes.pyx":239
  *         return
  * 
- *     def getVelXYZ(self):             # <<<<<<<<<<<<<<
- *         """ Retrieve velocities of objects
+ *     def _getVelXYZ(self):             # <<<<<<<<<<<<<<
+ *         """ Retrieve velocities of particles
  * 
  */
 
@@ -4831,7 +5156,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6get
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":204
+/* "dens_profs/dens_profs_classes.pyx":246
  *         return
  * 
  *     def getR200(self):             # <<<<<<<<<<<<<<
@@ -4840,26 +5165,26 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6get
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_9getR200(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getR200[] = " Fetch R200 values\n        \n        :return obj_r200: R200 value of parent halos\n        :rtype: (N1,) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_9getR200(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_13getR200(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getR200[] = " Fetch R200 values\n        \n        :return obj_r200: R200 value of parent halos in config.OutUnitLength_in_cm\n        :rtype: (N1,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_13getR200(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getR200 (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getR200(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getR200(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getR200(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getR200(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getR200", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":209
- *         :return obj_r200: R200 value of parent halos
+  /* "dens_profs/dens_profs_classes.pyx":251
+ *         :return obj_r200: R200 value of parent halos in config.OutUnitLength_in_cm
  *         :rtype: (N1,) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
@@ -4869,7 +5194,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8get
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":204
+  /* "dens_profs/dens_profs_classes.pyx":246
  *         return
  * 
  *     def getR200(self):             # <<<<<<<<<<<<<<
@@ -4884,7 +5209,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8get
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":211
+/* "dens_profs/dens_profs_classes.pyx":253
  *         return
  * 
  *     def getIdxCat(self):             # <<<<<<<<<<<<<<
@@ -4893,25 +5218,25 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8get
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_11getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10getIdxCat[] = " Fetch catalogue\n        \n        :return idx_cat: each row contains indices of particles belonging to an object,\n            obj_size: number of particles in each object\n        :rtype: (N1, N3) integers and (N1,) integers";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_11getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14getIdxCat[] = " Fetch catalogue\n        \n        :return idx_cat: each row contains indices of particles belonging to an object,\n            obj_size: number of particles in each object\n        :rtype: (N1, N3) integers and (N1,) integers";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15getIdxCat(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getIdxCat (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10getIdxCat(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14getIdxCat(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14getIdxCat(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getIdxCat", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":217
+  /* "dens_profs/dens_profs_classes.pyx":259
  *             obj_size: number of particles in each object
  *         :rtype: (N1, N3) integers and (N1,) integers"""
  *         return             # <<<<<<<<<<<<<<
@@ -4922,7 +5247,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10ge
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":211
+  /* "dens_profs/dens_profs_classes.pyx":253
  *         return
  * 
  *     def getIdxCat(self):             # <<<<<<<<<<<<<<
@@ -4937,7 +5262,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10ge
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":219
+/* "dens_profs/dens_profs_classes.pyx":261
  *         return
  * 
  *     def getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
@@ -4946,17 +5271,17 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10ge
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_13getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getMassesCenters[] = " Calculate total mass and centers of objects\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return centers, m: centers and masses\n        :rtype: (N,3) and (N,) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_13getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16getMassesCenters[] = " Calculate total mass and centers of objects\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return centers, m: centers in config.OutUnitLength_in_cm and masses in config.OutUnitMass_in_g\n        :rtype: (N,3) and (N,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select) {
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getMassesCenters (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 219, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getMassesCenters(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), ((PyObject*)__pyx_v_select));
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16getMassesCenters(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), ((PyObject*)__pyx_v_select));
 
   /* function exit code */
   goto __pyx_L0;
@@ -4967,23 +5292,23 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_13ge
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("getMassesCenters", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":226
- *         :return centers, m: centers and masses
+  /* "dens_profs/dens_profs_classes.pyx":268
+ *         :return centers, m: centers in config.OutUnitLength_in_cm and masses in config.OutUnitMass_in_g
  *         :rtype: (N,3) and (N,) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):
+ *     def _getMassesCenters(self, list select):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":219
+  /* "dens_profs/dens_profs_classes.pyx":261
  *         return
  * 
  *     def getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
@@ -4998,7 +5323,68 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12ge
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":228
+/* "dens_profs/dens_profs_classes.pyx":270
+ *         return
+ * 
+ *     def _getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
+ *         """ Calculate total mass and centers of objects
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19_getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18_getMassesCenters[] = " Calculate total mass and centers of objects\n        \n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return centers, m: centers in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3\n        :rtype: (N,3) and (N,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19_getMassesCenters(PyObject *__pyx_v_self, PyObject *__pyx_v_select) {
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getMassesCenters (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18_getMassesCenters(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), ((PyObject*)__pyx_v_select));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18_getMassesCenters(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_select) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_getMassesCenters", 0);
+
+  /* "dens_profs/dens_profs_classes.pyx":277
+ *         :return centers, m: centers in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3
+ *         :rtype: (N,3) and (N,) floats"""
+ *         return             # <<<<<<<<<<<<<<
+ * 
+ *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+
+  /* "dens_profs/dens_profs_classes.pyx":270
+ *         return
+ * 
+ *     def _getMassesCenters(self, list select):             # <<<<<<<<<<<<<<
+ *         """ Calculate total mass and centers of objects
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "dens_profs/dens_profs_classes.pyx":279
  *         return
  * 
  *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):             # <<<<<<<<<<<<<<
@@ -5007,9 +5393,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12ge
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14estDensProfs[] = " Estimate density profiles\n        \n        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined\n        :type ROverR200: (r_res,) floats\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param direct_binning: whether or not direct binning approach or\n            kernel-based approach should be used\n        :type direct_binning: boolean\n        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based\n            should be used, ignored if ``direct_binning`` = False\n        :type spherical: boolean\n        :return: density profiles\n        :rtype: (N2, r_res) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20estDensProfs[] = " Estimate density profiles\n        \n        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined\n        :type ROverR200: (r_res,) floats\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :param direct_binning: whether or not direct binning approach or\n            kernel-based approach should be used\n        :type direct_binning: boolean\n        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based\n            should be used, ignored if ``direct_binning`` = False\n        :type spherical: boolean\n        :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :rtype: (N2, r_res) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21estDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_select = 0;
   CYTHON_UNUSED int __pyx_v_direct_binning;
@@ -5047,7 +5433,7 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15es
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, 1); __PYX_ERR(0, 228, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, 1); __PYX_ERR(0, 279, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -5063,7 +5449,7 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15es
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estDensProfs") < 0)) __PYX_ERR(0, 228, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estDensProfs") < 0)) __PYX_ERR(0, 279, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5080,26 +5466,26 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15es
     __pyx_v_ROverR200 = values[0];
     __pyx_v_select = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_direct_binning = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_direct_binning == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 228, __pyx_L3_error)
+      __pyx_v_direct_binning = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_direct_binning == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 279, __pyx_L3_error)
     } else {
       __pyx_v_direct_binning = ((int)1);
     }
     if (values[3]) {
-      __pyx_v_spherical = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_spherical == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 228, __pyx_L3_error)
+      __pyx_v_spherical = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_spherical == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 279, __pyx_L3_error)
     } else {
       __pyx_v_spherical = ((int)1);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 228, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("estDensProfs", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 279, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfsHDF5.estDensProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 228, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14estDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_ROverR200, __pyx_v_select, __pyx_v_direct_binning, __pyx_v_spherical);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20estDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_ROverR200, __pyx_v_select, __pyx_v_direct_binning, __pyx_v_spherical);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5110,13 +5496,13 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15es
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_select, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("estDensProfs", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":243
- *         :return: density profiles
+  /* "dens_profs/dens_profs_classes.pyx":294
+ *         :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
  *         :rtype: (N2, r_res) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
@@ -5126,7 +5512,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14es
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":228
+  /* "dens_profs/dens_profs_classes.pyx":279
  *         return
  * 
  *     def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True):             # <<<<<<<<<<<<<<
@@ -5141,7 +5527,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14es
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":245
+/* "dens_profs/dens_profs_classes.pyx":296
  *         return
  * 
  *     def fitDensProfs(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -5150,9 +5536,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14es
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fitDensProfs[] = " Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_23fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22fitDensProfs[] = " Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, \n            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_23fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_method = 0;
@@ -5190,23 +5576,23 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17fi
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 1); __PYX_ERR(0, 245, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 1); __PYX_ERR(0, 296, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 2); __PYX_ERR(0, 245, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 2); __PYX_ERR(0, 296, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 3); __PYX_ERR(0, 245, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, 3); __PYX_ERR(0, 296, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fitDensProfs") < 0)) __PYX_ERR(0, 245, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "fitDensProfs") < 0)) __PYX_ERR(0, 296, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -5223,15 +5609,15 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17fi
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 245, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("fitDensProfs", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 296, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfsHDF5.fitDensProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 245, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 245, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fitDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 296, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22fitDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5242,12 +5628,12 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17fi
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("fitDensProfs", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":258
+  /* "dens_profs/dens_profs_classes.pyx":310
  *         :return: best-fits for each object
  *         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
  *         return             # <<<<<<<<<<<<<<
@@ -5258,7 +5644,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fi
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":245
+  /* "dens_profs/dens_profs_classes.pyx":296
  *         return
  * 
  *     def fitDensProfs(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -5273,7 +5659,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fi
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":260
+/* "dens_profs/dens_profs_classes.pyx":312
  *         return
  * 
  *     def estConcentrations(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -5282,9 +5668,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fi
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18estConcentrations[] = " Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_25estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24estConcentrations[] = " Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles to be fit, \n            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param ROverR200: normalized radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_25estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_method = 0;
@@ -5322,23 +5708,23 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19es
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 1); __PYX_ERR(0, 260, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 1); __PYX_ERR(0, 312, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 2); __PYX_ERR(0, 260, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 2); __PYX_ERR(0, 312, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 3); __PYX_ERR(0, 260, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, 3); __PYX_ERR(0, 312, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estConcentrations") < 0)) __PYX_ERR(0, 260, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "estConcentrations") < 0)) __PYX_ERR(0, 312, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -5355,15 +5741,15 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19es
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 260, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("estConcentrations", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 312, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfsHDF5.estConcentrations", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 260, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 260, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18estConcentrations(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 312, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 312, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24estConcentrations(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_method, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5374,12 +5760,12 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19es
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("estConcentrations", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":273
+  /* "dens_profs/dens_profs_classes.pyx":326
  *         :return: best-fit concentration for each object
  *         :rtype: (N3,) floats"""
  *         return             # <<<<<<<<<<<<<<
@@ -5390,7 +5776,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18es
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":260
+  /* "dens_profs/dens_profs_classes.pyx":312
  *         return
  * 
  *     def estConcentrations(self, dens_profs, ROverR200, str method, list select):             # <<<<<<<<<<<<<<
@@ -5405,7 +5791,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18es
   return __pyx_r;
 }
 
-/* "dens_profs/dens_profs_classes.pyx":275
+/* "dens_profs/dens_profs_classes.pyx":328
  *         return
  * 
  *     def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
@@ -5414,9 +5800,9 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18es
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20plotDensProfs[] = " Draws some simplistic density profiles\n        \n        :param dens_profs: estimated density profiles, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N2, r_res) floats\n        :param ROverR200: radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param ROverR200_fit: radii at which best-fits shall be calculated\n        :type ROverR200_fit: (r_res2,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        ";
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_27plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_26plotDensProfs[] = " Draws some simplistic density profiles\n        \n        :param dens_profs: estimated density profiles, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N2, r_res) floats\n        :param ROverR200: radii at which ``dens_profs`` are defined\n        :type ROverR200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param ROverR200_fit: radii at which best-fits shall be calculated\n        :type ROverR200_fit: (r_res2,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param VIZ_DEST: visualization folder\n        :type VIZ_DEST: string\n        :param select: index of first and last object to look at in the format [idx_first, idx_last]\n        :type select: list containing two integers\n        ";
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_27plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_ROverR200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit = 0;
@@ -5466,47 +5852,47 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21pl
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 1); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 1); __PYX_ERR(0, 328, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dens_profs_fit)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 2); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 2); __PYX_ERR(0, 328, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ROverR200_fit)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 3); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 3); __PYX_ERR(0, 328, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 4); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 4); __PYX_ERR(0, 328, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_nb_bins)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 5); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 5); __PYX_ERR(0, 328, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_VIZ_DEST)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 6); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 6); __PYX_ERR(0, 328, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 7); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, 7); __PYX_ERR(0, 328, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotDensProfs") < 0)) __PYX_ERR(0, 275, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plotDensProfs") < 0)) __PYX_ERR(0, 328, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
@@ -5525,22 +5911,22 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21pl
     __pyx_v_dens_profs_fit = values[2];
     __pyx_v_ROverR200_fit = values[3];
     __pyx_v_method = ((PyObject*)values[4]);
-    __pyx_v_nb_bins = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_nb_bins == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+    __pyx_v_nb_bins = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_nb_bins == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 328, __pyx_L3_error)
     __pyx_v_VIZ_DEST = ((PyObject*)values[6]);
     __pyx_v_select = ((PyObject*)values[7]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 275, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plotDensProfs", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 328, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("dens_profs.dens_profs_classes.DensProfsHDF5.plotDensProfs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20plotDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_dens_profs_fit, __pyx_v_ROverR200_fit, __pyx_v_method, __pyx_v_nb_bins, __pyx_v_VIZ_DEST, __pyx_v_select);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 328, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_VIZ_DEST), (&PyUnicode_Type), 1, "VIZ_DEST", 1))) __PYX_ERR(0, 328, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_select), (&PyList_Type), 1, "select", 1))) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_26plotDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_ROverR200, __pyx_v_dens_profs_fit, __pyx_v_ROverR200_fit, __pyx_v_method, __pyx_v_nb_bins, __pyx_v_VIZ_DEST, __pyx_v_select);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5551,12 +5937,12 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21pl
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_26plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_ROverR200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_ROverR200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_VIZ_DEST, CYTHON_UNUSED PyObject *__pyx_v_select) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotDensProfs", 0);
 
-  /* "dens_profs/dens_profs_classes.pyx":295
+  /* "dens_profs/dens_profs_classes.pyx":350
  *         :type select: list containing two integers
  *         """
  *         return             # <<<<<<<<<<<<<<
@@ -5565,7 +5951,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20pl
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "dens_profs/dens_profs_classes.pyx":275
+  /* "dens_profs/dens_profs_classes.pyx":328
  *         return
  * 
  *     def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, list select):             # <<<<<<<<<<<<<<
@@ -5587,19 +5973,19 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20pl
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_23__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_23__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_29__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_29__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22__reduce_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_28__reduce_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_28__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self) {
   PyObject *__pyx_v_state = 0;
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
@@ -5915,19 +6301,19 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22__
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_25__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_25__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_31__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_31__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24__setstate_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_30__setstate_cython__(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsHDF5_30__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsHDF5 *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -20082,14 +20468,17 @@ static int __pyx_tp_clear_10dens_profs_18dens_profs_classes_DensProfs(PyObject *
 }
 
 static PyMethodDef __pyx_methods_10dens_profs_18dens_profs_classes_DensProfs[] = {
-  {"getIdxCat", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_3getIdxCat, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_2getIdxCat},
-  {"getMassesCenters", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_5getMassesCenters, METH_O, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_4getMassesCenters},
-  {"estDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7estDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_6estDensProfs},
-  {"fitDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9fitDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_8fitDensProfs},
-  {"estConcentrations", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11estConcentrations, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_10estConcentrations},
-  {"plotDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13plotDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_12plotDensProfs},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_15__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_17__setstate_cython__, METH_O, 0},
+  {"getR200", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_3getR200, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_2getR200},
+  {"getIdxCat", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_5getIdxCat, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_4getIdxCat},
+  {"getXYZMasses", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_7getXYZMasses, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_6getXYZMasses},
+  {"getMassesCenters", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_9getMassesCenters, METH_O, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_8getMassesCenters},
+  {"_getMassesCenters", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_11_getMassesCenters, METH_O, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_10_getMassesCenters},
+  {"estDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_13estDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_12estDensProfs},
+  {"fitDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_15fitDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_14fitDensProfs},
+  {"estConcentrations", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_17estConcentrations, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_16estConcentrations},
+  {"plotDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_19plotDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs_18plotDensProfs},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_21__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_9DensProfs_23__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -20124,7 +20513,7 @@ static PyTypeObject __pyx_type_10dens_profs_18dens_profs_classes_DensProfs = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  " Class for density profile calculations\n    \n    Its public methods are ``getIdxCat()``,\n    ``getMassesCenters()``, ``estDensProfs``, ``fitDensProfs()``, ``estConcentrations()``, \n    ``plotDensProfs()``.", /*tp_doc*/
+  " Class for density profile calculations\n    \n    Its public methods are ``getR200()``, ``getIdxCat()``,\n    ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, \n    ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``.", /*tp_doc*/
   __pyx_tp_traverse_10dens_profs_18dens_profs_classes_DensProfs, /*tp_traverse*/
   __pyx_tp_clear_10dens_profs_18dens_profs_classes_DensProfs, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -20191,16 +20580,19 @@ static void __pyx_tp_dealloc_10dens_profs_18dens_profs_classes_DensProfsHDF5(PyO
 static PyMethodDef __pyx_methods_10dens_profs_18dens_profs_classes_DensProfsHDF5[] = {
   {"getPartType", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_3getPartType, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_2getPartType},
   {"getXYZMasses", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_5getXYZMasses, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_4getXYZMasses},
-  {"getVelXYZ", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_7getVelXYZ, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6getVelXYZ},
-  {"getR200", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_9getR200, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getR200},
-  {"getIdxCat", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_11getIdxCat, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10getIdxCat},
-  {"getMassesCenters", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_13getMassesCenters, METH_O, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getMassesCenters},
-  {"estDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15estDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14estDensProfs},
-  {"fitDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17fitDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16fitDensProfs},
-  {"estConcentrations", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19estConcentrations, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18estConcentrations},
-  {"plotDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21plotDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20plotDensProfs},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_23__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_25__setstate_cython__, METH_O, 0},
+  {"_getXYZMasses", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_7_getXYZMasses, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_6_getXYZMasses},
+  {"getVelXYZ", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_9getVelXYZ, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_8getVelXYZ},
+  {"_getVelXYZ", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_11_getVelXYZ, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_10_getVelXYZ},
+  {"getR200", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_13getR200, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_12getR200},
+  {"getIdxCat", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_15getIdxCat, METH_NOARGS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_14getIdxCat},
+  {"getMassesCenters", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_17getMassesCenters, METH_O, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_16getMassesCenters},
+  {"_getMassesCenters", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_19_getMassesCenters, METH_O, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_18_getMassesCenters},
+  {"estDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_21estDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_20estDensProfs},
+  {"fitDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_23fitDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_22fitDensProfs},
+  {"estConcentrations", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_25estConcentrations, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_24estConcentrations},
+  {"plotDensProfs", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_27plotDensProfs, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5_26plotDensProfs},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_29__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsHDF5_31__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -20235,7 +20627,7 @@ static PyTypeObject __pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5 =
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
-  " Class for density profile calculations for Gadget-style HDF5 data\n    \n    Its public methods are ``getXYZMasses()``, ``getVelXYZ()``, \n    ``getIdxCat()``,  ``getMassesCenters()``, \n    ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,\n    ``plotDensProfs()``.", /*tp_doc*/
+  " Class for density profile calculations for Gadget-style HDF5 data\n    \n    Its public methods are ``getXYZMasses()``, ``_getXYZMasses()``, ``getVelXYZ()``, \n    ``_getVelXYZ()``, ``getR200()``, ``getIdxCat()``,  ``getMassesCenters()``, \n    ``_getMassesCenters()``, ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,\n    ``plotDensProfs()``.", /*tp_doc*/
   0, /*tp_traverse*/
   0, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -21050,6 +21442,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Get_size, __pyx_k_Get_size, sizeof(__pyx_k_Get_size), 0, 0, 1, 1},
   {&__pyx_n_s_HDF5_GROUP_DEST, __pyx_k_HDF5_GROUP_DEST, sizeof(__pyx_k_HDF5_GROUP_DEST), 0, 0, 1, 1},
   {&__pyx_n_s_HDF5_SNAP_DEST, __pyx_k_HDF5_SNAP_DEST, sizeof(__pyx_k_HDF5_SNAP_DEST), 0, 0, 1, 1},
+  {&__pyx_n_s_InUnitLength_in_cm, __pyx_k_InUnitLength_in_cm, sizeof(__pyx_k_InUnitLength_in_cm), 0, 0, 1, 1},
+  {&__pyx_n_s_InUnitMass_in_g, __pyx_k_InUnitMass_in_g, sizeof(__pyx_k_InUnitMass_in_g), 0, 0, 1, 1},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0x3e, __pyx_k_Incompatible_checksums_s_vs_0x3e, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x3e), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0x51, __pyx_k_Incompatible_checksums_s_vs_0x51, sizeof(__pyx_k_Incompatible_checksums_s_vs_0x51), 0, 0, 1, 0},
   {&__pyx_kp_s_Incompatible_checksums_s_vs_0xb0, __pyx_k_Incompatible_checksums_s_vs_0xb0, sizeof(__pyx_k_Incompatible_checksums_s_vs_0xb0), 0, 0, 1, 0},
@@ -21085,6 +21479,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_class, __pyx_k_class, sizeof(__pyx_k_class), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_comm, __pyx_k_comm, sizeof(__pyx_k_comm), 0, 0, 1, 1},
+  {&__pyx_n_s_common, __pyx_k_common, sizeof(__pyx_k_common), 0, 0, 1, 1},
+  {&__pyx_n_s_config, __pyx_k_config, sizeof(__pyx_k_config), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
   {&__pyx_n_s_dens_profs, __pyx_k_dens_profs, sizeof(__pyx_k_dens_profs), 0, 0, 1, 1},
@@ -21172,8 +21568,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 38, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 47, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 133, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 148, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 151, __pyx_L1_error)
@@ -21469,6 +21865,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
 static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  __pyx_float_1_989e43 = PyFloat_FromDouble(1.989e43); if (unlikely(!__pyx_float_1_989e43)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_float_3_085678e24 = PyFloat_FromDouble(3.085678e24); if (unlikely(!__pyx_float_3_085678e24)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_65743817 = PyInt_FromLong(65743817L); if (unlikely(!__pyx_int_65743817)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -21530,7 +21928,7 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_ptype_6common_17cosmic_base_class_CosmicBase = __Pyx_ImportType(__pyx_t_1, "common.cosmic_base_class", "CosmicBase", sizeof(struct __pyx_obj_6common_17cosmic_base_class_CosmicBase), __Pyx_ImportType_CheckSize_Warn);
    if (!__pyx_ptype_6common_17cosmic_base_class_CosmicBase) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_type_10dens_profs_18dens_profs_classes_DensProfs.tp_base = __pyx_ptype_6common_17cosmic_base_class_CosmicBase;
-  if (PyType_Ready(&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_10dens_profs_18dens_profs_classes_DensProfs.tp_print = 0;
   #endif
@@ -21539,7 +21937,7 @@ static int __Pyx_modinit_type_init_code(void) {
   }
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 12, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 13, __pyx_L1_error)
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
       __pyx_wrapperbase_10dens_profs_18dens_profs_classes_9DensProfs___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_10dens_profs_18dens_profs_classes_9DensProfs___init__.doc = __pyx_doc_10dens_profs_18dens_profs_classes_9DensProfs___init__;
@@ -21547,11 +21945,11 @@ static int __Pyx_modinit_type_init_code(void) {
     }
   }
   #endif
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_DensProfs, (PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_DensProfs, (PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfs) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __pyx_ptype_10dens_profs_18dens_profs_classes_DensProfs = &__pyx_type_10dens_profs_18dens_profs_classes_DensProfs;
   __pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5.tp_base = __pyx_ptype_6common_17cosmic_base_class_CosmicBase;
-  if (PyType_Ready(&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5) < 0) __PYX_ERR(0, 174, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5.tp_print = 0;
   #endif
@@ -21560,7 +21958,7 @@ static int __Pyx_modinit_type_init_code(void) {
   }
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 149, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 174, __pyx_L1_error)
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
       __pyx_wrapperbase_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__.doc = __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsHDF5___init__;
@@ -21568,8 +21966,8 @@ static int __Pyx_modinit_type_init_code(void) {
     }
   }
   #endif
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_DensProfsHDF5, (PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_DensProfsHDF5, (PyObject *)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5) < 0) __PYX_ERR(0, 174, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5) < 0) __PYX_ERR(0, 174, __pyx_L1_error)
   __pyx_ptype_10dens_profs_18dens_profs_classes_DensProfsHDF5 = &__pyx_type_10dens_profs_18dens_profs_classes_DensProfsHDF5;
   __pyx_vtabptr_array = &__pyx_vtable_array;
   __pyx_vtable_array.get_memview = (PyObject *(*)(struct __pyx_array_obj *))__pyx_array_get_memview;
@@ -21863,8 +22261,8 @@ if (!__Pyx_RefNanny) {
  * 
  * from common.cosmic_base_class cimport CosmicBase
  * import numpy as np             # <<<<<<<<<<<<<<
+ * from common import config
  * from mpi4py import MPI
- * comm = MPI.COMM_WORLD
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -21874,84 +22272,105 @@ if (!__Pyx_RefNanny) {
   /* "dens_profs/dens_profs_classes.pyx":7
  * from common.cosmic_base_class cimport CosmicBase
  * import numpy as np
- * from mpi4py import MPI             # <<<<<<<<<<<<<<
+ * from common import config             # <<<<<<<<<<<<<<
+ * from mpi4py import MPI
  * comm = MPI.COMM_WORLD
- * rank = comm.Get_rank()
  */
   __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s_MPI);
-  __Pyx_GIVEREF(__pyx_n_s_MPI);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_MPI);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_mpi4py, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_INCREF(__pyx_n_s_config);
+  __Pyx_GIVEREF(__pyx_n_s_config);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_config);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_common, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_MPI); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_config); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MPI, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_config, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "dens_profs/dens_profs_classes.pyx":8
  * import numpy as np
+ * from common import config
+ * from mpi4py import MPI             # <<<<<<<<<<<<<<
+ * comm = MPI.COMM_WORLD
+ * rank = comm.Get_rank()
+ */
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_n_s_MPI);
+  __Pyx_GIVEREF(__pyx_n_s_MPI);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_MPI);
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_mpi4py, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_MPI); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MPI, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "dens_profs/dens_profs_classes.pyx":9
+ * from common import config
  * from mpi4py import MPI
  * comm = MPI.COMM_WORLD             # <<<<<<<<<<<<<<
  * rank = comm.Get_rank()
  * size = comm.Get_size()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_MPI); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_COMM_WORLD); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_MPI); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_comm, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_COMM_WORLD); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_comm, __pyx_t_2) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "dens_profs/dens_profs_classes.pyx":9
+  /* "dens_profs/dens_profs_classes.pyx":10
  * from mpi4py import MPI
  * comm = MPI.COMM_WORLD
  * rank = comm.Get_rank()             # <<<<<<<<<<<<<<
  * size = comm.Get_size()
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Get_rank); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Get_rank); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_rank, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_rank, __pyx_t_2) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "dens_profs/dens_profs_classes.pyx":10
+  /* "dens_profs/dens_profs_classes.pyx":11
  * comm = MPI.COMM_WORLD
  * rank = comm.Get_rank()
  * size = comm.Get_size()             # <<<<<<<<<<<<<<
  * 
  * cdef class DensProfs(CosmicBase):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Get_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Get_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_size, __pyx_t_1) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_size, __pyx_t_2) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_DensProfs(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_10dens_profs_18dens_profs_classes_1__pyx_unpickle_DensProfs, NULL, __pyx_n_s_dens_profs_dens_profs_classes); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_DensProfs, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_10dens_profs_18dens_profs_classes_1__pyx_unpickle_DensProfs, NULL, __pyx_n_s_dens_profs_dens_profs_classes); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_DensProfs, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":11
  *         __pyx_unpickle_DensProfs__set_state(<DensProfs> __pyx_result, __pyx_state)
@@ -21960,20 +22379,20 @@ if (!__Pyx_RefNanny) {
  *     __pyx_result.CENTER = __pyx_state[0]; __pyx_result.L_BOX = __pyx_state[1]; __pyx_result.MASS_UNIT = __pyx_state[2]; __pyx_result.MIN_NUMBER_PTCS = __pyx_state[3]; __pyx_result.SAFE = __pyx_state[4]; __pyx_result.SNAP = __pyx_state[5]; __pyx_result.idx_cat = __pyx_state[6]; __pyx_result.masses = __pyx_state[7]; __pyx_result.obj_size = __pyx_state[8]; __pyx_result.r200 = __pyx_state[9]; __pyx_result.start_time = __pyx_state[10]; __pyx_result.xyz = __pyx_state[11]
  *     if len(__pyx_state) > 12 and hasattr(__pyx_result, '__dict__'):
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_10dens_profs_18dens_profs_classes_3__pyx_unpickle_DensProfsHDF5, NULL, __pyx_n_s_dens_profs_dens_profs_classes); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_DensProfsHDF5, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_10dens_profs_18dens_profs_classes_3__pyx_unpickle_DensProfsHDF5, NULL, __pyx_n_s_dens_profs_dens_profs_classes); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_DensProfsHDF5, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "dens_profs/dens_profs_classes.pyx":1
  * #cython: language_level=3             # <<<<<<<<<<<<<<
  * #!/usr/bin/env python3
  * # -*- coding: utf-8 -*-
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "View.MemoryView":209
  *         info.obj = self
@@ -21982,10 +22401,10 @@ if (!__Pyx_RefNanny) {
  * 
  *     def __dealloc__(array self):
  */
-  __pyx_t_1 = __pyx_capsule_create(((void *)(&__pyx_array_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 209, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem((PyObject *)__pyx_array_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_1) < 0) __PYX_ERR(1, 209, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __pyx_capsule_create(((void *)(&__pyx_array_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 209, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_array_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_2) < 0) __PYX_ERR(1, 209, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_array_type);
 
   /* "View.MemoryView":286
@@ -21995,12 +22414,12 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(generic);
-  __Pyx_DECREF_SET(generic, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(generic, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
 
   /* "View.MemoryView":287
  * 
@@ -22009,12 +22428,12 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(strided);
-  __Pyx_DECREF_SET(strided, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(strided, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
 
   /* "View.MemoryView":288
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -22023,12 +22442,12 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 288, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect);
-  __Pyx_DECREF_SET(indirect, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(indirect, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
 
   /* "View.MemoryView":291
  * 
@@ -22037,12 +22456,12 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(contiguous);
-  __Pyx_DECREF_SET(contiguous, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(contiguous, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
 
   /* "View.MemoryView":292
  * 
@@ -22051,12 +22470,12 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__27, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__27, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect_contiguous);
-  __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_t_2 = 0;
 
   /* "View.MemoryView":316
  * 
@@ -22091,10 +22510,10 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 549, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem((PyObject *)__pyx_memoryview_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_1) < 0) __PYX_ERR(1, 549, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 549, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_memoryview_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_2) < 0) __PYX_ERR(1, 549, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_memoryview_type);
 
   /* "View.MemoryView":995
@@ -22104,10 +22523,10 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 995, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem((PyObject *)__pyx_memoryviewslice_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_1) < 0) __PYX_ERR(1, 995, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __pyx_capsule_create(((void *)(&__pyx_memoryview_getbuffer)), ((char *)"getbuffer(obj, view, flags)")); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 995, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem((PyObject *)__pyx_memoryviewslice_type->tp_dict, __pyx_n_s_pyx_getbuffer, __pyx_t_2) < 0) __PYX_ERR(1, 995, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_memoryviewslice_type);
 
   /* "(tree fragment)":1
@@ -22115,10 +22534,10 @@ if (!__Pyx_RefNanny) {
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_15View_dot_MemoryView_1__pyx_unpickle_Enum, NULL, __pyx_n_s_View_MemoryView); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_Enum, __pyx_t_1) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_15View_dot_MemoryView_1__pyx_unpickle_Enum, NULL, __pyx_n_s_View_MemoryView); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_Enum, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":11
  *         __pyx_unpickle_Enum__set_state(<Enum> __pyx_result, __pyx_state)
@@ -22524,6 +22943,67 @@ static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, P
 }
 #endif
 
+/* PyDictVersioning */
+#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
+    PyObject **dictptr = NULL;
+    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
+    if (offset) {
+#if CYTHON_COMPILING_IN_CPYTHON
+        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
+#else
+        dictptr = _PyObject_GetDictPtr(obj);
+#endif
+    }
+    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
+}
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
+        return 0;
+    return obj_dict_version == __Pyx_get_object_dict_version(obj);
+}
+#endif
+
+/* GetModuleGlobalName */
+#if CYTHON_USE_DICT_VERSIONS
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
+#else
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
+#endif
+{
+    PyObject *result;
+#if !CYTHON_AVOID_BORROWED_REFS
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
+    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    } else if (unlikely(PyErr_Occurred())) {
+        return NULL;
+    }
+#else
+    result = PyDict_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+#endif
+#else
+    result = PyObject_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+    PyErr_Clear();
+#endif
+    return __Pyx_GetBuiltinName(name);
+}
+
 /* MemviewSliceInit */
 static int
 __Pyx_init_memviewslice(struct __pyx_memoryview_obj *memview,
@@ -22654,67 +23134,6 @@ static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *memslice,
     } else {
         memslice->memview = NULL;
     }
-}
-
-/* PyDictVersioning */
-#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
-}
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
-    PyObject **dictptr = NULL;
-    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
-    if (offset) {
-#if CYTHON_COMPILING_IN_CPYTHON
-        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
-#else
-        dictptr = _PyObject_GetDictPtr(obj);
-#endif
-    }
-    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
-}
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
-        return 0;
-    return obj_dict_version == __Pyx_get_object_dict_version(obj);
-}
-#endif
-
-/* GetModuleGlobalName */
-#if CYTHON_USE_DICT_VERSIONS
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
-#else
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
-#endif
-{
-    PyObject *result;
-#if !CYTHON_AVOID_BORROWED_REFS
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
-    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    } else if (unlikely(PyErr_Occurred())) {
-        return NULL;
-    }
-#else
-    result = PyDict_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-#endif
-#else
-    result = PyObject_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-    PyErr_Clear();
-#endif
-    return __Pyx_GetBuiltinName(name);
 }
 
 /* GetItemInt */

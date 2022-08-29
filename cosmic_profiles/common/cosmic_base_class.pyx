@@ -5,12 +5,12 @@
 import numpy as np
 cimport cython
 from cosmic_profiles.common.python_routines import print_status
+from cosmic_profiles.common import config
 from cosmic_profiles.shape_profs.shape_profs_tools import getLocalTHist, getGlobalTHist, getShapeProfs
 from cosmic_profiles.dens_profs.dens_profs_tools import fitDensProfHelper
 from cosmic_profiles.shape_profs.shape_profs_algos import calcMorphLocal, calcMorphGlobal, calcMorphLocalVelDisp, calcMorphGlobalVelDisp
 from cosmic_profiles.dens_profs.dens_profs_algos import calcMassesCenters, calcDensProfsSphDirectBinning, calcDensProfsEllDirectBinning, calcDensProfsKernelBased
 import time
-import config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()

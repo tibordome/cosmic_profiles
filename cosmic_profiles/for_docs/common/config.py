@@ -105,4 +105,4 @@ def updateOutUnitSystem(out_unit_length_in_cm, out_unit_mass_in_g, out_unit_velo
     OutUnitMass_in_g = out_unit_mass_in_g
     OutUnitVelocity_in_cm_per_s = out_unit_velocity_in_cm_per_s
     
-initialize(GB=2, MAXSIZE=128, in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5, out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
+initialize(gbs=2, maxsize=128, in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5, out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
