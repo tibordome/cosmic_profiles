@@ -67,7 +67,7 @@ def createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS):
 
 ############## Parameters ####################################################################################
 updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
-updateOutUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
+updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
 L_BOX = np.float32(10) # Mpc/h
 nbar = 8e+3 # If too small, e.g. 5e+3: pynbody later yields OSError: Corrupt header record. If too large, need many GBs of RAM.
 Nmesh = 256

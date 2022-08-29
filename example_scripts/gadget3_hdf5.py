@@ -18,7 +18,7 @@ from cosmic_profiles import DensShapeProfsHDF5, updateInUnitSystem, updateOutUni
 
 # Parameters
 updateInUnitSystem(in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
-updateOutUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
+updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
 L_BOX = np.float32(10000) # kpc/h
 CAT_DEST = "./cat"
 HDF5_GROUP_DEST = "../../code_git/example_snapshot/LLGas256b20/groups_035"

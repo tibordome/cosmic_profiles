@@ -16,7 +16,7 @@ subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import updateCachingMaxGBs
-updateCachingMaxGBs(GB = 1)
+updateCachingMaxGBs(gbs = 1)
 from cosmic_profiles import genHalo, DensProfs, getEinastoProf, updateInUnitSystem, updateOutUnitSystem
 import matplotlib.pyplot as plt
 import matplotlib
