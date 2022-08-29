@@ -123,7 +123,7 @@ cdef class DensShapeProfs(DensProfs):
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+        :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
@@ -131,7 +131,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             return None, None, None, None, None, None, None, None
     
@@ -142,7 +142,7 @@ cdef class DensShapeProfs(DensProfs):
         :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+        :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs,) float arrays, 
             3 x (number_of_objs, 3) float arrays, 
@@ -150,7 +150,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             return None, None, None, None, None, None, None, None
     
@@ -541,7 +541,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+        :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
@@ -555,7 +555,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -567,7 +567,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+        :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs,) float arrays, 
             3 x (number_of_objs, 3) float arrays, 
@@ -581,7 +581,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             del xyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -595,7 +595,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+        :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays,
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
@@ -610,7 +610,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -622,7 +622,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+        :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs,) float arrays, 
             3 x (number_of_objs, 3) float arrays, 
@@ -637,7 +637,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
