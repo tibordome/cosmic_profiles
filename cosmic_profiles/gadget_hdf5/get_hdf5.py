@@ -6,7 +6,7 @@ import h5py
 from cosmic_profiles.common.caching import np_cache_factory
 import glob
 from mpi4py import MPI
-import config
+from cosmic_profiles.common import config
 import re
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
