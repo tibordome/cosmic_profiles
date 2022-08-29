@@ -15,9 +15,7 @@ install:
   - pip3 install mpi4py
   - pip3 install pathos
   - pip3 install h5py
-  - cd cosmic_profiles
-  - python3 setup.py build_ext --inplace 
-  - cd ..
+  - python3 setup_compile.py build_ext --inplace 
   - python3 setup.py install
 # command to run tests
 script:
