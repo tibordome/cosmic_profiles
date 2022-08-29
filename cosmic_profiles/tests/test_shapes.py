@@ -16,7 +16,7 @@ subprocess.call(['python3', 'setup_compile.py', 'build_ext', '--inplace'], cwd=o
 subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import genHalo, DensShapeProfs
+from cosmic_profiles import genHalo, DensShapeProfs, updateInUnitSystem, updateOutUnitSystem
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -24,6 +24,8 @@ size = comm.Get_size()
 
 def test_shapes():
     #################################### Parameters ################################################
+    updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
+    updateOutUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # Mpc/h
     VIZ_DEST = "./cosmic_profiles/tests/viz"
     D_LOGSTART = -2
@@ -33,7 +35,6 @@ def test_shapes():
     IT_WALL = 100
     IT_MIN = 10
     SNAP = '015'
-    MASS_UNIT = 1e+10
     MIN_NUMBER_DM_PTCS = 1000
     CENTER = 'mode'
     HIST_NB_BINS = 11 # Number of bins used for e.g. ellipticity histogram
@@ -69,7 +70,7 @@ def test_shapes():
     dm_xyz = np.float32(np.hstack((np.reshape(dm_x, (dm_x.shape[0],1)), np.reshape(dm_y, (dm_y.shape[0],1)), np.reshape(dm_z, (dm_z.shape[0],1)))))
     
     ######################### Extract R_vir, halo indices and halo sizes ##########################
-    mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
+    mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm # In M_sun/h
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################

@@ -25,18 +25,18 @@ cdef class DensShapeProfs(DensProfs):
     
     def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER):
         """
-        :param xyz: positions of all simulation particles
+        :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
         :type xyz: (N2,3) floats, N2 >> N1
-        :param masses: masses of all simulation particles
+        :param masses: masses of all simulation particles in config.InUnitMass_in_g
         :type masses: (N2,) floats
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
-        :param r200: R_200 radii of the parent halos
+        :param r200: R_200 radii of the parent halos in config.InUnitLength_in_cm
         :type r200: (N1,) floats
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
-        :param L_BOX: simulation box side length
-        :type L_BOX: float, units: Mpc/h
+        :param L_BOX: simulation box side length in config.InUnitLength_in_cm
+        :type L_BOX: float
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -83,7 +83,7 @@ cdef class DensShapeProfs(DensProfs):
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run,
             ignored if ``direct_binning`` = False
         :type shell_based: boolean
-        :return: density profiles
+        :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :rtype: (N2, r_res) floats"""
         return
         
@@ -96,7 +96,8 @@ cdef class DensShapeProfs(DensProfs):
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_center, obj_m
+        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+            obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
             (number_of_objs,3) float array, (number_of_objs,) float array"""
@@ -109,11 +110,11 @@ cdef class DensShapeProfs(DensProfs):
         :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_center, obj_m
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
-            (number_of_objs,3) float array, (number_of_objs,) float array,
-        """
+        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+            obj_masses in units of config.OutUnitMass_in_g
+        :rtype: 3 x (number_of_objs,) float arrays, 
+            3 x (number_of_objs, 3) float arrays, 
+            (number_of_objs, 3) float array, (number_of_objs,) float array"""
         return
     
     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False):
@@ -263,8 +264,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type SNAP: string
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
-        :param L_BOX: simulation box side length
-        :type L_BOX: float, units: Mpc/h
+        :param L_BOX: simulation box side length in config.InUnitLength_in_cm
+        :type L_BOX: float
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -314,7 +315,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: density profiles
+        :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :rtype: (N2, r_res) floats"""
         return
     
@@ -327,7 +328,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_center, obj_m
+        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+            obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
             (number_of_objs,3) float array, (number_of_objs,) float array"""
@@ -340,13 +342,14 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_center, obj_m
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
-            (number_of_objs,3) float array, (number_of_objs,) float array"""
+        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+            obj_masses in units of config.OutUnitMass_in_g
+        :rtype: 3 x (number_of_objs,) float arrays, 
+            3 x (number_of_objs, 3) float arrays, 
+            (number_of_objs, 3) float array, (number_of_objs,) float array"""
         return
         
-    def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False):
+    def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False): # Public Method
         """ Get all relevant local velocity shape data
         
         :param select: index of first and last object to look at in the format [idx_first, idx_last]
@@ -355,7 +358,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_center, obj_m
+        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+            obj_masses in units of config.OutUnitMass_in_g
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays,
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
             (number_of_objs,3) float array, (number_of_objs,) float array"""
@@ -368,11 +372,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type select: list containing two integers
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_center, obj_m
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
-            (number_of_objs,3) float array, (number_of_objs,) float array,
-        """
+        :return: d, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
+            obj_masses in units of config.OutUnitMass_in_g
+        :rtype: 3 x (number_of_objs,) float arrays, 
+            3 x (number_of_objs, 3) float arrays, 
+            (number_of_objs, 3) float array, (number_of_objs,) float array"""
         return
     
     def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False):

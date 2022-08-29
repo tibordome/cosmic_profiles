@@ -85,7 +85,7 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param r200s: catalogue of virial radii (of parent halos in case of gxs)
+    :param r200s: catalogue of virial radii (of parent halos) in Mpc/h
     :type r200s: N2-long float array
     :param dens_profs_fit: density profiles, defined at ``ROverR200``, in M_sun*h^2/(Mpc)**3
     :type dens_profs_fit: (N, r_res2) floats
@@ -96,7 +96,7 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
     :type dens_profs: (N, r_res1) floats
     :param ROverR200: normalized radii at which ``dens_profs`` are defined
     :type ROverR200: (N, r_res1) floats
-    :param obj_masses: masses of objects in M_sun/h
+    :param obj_masses: masses of objects in 10^10*M_sun/h
     :type obj_masses: (N,) floats
     :param obj_centers: centers of objects, each coordinate in Mpc/h
     :type obj_centers: (N,3) floats
@@ -106,7 +106,7 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
     :type nb_bins: int
     :param start_time: time of start of shape analysis
     :type start_time: float
-    :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h
+    :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h, usually 10^10
     :type MASS_UNIT: float
     :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
     :type suffix: string"""
@@ -190,7 +190,8 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     Fit density profile according to model provided
     
     Note that ``median`` which is defined at ``ROverR200``
-    must be in units of UnitMass/(Mpc/h)**3.
+    must be in units of M_sun*h^2/(Mpc)**3. ``r200`` must be
+    in units of Mpc/h.
     
     :param ROverR200: normalized radii where ``median`` is defined and 
         fitting should be carried out
@@ -198,7 +199,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     :param method: string describing density profile model assumed for fitting
     :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
     :param median_r200_obj_nb: density profile (often a median of many profiles combined,
-        in units of UNIT_MASS/(Mpc/h)**3), virial radius (of parent halo in case of gx) 
+        in units of M_sun*h^2/(Mpc)**3), virial radius (of parent halo in units of Mpc/h) 
         and object number
     :type median_r200_obj_nb: tuple of (N,) floats, float, int
     :return best_fit, obj_nb: best-fit results, object number
@@ -252,12 +253,12 @@ def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
     """ Helper function to carry out density profile fitting
     
     :param dens_profs: array containing density profiles in units 
-        of UnitMass/(Mpc/h)**3)
+        of M_sun*h^2/(Mpc)**3
     :type dens_profs: (N,r_res) floats
     :param ROverR200: normalized radii where density profile is defined
         and fitting should be carried out
     :type ROverR200: (r_res,) floats
-    :param r200s: R200 values of objects
+    :param r200s: R200 values of parent halos in units of Mpc/h
     :type r200s: (N,) floats
     :param method: string describing density profile model assumed for fitting
     :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`

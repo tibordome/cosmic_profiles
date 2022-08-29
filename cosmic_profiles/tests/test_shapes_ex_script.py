@@ -15,11 +15,13 @@ subprocess.call(['python3', 'setup_compile.py', 'build_ext', '--inplace'], cwd=o
 subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import genHalo, DensShapeProfs
+from cosmic_profiles import genHalo, DensShapeProfs, updateInUnitSystem, updateOutUnitSystem
 
 def test_shapes_ex_script():
     
     #################################### Parameters ################################################
+    updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
+    updateOutUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # Mpc/h
     CAT_DEST = "./cosmic_profiles/tests/cat"
     VIZ_DEST = "./cosmic_profiles/tests/viz"
@@ -30,7 +32,6 @@ def test_shapes_ex_script():
     IT_WALL = 100
     IT_MIN = 10
     SNAP = '015'
-    MASS_UNIT = 1e+10
     MIN_NUMBER_DM_PTCS = 200
     CENTER = 'mode'
     
@@ -54,7 +55,7 @@ def test_shapes_ex_script():
     dm_xyz = np.float32(np.hstack((np.reshape(halo_x, (halo_x.shape[0],1)), np.reshape(halo_y, (halo_y.shape[0],1)), np.reshape(halo_z, (halo_z.shape[0],1)))))
     
     ######################### Extract R_vir, halo indices and halo sizes ###########################
-    mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm/MASS_UNIT # Has to be in unit mass (= 10^10 M_sun/h)
+    mass_array = np.ones((dm_xyz.shape[0],), dtype = np.float32)*mass_dm # In M_sun/h
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensShapeProfs object #######################################

@@ -17,7 +17,7 @@ import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
 import numpy as np
-from cosmic_profiles import DensShapeProfs, getMassDMParticle
+from cosmic_profiles import DensShapeProfs, getMassDMParticle, updateInUnitSystem, updateOutUnitSystem
 from nbodykit.lab import cosmology, LogNormalCatalog
 
 def createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS):
@@ -66,6 +66,8 @@ def createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS):
         return None, None, None, None, None, None, None, None
 
 ############## Parameters ####################################################################################
+updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
+updateOutUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
 L_BOX = np.float32(10) # Mpc/h
 nbar = 8e+3 # If too small, e.g. 5e+3: pynbody later yields OSError: Corrupt header record. If too large, need many GBs of RAM.
 Nmesh = 256
@@ -87,7 +89,7 @@ VIZ_DEST = "./viz"
 
 def AHFEx():
     ############## Generate mock universe #######################################################################
-    N_tot, dm_x, dm_y, dm_z, vel_x, vel_y, vel_z, mass_array = createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS) # mass_array in 10**10 solar masses * h^-1
+    N_tot, dm_x, dm_y, dm_z, vel_x, vel_y, vel_z, mass_array = createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS) # mass_array in UNIT_MASS * solar masses * h^-1
     #############################################################################################################
     
     
@@ -165,7 +167,7 @@ def AHFEx():
     print("The second halo has mass {} 1e12 Msol".format(halos[2]['mass'].sum().in_units('1e12 Msol')))
     print("The first 5 particles of halo 2 are located at (in kpc)", halos[2]['pos'].in_units('kpc')[:5])
     pynbody.analysis.halo.center(halos[2]) # Modify cen_size="1 kpc" argument in analysis/halo.py's center() method to cen_size="10 kpc" if resolution is too low (i.e. nbar too low)
-    im = pynbody.plot.image(halos[2].d, width = '500 kpc', cmap=plt.cm.Greys, units = 'Msol kpc^-2')
+    pynbody.plot.image(halos[2].d, width = '500 kpc', cmap=plt.cm.Greys, units = 'Msol kpc^-2')
     plt.savefig('{}/RhoHalo2.pdf'.format(VIZ_DEST))
     #############################################################################################################
     

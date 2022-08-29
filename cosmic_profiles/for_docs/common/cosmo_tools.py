@@ -218,7 +218,7 @@ def getBlocks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPLIT = 9, NB_BINS = 2):
+def M_split(m, center, start_time, v = None, NB_BINS = 2):
     """Mass-splitting of quantities center, v
     
     Mass units are determined by ``m``
@@ -231,14 +231,7 @@ def M_split(m, center, start_time, v = None, M_SPLIT_TYPE = "const_occ", TWO_SPL
     :type start_time: float
     :param v: major axis of objects (optional) or any other vectorial quantity
     :type v: list of (3,) float arrays
-    :param M_SPLIT_TYPE: either "log_slice", where masses in log space are split, 
-        or "const_occ", where masses are split ensuring equal number of points in each bin
-        out of the ``NB_BINS`` bins, or "fixed_bins",
-        where bins will be 10^7 to 10^8, 10^8 to 10^9 etc.
-    :type M_SPLIT_TYPE: string
-    :param TWO_SPLIT: In case of "2_fixed_bins", around which mass to split (10** thereof)
-    :type TWO_SPLIT: float
-    :param NB_BINS: In case of "const_occ" and "log_slice", number of bins
+    :param NB_BINS: Number of mass bins
     :type NB_BINS: float
     :return: max_min_m (mass bin edges), m_groups (total mass in bins), center_groups (center average in each bin), 
         v_groups (v average in each bin), idx_groups (indices of all objects in each bin)
