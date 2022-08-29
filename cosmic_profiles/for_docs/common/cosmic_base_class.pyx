@@ -87,7 +87,7 @@ cdef class CosmicBase:
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of Mpc/h,
+        :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
@@ -118,7 +118,7 @@ cdef class CosmicBase:
         :type IT_MIN: int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of Mpc/h,
+        :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs,) float arrays, 
             3 x (number_of_objs, 3) float arrays, 
@@ -158,7 +158,7 @@ cdef class CosmicBase:
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of Mpc/h,
+        :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
@@ -191,7 +191,7 @@ cdef class CosmicBase:
         :type IT_MIN: int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :return: d, q, s, minor, inter, major, obj_centers in units of Mpc/h,
+        :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs,) float arrays, 
             3 x (number_of_objs, 3) float arrays, 
@@ -519,11 +519,11 @@ cdef class CosmicBase:
         :type obj_size: (N1,) integers
         :param ROverR200: normalized radii at which ``dens_profs`` are defined
         :type ROverR200: (r_res,) floats
-        :param a: major axis eigenvalues
+        :param a: major axis eigenvalues in Mpc/h
         :type a: (N1,D_BINS+1,) floats
-        :param b: intermediate axis eigenvalues
+        :param b: intermediate axis eigenvalues in Mpc/h
         :type b: (N1,D_BINS+1,) floats
-        :param c: minor axis eigenvalues
+        :param c: minor axis eigenvalues in Mpc/h
         :type c: (N1,D_BINS+1,) floats
         :param major: major axis eigenvectors
         :type major: (N1,D_BINS+1,3) floats

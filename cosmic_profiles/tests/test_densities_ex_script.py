@@ -30,7 +30,7 @@ def test_densities_ex_script():
     
     #################################### Parameters ############################################################
     updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
+    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # cMpc/h
     VIZ_DEST = "./cosmic_profiles/tests/viz"
     SNAP = '015'

@@ -16,6 +16,7 @@ from cosmic_profiles.common.python_routines import print_status, set_axes_equal,
 from cosmic_profiles.shape_profs.shape_profs_tools import getGlobalEpsHist, getLocalEpsHist
 from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5SHData
 import time
+import config
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -109,7 +110,7 @@ cdef class DensShapeProfs(DensProfs):
                     dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
-            return dens_profs*1.989e33/OutUnitMass_in_g*(3.085678e24/OutUnitLength_in_cm)**(-3)
+            return dens_profs*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
         else:
             return None
         
@@ -130,7 +131,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/OutUnitMass_in_g
+            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             return None, None, None, None, None, None, None, None
     
@@ -149,7 +150,7 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/OutUnitMass_in_g
+            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             return None, None, None, None, None, None, None, None
     
@@ -526,7 +527,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             del xyz; del masses; del idx_cat; del obj_size
-            return dens_profs*1.989e33/OutUnitMass_in_g*(3.085678e24/OutUnitLength_in_cm)**(-3)
+            return dens_profs*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None
@@ -554,7 +555,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/OutUnitMass_in_g
+            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -580,7 +581,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             del xyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/OutUnitMass_in_g
+            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -609,7 +610,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/OutUnitMass_in_g
+            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -636,7 +637,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return d, q, s, minor, inter, major, obj_centers*3.085678e24/OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/OutUnitMass_in_g
+            return d, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -1043,7 +1044,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             del xyz; del masses; del idx_cat; del obj_size; del velxyz
 
     def getObjInfo(self): # Public Method
-        """ Print basic info about the objects used for local shape estimation such as number of converged objects"""
+        """ Print basic info about the objects"""
         print_status(rank,self.start_time,'Starting getObjInfoLocal() with snap {0}'.format(self.SNAP))
         
         idx_cat, obj_size = self.getIdxCat()

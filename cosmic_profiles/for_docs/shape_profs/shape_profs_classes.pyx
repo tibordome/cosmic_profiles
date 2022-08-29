@@ -523,5 +523,5 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         return
 
     def getObjInfo(self):
-        """ Print basic info about the objects used for local shape estimation such as number of converged objects"""
+        """ Print basic info about the objects"""
         return

@@ -33,13 +33,13 @@ def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
 
 def getShape(Rs, d, param_interest, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS):
     """ Get average profile for param_interest (which is defined at all values of d)
-    at all elliptical radii Rs
+    at all ellipsoidal radii Rs
     
-    :param Rs: elliptical radii of interest
+    :param Rs: ellipsoidal radii of interest
     :type Rs: (N,) floats
-    :param d: param_interest is defined at all elliptical radii d
+    :param d: param_interest is defined at all ellipsoidal radii d
     :type d: (N2,) floats
-    :param param_interest: the quantity of interest defined at all elliptical radii d
+    :param param_interest: the quantity of interest defined at all ellipsoidal radii d
     :type param_interest: (N2,) floats
     :param ERROR_METHOD: mean (if ERROR_METHOD == "bootstrap" or "SEM") or median
         (if ERROR_METHOD == "median_quantile") and the +- 1 sigma error attached
@@ -76,11 +76,11 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type D_BINS: int
     :param start_time: time of start of shape analysis
     :type start_time: float
-    :param obj_masses: total mass of objects, in internal units
+    :param obj_masses: total mass of objects, in 10^10*M_sun/h
     :type obj_masses: (N,) floats
     :param obj_centers: positions of centers of objects, in Mpc/h
     :type obj_centers: (N,3) floats
-    :param d: param_interest is defined at all elliptical radii d
+    :param d: param_interest is defined at all ellipsoidal radii d
     :type d: (N, D_BINS+1) floats
     :param q: intermediate-to-major axis ratios
     :type q: (N, D_BINS+1) floats
@@ -111,7 +111,7 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type D_BINS: int
     :param start_time: time of start of shape analysis
     :type start_time: float
-    :param obj_masses: masses of objects, in internal units
+    :param obj_masses: masses of objects, in 10^10*M_sun/h
     :type obj_masses: (N,) floats
     :param obj_centers: centers of objects, each coordinate in Mpc/h
     :type obj_centers: (N,3) floats
@@ -143,7 +143,7 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
     :type SNAP: string
     :param start_time: time of start of shape analysis
     :type start_time: float
-    :param obj_masses: masses of objects in M_sun/h
+    :param obj_masses: masses of objects in 10^10*M_sun/h
     :type obj_masses: (N,) floats
     :param obj_centers: centers of objects, each coordinate in Mpc/h
     :type obj_centers: (N,3) floats
@@ -167,9 +167,9 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
 def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SNAP, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
-    :param xyz: coordinates of particles of type 1 or type 4
+    :param xyz: coordinates of particles of type 1 or type 4, in Mpc/h
     :type xyz: (N^3x3) floats
-    :param masses: masses of particles of type 1 or type 4, internal units
+    :param masses: masses of particles of type 1 or type 4, in 10^10*M_sun/h
     :type masses: (N^3x1) floats
     :param idx_cat: each row contains indices of particles belonging to an object
     :type idx_cat: (N1, N3) integers
@@ -195,7 +195,7 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DES
     
     :param xyz: coordinates of particles of type 1 or type 4, in Mpc/h
     :type xyz: (N^3x3) floats
-    :param masses: masses of particles of type 1 or type 4, internal units
+    :param masses: masses of particles of type 1 or type 4, in 10^10*M_sun/h
     :type masses: (N^3x1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats

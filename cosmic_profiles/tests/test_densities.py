@@ -25,7 +25,7 @@ size = comm.Get_size()
 def test_densities():
     #################################### Parameters #################################################
     updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
+    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # Mpc/h
     SNAP = '015'
     MIN_NUMBER_DM_PTCS = 1000
