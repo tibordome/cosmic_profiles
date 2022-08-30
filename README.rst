@@ -32,7 +32,7 @@ This repository provides shape and density profile analysis tools for cosmologic
 - mock halo generator: ellipsoidal or spherical, compatible with the 4 density profile models
 - easy to interface with `pynbody` to work with halos identified in a cosmological simulation (see example scripts)
 - easy to interface with `nbodykit` to harness large-scale structure capabilities (see example scripts)
-- 3D point cloud plotting tools
+- various profile plotting and 3D point cloud plotting tools
 - efficient caching capabilities to accelerate look-ups
 
 Documentation
