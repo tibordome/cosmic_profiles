@@ -180,7 +180,7 @@ cdef class DensShapeProfs(DensProfs):
                 print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
             else:
                 obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.idx_cat.shape[0] and obj_number >= 0]
-                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat[obj_numbers], self.obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat.base[obj_numbers], self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
                 del obj_m
                                     
                 # Viz all valid objects under 'obj_numbers'
@@ -269,11 +269,11 @@ cdef class DensShapeProfs(DensProfs):
                 print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
             else:
                 obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.idx_cat.shape[0] and obj_number >= 0]
-                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat[obj_numbers], self.obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat.base[obj_numbers], self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
                 del obj_m
             
                 # Viz all valid objects under 'obj_numbers'
-                for idx_obj, obj_number in enumerate(obj_numbers):                
+                for idx_obj, obj_number in enumerate(obj_numbers):
                     major_obj = major[idx_obj]
                     inter_obj = inter[idx_obj]
                     minor_obj = minor[idx_obj]
