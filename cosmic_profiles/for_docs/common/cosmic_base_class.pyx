@@ -34,7 +34,8 @@ cdef class CosmicBase:
             or 'com' (center of mass) of each halo
         :type CENTER: str"""
         self.SNAP = SNAP
-        self.L_BOX = L_BOX*config.InUnitLength_in_cm/3.085678e24 # self.L_BOX will be in Mpc/h
+        l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
+        self.L_BOX = L_BOX*l_curr_over_target # self.L_BOX will be in Mpc/h
         self.CENTER = CENTER
         self.MIN_NUMBER_PTCS = MIN_NUMBER_PTCS
         self.start_time = time.time()

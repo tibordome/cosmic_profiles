@@ -40,7 +40,8 @@ cdef class CosmicBase:
             or 'com' (center of mass) of each halo
         :type CENTER: str"""
         self.SNAP = SNAP
-        self.L_BOX = L_BOX*config.InUnitLength_in_cm/3.085678e24 # self.L_BOX will be in Mpc/h
+        l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
+        self.L_BOX = L_BOX*l_curr_over_target # self.L_BOX will be in Mpc/h
         self.CENTER = CENTER
         self.MIN_NUMBER_PTCS = MIN_NUMBER_PTCS
         self.start_time = time.time()
@@ -287,9 +288,11 @@ cdef class CosmicBase:
         """
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
-            d = d*3.085678e24/config.OutUnitLength_in_cm
-            obj_centers = obj_centers*3.085678e24/config.OutUnitLength_in_cm
-            obj_masses = obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            d = d*l_curr_over_target
+            obj_centers = obj_centers*l_curr_over_target
+            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)
@@ -338,9 +341,11 @@ cdef class CosmicBase:
         :type reduced: boolean"""
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced)
-            d = d*3.085678e24/config.OutUnitLength_in_cm
-            obj_centers = obj_centers*3.085678e24/config.OutUnitLength_in_cm
-            obj_masses = obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            d = d*l_curr_over_target
+            obj_centers = obj_centers*l_curr_over_target
+            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)
@@ -400,9 +405,11 @@ cdef class CosmicBase:
         """
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
-            d = d*3.085678e24/config.OutUnitLength_in_cm
-            obj_centers = obj_centers*3.085678e24/config.OutUnitLength_in_cm
-            obj_masses = obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            d = d*l_curr_over_target
+            obj_centers = obj_centers*l_curr_over_target
+            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)
@@ -461,9 +468,11 @@ cdef class CosmicBase:
         
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced)
-            d = d*3.085678e24/config.OutUnitLength_in_cm
-            obj_centers = obj_centers*3.085678e24/config.OutUnitLength_in_cm
-            obj_masses = obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            d = d*l_curr_over_target
+            obj_centers = obj_centers*l_curr_over_target
+            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)

@@ -44,14 +44,15 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
             last = rank == nb_jobs_to_do - 1
         count_fof = 0
         count_sh = 0
+        l_target_over_curr = 3.085678e24/config.InUnitLength_in_cm
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
             g = h5py.File(r'{}'.format(hdf5GroupFilenamesList[snap_run]), 'r')
             if 'Group/GroupLenType' in g:
                 fof_sizes = np.hstack((fof_sizes, np.int32([np.int32(g['Group/GroupLenType'][i,PART_TYPE]) for i in range(g['Group/GroupLenType'].shape[0])])))
                 if RVIR_OR_R200 == 'Rvir':
-                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_TopHat200'][:]/(3.085678e24/config.InUnitLength_in_cm))))
+                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_TopHat200'][:]/l_target_over_curr)))
                 elif RVIR_OR_R200 == 'R200':
-                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_Mean200'][:]/(3.085678e24/config.InUnitLength_in_cm))))
+                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_Mean200'][:]/l_target_over_curr)))
                 else:
                     raise ValueError("RVIR_OR_R200 should be either 'Rvir' or 'R200'. Please modify the provided RVIR_OR_R200 variable.")
                 nb_shs = np.hstack((nb_shs, np.int32([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])))
@@ -143,22 +144,25 @@ def getHDF5ObjData(HDF5_SNAP_DEST, PART_TYPE):
         perrank = nb_jobs_to_do//size + (nb_jobs_to_do//size == 0)*1
         do_sth = rank <= nb_jobs_to_do-1
         count = 0
+        l_target_over_curr = 3.085678e24/config.InUnitLength_in_cm
+        m_target_over_curr = 1.989e43/config.InUnitMass_in_g
+        v_target_over_curr = 1e5/config.InUnitVelocity_in_cm_per_s
         if size <= nb_jobs_to_do:
             last = rank == size - 1 # Whether or not last process
         else:
             last = rank == nb_jobs_to_do - 1
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
             f = h5py.File(r'{}'.format(hdf5SnapFilenamesList[snap_run]), 'r')
-            obj_x = np.hstack((obj_x, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,0]/(3.085678e24/config.InUnitLength_in_cm)))) # in Mpc = 3.085678e+27 cm
-            obj_y = np.hstack((obj_y, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,1]/(3.085678e24/config.InUnitLength_in_cm))))
-            obj_z = np.hstack((obj_z, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,2]/(3.085678e24/config.InUnitLength_in_cm))))
-            obj_velx = np.hstack((obj_velx, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,0]/(1e5/config.InUnitVelocity_in_cm_per_s)))) # in km/s
-            obj_vely = np.hstack((obj_vely, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,1]/(1e5/config.InUnitVelocity_in_cm_per_s))))
-            obj_velz = np.hstack((obj_velz, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,2]/(1e5/config.InUnitVelocity_in_cm_per_s))))
+            obj_x = np.hstack((obj_x, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,0]/l_target_over_curr))) # in Mpc = 3.085678e+27 cm
+            obj_y = np.hstack((obj_y, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,1]/l_target_over_curr)))
+            obj_z = np.hstack((obj_z, np.float32(f['PartType{0}/Coordinates'.format(PART_TYPE)][:,2]/l_target_over_curr)))
+            obj_velx = np.hstack((obj_velx, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,0]/v_target_over_curr))) # in km/s
+            obj_vely = np.hstack((obj_vely, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,1]/v_target_over_curr)))
+            obj_velz = np.hstack((obj_velz, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,2]/v_target_over_curr)))
             if PART_TYPE == 1:
-                obj_masses = np.hstack((obj_masses, np.ones((f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]/(1.989e43/config.InUnitMass_in_g)))) # in 1.989e+43 g
+                obj_masses = np.hstack((obj_masses, np.ones((f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]/m_target_over_curr))) # in 1.989e+43 g
             else:
-                obj_masses = np.hstack((obj_masses, np.float32(f['PartType{0}/Masses'.format(PART_TYPE)][:]/(1.989e43/config.InUnitMass_in_g)))) # in 1.989e+43 g
+                obj_masses = np.hstack((obj_masses, np.float32(f['PartType{0}/Masses'.format(PART_TYPE)][:]/m_target_over_curr))) # in 1.989e+43 g
             count += f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0]
         count_new = comm.gather(count, root=0)
         count_new = comm.bcast(count_new, root = 0)

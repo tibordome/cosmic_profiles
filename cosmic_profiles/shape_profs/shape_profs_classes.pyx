@@ -110,7 +110,9 @@ cdef class DensShapeProfs(DensProfs):
                     dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
-            return dens_profs*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
         else:
             return None
         
@@ -131,7 +133,9 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             return None, None, None, None, None, None, None, None
     
@@ -150,7 +154,9 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             return None, None, None, None, None, None, None, None
     
@@ -168,22 +174,24 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting vizLocalShapes() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
-            # Retrieve shape information
-            d, q, s, minor, inter, major, centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat.base, self.obj_size.base, self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            del obj_masses
+            if np.max(obj_numbers) >= self.idx_cat.shape[0]:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.idx_cat.shape[0]))
+            elif np.min(obj_numbers) < 0:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
+            else:
+                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.idx_cat.shape[0] and obj_number >= 0]
+                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat[obj_numbers], self.obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                del obj_m
                                     
-            # Viz all objects under 'obj_numbers'
-            for obj_number in obj_numbers:
-                if obj_number >= d.shape[0]:
-                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects of sufficient resolution. Skip.".format(obj_number, d.shape[0]))
-                else:
-                    major_obj = major[obj_number]
-                    inter_obj = inter[obj_number]
-                    minor_obj = minor[obj_number]
-                    d_obj = d[obj_number]
-                    q_obj = q[obj_number]
-                    s_obj = s[obj_number]
-                    center = centers[obj_number]
+                # Viz all valid objects under 'obj_numbers'
+                for idx_obj, obj_number in enumerate(obj_numbers):
+                    major_obj = major[idx_obj]
+                    inter_obj = inter[idx_obj]
+                    minor_obj = minor[idx_obj]
+                    d_obj = d[idx_obj]
+                    q_obj = q[idx_obj]
+                    s_obj = s[idx_obj]
+                    center = centers[idx_obj]
                     obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
                     masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
                     for idx, ptc in enumerate(self.idx_cat.base[obj_number,:self.obj_size[obj_number]]):
@@ -255,20 +263,24 @@ cdef class DensShapeProfs(DensProfs):
         print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
 
         if rank == 0:
-            # Retrieve shape information
-            d, q, s, minor, inter, major, centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat.base, self.obj_size.base, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            del obj_masses                        
-            for obj_number in obj_numbers:
-                if obj_number >= d.shape[0]:
-                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects of sufficient resolution. Skip.".format(obj_number, d.shape[0]))
-                else:
-                    major_obj = major[obj_number]
-                    inter_obj = inter[obj_number]
-                    minor_obj = minor[obj_number]
-                    d_obj = d[obj_number]
-                    q_obj = q[obj_number]
-                    s_obj = s[obj_number]
-                    center = centers[obj_number]
+            if np.max(obj_numbers) >= self.idx_cat.shape[0]:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.idx_cat.shape[0]))
+            elif np.min(obj_numbers) < 0:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
+            else:
+                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.idx_cat.shape[0] and obj_number >= 0]
+                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat[obj_numbers], self.obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+                del obj_m
+            
+                # Viz all valid objects under 'obj_numbers'
+                for idx_obj, obj_number in enumerate(obj_numbers):                
+                    major_obj = major[idx_obj]
+                    inter_obj = inter[idx_obj]
+                    minor_obj = minor[idx_obj]
+                    d_obj = d[idx_obj]
+                    q_obj = q[idx_obj]
+                    s_obj = s[idx_obj]
+                    center = centers[idx_obj]
                     obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
                     masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
                     for idx, ptc in enumerate(self.idx_cat.base[obj_number,:self.obj_size[obj_number]]):
@@ -527,7 +539,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             del xyz; del masses; del idx_cat; del obj_size
-            return dens_profs*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None
@@ -555,7 +569,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size
-            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -581,7 +597,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             del xyz; del masses; del idx_cat; del obj_size
-            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -610,7 +628,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -637,7 +657,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return d*3.085678e24/config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers*3.085678e24/config.OutUnitLength_in_cm, obj_masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
@@ -660,21 +682,24 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             # Retrieve shape information
-            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(xyz, masses, self.r200.base, self.getIdxCat()[0], self.getIdxCat()[1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-            del obj_m
+            if np.max(obj_numbers) >= self.getIdxCat()[0].shape[0]:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.getIdxCat()[0].shape[0]))
+            elif np.min(obj_numbers) < 0:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
+            else:
+                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.getIdxCat()[0].shape[0] and obj_number >= 0]
+                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], self.getIdxCat()[0][obj_numbers], self.getIdxCat()[1][obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                del obj_m
                         
-            # Viz all objects under 'obj_numbers'
-            for obj_number in obj_numbers:
-                if obj_number >= d.shape[0]:
-                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects that have sufficient resolution. Skip.".format(obj_number, d.shape[0]))
-                else:
-                    major_obj = major[obj_number]
-                    inter_obj = inter[obj_number]
-                    minor_obj = minor[obj_number]
-                    d_obj = d[obj_number]
-                    q_obj = q[obj_number]
-                    s_obj = s[obj_number]
-                    center = centers[obj_number]
+                # Viz all valid objects under 'obj_numbers'
+                for idx_obj, obj_number in enumerate(obj_numbers):
+                    major_obj = major[idx_obj]
+                    inter_obj = inter[idx_obj]
+                    minor_obj = minor[idx_obj]
+                    d_obj = d[idx_obj]
+                    q_obj = q[idx_obj]
+                    s_obj = s[idx_obj]
+                    center = centers[idx_obj]
                     obj = np.zeros((self.getIdxCat()[1][obj_number],3), dtype = np.float32)
                     masses_obj = np.zeros((self.getIdxCat()[1][obj_number],), dtype = np.float32)
                     for idx, ptc in enumerate(self.getIdxCat()[0][obj_number,:self.getIdxCat()[1][obj_number]]):
@@ -750,21 +775,24 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             # Retrieve shape information
-            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(xyz, masses, self.r200.base, self.getIdxCat()[0], self.getIdxCat()[1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-            del obj_m
-                      
-            # Viz all objects under 'obj_numbers'
-            for obj_number in obj_numbers:
-                if obj_number >= d.shape[0]:
-                    print_status(rank, self.start_time, "Given obj_number {} exceeds the maximum number. There are only {} objects. Skip.".format(obj_number, d.shape[0]))
-                else:
-                    major_obj = major[obj_number]
-                    inter_obj = inter[obj_number]
-                    minor_obj = minor[obj_number]
-                    d_obj = d[obj_number]
-                    q_obj = q[obj_number]
-                    s_obj = s[obj_number]
-                    center = centers[obj_number]
+            if np.max(obj_numbers) >= self.getIdxCat()[0].shape[0]:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.getIdxCat()[0].shape[0]))
+            elif np.min(obj_numbers) < 0:
+                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
+            else:
+                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.getIdxCat()[0].shape[0] and obj_number >= 0]
+                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], self.getIdxCat()[0][obj_numbers], self.getIdxCat()[1][obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+                del obj_m
+            
+                # Viz all valid objects under 'obj_numbers'
+                for idx_obj, obj_number in enumerate(obj_numbers):
+                    major_obj = major[idx_obj]
+                    inter_obj = inter[idx_obj]
+                    minor_obj = minor[idx_obj]
+                    d_obj = d[idx_obj]
+                    q_obj = q[idx_obj]
+                    s_obj = s[idx_obj]
+                    center = centers[idx_obj]
                     obj = np.zeros((self.getIdxCat()[1][obj_number],3), dtype = np.float32)
                     masses_obj = np.zeros((self.getIdxCat()[1][obj_number],), dtype = np.float32)
                     for idx, ptc in enumerate(self.getIdxCat()[0][obj_number,:self.getIdxCat()[1][obj_number]]):

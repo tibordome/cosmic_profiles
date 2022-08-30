@@ -43,8 +43,10 @@ def HDF5Ex():
     
     # Define DensShapeProfsHDF5 object
     cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE)
+    
+    idx_cat = cprofiles.getIdxCat()[0] # Only rank == 0 content is of interest
     if rank == 0:
-        h_idx_cat_len = len(cprofiles.getIdxCat()[0])
+        h_idx_cat_len = len(idx_cat)
     else:
         h_idx_cat_len = None
     h_idx_cat_len = comm.bcast(h_idx_cat_len, root = 0)
@@ -65,7 +67,7 @@ def HDF5Ex():
     cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST, select = halos_select)
 
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, halos_select, frac_r200, reduced = False, shell_based = False)
+    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, halos_select, reduced = False, shell_based = False)
 
     # Draw halo shape profiles (overall and mass-decomposed ones)
     cprofiles.plotShapeProfs(nb_bins = 2, VIZ_DEST = VIZ_DEST, select = halos_select, reduced = False, shell_based = False)
@@ -74,10 +76,14 @@ def HDF5Ex():
     # Create local halo density catalogue
     dens_profs = cprofiles.estDensProfs(ROverR200, select = halos_select, direct_binning = True)
 
+    if rank != 0:
+        dens_profs = np.zeros((halos_select[1]-halos_select[0]+1, len(ROverR200)), dtype = np.float32)
+    comm.Bcast(dens_profs, root = 0)
+    
     # Fit density profiles
-    best_fits = cprofiles.fitDensProfs(dens_profs[:,25:], ROverR200[25:], select = halos_select, method = 'nfw')
+    best_fits = cprofiles.fitDensProfs(dens_profs[:,25:], ROverR200[25:], method = 'nfw', select = halos_select)
 
     # Draw halo density profiles (overall and mass-decomposed ones). The results from getDensProfsBestFits() got cached.
-    cprofiles.plotDensProfs(dens_profs, ROverR200, dens_profs[:,25:], ROverR200[25:], select = halos_select, method = 'nfw', nb_bins = 2, VIZ_DEST = VIZ_DEST)
+    cprofiles.plotDensProfs(dens_profs, ROverR200, dens_profs[:,25:], ROverR200[25:], method = 'nfw', nb_bins = 2, VIZ_DEST = VIZ_DEST, select = halos_select)
 
 HDF5Ex()

@@ -17,7 +17,7 @@ Here, the combination of ``in_unit_length_in_cm``, ``in_unit_mass_in_g`` and ``i
 
 .. note:: The plotting functionalities of *Cosmic Profiles* will disregard the 'outgoing' unit system. For instance, ``plotDensProfs()`` will always plot density profiles in units of :math:`M_{\odot}h^2/\mathrm{Mpc}^3` vs normalized radius.
 
-.. note:: When handing over density profiles as arguments to ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()``, please make sure the units are as determined by the 'outgoing' unit system. This is important when a user employs the functionalities ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()`` directly, with density profiles obtained in some other way.
+.. warning:: When handing over density profiles as arguments to ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()``, please make sure the units are as determined by the 'outgoing' unit system. This is important when a user employs the functionalities ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()`` directly, with density profiles obtained in some other way.
 
 **************************
 Caching

@@ -19,12 +19,13 @@ The *Cosmic Profiles* project
   - iterative shell-based shape profile determination algorithm for high-resolution halos
   - iterative ellipsoid-based shape profile determination algorithm for lower-resolution halos
   - user can choose between reduced shape tensor and non-reduced shape tensor
-- works with
+- supports
     
   - 'direct' datasets (i.e. index catalogue provided by user) and
-  - *GADGET*-style HDF5 snapshot files
-    - additional velocity dispersion tensor eigenaxes determination
-    - galaxy density and shape profile determination also works out of the box
+  - *GADGET*-style FoF / SUBFIND HDF5 snapshot files
+
+    - density and shape profile determination for dark matter halos, gas particle halos and star particle halos
+    - velocity dispersion tensor eigenaxes determination
 - halo density profile estimation using direct binning and kernel-based approaches
   - user can choose between direct binning into spherical shells and
   - direct binning into ellipsoidal shells
@@ -33,7 +34,7 @@ The *Cosmic Profiles* project
 - mock halo generator: ellipsoidal or spherical, compatible with the 4 density profile models
 - easy to interface with `pynbody` to work with halos identified in a cosmological simulation (see example scripts)
 - easy to interface with `nbodykit` to harness large-scale structure capabilities (see example scripts)
-- 3D point cloud plotting tools
+- various profile plotting and 3D point cloud plotting tools
 - efficient caching capabilities to accelerate look-ups
 
 .. toctree::

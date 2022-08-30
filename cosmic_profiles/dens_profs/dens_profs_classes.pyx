@@ -43,8 +43,10 @@ cdef class DensProfs(CosmicBase):
         :type CENTER: str"""
         super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
-        self.xyz = np.float32(xyz.base*config.InUnitLength_in_cm/3.085678e24) # self.xyz will be in Mpc/h
-        self.masses = np.float32(masses.base*config.InUnitMass_in_g/1.989e43) # self.masses will be in 10^10 M_sun/h
+        m_curr_over_target = config.InUnitMass_in_g/1.989e43
+        l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
+        self.xyz = np.float32(xyz.base*l_curr_over_target) # self.xyz will be in Mpc/h
+        self.masses = np.float32(masses.base*m_curr_over_target) # self.masses will be in 10^10 M_sun/h
         cdef int nb_objs = len(idx_cat)
         cdef int p
         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
@@ -62,14 +64,15 @@ cdef class DensProfs(CosmicBase):
                 cat_arr.base[idxs_compr[p],:obj_size[p]] = np.array(idx_cat[p])
         self.idx_cat = cat_arr.base
         self.obj_size = obj_size.base[obj_pass.base.nonzero()[0]]
-        self.r200 = np.float32(r200.base[obj_pass.base.nonzero()[0]]*config.InUnitLength_in_cm/3.085678e24) # self.r200 will be in Mpc/h
+        self.r200 = np.float32(r200.base[obj_pass.base.nonzero()[0]]*l_curr_over_target) # self.r200 will be in Mpc/h
        
     def getR200(self): # Public Method
         """ Get overdensity radii in config.OutUnitLength_in_cm units"""
         print_status(rank,self.start_time,'Starting getR200() with snap {0}'.format(self.SNAP))
         
         if rank == 0:
-            return self.r200.base*3.085678e24/config.OutUnitLength_in_cm
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return self.r200.base*l_curr_over_target
         else:
             return None
     
@@ -91,7 +94,9 @@ cdef class DensProfs(CosmicBase):
             in config.OutUnitMass_in_g
         :rtype: (N2,3) floats, (N2,) floats"""
         if rank == 0:
-            return self.xyz.base*3.085678e24/config.OutUnitLength_in_cm, self.masses.base*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            return self.xyz.base*l_curr_over_target, self.masses.base*self.MASS_UNIT*m_curr_over_target
         else:
             return None, None
         
@@ -106,7 +111,9 @@ cdef class DensProfs(CosmicBase):
         :rtype: (N,3) and (N,) floats"""
         if rank == 0:
             centers, ms = self._getMassesCentersBase(self.xyz.base, self.masses.base, self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1])
-            return centers*3.085678e24/config.OutUnitLength_in_cm, ms*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            return centers*l_curr_over_target, ms*self.MASS_UNIT*m_curr_over_target
         else:
             return None, None
     
@@ -148,7 +155,9 @@ cdef class DensProfs(CosmicBase):
                 dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
-            return dens_profs*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
         else:
             return None
     
@@ -168,17 +177,21 @@ cdef class DensProfs(CosmicBase):
         print_status(rank,self.start_time,'Starting fitDensProfs() with snap {0}'.format(self.SNAP))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `fitDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        dens_profs = dens_profs*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
         if rank == 0:
             best_fits = self._getDensProfsBestFitsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
-            best_fits[:,0] = best_fits[:,0]*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            best_fits[:,0] = best_fits[:,0]*m_curr_over_target*l_curr_over_target**(-3)
             if method == 'einasto':
                 idx = 2
             elif method == 'alpha_beta_gamma':
                 idx = 4
             else:
                 idx = 1
-            best_fits[:,idx] = best_fits[:,idx]*3.085678e24/config.OutUnitLength_in_cm
+            best_fits[:,idx] = best_fits[:,idx]*l_curr_over_target
             return best_fits
         else:
             return None
@@ -200,7 +213,9 @@ cdef class DensProfs(CosmicBase):
         print_status(rank,self.start_time,'Starting estConcentrations() with snap {0}'.format(self.SNAP))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `estConcentrations()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        dens_profs = dens_profs*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
         if rank == 0:
             cs = self._getConcentrationsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
             return cs
@@ -232,8 +247,10 @@ cdef class DensProfs(CosmicBase):
         print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0}'.format(self.SNAP))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        dens_profs = dens_profs*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
-        dens_profs_fit = dens_profs_fit*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        dens_profs_fit = dens_profs_fit*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
         obj_centers, obj_masses = self._getMassesCenters(select) # In units of Mpc/h and 10^10*M_sun*h^2/(Mpc)**3
         
         if rank == 0:
@@ -301,7 +318,9 @@ cdef class DensProfsHDF5(CosmicBase):
         xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, self.getPartType())
         del velxyz
         if rank == 0:
-            return xyz*3.085678e24/config.OutUnitLength_in_cm, masses*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            return xyz*l_curr_over_target, masses*self.MASS_UNIT*m_curr_over_target
         else:
             del xyz; del masses
             return None, None
@@ -327,7 +346,8 @@ cdef class DensProfsHDF5(CosmicBase):
         xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, self.getPartType())
         del masses; del xyz
         if rank == 0:
-            return velxyz*1e5/config.OutUnitVelocity_in_cm_per_s
+            v_curr_over_target = 1e5/config.OutUnitVelocity_in_cm_per_s
+            return velxyz*v_curr_over_target
         else:
             del velxyz
             return None
@@ -358,7 +378,8 @@ cdef class DensProfsHDF5(CosmicBase):
             obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, self.MIN_NUMBER_PTCS)
             del nb_shs; del sh_len; del fof_sizes; del group_r200; del obj_cat; del obj_size
             self.r200 = obj_r200
-            return obj_r200*3.085678e24/config.OutUnitLength_in_cm
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return obj_r200*l_curr_over_target
         else:
             del nb_shs; del sh_len; del fof_sizes; del group_r200
             return None
@@ -396,7 +417,9 @@ cdef class DensProfsHDF5(CosmicBase):
             isValidSelection(select, idx_cat_len)
             centers, ms = self._getMassesCentersBase(xyz, masses, idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1])
             del xyz; del masses; del idx_cat; del obj_size
-            return centers*3.085678e24/config.OutUnitLength_in_cm, ms*self.MASS_UNIT*1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            return centers*l_curr_over_target, ms*self.MASS_UNIT*m_curr_over_target
         else:
             del xyz; del masses
             return None, None
@@ -450,7 +473,9 @@ cdef class DensProfsHDF5(CosmicBase):
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200))
             del xyz; del masses
-            return dens_profs*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
         else:
             del xyz; del masses
             return None
@@ -475,14 +500,16 @@ cdef class DensProfsHDF5(CosmicBase):
         dens_profs = dens_profs*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
         if rank == 0:
             best_fits = self._getDensProfsBestFitsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
-            best_fits[:,0] = best_fits[:,0]*1.989e33/config.OutUnitMass_in_g*(3.085678e24/config.OutUnitLength_in_cm)**(-3)
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            best_fits[:,0] = best_fits[:,0]*m_curr_over_target*l_curr_over_target**(-3)
             if method == 'einasto':
                 idx = 2
             elif method == 'alpha_beta_gamma':
                 idx = 4
             else:
                 idx = 1
-            best_fits[:,idx] = best_fits[:,idx]*3.085678e24/config.OutUnitLength_in_cm
+            best_fits[:,idx] = best_fits[:,idx]*l_curr_over_target
             return best_fits
         else:
             return None
@@ -504,7 +531,9 @@ cdef class DensProfsHDF5(CosmicBase):
         print_status(rank,self.start_time,'Starting estConcentrations() with snap {0}'.format(self.SNAP))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `estConcentrations()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        dens_profs = dens_profs*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
         if rank == 0:
             cs = self._getConcentrationsBase(np.float32(dens_profs), np.float32(ROverR200), self.r200.base[select[0]:select[1]+1], method)
             return cs
@@ -536,8 +565,10 @@ cdef class DensProfsHDF5(CosmicBase):
         print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0}'.format(self.SNAP))
         if len(dens_profs) > select[1] - select[0] + 1:
             raise ValueError("The `select` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `select` as used for the density profile estimation!")
-        dens_profs = dens_profs*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
-        dens_profs_fit = dens_profs_fit*config.OutUnitMass_in_g/1.989e33*(config.OutUnitLength_in_cm/3.085678e24)**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        dens_profs_fit = dens_profs_fit*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
         obj_centers, obj_masses = self._getMassesCenters(select)
         
         if rank == 0:
