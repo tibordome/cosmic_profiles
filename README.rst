@@ -15,13 +15,13 @@ This repository provides shape and density profile analysis tools for cosmologic
   - iterative shell-based shape profile determination algorithm for high-resolution halos
   - iterative ellipsoid-based shape profile determination algorithm for lower-resolution halos
   - user can choose between reduced shape tensor and non-reduced shape tensor
-- works with
+- supports
 
   - 'direct' datasets (i.e. index catalogue provided by user) and
   - Gadget-style HDF5 snapshot files
   
     - all functionalities available for dark matter halos, gas particle halos and star particle halos
-    - in addition, velocity dispersion tensor eigenaxes determination
+    - in addition, allows for velocity dispersion tensor eigenaxes determination
 - halo density profile estimation using direct binning and kernel-based approaches
 
   - user can choose between direct binning into spherical shells and
