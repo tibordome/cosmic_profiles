@@ -3,9 +3,9 @@
 Supported Data Structures
 ==========================
 
-To estimate and fit shape and / or density profiles with *Cosmic Profiles*, at the moment we support the following data structures.
+To estimate and fit shape and / or density profiles with CosmicProfiles, at the moment we support the following data structures.
 
-* *GADGET*-style HDF5 snapshots containing particle and halo/subhalo data in folders ``path/to/folder/snapdir_x`` and ``path/to/folder/groups_x`` with ``x`` typically a three-digit snapshot number identifier such as '042', respectively. Note that the HDF5 snapshot of the simulation must have been written with FoF / SUBFIND turned on in the simulation (e.g. *Arepo* or *GADGET-4*), otherwise *Cosmic Profiles* will not know how to identify the central subhalos of dark matter, gas or star particles. To calculate shape profiles, we instantiate a ``DensShapeProfsHDF5`` object via::
+* *GADGET*-style HDF5 snapshots containing particle and halo/subhalo data in folders ``path/to/folder/snapdir_x`` and ``path/to/folder/groups_x`` with ``x`` typically a three-digit snapshot number identifier such as '042', respectively. Note that the HDF5 snapshot of the simulation must have been written with FoF / SUBFIND turned on in the simulation (e.g. *Arepo* or *GADGET-4*), otherwise CosmicProfiles will not know how to identify the central subhalos of dark matter, gas or star particles. To calculate shape profiles, we instantiate a ``DensShapeProfsHDF5`` object via::
 
     from cosmic_profiles import DensShapeProfsHDF5, updateInUnitSystem, updateOutUnitSystem
     

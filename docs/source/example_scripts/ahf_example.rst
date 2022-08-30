@@ -12,7 +12,7 @@ AHF Example
 
 We mentioned that identifying halos and galaxies for a simulation box is a challenging task. Most state-of-the-art halo finders have no direct Python wrappers, yet `pynbody <https://pynbody.github.io/pynbody/>`_ allows to overcome this limitation by wrapping to **most** major halo finders, including the Amiga Halo Finder (AHF), Rockstar and SubFind.
 
-For this reason we demonstrate in this example how one can use the ``s.halos()`` command of ``pynbody`` to identify halos in a simulation box. For ``pynbody``'s AHF-invoking ``s.halos()`` command to work with a Gadget output, one needs to install AHF and place the executable into ~/bin (or extend $PATH variable), modify ``_run_ahf(self, sim)`` in ``/path/to/pynbody/halo/ahf.py`` to::
+For this reason we demonstrate in this example how one can use the ``s.halos()`` command of ``pynbody`` to identify halos in a simulation box. For ``pynbody``'s AHF-invoking ``s.halos()`` command to work with a Gadget output, one needs to install AHF and place the executable into ~/bin (or extend the $PATH variable), modify ``_run_ahf(self, sim)`` in ``/path/to/pynbody/halo/ahf.py`` to::
 
     def _run_ahf(self, sim):
         typecode = '60' # '61'
@@ -133,7 +133,7 @@ and the [AHFCatalogue] section in ``/path/to/pynbody/config.ini`` to::
               GADGET_MUNIT = 1.0e10
               GADGET_LUNIT = 1.0e-3
 
-In this example, we generate a mock universe using ``nbodykit``, save the universe to a Gadget 2 file, load the Gadget 2 file with ``pynbody``, identify halos with AHF, and instantiate a ``cosmic_profiles`` object.
+In this example, we generate a mock universe using ``nbodykit``, save the universe to a Gadget 2 file, load the Gadget 2 file with ``pynbody``, identify halos with AHF and estimate shape profiles with CosmicProfiles.
 
 If ``pynbody.plot.image(halos[2].d, width = '500 kpc', cmap=plt.cm.Greys, units = 'Msol kpc^-2')`` fails, modify the argument ``cen_size`` in the ``center()`` function of ``/path/to/pynbody/analysis/halo.py`` to something like ``cen_size="10 kpc"``.
 

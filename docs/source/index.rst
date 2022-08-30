@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-The *Cosmic Profiles* project
+The CosmicProfiles project
 =============================
 
 |pic0|
@@ -11,7 +11,7 @@ The *Cosmic Profiles* project
 .. |pic0| image:: ../../CProfiles.png
    :width: 50%
 
-*Cosmic Profiles* provides shape and density profile analysis tools for cosmological simulations (and beyond). Its features include
+CosmicProfiles provides shape and density profile analysis tools for cosmological simulations (and beyond). Its features include
 
 - overall halo shape determination, i.e. major, intermediate, minor axis vectors and shape quantities such as intermediate-to-major axis ratio or sphericity
 - halo shape profile determination
@@ -22,10 +22,10 @@ The *Cosmic Profiles* project
 - supports
     
   - 'direct' datasets (i.e. index catalogue provided by user) and
-  - *GADGET*-style FoF / SUBFIND HDF5 snapshot files
+  - *GADGET*-style HDF5 snapshot files
 
-    - density and shape profile determination for dark matter halos, gas particle halos and star particle halos
-    - velocity dispersion tensor eigenaxes determination
+    - all functionalities available for dark matter halos, gas particle halos and star particle halos
+    - in addition, allows for velocity dispersion tensor eigenaxes determination
 - halo density profile estimation using direct binning and kernel-based approaches
   - user can choose between direct binning into spherical shells and
   - direct binning into ellipsoidal shells

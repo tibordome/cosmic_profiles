@@ -16,7 +16,7 @@ We have added density profile estimation capabilities. We contend ourselves with
 
 where :math:`(x,y,z)` are the coordinates of a point cloud particle in some coordinate system centered on either the center of mass or the mode of the cloud. The density profile describes the radial mass distribution of the points in the cloud, e.g. in units of :math:`M_{\odot}h^2/(\mathrm{Mpc})^3` in the above plot. 
 
-To estimate density profiles with *Cosmic Profiles*, we first instantiate a ``DensProfs`` object called ``cprofiles`` via::
+To estimate density profiles with CosmicProfiles, we first instantiate a ``DensProfs`` object called ``cprofiles`` via::
 
     from cosmic_profiles import DensProfsHDF5, updateInUnitSystem, updateOutUnitSystem
     
