@@ -20,13 +20,12 @@ This repository provides shape and density profile analysis tools for cosmologic
   - 'direct' datasets (i.e. index catalogue provided by user) and
   - Gadget-style HDF5 snapshot files
   
-    - additional velocity dispersion tensor eigenaxes determination
-    - galaxy density and shape profile determination also works out of the box
+    - all functionalities available for dark matter halos, gas particle halos and star particle halos
+    - in addition, velocity dispersion tensor eigenaxes determination
 - halo density profile estimation using direct binning and kernel-based approaches
 
   - user can choose between direct binning into spherical shells and
   - direct binning into ellipsoidal shells
-  
 - density profile fitting assuming either `NFW <https://ui.adsabs.harvard.edu/abs/1997ApJ...490..493N/abstract>`_, `Hernquist 1990 <https://ui.adsabs.harvard.edu/abs/1990ApJ...356..359H/abstract>`_, `Einasto <https://ui.adsabs.harvard.edu/abs/1965TrAlm...5...87E/abstract>`_ or `alpha-beta-gamma <https://arxiv.org/abs/1107.5582>`_ profile model
 
   - concentration-mass relationship of halos easy to calculate
