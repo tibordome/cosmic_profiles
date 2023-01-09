@@ -11,11 +11,13 @@ Installation and Support
 - mpi4py
 - h5py
 - pathos
-- matplotlib
+- matplotlib<3.5
+
+  - versions >=3.5 will bicker over ``auto_add_to_figure=False`` not being an admissible argument for ``Axes3D``
+
 - psutil
 
-Source code for these is included with *CosmicProfiles* and is built automatically, so you do not need to install them yourself.
-
+Source code for these is included with *CosmicProfiles* and is built automatically, so you do not need to install them yourself. However, beware of MPI and OpenMP (see below).
 
 Binary installation with conda
 *********************************
@@ -24,6 +26,8 @@ This is the recommended installation path for Anaconda and Miniconda users. Cond
 
     conda config --add channels conda-forge
     conda install cosmic_profiles
+
+.. note:: Running *CosmicProfiles* relies on a functioning MPI implementation. For macOS and Linux, MPICH can be installed in the command line using ``brew install mpich`` or ``sudo apt install mpich``, respectively.
 
 Binary installation with pip
 *********************************
@@ -38,6 +42,7 @@ If you have installed with pip, you can keep your installation up to date by upg
     
     pip install --user --upgrade cosmic-profiles
 
+.. note:: Pip will most likely rely on OpenMP support being enabled for the compiler (gcc for Linux or clang for macOS) during the installation process, and while this is easy to establish on Linux (via ``sudo apt install libomp-dev``), it is challenging on macOS (albeit possible, see `here <https://blog.llvm.org/2015/05/openmp-support_22.html>`_).
 
 Contributing
 ****************************

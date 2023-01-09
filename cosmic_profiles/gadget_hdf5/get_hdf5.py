@@ -160,7 +160,10 @@ def getHDF5ObjData(HDF5_SNAP_DEST, PART_TYPE):
             obj_vely = np.hstack((obj_vely, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,1]/v_target_over_curr)))
             obj_velz = np.hstack((obj_velz, np.float32(f['PartType{0}/Velocities'.format(PART_TYPE)][:,2]/v_target_over_curr)))
             if PART_TYPE == 1:
-                obj_masses = np.hstack((obj_masses, np.ones((f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]/m_target_over_curr))) # in 1.989e+43 g
+                try:
+                    obj_masses = np.hstack((obj_masses, np.float32(f['PartType{0}/Masses'.format(PART_TYPE)][:]/m_target_over_curr))) # in 1.989e+43 g
+                except:
+                    obj_masses = np.hstack((obj_masses, np.ones((f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0],), dtype=np.float32)*np.float32(f['Header'].attrs['MassTable'][1]/m_target_over_curr))) # in 1.989e+43 g
             else:
                 obj_masses = np.hstack((obj_masses, np.float32(f['PartType{0}/Masses'.format(PART_TYPE)][:]/m_target_over_curr))) # in 1.989e+43 g
             count += f['PartType{0}/Coordinates'.format(PART_TYPE)][:].shape[0]
