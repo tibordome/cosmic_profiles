@@ -33,6 +33,9 @@ def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
         sh_len = np.empty(0, dtype = np.int32)
         group_r200 = np.empty(0, dtype = np.float32)
         hdf5GroupFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_GROUP_DEST))
+        # Raise Error message if empty
+        if len(hdf5GroupFilenamesList) == 0:
+            raise ValueError("Could not find any HDF5 files. Please double-check provided paths, specifically HDF5_GROUP_DEST.")
         groupfile_argsort = np.argsort(np.array([np.int32(re.split('(\d+)', file)[-4]) for file in hdf5GroupFilenamesList]))
         hdf5GroupFilenamesList = np.array(hdf5GroupFilenamesList)[groupfile_argsort]
         nb_jobs_to_do = len(hdf5GroupFilenamesList)
@@ -138,6 +141,9 @@ def getHDF5ObjData(HDF5_SNAP_DEST, PART_TYPE):
         obj_velz = np.empty(0, dtype = np.float32)
         obj_masses = np.empty(0, dtype = np.float32)
         hdf5SnapFilenamesList = glob.glob('{}/*.hdf5'.format(HDF5_SNAP_DEST))
+        # Raise Error message if empty
+        if len(hdf5SnapFilenamesList) == 0:
+            raise ValueError("Could not find any HDF5 files. Please double-check provided paths, specifically HDF5_SNAP_DEST.")
         snapfile_argsort = np.argsort(np.array([np.int32(re.split('(\d+)', file)[-4]) for file in hdf5SnapFilenamesList]))
         hdf5SnapFilenamesList = np.array(hdf5SnapFilenamesList)[snapfile_argsort]
         nb_jobs_to_do = len(hdf5SnapFilenamesList)

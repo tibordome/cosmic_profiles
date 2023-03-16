@@ -373,6 +373,9 @@ cdef class DensProfsHDF5(CosmicBase):
         
         # Import hdf5 data
         nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType())
+        # Raise Error message if empty
+        if len(nb_shs) == 0:
+            raise ValueError("No subhalos found in HDF5 files.")
         if rank == 0:
             # Construct catalogue
             obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, self.MIN_NUMBER_PTCS)
@@ -393,6 +396,9 @@ cdef class DensProfsHDF5(CosmicBase):
         
         # Import hdf5 data
         nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType())
+        # Raise Error message if empty
+        if len(nb_shs) == 0:
+            raise ValueError("No subhalos found in HDF5 files.")
         if rank == 0:
             # Construct catalogue
             obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, self.MIN_NUMBER_PTCS)

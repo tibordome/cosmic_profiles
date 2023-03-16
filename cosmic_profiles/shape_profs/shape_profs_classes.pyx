@@ -1080,6 +1080,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             del idx_cat; del obj_size
         self._getObjInfoBase(idx_cat, self.OBJ_TYPE)
         nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType())
+        # Raise Error message if empty
+        if len(nb_shs) == 0:
+            raise ValueError("No subhalos found in HDF5 files.")
         print_status(rank, self.start_time, "More detailed info on central subhalo catalogue. The total number of objects with > 0 SHs is {0}".format(nb_shs[nb_shs != 0].shape[0]))
         print_status(rank, self.start_time, "The total number of objects is {0}".format(len(nb_shs)))
         print_status(rank, self.start_time, "The total number of SHs (subhalos) is {0}".format(len(sh_len)))

@@ -64,7 +64,7 @@ For post-processing purposes, one can dump the shape profiles in a destination `
     
     cprofiles.dumpShapeCatLocal(CAT_DEST, select = [0, 9], reduced = False, shell_based = False),
 
-where ``CAT_DEST`` is a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. '/path/to/cat'.
+where ``CAT_DEST`` is a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. '/path/to/cat'  (will be created if missing).
 
 .. dropdown:: Shape Profiles, Dumped Files
 
@@ -141,4 +141,4 @@ which draws median shape profiles and also mass bin-decomposed ones. ``nb_bins``
  
     cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
 
-which for instance would visualize the 3D distribution of particles as well as the eigenaxes at two different ellipsoidal radii in the first three objects that have sufficient resolution.
+which for instance would visualize the 3D distribution of particles as well as the eigenaxes at two different ellipsoidal radii in the first three objects that have sufficient resolution. ``VIZ_DEST`` is a string describing the absolute (or relative with respect to Python working diretory) path to the visualization folder, e.g. '/path/to/viz' (will be created if missing).

@@ -39,7 +39,7 @@ with arguments identical to those we saw in the :ref:`Data Structures section<Da
 
     dens_profs_db = cprofiles.estDensProfs(r_over_r200, select = [0, 9], direct_binning = True, spherical = True),
 
-where the float array ``dens_profs_db`` of shape :math:`(N_{\text{pass}}, N_r)` contains the estimated density profiles. The ``select`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. As in the :ref:`Shape Estimation section<Shape Estimation>`, :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``select`` argument and in addition are sufficiently resolved. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice.
+where the float array ``dens_profs_db`` of shape :math:`(N_{\text{pass}}, N_r)` contains the estimated density profiles. The ``select`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. As in the :ref:`Shape Estimation section<Shape Estimation>`, :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``select`` argument and in addition are sufficiently resolved. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice, e.g. ``r_over_r200 = np.logspace(-1.5,0,70)``.
 
 As the naming suggests, with ``direct_binning = True`` we estimate density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. The user also has the liberty to invoke an ellipsoidal shell-based density profile estimation algorithm by setting the boolean ``spherical = False``. Note, however, that this necessitates that ``cprofiles`` is an object of the class ``DensShapeProfs`` or ``DensShapeProfsHDF5``, providing access to shape profiling capabilities.
 
@@ -76,9 +76,9 @@ Finally, the :math:`\alpha \beta \gamma` density profile (`Zemp et al 2011 <http
 
 To fit density profiles according to model ``method``, a string which can be either ``nfw``, ``hernquist``, ``einasto`` or ``alpha_beta_gamma``, invoke the method::
 
-    best_fits = cprofiles.fitDensProfs(dens_profs_fit, r_over_r200_fit, method, select = [0, 9]).
+    best_fits = cprofiles.fitDensProfs(dens_profs, r_over_r200, method, select = [0, 9]).
 
-The first argument ``dens_profs_fit`` is an array of shape :math:`(N_{\text{pass}}, N_r)` containing the density profiles defined at radii ``r_over_r200_fit``, possibly obtained via ``getDensProfsDirectBinning()`` or ``getDensProfsDirectBinning()``, with some non-reliable values removed. The last argument ``method`` is 1 of 4 possible strings corresponding to the density profile model, i.e. either ``nfw``, ``hernquist``, ``einasto`` or ``alpha_beta_gamma``. The returned array ``best_fits`` will store the best-fit results and has shape (:math:`N_{\text{pass}}, n`), :math:`n` being the number of parameters in model ``method``.
+The first argument ``dens_profs`` is an array of shape :math:`(N_{\text{pass}}, N_r)` containing the density profile estimates defined at normalized radii ``r_over_r200``. The last argument ``method`` is 1 of 4 possible strings corresponding to the density profile model, i.e. either ``nfw``, ``hernquist``, ``einasto`` or ``alpha_beta_gamma``. The returned array ``best_fits`` will store the best-fit results and has shape (:math:`N_{\text{pass}}, n`), :math:`n` being the number of parameters in model ``method``.
 
 Once density profiles have been fit, concentrations of objects can be calculated, defined as
 
@@ -86,7 +86,7 @@ Once density profiles have been fit, concentrations of objects can be calculated
 
 with :math:`r_s` the characteristic or scale radius of the corresponding density profile model. To this end, invoke::
 
-    cs = cprofiles.estConcentrations(dens_profs_fit, r_over_r200_fit, method, select = [0, 9]),
+    cs = cprofiles.estConcentrations(dens_profs, r_over_r200, method, select = [0, 9]),
 
 which will return a float array ``cs`` of shape (:math:`N_{\text{pass}},`).
 
