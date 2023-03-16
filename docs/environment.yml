@@ -13,7 +13,7 @@ dependencies:
   - cython
   - psutil
   - sphinx-autoapi
-  - sphinx_rtd_theme
+  - sphinx_rtd_theme=1.0.0
   - twine
   - pip:
     - sphinx_design

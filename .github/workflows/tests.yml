@@ -46,3 +46,4 @@ jobs:
         run: |
           $CONDA/bin/conda install pytest
           $CONDA/bin/pytest cosmic_profiles/tests
+
