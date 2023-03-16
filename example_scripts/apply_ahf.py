@@ -14,6 +14,7 @@ import os
 import sys
 import h5py
 import inspect
+import subprocess
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
 import numpy as np
@@ -85,6 +86,9 @@ MIN_NUMBER_DM_PTCS = 200
 CENTER = 'mode'
 CAT_DEST = "./cat"
 VIZ_DEST = "./viz"
+# Create CAT_DEST and VIZ_DEST if not available
+subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
+subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
 #############################################################################################################
 
 def AHFEx():

@@ -11,6 +11,11 @@ from cosmic_profiles.dens_profs.dens_profs_tools import fitDensProfHelper
 from cosmic_profiles.shape_profs.shape_profs_algos import calcMorphLocal, calcMorphGlobal, calcMorphLocalVelDisp, calcMorphGlobalVelDisp
 from cosmic_profiles.dens_profs.dens_profs_algos import calcMassesCenters, calcDensProfsSphDirectBinning, calcDensProfsEllDirectBinning, calcDensProfsKernelBased
 import time
+import subprocess
+import sys
+import inspect
+import os
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -302,6 +307,8 @@ cdef class CosmicBase:
                 inter = np.array([])
                 major = np.array([])
             
+            # Create CAT_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
             np.savetxt('{0}/d_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
             np.savetxt('{0}/q_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
             np.savetxt('{0}/s_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
@@ -355,6 +362,8 @@ cdef class CosmicBase:
                 inter = np.array([])
                 major = np.array([])
             
+            # Create CAT_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
             np.savetxt('{0}/d_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
             np.savetxt('{0}/q_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
             np.savetxt('{0}/s_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
@@ -419,6 +428,8 @@ cdef class CosmicBase:
                 inter = np.array([])
                 major = np.array([])
             
+            # Create CAT_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
             np.savetxt('{0}/d_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
             np.savetxt('{0}/q_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
             np.savetxt('{0}/s_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
@@ -482,6 +493,8 @@ cdef class CosmicBase:
                 inter = np.array([])
                 major = np.array([])
             
+            # Create CAT_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
             np.savetxt('{0}/d_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
             np.savetxt('{0}/q_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
             np.savetxt('{0}/s_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')

@@ -11,6 +11,10 @@ from matplotlib.font_manager import FontProperties
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
 cimport cython
+import inspect
+import subprocess
+import os
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 from cosmic_profiles.dens_profs.dens_profs_classes cimport DensProfs, DensProfsHDF5
 from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, isValidSelection
 from cosmic_profiles.common import config
@@ -183,6 +187,9 @@ cdef class DensShapeProfs(DensProfs):
                 d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat.base[obj_numbers], self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
                 del obj_m
                                     
+                # Create VIZ_DEST if not available
+                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+                
                 # Viz all valid objects under 'obj_numbers'
                 for idx_obj, obj_number in enumerate(obj_numbers):
                     major_obj = major[idx_obj]
@@ -272,6 +279,9 @@ cdef class DensShapeProfs(DensProfs):
                 d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat.base[obj_numbers], self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
                 del obj_m
             
+                # Create VIZ_DEST if not available
+                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+                
                 # Viz all valid objects under 'obj_numbers'
                 for idx_obj, obj_number in enumerate(obj_numbers):
                     major_obj = major[idx_obj]
@@ -691,6 +701,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                 d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], self.getIdxCat()[0][obj_numbers], self.getIdxCat()[1][obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
                 del obj_m
                         
+                # Create VIZ_DEST if not available
+                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+                
                 # Viz all valid objects under 'obj_numbers'
                 for idx_obj, obj_number in enumerate(obj_numbers):
                     major_obj = major[idx_obj]
@@ -784,6 +797,9 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                 d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], self.getIdxCat()[0][obj_numbers], self.getIdxCat()[1][obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
                 del obj_m
             
+                # Create VIZ_DEST if not available
+                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+                
                 # Viz all valid objects under 'obj_numbers'
                 for idx_obj, obj_number in enumerate(obj_numbers):
                     major_obj = major[idx_obj]

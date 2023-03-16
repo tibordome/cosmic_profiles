@@ -6,6 +6,10 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode, print_status, eTo10, getCatWithinFracR200
 from cosmic_profiles.common.cosmo_tools import M_split, getMeanOrMedianAndError
+import inspect
+import subprocess
+import os
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -152,6 +156,9 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         Rs = np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1)
         ERROR_METHOD = "median_quantile"
         
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
         # Q
         plt.figure()
         mean_median, err_low, err_high = getShape(Rs, d, q, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
@@ -280,6 +287,9 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
             t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
         t = np.nan_to_num(t)
         
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
         # T counting
         plt.figure()
         t[t == 0.] = np.nan
@@ -332,6 +342,9 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
             t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
         t = np.nan_to_num(t)
         
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
         # T counting
         plt.figure()
         t[t == 0.] = np.nan
@@ -375,6 +388,9 @@ def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SN
     :type HIST_NB_BINS: int"""
     
     if rank == 0:
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
         eps = getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER)
         plt.figure()
         n, bins, patches = plt.hist(x=abs(eps), bins = np.linspace(0, 1, HIST_NB_BINS), alpha=0.7, density=True)
@@ -416,6 +432,9 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DES
     if rank == 0:
         # Update h_cat so that only particles within r200 are considered
         idx_cat_new, obj_size_new = getCatWithinFracR200(idx_cat, obj_size, xyz, L_BOX, CENTER, r200, frac_r200)
+        
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
         
         # Direct fitting result prep, needed for both D and A
         eps = getEpsilon(idx_cat_new, obj_size_new, xyz, masses, L_BOX, CENTER)
