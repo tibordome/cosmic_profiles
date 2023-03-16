@@ -497,25 +497,26 @@ def drawUniformFromShell(dims, a, b, c, Nptc, shell_nb):
 
 def respectPBCNoRef(xyz, L_BOX):
     """
-    Return positions xyz that respect the box periodicity
+    Return modified positions xyz_out of an object that respect the box periodicity
     
     If point distro xyz has particles separated in any Cartesian direction
-    by more than L_BOX/2, reflect those particles along L_BOX/2
+    by more than config.L_BOX/2, translate those particles accordingly.
     
-    :param xyz: coordinates of particles of type 1 or type 4
-    :type xyz: (N,3) floats
-    :param L_BOX: periodicity of the box
-    :type L_BOX: float
-    :return: updated coordinates of particles of type 1 or type 4
-    :rtype: (N,3) floats"""
+    :param xyz: coordinates of particles
+    :type xyz: (N^3x3) floats
+    :return: updated coordinates of particles
+    :rtype: (N^3x3) floats"""
     xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
     ref = 0 # Reference particle does not matter
-    dist_x = abs(xyz_out[ref, 0]-xyz_out[:,0])
-    xyz_out[:,0][dist_x > L_BOX/2] = L_BOX-xyz_out[:,0][dist_x > L_BOX/2] # Reflect x-xyz_outition along L_BOX/2
-    dist_y = abs(xyz_out[ref, 1]-xyz_out[:,1])
-    xyz_out[:,1][dist_y > L_BOX/2] = L_BOX-xyz_out[:,1][dist_y > L_BOX/2] # Reflect y-xyz_outition along L_BOX/2
-    dist_z = abs(xyz_out[ref, 2]-xyz_out[:,2])
-    xyz_out[:,2][dist_z > L_BOX/2] = L_BOX-xyz_out[:,2][dist_z > L_BOX/2] # Reflect z-xyz_outition along L_BOX/2
+    dist_x = xyz_out[:,0]-xyz_out[ref, 0]
+    dist_y = xyz_out[:,1]-xyz_out[ref, 1]
+    dist_z = xyz_out[:,2]-xyz_out[ref, 2]
+    xyz_out[:,0][dist_x > L_BOX/2] = xyz_out[:,0][dist_x > L_BOX/2]-L_BOX
+    xyz_out[:,0][dist_x < -L_BOX/2] = xyz_out[:,0][dist_x < -L_BOX/2]+L_BOX
+    xyz_out[:,1][dist_y > L_BOX/2] = xyz_out[:,1][dist_y > L_BOX/2]-L_BOX
+    xyz_out[:,1][dist_y < -L_BOX/2] = xyz_out[:,1][dist_y < -L_BOX/2]+L_BOX
+    xyz_out[:,2][dist_z > L_BOX/2] = xyz_out[:,2][dist_z > L_BOX/2]-L_BOX
+    xyz_out[:,2][dist_z < -L_BOX/2] = xyz_out[:,2][dist_z < -L_BOX/2]+L_BOX
     return xyz_out
 
 def calcCoM(xyz, masses):

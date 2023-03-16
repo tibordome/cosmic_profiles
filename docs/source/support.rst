@@ -4,18 +4,17 @@ Installation and Support
 
 *CosmicProfiles* makes use of the following packages:
 
-- numpy>=1.19.2
-- scipy
-- cython
-- scikit-learn
-- mpi4py
-- h5py
-- pathos
-- matplotlib<3.5
+* numpy>=1.19.2
+* scipy
+* cython
+* scikit-learn
+* mpi4py
+* h5py
+* pathos
+* matplotlib<3.5
 
   - versions >=3.5 will bicker over ``auto_add_to_figure=False`` not being an admissible argument for ``Axes3D``
-
-- psutil
+* psutil
 
 Source code for these is included with *CosmicProfiles* and is built automatically, so you do not need to install them yourself. However, beware of MPI and OpenMP (see below).
 
