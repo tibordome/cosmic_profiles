@@ -34,9 +34,9 @@ with arguments and public methods explained in detail in :ref:`the code referenc
 
 .. dropdown:: User Parameters for DensShapeProfsHDF5
 
-  * ``HDF5_GROUP_DEST`` and ``HDF5_SNAP_DEST``: path to simulation snapshot
+  * ``HDF5_GROUP_DEST`` and ``HDF5_SNAP_DEST``: path to simulation snapshot (string, e.g. ``path/to/folder/snapdir_x``)
   * ``SNAP``: snapshot identifier, used when dumping files etc.
-  * ``L_BOX``: simulation box side length (i.e. periodicity of box) in units of ``config.InUnitLength_in_cm``
+  * ``L_BOX``: simulation box side length (i.e. periodicity of box) in units of ``config.InUnitLength_in_cm`` (zero if non-periodic)
   * ``MIN_NUMBER_PTCS``: minimum number of particles for objects to qualify for analyses (e.g. shape analysis)
   * ``D_LOGSTART`` and ``D_LOGEND``: logarithm of minimum and maximum ellipsoidal radius of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo
   * ``D_BINS``: number of bins to consider for shape profiling 
@@ -64,7 +64,7 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``estDensProfs(ROverR200, select, direct_binning = True, spherical = True, reduced = False, shell_based = False)``: estimate density profiles at normalized radii ``ROverR200``
   * ``fitDensProfs(dens_profs, ROverR200, method, select)``: get best-fit results for density profile fitting
   * ``estConcentrations(dens_profs, ROverR200, method, select)``: get best-fit concentration values from density profile fitting
-  * ``plotDensProfs(dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, method, nb_bins, VIZ_DEST, select)``: draw some simplistic density profiles and save in ``VIZ_DEST``
+  * ``plotDensProfs(dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, method, nb_bins, VIZ_DEST, select)``: draw some simplistic density profiles and save in ``VIZ_DEST`` (string, e.g. ``/path/to/viz``)
 
   while the shape profiling-related public methods are
   
@@ -77,7 +77,7 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, select, reduced = False, shell_based = False)``: plot histogram of local triaxiality at depth ``frac_r200``
   * ``plotGlobalTHist(HIST_NB_BINS, VIZ_DEST, select, reduced = False)``: plot histogram of global triaxiality
   * ``plotShapeProfs(nb_bins, VIZ_DEST, select, reduced = False, shell_based = False)``: plot shape profiles, also mass bin-decomposed ones
-  * ``dumpShapeCatLocal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant local shape data into ``CAT_DEST``
+  * ``dumpShapeCatLocal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant local shape data into ``CAT_DEST`` (string, e.g. ``/path/to/cat``)
   * ``dumpShapeCatGlobal(CAT_DEST, select, reduced = False, shell_based = False)``: dumps all relevant global shape data into ``CAT_DEST``.
 
 * very general assortments of point clouds. There is no requirement on the nature of the point clouds whatsoever, yet the shape determination algorithm will perform better the closer the point clouds are to being truly ellipsoidal. Often, the process of identifying such point clouds in a simulation can be challenging, which is why we provide an :ref:`interface<AHF example>` showcasing how to use the 'Amiga Halo Finder' (AHF) via ``pynbody``. For now, we assume that we have identified the point clouds already and that ``idx_cat`` (list of lists) stores the indices of the particles belonging to the point clouds::
@@ -113,7 +113,7 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``idx_cat``: each entry of the list is a list containing indices (to ``xyz`` and ``mass_array``, respectively) of particles belonging to an object
   * ``r_vir``: virial radii of the parent halos in units of ``config.InUnitLength_in_cm``
   * ``SNAP``: snapshot identifier, used when dumping files etc.
-  * ``L_BOX``: simulation box side length (i.e. periodicity of box) in units of ``config.InUnitLength_in_cm``
+  * ``L_BOX``: simulation box side length (i.e. periodicity of box) in units of ``config.InUnitLength_in_cm`` (zero if non-periodic)
   * ``MIN_NUMBER_PTCS``: minimum number of particles for objects to qualify for analyses (e.g. shape analysis)
   * ``D_LOGSTART`` and ``D_LOGEND``: logarithm of minimum and maximum ellipsoidal radius of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo
   * ``D_BINS``: number of bins to consider for shape profiling 

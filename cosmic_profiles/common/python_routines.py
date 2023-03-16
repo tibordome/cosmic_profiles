@@ -495,29 +495,34 @@ def drawUniformFromShell(dims, a, b, c, Nptc, shell_nb):
     # All ptcs pt in Y fulfill inShell(Y[pt], a, b, c, shell_nb) == True.
     return Y
 
-def respectPBCNoRef(xyz, L_BOX):
+def respectPBCNoRef(xyz, L_BOX = None):
     """
     Return modified positions xyz_out of an object that respect the box periodicity
     
     If point distro xyz has particles separated in any Cartesian direction
-    by more than config.L_BOX/2, translate those particles accordingly.
+    by more than L_BOX/2, translate those particles accordingly.
     
     :param xyz: coordinates of particles
     :type xyz: (N^3x3) floats
+    :param L_BOX: periodicity of box (0.0 if non-periodic)
+    :type L_BOX: float
     :return: updated coordinates of particles
     :rtype: (N^3x3) floats"""
-    xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
-    ref = 0 # Reference particle does not matter
-    dist_x = xyz_out[:,0]-xyz_out[ref, 0]
-    dist_y = xyz_out[:,1]-xyz_out[ref, 1]
-    dist_z = xyz_out[:,2]-xyz_out[ref, 2]
-    xyz_out[:,0][dist_x > L_BOX/2] = xyz_out[:,0][dist_x > L_BOX/2]-L_BOX
-    xyz_out[:,0][dist_x < -L_BOX/2] = xyz_out[:,0][dist_x < -L_BOX/2]+L_BOX
-    xyz_out[:,1][dist_y > L_BOX/2] = xyz_out[:,1][dist_y > L_BOX/2]-L_BOX
-    xyz_out[:,1][dist_y < -L_BOX/2] = xyz_out[:,1][dist_y < -L_BOX/2]+L_BOX
-    xyz_out[:,2][dist_z > L_BOX/2] = xyz_out[:,2][dist_z > L_BOX/2]-L_BOX
-    xyz_out[:,2][dist_z < -L_BOX/2] = xyz_out[:,2][dist_z < -L_BOX/2]+L_BOX
-    return xyz_out
+    if L_BOX != 0.0:
+        xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
+        ref = 0 # Reference particle does not matter
+        dist_x = xyz_out[:,0]-xyz_out[ref, 0]
+        dist_y = xyz_out[:,1]-xyz_out[ref, 1]
+        dist_z = xyz_out[:,2]-xyz_out[ref, 2]
+        xyz_out[:,0][dist_x > L_BOX/2] = xyz_out[:,0][dist_x > L_BOX/2]-L_BOX
+        xyz_out[:,0][dist_x < -L_BOX/2] = xyz_out[:,0][dist_x < -L_BOX/2]+L_BOX
+        xyz_out[:,1][dist_y > L_BOX/2] = xyz_out[:,1][dist_y > L_BOX/2]-L_BOX
+        xyz_out[:,1][dist_y < -L_BOX/2] = xyz_out[:,1][dist_y < -L_BOX/2]+L_BOX
+        xyz_out[:,2][dist_z > L_BOX/2] = xyz_out[:,2][dist_z > L_BOX/2]-L_BOX
+        xyz_out[:,2][dist_z < -L_BOX/2] = xyz_out[:,2][dist_z < -L_BOX/2]+L_BOX
+        return xyz_out
+    else:
+        return xyz
 
 def calcCoM(xyz, masses):
     """ Calculate center of mass of point distribution
