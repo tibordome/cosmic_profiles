@@ -33,7 +33,7 @@ cdef class CosmicBase:
     ``_getConcentrationsBase()``, ``_getDensProfsSphDirectBinningBase()``, ``_getDensProfsEllDirectBinningBase()``,
     ``_getDensProfsKernelBasedBase()``, ``_getObjInfoBase()``"""
     
-    def __init__(self, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER):
+    def __init__(self, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST):
         """
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
@@ -43,11 +43,17 @@ cdef class CosmicBase:
         :type MIN_NUMBER_PTCS: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str"""
+        :type CENTER: str
+        :param VIZ_DEST: visualization folder
+        :type VIZ_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string"""
         self.SNAP = SNAP
         l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
         self.L_BOX = L_BOX*l_curr_over_target # self.L_BOX will be in Mpc/h
         self.CENTER = CENTER
+        self.VIZ_DEST = VIZ_DEST
+        self.CAT_DEST = CAT_DEST
         self.MIN_NUMBER_PTCS = MIN_NUMBER_PTCS
         self.start_time = time.time()
         self.SAFE = 6
@@ -70,7 +76,7 @@ cdef class CosmicBase:
         centers, m = calcMassesCenters(xyz.base, masses.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
         return centers, m
     
-    def _getShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+    def _getShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, str suffix):
         """ Get all relevant local shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -101,6 +107,8 @@ cdef class CosmicBase:
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
+        :param suffix: suffix for file names
+        :type suffix: string
         :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
@@ -108,12 +116,44 @@ cdef class CosmicBase:
             (number_of_objs,3) float array, (number_of_objs,) float array
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocal(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
+            
+            if os.path.exists('{0}/d_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP)):
+                d = np.loadtxt('{0}/d_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                q = np.loadtxt('{0}/q_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                s = np.loadtxt('{0}/s_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                minor = np.loadtxt('{0}/minor_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                inter = np.loadtxt('{0}/inter_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                major = np.loadtxt('{0}/major_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_masses = np.loadtxt('{0}/m_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_centers = np.loadtxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                
+                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                d = d/l_curr_over_target
+                obj_centers = obj_centers/l_curr_over_target
+                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
+                if d.shape[0] != 0 and d.ndim == 2:
+                    minor = minor.reshape(minor.shape[0], -1, 3)
+                    inter = inter.reshape(inter.shape[0], -1, 3)
+                    major = major.reshape(major.shape[0], -1, 3)
+                elif d.ndim == 1:
+                    minor = minor.reshape(1, -1, 3)
+                    inter = inter.reshape(1, -1, 3)
+                    major = major.reshape(1, -1, 3)
+                    obj_masses = np.array([obj_masses])
+                    obj_centers = obj_centers.reshape(1, 3)
+                else:
+                    minor = np.array([])
+                    inter = np.array([])
+                    major = np.array([])
+            
+            else:
+                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocal(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
     
-    def _getShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+    def _getShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, str suffix):
         """ Get all relevant global shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -136,31 +176,66 @@ cdef class CosmicBase:
         :type IT_MIN: int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
+        :param suffix: suffix for file names
+        :type suffix: string
         :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs,) float arrays, 
             3 x (number_of_objs, 3) float arrays, 
             (number_of_objs, 3) float array, (number_of_objs,) float array"""
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphGlobal(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, IT_TOL, IT_WALL, IT_MIN, self.CENTER, self.SAFE, reduced)
-            print_status(rank, self.start_time, "Finished calcMorphGlobal()")
-        
-            if d.shape[0] != 0:
-                d = np.reshape(d, (d.shape[0], 1)) # Has shape (number_of_halos, 1)
-                q = np.reshape(q, (q.shape[0], 1)) # Has shape (number_of_halos, 1)
-                s = np.reshape(s, (s.shape[0], 1)) # Has shape (number_of_halos, 1)
-                minor = minor.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
-                inter = inter.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
-                major = major.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+            
+            if os.path.exists('{0}/d_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP)):
+                
+                d = np.loadtxt('{0}/d_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                q = np.loadtxt('{0}/q_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                s = np.loadtxt('{0}/s_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                minor = np.loadtxt('{0}/minor_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                inter = np.loadtxt('{0}/inter_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                major = np.loadtxt('{0}/major_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_masses = np.loadtxt('{0}/m_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_centers = np.loadtxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                
+                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                d = d/l_curr_over_target
+                obj_centers = obj_centers/l_curr_over_target
+                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
+                if d.shape[0] != 0 and d.ndim == 2:
+                    minor = minor.reshape(minor.shape[0], -1, 3)
+                    inter = inter.reshape(inter.shape[0], -1, 3)
+                    major = major.reshape(major.shape[0], -1, 3)
+                elif d.ndim == 1:
+                    minor = minor.reshape(1, -1, 3)
+                    inter = inter.reshape(1, -1, 3)
+                    major = major.reshape(1, -1, 3)
+                    obj_masses = np.array([obj_masses])
+                    obj_centers = obj_centers.reshape(1, 3)
+                else:
+                    minor = np.array([])
+                    inter = np.array([])
+                    major = np.array([])
+            
             else:
-                minor = np.array([])
-                inter = np.array([])
-                major = np.array([])
+                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphGlobal(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, IT_TOL, IT_WALL, IT_MIN, self.CENTER, self.SAFE, reduced)
+                print_status(rank, self.start_time, "Finished calcMorphGlobal()")
+            
+                if d.shape[0] != 0:
+                    d = np.reshape(d, (d.shape[0], 1)) # Has shape (number_of_halos, 1)
+                    q = np.reshape(q, (q.shape[0], 1)) # Has shape (number_of_halos, 1)
+                    s = np.reshape(s, (s.shape[0], 1)) # Has shape (number_of_halos, 1)
+                    minor = minor.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+                    inter = inter.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+                    major = major.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+                else:
+                    minor = np.array([])
+                    inter = np.array([])
+                    major = np.array([])
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
         
-    def _getShapeCatVelLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+    def _getShapeCatVelLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, str suffix):
         """ Get all relevant local velocity shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -193,6 +268,8 @@ cdef class CosmicBase:
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean
+        :param suffix: suffix for file names
+        :type suffix: string
         :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
@@ -200,13 +277,45 @@ cdef class CosmicBase:
             (number_of_objs,3) float array, (number_of_objs,) float array
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
-            print_status(rank, self.start_time, "Finished calcMorphLocalVelDisp()")
+            
+            if os.path.exists('{0}/d_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP)):
+                d = np.loadtxt('{0}/d_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                q = np.loadtxt('{0}/q_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                s = np.loadtxt('{0}/s_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                minor = np.loadtxt('{0}/minor_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                inter = np.loadtxt('{0}/inter_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                major = np.loadtxt('{0}/major_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_masses = np.loadtxt('{0}/m_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_centers = np.loadtxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                
+                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                d = d/l_curr_over_target
+                obj_centers = obj_centers/l_curr_over_target
+                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
+                if d.shape[0] != 0 and d.ndim == 2:
+                    minor = minor.reshape(minor.shape[0], -1, 3)
+                    inter = inter.reshape(inter.shape[0], -1, 3)
+                    major = major.reshape(major.shape[0], -1, 3)
+                elif d.ndim == 1:
+                    minor = minor.reshape(1, -1, 3)
+                    inter = inter.reshape(1, -1, 3)
+                    major = major.reshape(1, -1, 3)
+                    obj_masses = np.array([obj_masses])
+                    obj_centers = obj_centers.reshape(1, 3)
+                else:
+                    minor = np.array([])
+                    inter = np.array([])
+                    major = np.array([])
+            
+            else:
+                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
+                print_status(rank, self.start_time, "Finished calcMorphLocalVelDisp()")
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
     
-    def _getShapeCatVelGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+    def _getShapeCatVelGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, str suffix):
         """ Get all relevant global velocity shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -231,31 +340,66 @@ cdef class CosmicBase:
         :type IT_MIN: int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
+        :param suffix: suffix for file names
+        :type suffix: string
         :return: d in Mpc/h, q, s, minor, inter, major, obj_centers in units of Mpc/h,
             obj_masses in units of 10^10*M_sun/h
         :rtype: 3 x (number_of_objs,) float arrays, 
             3 x (number_of_objs, 3) float arrays, 
             (number_of_objs, 3) float array, (number_of_objs,) float array"""
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphGlobalVelDisp(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, IT_TOL, IT_WALL, IT_MIN, self.CENTER, self.SAFE, reduced)
-            print_status(rank, self.start_time, "Finished calcMorphGlobalVelDisp")
             
-            if d.shape[0] != 0:
-                d = np.reshape(d, (d.shape[0], 1)) # Has shape (number_of_halos, 1)
-                q = np.reshape(q, (q.shape[0], 1)) # Has shape (number_of_halos, 1)
-                s = np.reshape(s, (s.shape[0], 1)) # Has shape (number_of_halos, 1)
-                minor = minor.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
-                inter = inter.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
-                major = major.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+            if os.path.exists('{0}/d_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP)):
+                
+                d = np.loadtxt('{0}/d_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                q = np.loadtxt('{0}/q_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                s = np.loadtxt('{0}/s_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                minor = np.loadtxt('{0}/minor_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                inter = np.loadtxt('{0}/inter_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                major = np.loadtxt('{0}/major_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_masses = np.loadtxt('{0}/m_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                obj_centers = np.loadtxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
+                
+                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                d = d/l_curr_over_target
+                obj_centers = obj_centers/l_curr_over_target
+                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
+                if d.shape[0] != 0 and d.ndim == 2:
+                    minor = minor.reshape(minor.shape[0], -1, 3)
+                    inter = inter.reshape(inter.shape[0], -1, 3)
+                    major = major.reshape(major.shape[0], -1, 3)
+                elif d.ndim == 1:
+                    minor = minor.reshape(1, -1, 3)
+                    inter = inter.reshape(1, -1, 3)
+                    major = major.reshape(1, -1, 3)
+                    obj_masses = np.array([obj_masses])
+                    obj_centers = obj_centers.reshape(1, 3)
+                else:
+                    minor = np.array([])
+                    inter = np.array([])
+                    major = np.array([])
+            
             else:
-                minor = np.array([])
-                inter = np.array([])
-                major = np.array([])
+                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphGlobalVelDisp(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, IT_TOL, IT_WALL, IT_MIN, self.CENTER, self.SAFE, reduced)
+                print_status(rank, self.start_time, "Finished calcMorphGlobalVelDisp")
+                
+                if d.shape[0] != 0:
+                    d = np.reshape(d, (d.shape[0], 1)) # Has shape (number_of_halos, 1)
+                    q = np.reshape(q, (q.shape[0], 1)) # Has shape (number_of_halos, 1)
+                    s = np.reshape(s, (s.shape[0], 1)) # Has shape (number_of_halos, 1)
+                    minor = minor.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+                    inter = inter.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+                    major = major.reshape((d.shape[0],d.shape[1],3)) # Has shape (number_of_halos, 1, 3)
+                else:
+                    minor = np.array([])
+                    inter = np.array([])
+                    major = np.array([])
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
     
-    def _dumpShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
+    def _dumpShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -282,8 +426,6 @@ cdef class CosmicBase:
         :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type IT_MIN: int
-        :param CAT_DEST: catalogue destination
-        :type CAT_DEST: string
         :param suffix: suffix for file names
         :type suffix: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -292,7 +434,7 @@ cdef class CosmicBase:
         :type shell_based: boolean
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
             del idx_cat
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
@@ -309,18 +451,18 @@ cdef class CosmicBase:
                 major = np.array([])
             
             # Create CAT_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
-            np.savetxt('{0}/d_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
-            np.savetxt('{0}/q_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
-            np.savetxt('{0}/s_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
-            np.savetxt('{0}/minor_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
-            np.savetxt('{0}/inter_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
-            np.savetxt('{0}/major_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
-            np.savetxt('{0}/m_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
-            np.savetxt('{0}/centers_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
+            subprocess.call(['mkdir', '-p', '{}'.format(self.CAT_DEST)], cwd=os.path.join(currentdir))
+            np.savetxt('{0}/d_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
+            np.savetxt('{0}/q_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
+            np.savetxt('{0}/s_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
+            np.savetxt('{0}/minor_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
+            np.savetxt('{0}/inter_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
+            np.savetxt('{0}/major_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
+            np.savetxt('{0}/m_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
+            np.savetxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
         
-    def _dumpShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced):
+    def _dumpShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced):
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -341,14 +483,12 @@ cdef class CosmicBase:
         :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type IT_MIN: int
-        :param CAT_DEST: catalogue destination
-        :type CAT_DEST: string
         :param suffix: suffix for file names
         :type suffix: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced, suffix)
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             d = d*l_curr_over_target
@@ -364,18 +504,18 @@ cdef class CosmicBase:
                 major = np.array([])
             
             # Create CAT_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
-            np.savetxt('{0}/d_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
-            np.savetxt('{0}/q_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
-            np.savetxt('{0}/s_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
-            np.savetxt('{0}/minor_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
-            np.savetxt('{0}/inter_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
-            np.savetxt('{0}/major_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
-            np.savetxt('{0}/m_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
-            np.savetxt('{0}/centers_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
+            subprocess.call(['mkdir', '-p', '{}'.format(self.CAT_DEST)], cwd=os.path.join(currentdir))
+            np.savetxt('{0}/d_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
+            np.savetxt('{0}/q_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
+            np.savetxt('{0}/s_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
+            np.savetxt('{0}/minor_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
+            np.savetxt('{0}/inter_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
+            np.savetxt('{0}/major_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
+            np.savetxt('{0}/m_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
+            np.savetxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _dumpShapeVelCatLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
+    def _dumpShapeVelCatLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -404,8 +544,6 @@ cdef class CosmicBase:
         :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type IT_MIN: int
-        :param CAT_DEST: catalogue destination
-        :type CAT_DEST: string
         :param suffix: suffix for file names
         :type suffix: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -414,7 +552,7 @@ cdef class CosmicBase:
         :type shell_based: boolean
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             d = d*l_curr_over_target
@@ -430,18 +568,18 @@ cdef class CosmicBase:
                 major = np.array([])
             
             # Create CAT_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
-            np.savetxt('{0}/d_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
-            np.savetxt('{0}/q_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
-            np.savetxt('{0}/s_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
-            np.savetxt('{0}/minor_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
-            np.savetxt('{0}/inter_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
-            np.savetxt('{0}/major_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
-            np.savetxt('{0}/m_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
-            np.savetxt('{0}/centers_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
+            subprocess.call(['mkdir', '-p', '{}'.format(self.CAT_DEST)], cwd=os.path.join(currentdir))
+            np.savetxt('{0}/d_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
+            np.savetxt('{0}/q_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
+            np.savetxt('{0}/s_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
+            np.savetxt('{0}/minor_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
+            np.savetxt('{0}/inter_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
+            np.savetxt('{0}/major_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
+            np.savetxt('{0}/m_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
+            np.savetxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _dumpShapeVelCatGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced):
+    def _dumpShapeVelCatGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced):
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -470,8 +608,6 @@ cdef class CosmicBase:
         :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type IT_MIN: int
-        :param CAT_DEST: catalogue destination
-        :type CAT_DEST: string
         :param suffix: suffix for file names
         :type suffix: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -479,7 +615,7 @@ cdef class CosmicBase:
         """
         
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced, suffix)
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             d = d*l_curr_over_target
@@ -495,18 +631,18 @@ cdef class CosmicBase:
                 major = np.array([])
             
             # Create CAT_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
-            np.savetxt('{0}/d_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
-            np.savetxt('{0}/q_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
-            np.savetxt('{0}/s_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
-            np.savetxt('{0}/minor_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
-            np.savetxt('{0}/inter_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
-            np.savetxt('{0}/major_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
-            np.savetxt('{0}/m_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
-            np.savetxt('{0}/centers_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
+            subprocess.call(['mkdir', '-p', '{}'.format(self.CAT_DEST)], cwd=os.path.join(currentdir))
+            np.savetxt('{0}/d_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), d, fmt='%1.7e')
+            np.savetxt('{0}/q_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), q, fmt='%1.7e')
+            np.savetxt('{0}/s_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), s, fmt='%1.7e')
+            np.savetxt('{0}/minor_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), minor, fmt='%1.7e')
+            np.savetxt('{0}/inter_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), inter, fmt='%1.7e')
+            np.savetxt('{0}/major_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), major, fmt='%1.7e')
+            np.savetxt('{0}/m_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_masses, fmt='%1.7e')
+            np.savetxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _plotShapeProfsBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, bint reduced, bint shell_based, int nb_bins, str suffix = ''):
+    def _plotShapeProfsBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, int nb_bins, str suffix = ''):
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -533,8 +669,6 @@ cdef class CosmicBase:
         :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type IT_MIN: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -546,11 +680,11 @@ cdef class CosmicBase:
         """
                 
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
-            getShapeProfs(VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, nb_bins, self.MASS_UNIT, suffix = suffix)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+            getShapeProfs(self.VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, nb_bins, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
             
-    def _plotLocalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, int HIST_NB_BINS, float frac_r200, bint reduced, bint shell_based, str suffix = ''):
+    def _plotLocalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, int HIST_NB_BINS, float frac_r200, bint reduced, bint shell_based, str suffix = ''):
         """ Plot a local-shape triaxiality histogram at a specified ellipsoidal depth of ``frac_r200``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -577,8 +711,6 @@ cdef class CosmicBase:
         :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type IT_MIN: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param frac_r200: depth of objects to plot triaxiality, in units of R200
@@ -592,11 +724,11 @@ cdef class CosmicBase:
         """
                 
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
-            getLocalTHist(VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, frac_r200, self.MASS_UNIT, suffix = suffix)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+            getLocalTHist(self.VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, frac_r200, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _plotGlobalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, int HIST_NB_BINS, bint reduced, str suffix = ''):
+    def _plotGlobalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, int HIST_NB_BINS, bint reduced, str suffix = ''):
         """ Plot a global-shape triaxiality histogram
                 
         :param xyz: positions of all simulation particles in Mpc/h
@@ -617,8 +749,6 @@ cdef class CosmicBase:
         :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
             if undercut, shape is unclassified
         :type IT_MIN: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param suffix: suffix for file names
@@ -626,8 +756,8 @@ cdef class CosmicBase:
         """
                 
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced)
-            getGlobalTHist(VIZ_DEST, self.SNAP, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, self.MASS_UNIT, suffix = suffix)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced, suffix)
+            getGlobalTHist(self.VIZ_DEST, self.SNAP, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
     def _getDensProfsBestFitsBase(self, float[:,:] dens_profs, float[:] ROverR200, float[:] r200, str method = 'einasto'):

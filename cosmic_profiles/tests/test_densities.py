@@ -27,10 +27,12 @@ def test_densities():
     updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
     updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # Mpc/h
-    SNAP = '015'
+    SNAP = '018'
     MIN_NUMBER_DM_PTCS = 1000
     CENTER = 'mode'
     r_over_rvir = np.logspace(-2,0,50)
+    VIZ_DEST = "./cosmic_profiles/tests/viz"
+    CAT_DEST = "./cosmic_profiles/tests/cat"
     method = 'einasto'
     nb_model_pars = {'einasto': 3, 'nfw': 2, 'hernquist': 2, 'alpha_beta_gamma': 5}
     N = 10 # Number of halos used for test
@@ -68,7 +70,7 @@ def test_densities():
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define DensProfs object ##############################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, VIZ_DEST, CAT_DEST)
     
     ############################## Estimate Density Profiles #########################################
     obj_numbers = np.arange(5)

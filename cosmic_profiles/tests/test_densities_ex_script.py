@@ -33,7 +33,8 @@ def test_densities_ex_script():
     updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # cMpc/h
     VIZ_DEST = "./cosmic_profiles/tests/viz"
-    SNAP = '015'
+    CAT_DEST = "./cosmic_profiles/tests/cat"
+    SNAP = '017'
     MIN_NUMBER_DM_PTCS = 200
     CENTER = 'com'
     
@@ -64,7 +65,7 @@ def test_densities_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensProfs object ########################################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, VIZ_DEST, CAT_DEST)
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!

@@ -59,13 +59,13 @@ def test_shapes_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensShapeProfs object #######################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST)
     
     ######################### Calculating Morphological Properties #################################
     # Create halo shape catalogue
     obj_numbers = [0]
-    cprofiles.dumpShapeCatLocal(CAT_DEST, obj_numbers = obj_numbers, reduced = False, shell_based = False)
+    cprofiles.dumpShapeCatLocal(obj_numbers = obj_numbers, reduced = False, shell_based = False)
     
     ######################################## Visualizations ########################################
     # Visualize halo: A sample output is shown above!
-    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, reduced = False, shell_based = False)

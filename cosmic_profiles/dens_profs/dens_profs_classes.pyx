@@ -22,7 +22,7 @@ cdef class DensProfs(CosmicBase):
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``."""
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER):
+    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST):
         """
         :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
         :type xyz: (N2,3) floats, N2 >> N1
@@ -40,8 +40,12 @@ cdef class DensProfs(CosmicBase):
         :type MIN_NUMBER_PTCS: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str"""
-        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
+        :type CENTER: str
+        :param VIZ_DEST: visualization folder
+        :type VIZ_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string"""
+        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, VIZ_DEST, CAT_DEST)
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
         m_curr_over_target = config.InUnitMass_in_g/1.989e43
         l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
@@ -244,7 +248,7 @@ cdef class DensProfs(CosmicBase):
         else:
             return None
         
-    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, obj_numbers): # Public Method
+    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, obj_numbers): # Public Method
         """ Draws some simplistic density profiles
         
         :param dens_profs: estimated density profiles, in units of 
@@ -261,8 +265,6 @@ cdef class DensProfs(CosmicBase):
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param nb_bins: Number of mass bins to plot density profiles for
         :type nb_bins: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         """
@@ -281,7 +283,7 @@ cdef class DensProfs(CosmicBase):
             idx_cat_len = len(self.obj_size.base)
             isValidSelection(obj_numbers, idx_cat_len)
             suffix = '_'
-            drawDensProfs(VIZ_DEST, self.SNAP, self.r200.base[obj_numbers], dens_profs_fit, ROverR200_fit, dens_profs, np.float32(ROverR200), obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            drawDensProfs(self.VIZ_DEST, self.SNAP, self.r200.base[obj_numbers], dens_profs_fit, ROverR200_fit, dens_profs, np.float32(ROverR200), obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
             del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
         else:
             del obj_centers; del obj_masses
@@ -294,7 +296,7 @@ cdef class DensProfsHDF5(CosmicBase):
     ``_getMassesCenters()``, ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,
     ``plotDensProfs()``."""
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE, str VIZ_DEST, str CAT_DEST):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -315,8 +317,12 @@ cdef class DensProfsHDF5(CosmicBase):
             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
         :type RVIR_OR_R200: str
         :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
-        :type OBJ_TYPE: str"""
-        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
+        :type OBJ_TYPE: str
+        :param VIZ_DEST: visualization folder
+        :type VIZ_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string"""
+        super().__init__(SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, VIZ_DEST, CAT_DEST)
         self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
         self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
         self.RVIR_OR_R200 = RVIR_OR_R200
@@ -590,7 +596,7 @@ cdef class DensProfsHDF5(CosmicBase):
         else:
             return None
         
-    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, str VIZ_DEST, obj_numbers): # Public Method
+    def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, obj_numbers): # Public Method
         """ Draws some simplistic density profiles
         
         :param dens_profs: estimated density profiles, in units of 
@@ -607,8 +613,6 @@ cdef class DensProfsHDF5(CosmicBase):
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param nb_bins: Number of mass bins to plot density profiles for
         :type nb_bins: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         """
@@ -628,7 +632,7 @@ cdef class DensProfsHDF5(CosmicBase):
             idx_cat_len = len(obj_size)
             isValidSelection(obj_numbers, idx_cat_len)
             suffix = '_{}_'.format(self.OBJ_TYPE)
-            drawDensProfs(VIZ_DEST, self.SNAP, self.r200.base[obj_numbers], dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            drawDensProfs(self.VIZ_DEST, self.SNAP, self.r200.base[obj_numbers], dens_profs_fit, ROverR200_fit, dens_profs, ROverR200, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
             del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
         else:
             del obj_centers; del obj_masses

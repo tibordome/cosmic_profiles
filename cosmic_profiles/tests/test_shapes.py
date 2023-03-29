@@ -28,13 +28,14 @@ def test_shapes():
     updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # Mpc/h
     VIZ_DEST = "./cosmic_profiles/tests/viz"
+    CAT_DEST = "./cosmic_profiles/tests/cat"
     D_LOGSTART = -2
     D_LOGEND = 0
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
     IT_TOL = np.float32(1e-2)
     IT_WALL = 100
     IT_MIN = 10
-    SNAP = '015'
+    SNAP = '016'
     MIN_NUMBER_DM_PTCS = 1000
     CENTER = 'mode'
     HIST_NB_BINS = 11 # Number of bins used for e.g. ellipticity histogram
@@ -74,7 +75,7 @@ def test_shapes():
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST)
     
     idx_cat, obj_size = cprofiles.getIdxCat()
     obj_numbers = [0, 1, 2, 3, 4, 5]
@@ -109,13 +110,13 @@ def test_shapes():
         assert major.shape[2] == 3
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.plotShapeProfs(nb_bins = 2, VIZ_DEST = VIZ_DEST, obj_numbers = obj_numbers, reduced = True, shell_based = True)
+    cprofiles.plotShapeProfs(nb_bins = 2, obj_numbers = obj_numbers, reduced = True, shell_based = True)
     
     # Viz first few halos' shapes
-    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], reduced = False, shell_based = False)
     
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, obj_numbers = obj_numbers, reduced = False, shell_based = False)
+    cprofiles.plotLocalTHist(HIST_NB_BINS, frac_r200, obj_numbers = obj_numbers, reduced = False, shell_based = False)
     
     ######################### Calculating Global Morphological Properties ############################
     obj_numbers = np.arange(N)
@@ -142,7 +143,7 @@ def test_shapes():
         assert major.shape[2] == 3
     
     # Plot halo ellipticity histogram
-    cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST, obj_numbers = obj_numbers)
+    cprofiles.plotGlobalEpsHist(HIST_NB_BINS, obj_numbers = obj_numbers)
     
     # Viz first few halos' shapes
-    cprofiles.vizGlobalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False)
+    cprofiles.vizGlobalShapes(obj_numbers = [0,1,2], reduced = False)

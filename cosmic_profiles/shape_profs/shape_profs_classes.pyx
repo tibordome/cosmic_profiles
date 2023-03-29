@@ -41,7 +41,7 @@ cdef class DensShapeProfs(DensProfs):
     cdef int IT_WALL
     cdef int IT_MIN
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER):
+    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST):
         """
         :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
         :type xyz: (N2,3) floats, N2 >> N1
@@ -73,8 +73,12 @@ cdef class DensShapeProfs(DensProfs):
         :type IT_MIN: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str"""
-        super().__init__(xyz.base, masses.base, idx_cat, r200.base, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER)
+        :type CENTER: str
+        :param VIZ_DEST: visualization folder
+        :type VIZ_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string"""
+        super().__init__(xyz.base, masses.base, idx_cat, r200.base, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, VIZ_DEST, CAT_DEST)
         self.D_LOGSTART = D_LOGSTART
         self.D_LOGEND = D_LOGEND
         self.D_BINS = D_BINS
@@ -111,8 +115,9 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             if direct_binning:
+                suffix = '_'
                 if spherical == False:
-                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
                     dens_profs = self._getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
                 else:
                     dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200))
@@ -145,7 +150,8 @@ cdef class DensShapeProfs(DensProfs):
             nb_objects = len(self.obj_size.base)
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            suffix = '_'
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
@@ -171,20 +177,19 @@ cdef class DensShapeProfs(DensProfs):
             nb_objects = len(self.obj_size.base)
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            suffix = '_'
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, suffix)
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             return None, None, None, None, None, None, None, None
     
-    def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False): # Public Method
+    def vizLocalShapes(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Visualize local shape of objects with numbers ``obj_numbers``
         
         :param obj_numbers: list of object indices for which to visualize local shapes
         :type obj_numbers: list of int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: strings
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -197,11 +202,12 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             offsets = np.int32(np.hstack((np.array([0]), np.cumsum(self.obj_size.base))))
-            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            suffix = '_'
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
             del obj_m
                                 
             # Create VIZ_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            subprocess.call(['mkdir', '-p', '{}'.format(self.VIZ_DEST)], cwd=os.path.join(currentdir))
             
             # Viz all valid objects under 'obj_numbers'
             for idx_obj, obj_number in enumerate(obj_numbers):
@@ -269,15 +275,13 @@ cdef class DensShapeProfs(DensProfs):
                 ax.set_zlabel(r"z (Mpc/h)")
                 ax.set_box_aspect([1,1,1])
                 set_axes_equal(ax)
-                fig.savefig("{}/LocalObj{}_{}.pdf".format(VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
+                fig.savefig("{}/LocalObj{}_{}.pdf".format(self.VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
         
-    def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False): # Public Method
+    def vizGlobalShapes(self, obj_numbers, bint reduced = False): # Public Method
         """ Visualize global shape of objects with numbers ``obj_numbers``
         
         :param obj_numbers: list of object indices for which to visualize global shapes
         :type obj_numbers: list of ints
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
@@ -288,11 +292,12 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             offsets = np.int32(np.hstack((np.array([0]), np.cumsum(self.obj_size.base))))
-            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            suffix = '_'
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, suffix)
             del obj_m
         
             # Create VIZ_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            subprocess.call(['mkdir', '-p', '{}'.format(self.VIZ_DEST)], cwd=os.path.join(currentdir))
             
             # Viz all valid objects under 'obj_numbers'
             for idx_obj, obj_number in enumerate(obj_numbers):
@@ -341,15 +346,13 @@ cdef class DensShapeProfs(DensProfs):
                 ax.set_zlabel(r"z (Mpc/h)")
                 ax.set_box_aspect([1,1,1])
                 set_axes_equal(ax)
-                fig.savefig("{}/GlobalObj{}_{}.pdf".format(VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
+                fig.savefig("{}/GlobalObj{}_{}.pdf".format(self.VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
     
-    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
+    def plotGlobalEpsHist(self, HIST_NB_BINS, obj_numbers): # Public Method
         """ Plot global ellipticity histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotGlobalEpsHist() with snap {0}'.format(self.SNAP))
@@ -360,17 +363,15 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            getGlobalEpsHist(self.xyz.base, self.masses.base, subset_idx_cat, self.obj_size.base[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            getGlobalEpsHist(self.xyz.base, self.masses.base, subset_idx_cat, self.obj_size.base[obj_numbers], self.L_BOX, self.CENTER, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
         
-    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
+    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, obj_numbers): # Public Method
         """ Plot local ellipticity histogram at depth ``frac_r200``
         
         :param frac_r200: depth of objects to plot ellipticity, in units of R200
         :type frac_r200: float
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotLocalEpsHist() with snap {0}'.format(self.SNAP))
@@ -381,15 +382,13 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            getLocalEpsHist(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            getLocalEpsHist(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.L_BOX, self.CENTER, self.VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
     
-    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def plotLocalTHist(self, HIST_NB_BINS, frac_r200, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Plot local triaxiality histogram at depth ``frac_r200``
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param frac_r200: depth of objects to plot triaxiality, in units of R200
         :type frac_r200: float
         :param obj_numbers: list of object indices of interest
@@ -406,15 +405,13 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._plotLocalTHistBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
+            self._plotLocalTHistBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
     
-    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers, bint reduced = False): # Public Method
+    def plotGlobalTHist(self, HIST_NB_BINS, obj_numbers, bint reduced = False): # Public Method
         """ Plot global triaxiality histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -427,15 +424,13 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._plotGlobalTHistBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
+            self._plotGlobalTHistBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, HIST_NB_BINS, reduced, suffix = suffix)
     
-    def plotShapeProfs(self, int nb_bins, str VIZ_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def plotShapeProfs(self, int nb_bins, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param nb_bins: Number of mass bins to plot density profiles for
         :type nb_bins: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param obj_numbers: list of object indices of interest
@@ -450,13 +445,11 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._plotShapeProfsBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
+            self._plotShapeProfsBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, nb_bins, suffix = suffix)
     
-    def dumpShapeCatLocal(self, str CAT_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
-        :param CAT_DEST: catalogue folder
-        :type CAT_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -471,13 +464,11 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._dumpShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            self._dumpShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, suffix, reduced, shell_based)
     
-    def dumpShapeCatGlobal(self, str CAT_DEST, obj_numbers, bint reduced = False): # Public Method
+    def dumpShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Dumps all relevant global shape data into ``CAT_DEST``
-        
-        :param CAT_DEST: catalogue folder
-        :type CAT_DEST: string
+
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -490,7 +481,7 @@ cdef class DensShapeProfs(DensProfs):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._dumpShapeCatGlobalBase(self.xyz.base, self.masses.base, subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            self._dumpShapeCatGlobalBase(self.xyz.base, self.masses.base, subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, suffix, reduced)
     
     def getObjInfo(self): # Public Method
         """ Print basic info about the objects"""
@@ -514,7 +505,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
     cdef int IT_WALL
     cdef int IT_MIN
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str RVIR_OR_R200, str OBJ_TYPE):
+    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str RVIR_OR_R200, str OBJ_TYPE, str VIZ_DEST, str CAT_DEST):
         """
         :param HDF5_SNAP_DEST: where we can find the snapshot
         :type HDF5_SNAP_DEST: string
@@ -549,8 +540,12 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
         :type RVIR_OR_R200: str
         :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
-        :type OBJ_TYPE: str"""
-        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200, OBJ_TYPE)
+        :type OBJ_TYPE: str
+        :param VIZ_DEST: visualization folder
+        :type VIZ_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string"""
+        super().__init__(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200, OBJ_TYPE, VIZ_DEST, CAT_DEST)
         self.D_LOGSTART = D_LOGSTART
         self.D_LOGEND = D_LOGEND
         self.D_BINS = D_BINS
@@ -587,10 +582,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
             if direct_binning:
+                suffix = '_{}_'.format(self.OBJ_TYPE)
                 if spherical:
                     dens_profs = self._getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], np.float32(ROverR200))
                 else:
-                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
                     dens_profs = self._getDensProfsEllDirectBinningBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
                     del d; del q; del s; del minor; del inter; del major
             else:
@@ -626,7 +622,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             nb_objects = len(obj_size)
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            suffix = '_{}_'.format(self.OBJ_TYPE)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
             del xyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -656,7 +653,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             nb_objects = len(obj_size)
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            suffix = '_{}_'.format(self.OBJ_TYPE)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, suffix)
             del xyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -689,7 +687,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             nb_objects = len(obj_size)
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            suffix = '_v{}_'.format(self.OBJ_TYPE)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -720,7 +719,8 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             nb_objects = len(obj_size)
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
+            suffix = '_v{}_'.format(self.OBJ_TYPE)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced, suffix)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -729,13 +729,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
     
-    def vizLocalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False, bint shell_based = False): # Public Method
+    def vizLocalShapes(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Visualize local shape of objects with numbers ``obj_numbers``
         
         :param obj_numbers: list of object indices for which to visualize local shapes
         :type obj_numbers: list of int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: strings
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -753,11 +751,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             # Retrieve shape information
             nb_objects = len(obj_size)
             isValidSelection(obj_numbers, nb_objects)
-            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
             del obj_m
                     
             # Create VIZ_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            subprocess.call(['mkdir', '-p', '{}'.format(self.VIZ_DEST)], cwd=os.path.join(currentdir))
             
             # Viz all valid objects under 'obj_numbers'
             for idx_obj, obj_number in enumerate(obj_numbers):
@@ -825,15 +823,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                 ax.set_zlabel(r"z (Mpc/h)")
                 ax.set_box_aspect([1,1,1])
                 set_axes_equal(ax)
-                fig.savefig("{}/LocalObj{}{}{}.pdf".format(VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
+                fig.savefig("{}/LocalObj{}{}{}.pdf".format(self.VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
         
-    def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False): # Public Method
+    def vizGlobalShapes(self, obj_numbers, bint reduced = False): # Public Method
         """ Visualize global shape of objects with numbers ``obj_numbers``
         
         :param obj_numbers: list of object indices for which to visualize global shapes
         :type obj_numbers: list of ints
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
@@ -847,11 +843,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             idx_cat, obj_size = self.getIdxCat()
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
             offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size))))
-            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, suffix)
             del obj_m
         
             # Create VIZ_DEST if not available
-            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            subprocess.call(['mkdir', '-p', '{}'.format(self.VIZ_DEST)], cwd=os.path.join(currentdir))
             
             # Viz all valid objects under 'obj_numbers'
             for idx_obj, obj_number in enumerate(obj_numbers):
@@ -900,15 +896,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
                 ax.set_zlabel(r"z (Mpc/h)")
                 ax.set_box_aspect([1,1,1])
                 set_axes_equal(ax)
-                fig.savefig("{}/GlobalObj{}{}{}.pdf".format(VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
+                fig.savefig("{}/GlobalObj{}{}{}.pdf".format(self.VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
     
-    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
+    def plotGlobalEpsHist(self, HIST_NB_BINS, obj_numbers): # Public Method
         """ Plot global ellipticity histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotGlobalEpsHist() with snap {0}'.format(self.SNAP))
@@ -925,18 +919,16 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            getGlobalEpsHist(xyz, masses, subset_idx_cat, obj_size[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            getGlobalEpsHist(xyz, masses, subset_idx_cat, obj_size[obj_numbers], self.L_BOX, self.CENTER, self.VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
+    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, obj_numbers): # Public Method
         """ Plot local ellipticity histogram at depth ``frac_r200``
         
         :param frac_r200: depth of objects to plot ellipticity, in units of R200
         :type frac_r200: float
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotLocalEpsHist() with snap {0}'.format(self.SNAP))
@@ -953,16 +945,14 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            getLocalEpsHist(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            getLocalEpsHist(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.L_BOX, self.CENTER, self.VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
             del xyz; del masses; del idx_cat; del obj_size
     
-    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def plotLocalTHist(self, HIST_NB_BINS, frac_r200, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Plot local triaxiality histogram at depth ``frac_r200``
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param frac_r200: depth of objects to plot triaxiality, in units of R200
         :type frac_r200: float
         :param obj_numbers: list of object indices of interest
@@ -985,18 +975,16 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            self._plotLocalTHistBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
+            self._plotLocalTHistBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
             del xyz; del masses; del idx_cat; del obj_size
     
-    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers, bint reduced = False): # Public Method
+    def plotGlobalTHist(self, HIST_NB_BINS, obj_numbers, bint reduced = False): # Public Method
         """ Plot global triaxiality histogram
         
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -1015,16 +1003,14 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            self._plotGlobalTHistBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
+            self._plotGlobalTHistBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, HIST_NB_BINS, reduced, suffix = suffix)
             del xyz; del masses; del idx_cat; del obj_size
         
-    def plotShapeProfs(self, int nb_bins, str VIZ_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def plotShapeProfs(self, int nb_bins, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param nb_bins: Number of mass bins to plot density profiles for
         :type nb_bins: int
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -1045,14 +1031,12 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            self._plotShapeProfsBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
+            self._plotShapeProfsBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, nb_bins, suffix = suffix)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def dumpShapeCatLocal(self, str CAT_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
-        :param CAT_DEST: catalogue folder
-        :type CAT_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -1073,14 +1057,12 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            self._dumpShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            self._dumpShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, suffix, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def dumpShapeCatGlobal(self, str CAT_DEST, obj_numbers, bint reduced = False): # Public Method
+    def dumpShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
-        :param CAT_DEST: catalogue folder
-        :type CAT_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -1099,14 +1081,12 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            self._dumpShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            self._dumpShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, suffix, reduced)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def dumpShapeVelCatLocal(self, str CAT_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeVelCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
-        :param CAT_DEST: catalogue folder
-        :type CAT_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -1128,14 +1108,12 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            self._dumpShapeVelCatLocalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            self._dumpShapeVelCatLocalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, suffix, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size; del velxyz
 
-    def dumpShapeVelCatGlobal(self, str CAT_DEST, obj_numbers, bint reduced = False): # Public Method
+    def dumpShapeVelCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
         
-        :param CAT_DEST: catalogue folder
-        :type CAT_DEST: string
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -1155,7 +1133,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         if rank == 0:
             subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
-            self._dumpShapeVelCatGlobalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            self._dumpShapeVelCatGlobalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, suffix, reduced)
             del xyz; del masses; del idx_cat; del obj_size; del velxyz
 
     def getObjInfo(self): # Public Method
