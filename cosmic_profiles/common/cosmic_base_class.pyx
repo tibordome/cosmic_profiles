@@ -142,6 +142,9 @@ cdef class CosmicBase:
                     major = major.reshape(1, -1, 3)
                     obj_masses = np.array([obj_masses])
                     obj_centers = obj_centers.reshape(1, 3)
+                    d = d.reshape(1, -1)
+                    q = q.reshape(1, -1)
+                    s = s.reshape(1, -1)
                 else:
                     minor = np.array([])
                     inter = np.array([])
@@ -211,6 +214,9 @@ cdef class CosmicBase:
                     major = major.reshape(1, -1, 3)
                     obj_masses = np.array([obj_masses])
                     obj_centers = obj_centers.reshape(1, 3)
+                    d = d.reshape(1, -1)
+                    q = q.reshape(1, -1)
+                    s = s.reshape(1, -1)
                 else:
                     minor = np.array([])
                     inter = np.array([])
@@ -303,6 +309,9 @@ cdef class CosmicBase:
                     major = major.reshape(1, -1, 3)
                     obj_masses = np.array([obj_masses])
                     obj_centers = obj_centers.reshape(1, 3)
+                    d = d.reshape(1, -1)
+                    q = q.reshape(1, -1)
+                    s = s.reshape(1, -1)
                 else:
                     minor = np.array([])
                     inter = np.array([])
@@ -375,6 +384,9 @@ cdef class CosmicBase:
                     major = major.reshape(1, -1, 3)
                     obj_masses = np.array([obj_masses])
                     obj_centers = obj_centers.reshape(1, 3)
+                    d = d.reshape(1, -1)
+                    q = q.reshape(1, -1)
+                    s = s.reshape(1, -1)
                 else:
                     minor = np.array([])
                     inter = np.array([])
