@@ -8,7 +8,7 @@ cdef class DensProfs(CosmicBase):
     
     cdef float[:,:] xyz
     cdef float[:] masses
-    cdef int[:,:] idx_cat
+    cdef int[:] idx_cat
     cdef int[:] obj_size
     
 cdef class DensProfsHDF5(CosmicBase):

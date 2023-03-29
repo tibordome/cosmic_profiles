@@ -546,8 +546,8 @@ def calcCoM(xyz, masses):
 def getCatWithinFracR200(cat_in, obj_size_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
     """ Cleanse index catalogue ``cat_in`` of particles beyond R200 ``r200``
     
-    :param idx_cat_in: each row contains indices of particles belonging to an object
-    :type idx_cat_in: (N1, N3) integers
+    :param cat_in: contains indices of particles belonging to an object
+    :type cat_in: (N3) integers
     :param obj_size_in: indicates how many particles are in each object
     :type obj_size_in: (N1,) integers
     :param xyz: coordinates of particles of type 1 or type 4
@@ -566,40 +566,65 @@ def getCatWithinFracR200(cat_in, obj_size_in, xyz, masses, L_BOX, CENTER, r200, 
     :return cat_out, obj_size_out: updated cat_in and obj_size_out, with particles
         beyond R200 ``r200`` removed
     :rtype: list of length N1"""
-    cat_out = np.zeros((len(cat_in),np.max(obj_size_in)), dtype = np.int32)
-    obj_size_out = np.zeros((len(cat_in),), dtype = np.int32)
-    centers = np.zeros((len(cat_in),3), dtype = np.float32)
-    for idx in range(len(cat_in)): # Calculate centers of objects
-        xyz_ = respectPBCNoRef(xyz[cat_in[idx,:obj_size_in[idx]]], L_BOX)
+    cat_out = np.empty(0, dtype = np.int32)
+    obj_size_out = np.zeros((len(obj_size_in),), dtype = np.int32)
+    centers = np.zeros((len(obj_size_in),3), dtype = np.float32)
+    for idx in range(len(obj_size_in)): # Calculate centers of objects
+        xyz_ = respectPBCNoRef(xyz[cat_in[np.sum(obj_size_in[:idx]):np.sum(obj_size_in[:idx+1])]], L_BOX)
         if CENTER == 'mode':
-            centers.base[idx] = calcMode(xyz_, masses[cat_in[idx,:obj_size_in[idx]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
+            centers.base[idx] = calcMode(xyz_, masses[cat_in[np.sum(obj_size_in[:idx]):np.sum(obj_size_in[:idx+1])]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
         else:
-            centers.base[idx] = calcCoM(xyz_, masses[cat_in[idx,:obj_size_in[idx]]])
+            centers.base[idx] = calcCoM(xyz_, masses[cat_in[np.sum(obj_size_in[:idx]):np.sum(obj_size_in[:idx+1])]])
     remnant = []
-    for idx, obj in enumerate(cat_in):
-        xyz_ = respectPBCNoRef(xyz[obj[:obj_size_in[idx]]])
+    for idx in range(len(obj_size_in)):
+        obj = cat_in[np.sum(obj_size_in[:idx]):np.sum(obj_size_in[:idx+1])]
+        xyz_ = respectPBCNoRef(xyz[obj])
         tree = cKDTree(xyz_, leafsize=2, balanced_tree = False)
         all_nn_idxs = tree.query_ball_point(centers[idx], r=r200[idx]*frac_r200, n_jobs=-1)
         if all_nn_idxs != []:
-            cat_out[idx] = list(np.array(obj[:obj_size_in[idx]])[all_nn_idxs])
+            cat_out = np.hstack((cat_out, np.array(obj)[all_nn_idxs]))
             obj_size_out[idx] = len(all_nn_idxs)
             remnant.append(idx)            
-    return cat_out[remnant], obj_size_out[remnant]
+    return cat_out, obj_size_out[remnant]
 
-def isValidSelection(select, nb_objects):
+def isValidSelection(obj_numbers, nb_objects):
     """ Trivial function to check whether selection of objects is valid
     
-    :param select: index of first and last object to look at in the format [idx_first, idx_last]
-    :type select: list containing two integers
+    :param obj_numbers: list of object indices of interest
+    :type obj_numbers: list of int
     :param nb_objects: number of objects in inventory
     :type nb_objects: integer
     :return valid: True if selection of objects is valid one, False otherwise
     :rtype: boolean
     :raises: ``ValueError`` if selection of objects is invalid"""
-    if select[0] < 0 or select[1] < 0:
-        raise ValueError("No negative indices allowed in `select` list.")
-    if select[1] < select[0]:
-        raise ValueError("Index of last object of interest cannot be smaller than index of first object of interest. `select[0]` must be smaller than `select[1]`.")
-    if select[0] >= nb_objects or select[1] >= nb_objects:
-        raise ValueError("Index / indices in `select` list too large. There aren't that many objects in the inventory.")
+    # Check for non-integers
+    if len(np.where(obj_numbers != obj_numbers.round())[0]) != 0:
+        raise ValueError("Please supply integers only for your object selection!")
+    # Check for negative integers
+    if len(np.where(obj_numbers < 0)[0]) != 0:
+        raise ValueError("No negative indices allowed in your object selection!")
+    # Check for repeated non-negative integers
+    if len(np.unique(obj_numbers)) != len(obj_numbers):
+        raise ValueError("No repeated indices allowed in your object selection!")
+    # Check for too large integers
+    if np.max(obj_numbers) >= nb_objects:
+        raise ValueError("Index / indices in your object selection too large. There aren't that many objects in the inventory.")
     return True
+
+def getSubSetIdxCat(idx_cat, obj_size, obj_numbers):
+    """ Get the indices from idx_cat that correspond to object numbers ``obj_numbers``
+    
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
+    :param obj_numbers: list of object indices of interest
+    :type obj_numbers: list of int
+    :return subset_idx_cat: indices from idx_cat that correspond to requested object numbers
+    :rtype: (N4,) integers"""
+    
+    offsets = np.hstack((np.array([0]), np.cumsum(obj_size)))
+    subset_idx_cat = np.empty((0,), np.int32)
+    for p in obj_numbers:
+        subset_idx_cat = np.hstack((subset_idx_cat, idx_cat[offsets[p]:offsets[p+1]]))
+    return subset_idx_cat

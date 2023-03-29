@@ -71,11 +71,11 @@ def test_densities():
     cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER)
     
     ############################## Estimate Density Profiles #########################################
-    halos_select = [0, 5]
-    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
-    dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = False) # These estimates will be kernel-based
+    obj_numbers = np.arange(5)
+    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = False) # These estimates will be kernel-based
     if rank == 0:
-        nb_suff_res = halos_select[1]-halos_select[0]+1
+        nb_suff_res = len(obj_numbers)
         assert dens_profs_db.shape[0] == nb_suff_res
         assert dens_profs_db.shape[1] == r_over_rvir.shape[0]
         assert dens_profs_kb.shape[0] == nb_suff_res
@@ -87,7 +87,7 @@ def test_densities():
     ############################## Fit Density Profile ###############################################
     r_over_rvir = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db = dens_profs_db[:,10:]
-    best_fits = cprofiles.fitDensProfs(dens_profs_db, r_over_rvir, method = method, select = halos_select)
+    best_fits = cprofiles.fitDensProfs(dens_profs_db, r_over_rvir, method = method, obj_numbers = obj_numbers)
     if rank == 0:
         assert best_fits.shape[0] == nb_suff_res
         assert best_fits.shape[1] == nb_model_pars[method]

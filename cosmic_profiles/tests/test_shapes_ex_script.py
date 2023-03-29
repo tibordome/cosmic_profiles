@@ -63,9 +63,9 @@ def test_shapes_ex_script():
     
     ######################### Calculating Morphological Properties #################################
     # Create halo shape catalogue
-    halos_select = [0, 0]
-    cprofiles.dumpShapeCatLocal(CAT_DEST, select = halos_select, reduced = False, shell_based = False)
+    obj_numbers = [0]
+    cprofiles.dumpShapeCatLocal(CAT_DEST, obj_numbers = obj_numbers, reduced = False, shell_based = False)
     
     ######################################## Visualizations ########################################
     # Visualize halo: A sample output is shown above!
-    cprofiles.vizLocalShapes(obj_numbers = [0], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)

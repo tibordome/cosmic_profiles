@@ -16,7 +16,7 @@ import subprocess
 import os
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 from cosmic_profiles.dens_profs.dens_profs_classes cimport DensProfs, DensProfsHDF5
-from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, isValidSelection
+from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, isValidSelection, getSubSetIdxCat
 from cosmic_profiles.common import config
 from cosmic_profiles.shape_profs.shape_profs_tools import getGlobalEpsHist, getLocalEpsHist
 from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5SHData
@@ -82,13 +82,13 @@ cdef class DensShapeProfs(DensProfs):
         self.IT_WALL = IT_WALL
         self.IT_MIN = IT_MIN
         
-    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False): # Public Method
+    def estDensProfs(self, ROverR200, obj_numbers, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False): # Public Method
         """ Estimate density profiles
         
         :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
         :type ROverR200: (r_res,) floats
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param direct_binning: whether or not direct binning approach or
             kernel-based approach should be used
         :type direct_binning: boolean
@@ -104,27 +104,31 @@ cdef class DensShapeProfs(DensProfs):
         :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :rtype: (N2, r_res) floats"""
         print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
-        isValidSelection(select, self.idx_cat.shape[0])
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             if direct_binning:
                 if spherical == False:
-                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-                    dens_profs = self._getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                    dens_profs = self._getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
                 else:
-                    dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
+                    dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200))
             else:
-                dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], np.float32(ROverR200))
+                dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200))
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
         else:
             return None
         
-    def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def getShapeCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Get all relevant local shape data
         
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -135,19 +139,24 @@ cdef class DensShapeProfs(DensProfs):
             3 x (number_of_objs, D_BINS+1, 3) float arrays, 
             (number_of_objs,3) float array, (number_of_objs,) float array"""
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
         else:
             return None, None, None, None, None, None, None, None
     
-    def getShapeCatGlobal(self, list select, bint reduced = False): # Public Method
+    def getShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Get all relevant global shape data
         
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
@@ -156,8 +165,13 @@ cdef class DensShapeProfs(DensProfs):
             3 x (number_of_objs, 3) float arrays, 
             (number_of_objs, 3) float array, (number_of_objs,) float array"""
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*self.MASS_UNIT*m_curr_over_target
@@ -176,87 +190,86 @@ cdef class DensShapeProfs(DensProfs):
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting vizLocalShapes() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            if np.max(obj_numbers) >= self.idx_cat.shape[0]:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.idx_cat.shape[0]))
-            elif np.min(obj_numbers) < 0:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
-            else:
-                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.idx_cat.shape[0] and obj_number >= 0]
-                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat.base[obj_numbers], self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-                del obj_m
-                                    
-                # Create VIZ_DEST if not available
-                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
+            offsets = np.int32(np.hstack((np.array([0]), np.cumsum(self.obj_size.base))))
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            del obj_m
+                                
+            # Create VIZ_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            
+            # Viz all valid objects under 'obj_numbers'
+            for idx_obj, obj_number in enumerate(obj_numbers):
+                major_obj = major[idx_obj]
+                inter_obj = inter[idx_obj]
+                minor_obj = minor[idx_obj]
+                d_obj = d[idx_obj]
+                q_obj = q[idx_obj]
+                s_obj = s[idx_obj]
+                center = centers[idx_obj]
+                obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
+                masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
+                for idx, ptc in enumerate(self.idx_cat.base[offsets[obj_number]:offsets[obj_number+1]]):
+                    obj[idx] = self.xyz.base[ptc]
+                    masses_obj[idx] = self.masses.base[ptc]
+                obj = respectPBCNoRef(obj, self.L_BOX)
+                # Plotting
+                fig = pyplot.figure()
+                ax = Axes3D(fig, auto_add_to_figure = False)
+                fig.add_axes(ax)
+                # If obj contains too many particles, choose some randomly for display
+                if len(obj) > 5000:
+                    rng = default_rng(seed=42)
+                    choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
+                else:
+                    choose = np.arange(len(obj))
+                ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
+                ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
                 
-                # Viz all valid objects under 'obj_numbers'
-                for idx_obj, obj_number in enumerate(obj_numbers):
-                    major_obj = major[idx_obj]
-                    inter_obj = inter[idx_obj]
-                    minor_obj = minor[idx_obj]
-                    d_obj = d[idx_obj]
-                    q_obj = q[idx_obj]
-                    s_obj = s[idx_obj]
-                    center = centers[idx_obj]
-                    obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
-                    masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
-                    for idx, ptc in enumerate(self.idx_cat.base[obj_number,:self.obj_size[obj_number]]):
-                        obj[idx] = self.xyz.base[ptc]
-                        masses_obj[idx] = self.masses.base[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
-                    # Plotting
-                    fig = pyplot.figure()
-                    ax = Axes3D(fig, auto_add_to_figure = False)
-                    fig.add_axes(ax)
-                    # If obj contains too many particles, choose some randomly for display
-                    if len(obj) > 5000:
-                        rng = default_rng(seed=42)
-                        choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
+                ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
+                rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
+                for j in range(len(ell)): # Transformation into the principal frame
+                    ell[j] = np.dot(rot_matrix, np.array(ell[j]))
+                ell_x = np.array([x[0] for x in ell])
+                ell_y = np.array([x[1] for x in ell])
+                ell_z = np.array([x[2] for x in ell])
+                
+                ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
+                for idx in np.arange(self.D_BINS-self.D_BINS//5, self.D_BINS):
+                    if idx == self.D_BINS-1:
+                        ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m', label= "Major")
+                        ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c', label = "Intermediate")
+                        ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y', label = "Minor")
                     else:
-                        choose = np.arange(len(obj))
-                    ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
-                    ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
-                    
-                    ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
-                    rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
+                        ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m')
+                        ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c')
+                        ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y')
+                for special in np.arange(-self.D_BINS//5,-self.D_BINS//5+1):
+                    ell = fibonacci_ellipsoid(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special], samples=500)
+                    rot_matrix = np.hstack((np.reshape(major_obj[special]/np.linalg.norm(major_obj[special]), (3,1)), np.reshape(inter_obj[special]/np.linalg.norm(inter_obj[special]), (3,1)), np.reshape(minor_obj[special]/np.linalg.norm(minor_obj[special]), (3,1))))
                     for j in range(len(ell)): # Transformation into the principal frame
-                        ell[j] = np.dot(rot_matrix, np.array(ell[j]))
+                        ell[j] = np.dot(rot_matrix, np.array(ell[j])) 
                     ell_x = np.array([x[0] for x in ell])
                     ell_y = np.array([x[1] for x in ell])
                     ell_z = np.array([x[2] for x in ell])
-                    
-                    ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
-                    for idx in np.arange(self.D_BINS-self.D_BINS//5, self.D_BINS):
-                        if idx == self.D_BINS-1:
-                            ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m', label= "Major")
-                            ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c', label = "Intermediate")
-                            ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y', label = "Minor")
-                        else:
-                            ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m')
-                            ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c')
-                            ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y')
-                    for special in np.arange(-self.D_BINS//5,-self.D_BINS//5+1):
-                        ell = fibonacci_ellipsoid(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special], samples=500)
-                        rot_matrix = np.hstack((np.reshape(major_obj[special]/np.linalg.norm(major_obj[special]), (3,1)), np.reshape(inter_obj[special]/np.linalg.norm(inter_obj[special]), (3,1)), np.reshape(minor_obj[special]/np.linalg.norm(minor_obj[special]), (3,1))))
-                        for j in range(len(ell)): # Transformation into the principal frame
-                            ell[j] = np.dot(rot_matrix, np.array(ell[j])) 
-                        ell_x = np.array([x[0] for x in ell])
-                        ell_y = np.array([x[1] for x in ell])
-                        ell_z = np.array([x[2] for x in ell])
-                        ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="r", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special]))
-                        ax.quiver(*center, major_obj[special][0], major_obj[special][1], major_obj[special][2], length=d_obj[special], color='limegreen', label= "Major {0}".format(special))
-                        ax.quiver(*center, inter_obj[special][0], inter_obj[special][1], inter_obj[special][2], length=q_obj[special]*d_obj[special], color='darkorange', label = "Intermediate {0}".format(special))
-                        ax.quiver(*center, minor_obj[special][0], minor_obj[special][1], minor_obj[special][2], length=s_obj[special]*d_obj[special], color='indigo', label = "Minor {0}".format(special))
-                    fontP = FontProperties()
-                    fontP.set_size('xx-small')
-                    plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)        
-                    plt.xlabel(r"x (Mpc/h)")
-                    plt.ylabel(r"y (Mpc/h)")
-                    ax.set_zlabel(r"z (Mpc/h)")
-                    ax.set_box_aspect([1,1,1])
-                    set_axes_equal(ax)
-                    fig.savefig("{}/LocalObj{}_{}.pdf".format(VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
+                    ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="r", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special]))
+                    ax.quiver(*center, major_obj[special][0], major_obj[special][1], major_obj[special][2], length=d_obj[special], color='limegreen', label= "Major {0}".format(special))
+                    ax.quiver(*center, inter_obj[special][0], inter_obj[special][1], inter_obj[special][2], length=q_obj[special]*d_obj[special], color='darkorange', label = "Intermediate {0}".format(special))
+                    ax.quiver(*center, minor_obj[special][0], minor_obj[special][1], minor_obj[special][2], length=s_obj[special]*d_obj[special], color='indigo', label = "Minor {0}".format(special))
+                fontP = FontProperties()
+                fontP.set_size('xx-small')
+                plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)        
+                plt.xlabel(r"x (Mpc/h)")
+                plt.ylabel(r"y (Mpc/h)")
+                ax.set_zlabel(r"z (Mpc/h)")
+                ax.set_box_aspect([1,1,1])
+                set_axes_equal(ax)
+                fig.savefig("{}/LocalObj{}_{}.pdf".format(VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
         
     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False): # Public Method
         """ Visualize global shape of objects with numbers ``obj_numbers``
@@ -268,85 +281,88 @@ cdef class DensShapeProfs(DensProfs):
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting vizGlobalShapes() with snap {0}'.format(self.SNAP))
-
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            if np.max(obj_numbers) >= self.idx_cat.shape[0]:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.idx_cat.shape[0]))
-            elif np.min(obj_numbers) < 0:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
-            else:
-                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.idx_cat.shape[0] and obj_number >= 0]
-                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], self.idx_cat.base[obj_numbers], self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-                del obj_m
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
+            offsets = np.int32(np.hstack((np.array([0]), np.cumsum(self.obj_size.base))))
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            del obj_m
+        
+            # Create VIZ_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
             
-                # Create VIZ_DEST if not available
-                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            # Viz all valid objects under 'obj_numbers'
+            for idx_obj, obj_number in enumerate(obj_numbers):
+                major_obj = major[idx_obj]
+                inter_obj = inter[idx_obj]
+                minor_obj = minor[idx_obj]
+                d_obj = d[idx_obj]
+                q_obj = q[idx_obj]
+                s_obj = s[idx_obj]
+                center = centers[idx_obj]
+                obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
+                masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
+                for idx, ptc in enumerate(self.idx_cat.base[offsets[obj_number]:offsets[obj_number+1]]):
+                    obj[idx] = self.xyz.base[ptc]
+                    masses_obj[idx] = self.masses.base[ptc]
+                obj = respectPBCNoRef(obj, self.L_BOX)
+                # Plotting
+                fig = pyplot.figure()
+                ax = Axes3D(fig, auto_add_to_figure = False)
+                fig.add_axes(ax)
+                # If obj contains too many particles, choose some randomly for display
+                if len(obj) > 5000:
+                    rng = default_rng(seed=42)
+                    choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
+                else:
+                    choose = np.arange(len(obj))
+                ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
+                ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
                 
-                # Viz all valid objects under 'obj_numbers'
-                for idx_obj, obj_number in enumerate(obj_numbers):
-                    major_obj = major[idx_obj]
-                    inter_obj = inter[idx_obj]
-                    minor_obj = minor[idx_obj]
-                    d_obj = d[idx_obj]
-                    q_obj = q[idx_obj]
-                    s_obj = s[idx_obj]
-                    center = centers[idx_obj]
-                    obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
-                    masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
-                    for idx, ptc in enumerate(self.idx_cat.base[obj_number,:self.obj_size[obj_number]]):
-                        obj[idx] = self.xyz.base[ptc]
-                        masses_obj[idx] = self.masses.base[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
-                    # Plotting
-                    fig = pyplot.figure()
-                    ax = Axes3D(fig, auto_add_to_figure = False)
-                    fig.add_axes(ax)
-                    # If obj contains too many particles, choose some randomly for display
-                    if len(obj) > 5000:
-                        rng = default_rng(seed=42)
-                        choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
-                    else:
-                        choose = np.arange(len(obj))
-                    ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
-                    ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
-                    
-                    ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
-                    rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
-                    for j in range(len(ell)): # Transformation into the principal frame
-                        ell[j] = np.dot(rot_matrix, np.array(ell[j]))
-                    ell_x = np.array([x[0] for x in ell])
-                    ell_y = np.array([x[1] for x in ell])
-                    ell_z = np.array([x[2] for x in ell])
-                    ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
-                    ax.quiver(*center, major_obj[0][0], major_obj[0][1], major_obj[0][2], length=d_obj[0], color='m', label= "Major")
-                    ax.quiver(*center, inter_obj[0][0], inter_obj[0][1], inter_obj[0][2], length=q_obj[0]*d_obj[0], color='c', label = "Intermediate")
-                    ax.quiver(*center, minor_obj[0][0], minor_obj[0][1], minor_obj[0][2], length=s_obj[0]*d_obj[0], color='y', label = "Minor")
-                    fontP = FontProperties()
-                    fontP.set_size('xx-small')
-                    plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
-                    plt.xlabel(r"x (Mpc/h)")
-                    plt.ylabel(r"y (Mpc/h)")
-                    ax.set_zlabel(r"z (Mpc/h)")
-                    ax.set_box_aspect([1,1,1])
-                    set_axes_equal(ax)
-                    fig.savefig("{}/GlobalObj{}_{}.pdf".format(VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
+                ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
+                rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
+                for j in range(len(ell)): # Transformation into the principal frame
+                    ell[j] = np.dot(rot_matrix, np.array(ell[j]))
+                ell_x = np.array([x[0] for x in ell])
+                ell_y = np.array([x[1] for x in ell])
+                ell_z = np.array([x[2] for x in ell])
+                ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
+                ax.quiver(*center, major_obj[0][0], major_obj[0][1], major_obj[0][2], length=d_obj[0], color='m', label= "Major")
+                ax.quiver(*center, inter_obj[0][0], inter_obj[0][1], inter_obj[0][2], length=q_obj[0]*d_obj[0], color='c', label = "Intermediate")
+                ax.quiver(*center, minor_obj[0][0], minor_obj[0][1], minor_obj[0][2], length=s_obj[0]*d_obj[0], color='y', label = "Minor")
+                fontP = FontProperties()
+                fontP.set_size('xx-small')
+                plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
+                plt.xlabel(r"x (Mpc/h)")
+                plt.ylabel(r"y (Mpc/h)")
+                ax.set_zlabel(r"z (Mpc/h)")
+                ax.set_box_aspect([1,1,1])
+                set_axes_equal(ax)
+                fig.savefig("{}/GlobalObj{}_{}.pdf".format(VIZ_DEST, obj_number, self.SNAP), bbox_inches='tight')
     
-    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select): # Public Method
+    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
         """ Plot global ellipticity histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers"""
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotGlobalEpsHist() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            getGlobalEpsHist(self.xyz.base, self.masses.base, self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            getGlobalEpsHist(self.xyz.base, self.masses.base, subset_idx_cat, self.obj_size.base[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
         
-    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select): # Public Method
+    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
         """ Plot local ellipticity histogram at depth ``frac_r200``
         
         :param frac_r200: depth of objects to plot ellipticity, in units of R200
@@ -355,15 +371,19 @@ cdef class DensShapeProfs(DensProfs):
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers"""
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotLocalEpsHist() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            getLocalEpsHist(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            getLocalEpsHist(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
     
-    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Plot local triaxiality histogram at depth ``frac_r200``
         
         :param HIST_NB_BINS: number of histogram bins
@@ -372,34 +392,44 @@ cdef class DensShapeProfs(DensProfs):
         :type VIZ_DEST: string
         :param frac_r200: depth of objects to plot triaxiality, in units of R200
         :type frac_r200: float
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting plotLocalTHist() with snap {0}'.format(self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._plotLocalTHistBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
+            self._plotLocalTHistBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
     
-    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False): # Public Method
+    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers, bint reduced = False): # Public Method
         """ Plot global triaxiality histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting plotGlobalTHist() with snap {0}'.format(self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._plotGlobalTHistBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
+            self._plotGlobalTHistBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
     
-    def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def plotShapeProfs(self, int nb_bins, str VIZ_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param nb_bins: Number of mass bins to plot density profiles for
@@ -408,50 +438,65 @@ cdef class DensShapeProfs(DensProfs):
         :type VIZ_DEST: string
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting plotShapeProfs() with snap {0}'.format(self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._plotShapeProfsBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
+            self._plotShapeProfsBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
     
-    def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeCatLocal(self, str CAT_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting dumpShapeCatLocal() with snap {0}'.format(self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._dumpShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[select[0]:select[1]+1], self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            self._dumpShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
     
-    def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False): # Public Method
+    def dumpShapeCatGlobal(self, str CAT_DEST, obj_numbers, bint reduced = False): # Public Method
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting dumpShapeCatGlobal() with snap {0}'.format(self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             suffix = '_'
-            self._dumpShapeCatGlobalBase(self.xyz.base, self.masses.base, self.idx_cat.base[select[0]:select[1]+1], self.obj_size.base[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            self._dumpShapeCatGlobalBase(self.xyz.base, self.masses.base, subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
     
     def getObjInfo(self): # Public Method
         """ Print basic info about the objects"""
         print_status(rank,self.start_time,'Starting getObjInfo() with snap {0}'.format(self.SNAP))
         obj_type = 'unspecified'
-        self._getObjInfoBase(self.idx_cat.base, obj_type)
+        self._getObjInfoBase(self.idx_cat.base, self.obj_size.base, obj_type)
 
 cdef class DensShapeProfsHDF5(DensProfsHDF5):
     """ Class for density profile and shape profile calculations for Gadget-style HDF5 data
@@ -513,13 +558,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         self.IT_WALL = IT_WALL
         self.IT_MIN = IT_MIN
         
-    def estDensProfs(self, ROverR200, list select, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False): # Public Method
+    def estDensProfs(self, ROverR200, obj_numbers, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False): # Public Method
         """ Estimate density profiles
         
         :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
         :type ROverR200: (r_res,) floats
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param direct_binning: whether or not direct binning approach or
             kernel-based approach should be used
         :type direct_binning: boolean
@@ -535,19 +580,21 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
-        if rank == 0:
+            nb_objects = len(obj_size)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
             if direct_binning:
                 if spherical:
-                    dens_profs = self._getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200))
+                    dens_profs = self._getDensProfsSphDirectBinningBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], np.float32(ROverR200))
                 else:
-                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-                    dens_profs = self._getDensProfsEllDirectBinningBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+                    dens_profs = self._getDensProfsEllDirectBinningBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
                     del d; del q; del s; del minor; del inter; del major
             else:
-                dens_profs = self._getDensProfsKernelBasedBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], np.float32(ROverR200))
+                dens_profs = self._getDensProfsKernelBasedBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], np.float32(ROverR200))
             del xyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -556,11 +603,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             del xyz; del masses; del idx_cat; del obj_size
             return None
     
-    def getShapeCatLocal(self, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def getShapeCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Get all relevant local shape data
         
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -573,11 +620,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
-        if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            nb_objects = len(obj_size)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -586,11 +635,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
     
-    def getShapeCatGlobal(self, list select, bint reduced = False): # Public Method
+    def getShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Get all relevant global shape data
         
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
@@ -601,11 +650,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
-        if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            nb_objects = len(obj_size)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
             del xyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -614,11 +665,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             del xyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
         
-    def getShapeCatVelLocal(self, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def getShapeCatVelLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Get all relevant local velocity shape data
         
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
@@ -632,11 +683,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         xyz, masses = self._getXYZMasses()
         velxyz = self._getVelXYZ()
         idx_cat, obj_size = self.getIdxCat()
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
-        if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            nb_objects = len(obj_size)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -645,11 +698,11 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             return None, None, None, None, None, None, None, None
     
-    def getShapeCatVelGlobal(self, list select, bint reduced = False): # Public Method
+    def getShapeCatVelGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Get all relevant global velocity shape data
         
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
@@ -661,11 +714,13 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         xyz, masses = self._getXYZMasses()
         velxyz = self._getVelXYZ()
         idx_cat, obj_size = self.getIdxCat()
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
-        if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
+            nb_objects = len(obj_size)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
@@ -689,88 +744,88 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         
         xyz, masses = self._getXYZMasses()
         suffix = '_{}_'.format(self.OBJ_TYPE)
-        
+        idx_cat, obj_size = self.getIdxCat()
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         if rank == 0:
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size))))
             # Retrieve shape information
-            if np.max(obj_numbers) >= self.getIdxCat()[0].shape[0]:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.getIdxCat()[0].shape[0]))
-            elif np.min(obj_numbers) < 0:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
-            else:
-                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.getIdxCat()[0].shape[0] and obj_number >= 0]
-                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], self.getIdxCat()[0][obj_numbers], self.getIdxCat()[1][obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
-                del obj_m
-                        
-                # Create VIZ_DEST if not available
-                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
-                
-                # Viz all valid objects under 'obj_numbers'
-                for idx_obj, obj_number in enumerate(obj_numbers):
-                    major_obj = major[idx_obj]
-                    inter_obj = inter[idx_obj]
-                    minor_obj = minor[idx_obj]
-                    d_obj = d[idx_obj]
-                    q_obj = q[idx_obj]
-                    s_obj = s[idx_obj]
-                    center = centers[idx_obj]
-                    obj = np.zeros((self.getIdxCat()[1][obj_number],3), dtype = np.float32)
-                    masses_obj = np.zeros((self.getIdxCat()[1][obj_number],), dtype = np.float32)
-                    for idx, ptc in enumerate(self.getIdxCat()[0][obj_number,:self.getIdxCat()[1][obj_number]]):
-                        obj[idx] = xyz[ptc]
-                        masses_obj[idx] = masses[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
-                    # Plotting
-                    fig = pyplot.figure()
-                    ax = Axes3D(fig, auto_add_to_figure = False)
-                    fig.add_axes(ax)
-                    # If obj contains too many particles, choose some randomly for display
-                    if len(obj) > 5000:
-                        rng = default_rng(seed=42)
-                        choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
-                    else:
-                        choose = np.arange(len(obj))
-                    ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
-                    ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
+            nb_objects = len(obj_size)
+            isValidSelection(obj_numbers, nb_objects)
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based)
+            del obj_m
                     
-                    ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
-                    rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
+            # Create VIZ_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            
+            # Viz all valid objects under 'obj_numbers'
+            for idx_obj, obj_number in enumerate(obj_numbers):
+                major_obj = major[idx_obj]
+                inter_obj = inter[idx_obj]
+                minor_obj = minor[idx_obj]
+                d_obj = d[idx_obj]
+                q_obj = q[idx_obj]
+                s_obj = s[idx_obj]
+                center = centers[idx_obj]
+                obj = np.zeros((obj_size[obj_number],3), dtype = np.float32)
+                masses_obj = np.zeros((obj_size[obj_number],), dtype = np.float32)
+                for idx, ptc in enumerate(idx_cat[offsets[obj_number]:offsets[obj_number+1]]):
+                    obj[idx] = xyz[ptc]
+                    masses_obj[idx] = masses[ptc]
+                obj = respectPBCNoRef(obj, self.L_BOX)
+                # Plotting
+                fig = pyplot.figure()
+                ax = Axes3D(fig, auto_add_to_figure = False)
+                fig.add_axes(ax)
+                # If obj contains too many particles, choose some randomly for display
+                if len(obj) > 5000:
+                    rng = default_rng(seed=42)
+                    choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
+                else:
+                    choose = np.arange(len(obj))
+                ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
+                ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
+                
+                ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
+                rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
+                for j in range(len(ell)): # Transformation into the principal frame
+                    ell[j] = np.dot(rot_matrix, np.array(ell[j]))
+                ell_x = np.array([x[0] for x in ell])
+                ell_y = np.array([x[1] for x in ell])
+                ell_z = np.array([x[2] for x in ell])
+                
+                ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
+                for idx in np.arange(self.D_BINS-self.D_BINS//5, self.D_BINS):
+                    if idx == self.D_BINS-1:
+                        ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m', label= "Major")
+                        ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c', label = "Intermediate")
+                        ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y', label = "Minor")
+                    else:
+                        ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m')
+                        ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c')
+                        ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y')
+                for special in np.arange(-self.D_BINS//5,-self.D_BINS//5+1):
+                    ell = fibonacci_ellipsoid(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special], samples=500)
+                    rot_matrix = np.hstack((np.reshape(major_obj[special]/np.linalg.norm(major_obj[special]), (3,1)), np.reshape(inter_obj[special]/np.linalg.norm(inter_obj[special]), (3,1)), np.reshape(minor_obj[special]/np.linalg.norm(minor_obj[special]), (3,1))))
                     for j in range(len(ell)): # Transformation into the principal frame
-                        ell[j] = np.dot(rot_matrix, np.array(ell[j]))
+                        ell[j] = np.dot(rot_matrix, np.array(ell[j])) 
                     ell_x = np.array([x[0] for x in ell])
                     ell_y = np.array([x[1] for x in ell])
                     ell_z = np.array([x[2] for x in ell])
-                    
-                    ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
-                    for idx in np.arange(self.D_BINS-self.D_BINS//5, self.D_BINS):
-                        if idx == self.D_BINS-1:
-                            ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m', label= "Major")
-                            ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c', label = "Intermediate")
-                            ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y', label = "Minor")
-                        else:
-                            ax.quiver(*center, major_obj[idx][0], major_obj[idx][1], major_obj[idx][2], length=d_obj[idx], color='m')
-                            ax.quiver(*center, inter_obj[idx][0], inter_obj[idx][1], inter_obj[idx][2], length=q_obj[idx]*d_obj[idx], color='c')
-                            ax.quiver(*center, minor_obj[idx][0], minor_obj[idx][1], minor_obj[idx][2], length=s_obj[idx]*d_obj[idx], color='y')
-                    for special in np.arange(-self.D_BINS//5,-self.D_BINS//5+1):
-                        ell = fibonacci_ellipsoid(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special], samples=500)
-                        rot_matrix = np.hstack((np.reshape(major_obj[special]/np.linalg.norm(major_obj[special]), (3,1)), np.reshape(inter_obj[special]/np.linalg.norm(inter_obj[special]), (3,1)), np.reshape(minor_obj[special]/np.linalg.norm(minor_obj[special]), (3,1))))
-                        for j in range(len(ell)): # Transformation into the principal frame
-                            ell[j] = np.dot(rot_matrix, np.array(ell[j])) 
-                        ell_x = np.array([x[0] for x in ell])
-                        ell_y = np.array([x[1] for x in ell])
-                        ell_z = np.array([x[2] for x in ell])
-                        ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="r", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special]))
-                        ax.quiver(*center, major_obj[special][0], major_obj[special][1], major_obj[special][2], length=d_obj[special], color='limegreen', label= "Major {0}".format(special))
-                        ax.quiver(*center, inter_obj[special][0], inter_obj[special][1], inter_obj[special][2], length=q_obj[special]*d_obj[special], color='darkorange', label = "Intermediate {0}".format(special))
-                        ax.quiver(*center, minor_obj[special][0], minor_obj[special][1], minor_obj[special][2], length=s_obj[special]*d_obj[special], color='indigo', label = "Minor {0}".format(special))
-                    fontP = FontProperties()
-                    fontP.set_size('xx-small')
-                    plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)        
-                    plt.xlabel(r"x (Mpc/h)")
-                    plt.ylabel(r"y (Mpc/h)")
-                    ax.set_zlabel(r"z (Mpc/h)")
-                    ax.set_box_aspect([1,1,1])
-                    set_axes_equal(ax)
-                    fig.savefig("{}/LocalObj{}{}{}.pdf".format(VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
+                    ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="r", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[special], q_obj[special]*d_obj[special], s_obj[special]*d_obj[special]))
+                    ax.quiver(*center, major_obj[special][0], major_obj[special][1], major_obj[special][2], length=d_obj[special], color='limegreen', label= "Major {0}".format(special))
+                    ax.quiver(*center, inter_obj[special][0], inter_obj[special][1], inter_obj[special][2], length=q_obj[special]*d_obj[special], color='darkorange', label = "Intermediate {0}".format(special))
+                    ax.quiver(*center, minor_obj[special][0], minor_obj[special][1], minor_obj[special][2], length=s_obj[special]*d_obj[special], color='indigo', label = "Minor {0}".format(special))
+                fontP = FontProperties()
+                fontP.set_size('xx-small')
+                plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)        
+                plt.xlabel(r"x (Mpc/h)")
+                plt.ylabel(r"y (Mpc/h)")
+                ax.set_zlabel(r"z (Mpc/h)")
+                ax.set_box_aspect([1,1,1])
+                set_axes_equal(ax)
+                fig.savefig("{}/LocalObj{}{}{}.pdf".format(VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
         
     def vizGlobalShapes(self, obj_numbers, str VIZ_DEST, bint reduced = False): # Public Method
         """ Visualize global shape of objects with numbers ``obj_numbers``
@@ -785,95 +840,95 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
 
         xyz, masses = self._getXYZMasses()
         suffix = '_{}_'.format(self.OBJ_TYPE)
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         
         if rank == 0:
-            # Retrieve shape information
-            if np.max(obj_numbers) >= self.getIdxCat()[0].shape[0]:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} exceed the maximum allowed number. There are only {} objects that have sufficient resolution. Skip.".format(obj_numbers, self.getIdxCat()[0].shape[0]))
-            elif np.min(obj_numbers) < 0:
-                print_status(rank, self.start_time, "Some of the obj_numbers {} are negative. Such indices are not allowed. Skip.".format(obj_numbers))
-            else:
-                obj_numbers = [obj_number for obj_number in obj_numbers if obj_number < self.getIdxCat()[0].shape[0] and obj_number >= 0]
-                d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], self.getIdxCat()[0][obj_numbers], self.getIdxCat()[1][obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
-                del obj_m
+            idx_cat, obj_size = self.getIdxCat()
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size))))
+            d, q, s, minor, inter, major, centers, obj_m = self._getShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced)
+            del obj_m
+        
+            # Create VIZ_DEST if not available
+            subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
             
-                # Create VIZ_DEST if not available
-                subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+            # Viz all valid objects under 'obj_numbers'
+            for idx_obj, obj_number in enumerate(obj_numbers):
+                major_obj = major[idx_obj]
+                inter_obj = inter[idx_obj]
+                minor_obj = minor[idx_obj]
+                d_obj = d[idx_obj]
+                q_obj = q[idx_obj]
+                s_obj = s[idx_obj]
+                center = centers[idx_obj]
+                obj = np.zeros((obj_size[obj_number],3), dtype = np.float32)
+                masses_obj = np.zeros((obj_size[obj_number],), dtype = np.float32)
+                for idx, ptc in enumerate(idx_cat[offsets[obj_number]:offsets[obj_number+1]]):
+                    obj[idx] = xyz[ptc]
+                    masses_obj[idx] = masses[ptc]
+                obj = respectPBCNoRef(obj, self.L_BOX)
+                # Plotting
+                fig = pyplot.figure()
+                ax = Axes3D(fig, auto_add_to_figure = False)
+                fig.add_axes(ax)
+                # If obj contains too many particles, choose some randomly for display
+                if len(obj) > 5000:
+                    rng = default_rng(seed=42)
+                    choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
+                else:
+                    choose = np.arange(len(obj))
+                ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
+                ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
                 
-                # Viz all valid objects under 'obj_numbers'
-                for idx_obj, obj_number in enumerate(obj_numbers):
-                    major_obj = major[idx_obj]
-                    inter_obj = inter[idx_obj]
-                    minor_obj = minor[idx_obj]
-                    d_obj = d[idx_obj]
-                    q_obj = q[idx_obj]
-                    s_obj = s[idx_obj]
-                    center = centers[idx_obj]
-                    obj = np.zeros((self.getIdxCat()[1][obj_number],3), dtype = np.float32)
-                    masses_obj = np.zeros((self.getIdxCat()[1][obj_number],), dtype = np.float32)
-                    for idx, ptc in enumerate(self.getIdxCat()[0][obj_number,:self.getIdxCat()[1][obj_number]]):
-                        obj[idx] = xyz[ptc]
-                        masses_obj[idx] = masses[ptc]
-                    obj = respectPBCNoRef(obj, self.L_BOX)
-                    # Plotting
-                    fig = pyplot.figure()
-                    ax = Axes3D(fig, auto_add_to_figure = False)
-                    fig.add_axes(ax)
-                    # If obj contains too many particles, choose some randomly for display
-                    if len(obj) > 5000:
-                        rng = default_rng(seed=42)
-                        choose = rng.choice(np.arange(len(obj)), (5000,), replace = False)
-                    else:
-                        choose = np.arange(len(obj))
-                    ax.scatter(obj[choose,0],obj[choose,1],obj[choose,2],s=masses_obj[choose]/np.average(masses_obj[choose])*0.3, label = "Particles")
-                    ax.scatter(center[0],center[1],center[2],s=50,c="r", label = "COM")
-                    
-                    ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
-                    rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
-                    for j in range(len(ell)): # Transformation into the principal frame
-                        ell[j] = np.dot(rot_matrix, np.array(ell[j]))
-                    ell_x = np.array([x[0] for x in ell])
-                    ell_y = np.array([x[1] for x in ell])
-                    ell_z = np.array([x[2] for x in ell])
-                    ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
-                    ax.quiver(*center, major_obj[0][0], major_obj[0][1], major_obj[0][2], length=d_obj[0], color='m', label= "Major")
-                    ax.quiver(*center, inter_obj[0][0], inter_obj[0][1], inter_obj[0][2], length=q_obj[0]*d_obj[0], color='c', label = "Intermediate")
-                    ax.quiver(*center, minor_obj[0][0], minor_obj[0][1], minor_obj[0][2], length=s_obj[0]*d_obj[0], color='y', label = "Minor")
-                    fontP = FontProperties()
-                    fontP.set_size('xx-small')
-                    plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
-                    plt.xlabel(r"x (Mpc/h)")
-                    plt.ylabel(r"y (Mpc/h)")
-                    ax.set_zlabel(r"z (Mpc/h)")
-                    ax.set_box_aspect([1,1,1])
-                    set_axes_equal(ax)
-                    fig.savefig("{}/GlobalObj{}{}{}.pdf".format(VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
+                ell = fibonacci_ellipsoid(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1], samples=500)
+                rot_matrix = np.hstack((np.reshape(major_obj[-1]/np.linalg.norm(major_obj[-1]), (3,1)), np.reshape(inter_obj[-1]/np.linalg.norm(inter_obj[-1]), (3,1)), np.reshape(minor_obj[-1]/np.linalg.norm(minor_obj[-1]), (3,1))))
+                for j in range(len(ell)): # Transformation into the principal frame
+                    ell[j] = np.dot(rot_matrix, np.array(ell[j]))
+                ell_x = np.array([x[0] for x in ell])
+                ell_y = np.array([x[1] for x in ell])
+                ell_z = np.array([x[2] for x in ell])
+                ax.scatter(ell_x+center[0],ell_y+center[1],ell_z+center[2],s=1, c="g", label = "Inferred; a = {:.2f}, b = {:.2f}, c = {:.2f}".format(d_obj[-1], q_obj[-1]*d_obj[-1], s_obj[-1]*d_obj[-1]))
+                ax.quiver(*center, major_obj[0][0], major_obj[0][1], major_obj[0][2], length=d_obj[0], color='m', label= "Major")
+                ax.quiver(*center, inter_obj[0][0], inter_obj[0][1], inter_obj[0][2], length=q_obj[0]*d_obj[0], color='c', label = "Intermediate")
+                ax.quiver(*center, minor_obj[0][0], minor_obj[0][1], minor_obj[0][2], length=s_obj[0]*d_obj[0], color='y', label = "Minor")
+                fontP = FontProperties()
+                fontP.set_size('xx-small')
+                plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
+                plt.xlabel(r"x (Mpc/h)")
+                plt.ylabel(r"y (Mpc/h)")
+                ax.set_zlabel(r"z (Mpc/h)")
+                ax.set_box_aspect([1,1,1])
+                set_axes_equal(ax)
+                fig.savefig("{}/GlobalObj{}{}{}.pdf".format(VIZ_DEST, obj_number, suffix, self.SNAP), bbox_inches='tight')
     
-    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, list select): # Public Method
+    def plotGlobalEpsHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
         """ Plot global ellipticity histogram
         
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers"""
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotGlobalEpsHist() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         suffix = '_{}_'.format(self.OBJ_TYPE)
         
         if rank == 0:
-            getGlobalEpsHist(xyz, masses, idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            getGlobalEpsHist(xyz, masses, subset_idx_cat, obj_size[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, list select): # Public Method
+    def plotLocalEpsHist(self, frac_r200, HIST_NB_BINS, str VIZ_DEST, obj_numbers): # Public Method
         """ Plot local ellipticity histogram at depth ``frac_r200``
         
         :param frac_r200: depth of objects to plot ellipticity, in units of R200
@@ -882,24 +937,26 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers"""
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int"""
         print_status(rank,self.start_time,'Starting plotLocalEpsHist() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         suffix = '_{}_'.format(self.OBJ_TYPE)
             
         if rank == 0:
-            getLocalEpsHist(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            getLocalEpsHist(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.L_BOX, self.CENTER, VIZ_DEST, self.SNAP, frac_r200, suffix = suffix, HIST_NB_BINS = HIST_NB_BINS)
             del xyz; del masses; del idx_cat; del obj_size
     
-    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def plotLocalTHist(self, HIST_NB_BINS, str VIZ_DEST, frac_r200, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Plot local triaxiality histogram at depth ``frac_r200``
         
         :param HIST_NB_BINS: number of histogram bins
@@ -908,28 +965,30 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type VIZ_DEST: string
         :param frac_r200: depth of objects to plot triaxiality, in units of R200
         :type frac_r200: float
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting plotLocalTHist() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         suffix = '_{}_'.format(self.OBJ_TYPE)
             
         if rank == 0:
-            self._plotLocalTHistBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            self._plotLocalTHistBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, frac_r200, reduced, shell_based, suffix = suffix)
             del xyz; del masses; del idx_cat; del obj_size
     
-    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, list select, bint reduced = False): # Public Method
+    def plotGlobalTHist(self, HIST_NB_BINS, str VIZ_DEST, obj_numbers, bint reduced = False): # Public Method
         """ Plot global triaxiality histogram
         
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
@@ -938,153 +997,165 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         :type HIST_NB_BINS: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting plotGlobalTHist() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         suffix = '_{}_'.format(self.OBJ_TYPE)
             
         if rank == 0:
-            self._plotGlobalTHistBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            self._plotGlobalTHistBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, HIST_NB_BINS, reduced, suffix = suffix)
             del xyz; del masses; del idx_cat; del obj_size
         
-    def plotShapeProfs(self, int nb_bins, str VIZ_DEST, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def plotShapeProfs(self, int nb_bins, str VIZ_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param nb_bins: Number of mass bins to plot density profiles for
         :type nb_bins: int
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting plotShapeProfs() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         suffix = '_{}_'.format(self.OBJ_TYPE)
         
         if rank == 0:
-            self._plotShapeProfsBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            self._plotShapeProfsBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, VIZ_DEST, reduced, shell_based, nb_bins, suffix = suffix)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def dumpShapeCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeCatLocal(self, str CAT_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting dumpShapeCatLocal() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         suffix = '_{}_'.format(self.OBJ_TYPE)
         
         if rank == 0:
-            self._dumpShapeCatLocalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            self._dumpShapeCatLocalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def dumpShapeCatGlobal(self, str CAT_DEST, list select, bint reduced = False): # Public Method
+    def dumpShapeCatGlobal(self, str CAT_DEST, obj_numbers, bint reduced = False): # Public Method
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting dumpShapeCatGlobal() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size
         suffix = '_{}_'.format(self.OBJ_TYPE)
         
         if rank == 0:
-            self._dumpShapeCatGlobalBase(xyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            self._dumpShapeCatGlobalBase(xyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
             del xyz; del masses; del idx_cat; del obj_size
 
-    def dumpShapeVelCatLocal(self, str CAT_DEST, list select, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeVelCatLocal(self, str CAT_DEST, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
         :type shell_based: boolean"""
         print_status(rank,self.start_time,'Starting dumpShapeVelCatLocal() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         velxyz = self._getVelXYZ()
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size; del velxyz
         suffix = '_v{}_'.format(self.OBJ_TYPE)
         
         if rank == 0:
-            self._dumpShapeVelCatLocalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            self._dumpShapeVelCatLocalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced, shell_based)
             del xyz; del masses; del idx_cat; del obj_size; del velxyz
 
-    def dumpShapeVelCatGlobal(self, str CAT_DEST, list select, bint reduced = False): # Public Method
+    def dumpShapeVelCatGlobal(self, str CAT_DEST, obj_numbers, bint reduced = False): # Public Method
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
         
         :param CAT_DEST: catalogue folder
         :type CAT_DEST: string
-        :param select: index of first and last object to look at in the format [idx_first, idx_last]
-        :type select: list containing two integers
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
         :param reduced: whether or not reduced shape tensor (1/r^2 factor)
         :type reduced: boolean"""
         print_status(rank,self.start_time,'Starting dumpShapeVelCatGlobal() with snap {0}'.format(self.SNAP))
-        
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
         xyz, masses = self._getXYZMasses()
         idx_cat, obj_size = self.getIdxCat()
         if rank == 0:
-            idx_cat_len = len(idx_cat)
-            isValidSelection(select, idx_cat_len)
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
         velxyz = self._getVelXYZ()
         if rank != 0:
             del xyz; del masses; del idx_cat; del obj_size; del velxyz
         suffix = '_v{}_'.format(self.OBJ_TYPE)
         
         if rank == 0:
-            self._dumpShapeVelCatGlobalBase(xyz, velxyz, masses, self.r200.base[select[0]:select[1]+1], idx_cat[select[0]:select[1]+1], obj_size[select[0]:select[1]+1], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            self._dumpShapeVelCatGlobalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, CAT_DEST, suffix, reduced)
             del xyz; del masses; del idx_cat; del obj_size; del velxyz
 
     def getObjInfo(self): # Public Method
@@ -1094,7 +1165,7 @@ cdef class DensShapeProfsHDF5(DensProfsHDF5):
         idx_cat, obj_size = self.getIdxCat()
         if rank != 0:
             del idx_cat; del obj_size
-        self._getObjInfoBase(idx_cat, self.OBJ_TYPE)
+        self._getObjInfoBase(idx_cat, obj_size, self.OBJ_TYPE)
         nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, self.getPartType())
         # Raise Error message if empty
         if len(nb_shs) == 0:

@@ -54,7 +54,7 @@ cdef class CosmicBase:
         self.MASS_UNIT = 1e10
         self.r200 = None
         
-    def _getMassesCentersBase(self, float[:,:] xyz, float[:] masses, int[:,:] idx_cat, int[:] obj_size):
+    def _getMassesCentersBase(self, float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] obj_size):
         """ Calculate total mass and centers of objects
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -62,7 +62,7 @@ cdef class CosmicBase:
         :param masses: masses of all simulation particles in 10^10*M_sun/h
         :type masses: (N2,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :return centers, m: centers in Mpc/h and masses in 10^10*M_sun/h
@@ -70,7 +70,7 @@ cdef class CosmicBase:
         centers, m = calcMassesCenters(xyz.base, masses.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
         return centers, m
     
-    def _getShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+    def _getShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
         """ Get all relevant local shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -80,7 +80,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -113,7 +113,7 @@ cdef class CosmicBase:
         else:
             return None, None, None, None, None, None, None, None
     
-    def _getShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+    def _getShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
         """ Get all relevant global shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -123,7 +123,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
@@ -160,7 +160,7 @@ cdef class CosmicBase:
         else:
             return None, None, None, None, None, None, None, None
         
-    def _getShapeCatVelLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+    def _getShapeCatVelLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
         """ Get all relevant local velocity shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -172,7 +172,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -206,7 +206,7 @@ cdef class CosmicBase:
         else:
             return None, None, None, None, None, None, None, None
     
-    def _getShapeCatVelGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+    def _getShapeCatVelGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
         """ Get all relevant global velocity shape data
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -218,7 +218,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
@@ -255,7 +255,7 @@ cdef class CosmicBase:
         else:
             return None, None, None, None, None, None, None, None
     
-    def _dumpShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
+    def _dumpShapeCatLocalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -265,7 +265,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -293,6 +293,7 @@ cdef class CosmicBase:
         """
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
+            del idx_cat
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
             m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
             d = d*l_curr_over_target
@@ -319,7 +320,7 @@ cdef class CosmicBase:
             np.savetxt('{0}/centers_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
         
-    def _dumpShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced):
+    def _dumpShapeCatGlobalBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced):
         """ Dumps all relevant global shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -329,7 +330,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
@@ -374,7 +375,7 @@ cdef class CosmicBase:
             np.savetxt('{0}/centers_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _dumpShapeVelCatLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
+    def _dumpShapeVelCatLocalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -386,7 +387,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -440,7 +441,7 @@ cdef class CosmicBase:
             np.savetxt('{0}/centers_local{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _dumpShapeVelCatGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced):
+    def _dumpShapeVelCatGlobalBase(self, float[:,:] xyz, float[:,:] velxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str CAT_DEST, str suffix, bint reduced):
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -452,7 +453,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -505,7 +506,7 @@ cdef class CosmicBase:
             np.savetxt('{0}/centers_global{1}{2}.txt'.format(CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _plotShapeProfsBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, bint reduced, bint shell_based, int nb_bins, str suffix = ''):
+    def _plotShapeProfsBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, bint reduced, bint shell_based, int nb_bins, str suffix = ''):
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -515,7 +516,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -549,7 +550,7 @@ cdef class CosmicBase:
             getShapeProfs(VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, nb_bins, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
             
-    def _plotLocalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, int HIST_NB_BINS, float frac_r200, bint reduced, bint shell_based, str suffix = ''):
+    def _plotLocalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, int HIST_NB_BINS, float frac_r200, bint reduced, bint shell_based, str suffix = ''):
         """ Plot a local-shape triaxiality histogram at a specified ellipsoidal depth of ``frac_r200``
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -559,7 +560,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -595,7 +596,7 @@ cdef class CosmicBase:
             getLocalTHist(VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, frac_r200, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _plotGlobalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, int HIST_NB_BINS, bint reduced, str suffix = ''):
+    def _plotGlobalTHistBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float IT_TOL, int IT_WALL, int IT_MIN, str VIZ_DEST, int HIST_NB_BINS, bint reduced, str suffix = ''):
         """ Plot a global-shape triaxiality histogram
                 
         :param xyz: positions of all simulation particles in Mpc/h
@@ -605,7 +606,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
@@ -670,7 +671,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _getDensProfsSphDirectBinningBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float[:] ROverR200):
+    def _getDensProfsSphDirectBinningBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float[:] ROverR200):
         """ Get direct-binning-based spherically averaged density profiles
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -680,7 +681,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param ROverR200: normalized radii at which ``dens_profs`` are defined
@@ -694,7 +695,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _getDensProfsEllDirectBinningBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor):
+    def _getDensProfsEllDirectBinningBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor):
         """ Get direct-binning-based ellipsoidal shell-based density profiles
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -704,7 +705,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param ROverR200: normalized radii at which ``dens_profs`` are defined
@@ -732,7 +733,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _getDensProfsKernelBasedBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float[:] ROverR200):
+    def _getDensProfsKernelBasedBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float[:] ROverR200):
         """ Get kernel-based density profiles
         
         :param xyz: positions of all simulation particles in Mpc/h
@@ -742,7 +743,7 @@ cdef class CosmicBase:
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
         :param idx_cat: each row contains indices of particles belonging to an object
-        :type idx_cat: (N1, N3) integers
+        :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param ROverR200: normalized radii at which ``dens_profs`` are defined
@@ -756,7 +757,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _getObjInfoBase(self, int[:,:] idx_cat, str obj_type):
+    def _getObjInfoBase(self, int[:] idx_cat, int[:] obj_size, str obj_type):
         """ Print basic info about the objects used for local shape estimation such as number of converged objects
         
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
@@ -765,4 +766,4 @@ cdef class CosmicBase:
         :type obj_type: string"""
         print_status(rank,self.start_time,'Basic Info. Object type: {0}'.format(obj_type))
         print_status(rank,self.start_time,'Snap {0}'.format(self.SNAP))
-        print_status(rank,self.start_time,'Number of objects with sufficient resolution: {0}'.format(idx_cat.shape[0]))
+        print_status(rank,self.start_time,'Number of objects with sufficient resolution: {0}'.format(obj_size.shape[0]))

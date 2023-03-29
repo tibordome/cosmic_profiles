@@ -68,9 +68,9 @@ def test_densities_ex_script():
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!
-    halos_select = [0, 0]
-    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
-    dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = False)
+    obj_numbers = [0]
+    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = False)
     
     if rank == 0:
         dens_profs_db = dens_profs_db[0]
@@ -92,7 +92,7 @@ def test_densities_ex_script():
     ############################## Fit Density Profile #########################################################
     r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db_fit = dens_profs_db[10:]
-    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', select = halos_select)
+    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', obj_numbers = obj_numbers)
     
     if rank == 0:
         plt.figure()
