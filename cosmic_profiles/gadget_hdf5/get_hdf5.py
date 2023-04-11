@@ -12,6 +12,21 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
+def getPartType(OBJ_TYPE):
+    """ Return particle type number
+    
+    :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
+    :type OBJ_TYPE: str
+    :returns: particle type number
+    :rtype: int"""
+    if OBJ_TYPE == 'dm':
+        return 1
+    elif OBJ_TYPE == 'stars':
+        return 4
+    else:
+        assert OBJ_TYPE == 'gas', "Please specify either 'dm', 'gas' or 'stars' for OBJ_TYPE"
+        return 0
+
 def getHDF5SHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
     """ Retrieve FoF/SH-related DM HDF5 data from the simulation box
     

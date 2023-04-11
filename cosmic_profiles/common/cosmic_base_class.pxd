@@ -17,3 +17,4 @@ cdef class CosmicBase:
     cdef float SAFE # Units: Mpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
     cdef float MASS_UNIT
     cdef int MIN_NUMBER_PTCS
+    cdef str SUFFIX

@@ -4,10 +4,10 @@
 
 import numpy as np
 cimport cython
-from cosmic_profiles.common.python_routines import print_status
+from cosmic_profiles.common.python_routines import print_status, isValidSelection, getSubSetIdxCat
 from cosmic_profiles.common import config
 from cosmic_profiles.shape_profs.shape_profs_tools import getLocalTHist, getGlobalTHist, getShapeProfs
-from cosmic_profiles.dens_profs.dens_profs_tools import fitDensProfHelper
+from cosmic_profiles.dens_profs.dens_profs_tools import fitDensProfHelper, drawDensProfs
 from cosmic_profiles.shape_profs.shape_profs_algos import calcMorphLocal, calcMorphGlobal, calcMorphLocalVelDisp, calcMorphGlobalVelDisp
 from cosmic_profiles.dens_profs.dens_profs_algos import calcMassesCenters, calcDensProfsSphDirectBinning, calcDensProfsEllDirectBinning, calcDensProfsKernelBased
 import time
@@ -33,7 +33,7 @@ cdef class CosmicBase:
     ``_getConcentrationsBase()``, ``_getDensProfsSphDirectBinningBase()``, ``_getDensProfsEllDirectBinningBase()``,
     ``_getDensProfsKernelBasedBase()``, ``_getObjInfoBase()``"""
     
-    def __init__(self, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST):
+    def __init__(self, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
         """
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
@@ -47,7 +47,9 @@ cdef class CosmicBase:
         :param VIZ_DEST: visualization folder
         :type VIZ_DEST: string
         :param CAT_DEST: catalogue destination
-        :type CAT_DEST: string"""
+        :type CAT_DEST: string
+        :param SUFFIX: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+        :type SUFFIX: string"""
         self.SNAP = SNAP
         l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
         self.L_BOX = L_BOX*l_curr_over_target # self.L_BOX will be in Mpc/h
@@ -59,6 +61,7 @@ cdef class CosmicBase:
         self.SAFE = 6
         self.MASS_UNIT = 1e10
         self.r200 = None
+        self.SUFFIX = SUFFIX
         
     def _getMassesCentersBase(self, float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] obj_size):
         """ Calculate total mass and centers of objects
@@ -898,6 +901,236 @@ cdef class CosmicBase:
             return dens_profs*self.MASS_UNIT
         else:
             return None
+        
+    def _estDensProfsBase(self, float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float[:] ROverR200, obj_numbers, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False, int D_LOGSTART = 0, int D_LOGEND = 0, int D_BINS = 0, float IT_TOL = 0.0, int IT_WALL = 0, int IT_MIN = 0):
+        """ Estimate density profiles
+        
+        :param xyz: positions of all simulation particles in Mpc/h
+        :type xyz: (N2,3) floats, N2 >> N1
+        :param masses: masses of all simulation particles in 10^10*M_sun/h
+        :type masses: (N2,) floats
+        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
+        :type r200: (N1,) floats
+        :param idx_cat: each row contains indices of particles belonging to an object
+        :type idx_cat: (N3) integers
+        :param obj_size: indicates how many particles are in each object
+        :type obj_size: (N1,) integers
+        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
+        :type ROverR200: (r_res,) floats
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
+        :param direct_binning: whether or not direct binning approach or
+            kernel-based approach should be used
+        :type direct_binning: boolean
+        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based
+            should be used, ignored if ``direct_binning`` = False
+        :type spherical: boolean
+        :param reduced: whether or not reduced shape tensor (1/r^2 factor) should be used,
+            ignored if ``direct_binning`` = False
+        :type reduced: boolean
+        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run,
+            ignored if ``direct_binning`` = False
+        :type shell_based: boolean
+        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGSTART: int
+        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
+        :type D_LOGEND: int
+        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
+        :type D_BINS: int
+        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
+            for iteration to stop
+        :type IT_TOL: float
+        :param IT_WALL: maximum permissible number of iterations
+        :type IT_WALL: int
+        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
+            if undercut, shape is unclassified
+        :type IT_MIN: int
+        :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
+        :rtype: (N2, r_res) floats"""
+        print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
+        if rank == 0:
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
+            subset_idx_cat = getSubSetIdxCat(idx_cat, obj_size, obj_numbers)
+            if direct_binning:
+                suffix = '_'
+                if spherical == False:
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+                    dens_profs = self._getDensProfsEllDirectBinningBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base, d, d*q, d*s, major, inter, minor)
+                else:
+                    dens_profs = self._getDensProfsSphDirectBinningBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base)
+            else:
+                dens_profs = self._getDensProfsKernelBasedBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base)
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
+        else:
+            return None
+        
+    def estDensProfs(self, ROverR200, obj_numbers, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False): # Public Method
+        """ Estimate density profiles
+        
+        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
+        :type ROverR200: (r_res,) floats
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
+        :param direct_binning: whether or not direct binning approach or
+            kernel-based approach should be used
+        :type direct_binning: boolean
+        :param spherical: whether or not spherical shell-based or ellipsoidal shell-based
+            should be used, ignored if ``direct_binning`` = False
+        :type spherical: boolean
+        :param reduced: whether or not reduced shape tensor (1/r^2 factor) should be used,
+            ignored if ``direct_binning`` = False
+        :type reduced: boolean
+        
+        :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
+        :rtype: (N2, r_res) floats"""
+        print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
+        if rank == 0:
+            nb_objects = len(self.obj_size.base)
+            isValidSelection(obj_numbers, nb_objects)
+            subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
+            if direct_binning:
+                suffix = '_'
+                if spherical == False:
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
+                    dens_profs = self._getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200), d, d*q, d*s, major, inter, minor)
+                else:
+                    dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200))
+            else:
+                dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200))
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
+        else:
+            return None
+        
+    def _fitDensProfsBase(self, float[:] r200, int[:] obj_size, float[:,:] dens_profs, float[:] ROverR200, str method, obj_numbers):
+        """ Get best-fit results for density profile fitting
+        
+        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
+        :type r200: (N1,) floats
+        :param obj_size: indicates how many particles are in each object
+        :type obj_size: (N1,) integers
+        :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
+        :type dens_profs: (N3, r_res) floats
+        :param ROverR200: normalized radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
+        :return: best-fits for each object
+        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
+        print_status(rank,self.start_time,'Starting fitDensProfs() with snap {0}'.format(self.SNAP))
+        if len(dens_profs) != len(obj_numbers):
+            raise ValueError("The `obj_numbers` argument is inconsistent with the `dens_profs` handed over to the `fitDensProfs()` function. Please double-check and use the same `obj_numbers` as used for the density profile estimation!")
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        if rank == 0:
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
+            best_fits = self._getDensProfsBestFitsBase(dens_profs, ROverR200.base, r200.base[obj_numbers], method)
+            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            best_fits[:,0] = best_fits[:,0]*m_curr_over_target*l_curr_over_target**(-3)
+            if method == 'einasto':
+                idx = 2
+            elif method == 'alpha_beta_gamma':
+                idx = 4
+            else:
+                idx = 1
+            best_fits[:,idx] = best_fits[:,idx]*l_curr_over_target
+            return best_fits
+        else:
+            return None
+        
+    def _estConcentrationsBase(self, float[:] r200, int[:] obj_size, float[:,:] dens_profs, float[:] ROverR200, str method, obj_numbers):
+        """ Get best-fit concentration values of objects from density profile fitting
+        
+        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
+        :type r200: (N1,) floats
+        :param obj_size: indicates how many particles are in each object
+        :type obj_size: (N1,) integers
+        :param dens_profs: density profiles whose concentrations are to be determined, 
+            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
+        :type dens_profs: (N3, r_res) floats
+        :param ROverR200: normalized radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
+        :return: best-fit concentration for each object
+        :rtype: (N3,) floats"""
+        print_status(rank,self.start_time,'Starting estConcentrations() with snap {0}'.format(self.SNAP))
+        if len(dens_profs) != len(obj_numbers):
+            raise ValueError("The `obj_numbers` argument is inconsistent with the `dens_profs` handed over to the `estConcentrations()` function. Please double-check and use the same `obj_numbers` as used for the density profile estimation!")
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        if rank == 0:
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
+            cs = self._getConcentrationsBase(dens_profs, ROverR200.base, r200.base[obj_numbers], method)
+            return cs
+        else:
+            return None
+        
+    def _plotDensProfsBase(self, float[:] r200, int[:] obj_size, float[:,:] dens_profs, float[:] ROverR200, float[:,:] dens_profs_fit, float[:] ROverR200_fit, str method, str suffix, int nb_bins, obj_numbers):
+        """ Draws some simplistic density profiles
+        
+        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
+        :type r200: (N1,) floats
+        :param obj_size: indicates how many particles are in each object
+        :type obj_size: (N1,) integers
+        :param dens_profs: estimated density profiles, in units of 
+            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
+        :type dens_profs: (N2, r_res) floats
+        :param ROverR200: radii at which ``dens_profs`` are defined
+        :type ROverR200: (r_res,) floats
+        :param dens_profs_fit: density profiles to be fit, in units of 
+            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
+        :type dens_profs_fit: (N2, r_res2) floats
+        :param ROverR200_fit: radii at which best-fits shall be calculated
+        :type ROverR200_fit: (r_res2,) floats
+        :param method: string describing density profile model assumed for fitting
+        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+        :type suffix: string
+        :param nb_bins: Number of mass bins to plot density profiles for
+        :type nb_bins: int
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
+        """
+        print_status(rank,self.start_time,'Starting plotDensProfs() with snap {0}'.format(self.SNAP))
+        if len(dens_profs) != len(obj_numbers):
+            raise ValueError("The `obj_numbers` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `obj_numbers` as used for the density profile estimation!")
+        if type(obj_numbers) == list:
+            obj_numbers = np.int32(obj_numbers)
+        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
+        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        dens_profs = dens_profs*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        dens_profs_fit = dens_profs_fit*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
+        obj_centers, obj_masses = self._getMassesCenters(obj_numbers) # In units of Mpc/h and 10^10*M_sun*h^2/(Mpc)**3
+        
+        if rank == 0:
+            idx_cat_len = len(obj_size)
+            isValidSelection(obj_numbers, idx_cat_len)
+            drawDensProfs(self.VIZ_DEST, self.SNAP, r200.base[obj_numbers], dens_profs_fit.base, ROverR200_fit.base, dens_profs.base, ROverR200.base, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
+        else:
+            del obj_centers; del obj_masses
         
     def _getObjInfoBase(self, int[:] idx_cat, int[:] obj_size, str obj_type):
         """ Print basic info about the objects used for local shape estimation such as number of converged objects

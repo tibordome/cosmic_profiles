@@ -111,7 +111,7 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
     :type start_time: float
     :param MASS_UNIT: conversion factor from previous mass unit to M_sun/h, usually 10^10
     :type MASS_UNIT: float
-    :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
+    :param suffix: either '_dm_' or '_gx_' or '_' (latter for CosmicProfsDirect)
     :type suffix: string"""
     
     if rank == 0:
