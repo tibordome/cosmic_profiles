@@ -4,7 +4,7 @@ Shape Profiling
 Classes for Shape Profiling
 ******************************
 
-The ``shape_profs_classes`` module defines the ``DensShapeProfs`` and ``DensShapeProfsHDF5`` classes that provide shape profiling capabilities. They inherit from the ``DensProfs`` and ``DensProfsHDF5`` classes, respectively, and thus provide an interface to density profiling, including ellipsoidal shell-based density profiling.
+The ``shape_profs_classes`` module defines the ``DensShapeProfs`` and ``DensShapeProfsGadget`` classes that provide shape profiling capabilities. They inherit from the ``DensShapeProfsBase`` class (not relevant for the user). In addition to shape profiling, they also provide an interface to density profiling, including ellipsoidal shell-based density profiling.
 
 .. automodule:: shape_profs.shape_profs_classes
    :members:

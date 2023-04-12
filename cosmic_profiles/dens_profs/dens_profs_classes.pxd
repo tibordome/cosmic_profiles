@@ -10,7 +10,7 @@ cdef class DensProfsBase(CosmicBase):
     cdef float[:] masses
     cdef int[:] idx_cat
     cdef int[:] obj_size    
-    
+        
 cdef class DensProfsGadget(DensProfsBase):
     
     cdef str HDF5_SNAP_DEST

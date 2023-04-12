@@ -15,7 +15,7 @@ import inspect
 import subprocess
 import os
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-from cosmic_profiles.dens_profs.dens_profs_classes cimport DensProfsBase, DensProfsHDF5
+from cosmic_profiles.dens_profs.dens_profs_classes cimport DensProfsBase
 from cosmic_profiles.common.python_routines import print_status, set_axes_equal, fibonacci_ellipsoid, respectPBCNoRef, isValidSelection, getSubSetIdxCat
 from cosmic_profiles.common import config
 from cosmic_profiles.shape_profs.shape_profs_tools import getGlobalEpsHist, getLocalEpsHist
