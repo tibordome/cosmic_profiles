@@ -11,7 +11,7 @@ cdef class DensProfsBase(CosmicBase):
     cdef int[:] idx_cat
     cdef int[:] obj_size    
     
-cdef class DensProfsHDF5(DensProfsBase):
+cdef class DensProfsGadget(DensProfsBase):
     
     cdef str HDF5_SNAP_DEST
     cdef str HDF5_GROUP_DEST

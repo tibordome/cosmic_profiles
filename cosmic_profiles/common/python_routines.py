@@ -597,6 +597,9 @@ def isValidSelection(obj_numbers, nb_objects):
     :return valid: True if selection of objects is valid one, False otherwise
     :rtype: boolean
     :raises: ``ValueError`` if selection of objects is invalid"""
+    # Check that obj_numbers has at least 1 object
+    if len(obj_numbers) == 0:
+        raise ValueError("Choose at least one halo for your object selection (obj_numbers). Please provide a list of halo indices.")
     # Check for non-integers
     if len(np.where(obj_numbers != obj_numbers.round())[0]) != 0:
         raise ValueError("Please supply integers only for your object selection!")

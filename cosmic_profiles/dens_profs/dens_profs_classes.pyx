@@ -7,8 +7,9 @@ from cosmic_profiles.common.cosmic_base_class cimport CosmicBase
 from cosmic_profiles.common import config
 from cosmic_profiles.common.python_routines import print_status, isValidSelection, getSubSetIdxCat
 from cosmic_profiles.dens_profs.dens_profs_tools import drawDensProfs
-from cosmic_profiles.gadget_hdf5.get_hdf5 import getHDF5SHData, getHDF5ObjData, getPartType
-from cosmic_profiles.gadget_hdf5.gen_catalogues import calcObjCat
+from cosmic_profiles.gadget.read_fof import getFoFSHData, getPartType
+from cosmic_profiles.gadget.gen_catalogues import calcObjCat
+from cosmic_profiles.gadget import readgadget
 import time
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -20,7 +21,7 @@ cdef class DensProfsBase(CosmicBase):
     
     Its public methods are ``getR200()``, ``getIdxCat()``,
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
-    ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``."""
+    ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``."""
     
     def __init__(self, float[:,:] xyz, float[:] masses, int[:] idx_cat, float[:] r200, int[:] obj_size, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
         """
@@ -28,8 +29,8 @@ cdef class DensProfsBase(CosmicBase):
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles in 10^10 M_sun/h
         :type masses: (N2,) floats
-        :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
-        :type idx_cat: list of length N1
+        :param idx_cat: contains indices of particles belonging to an object
+        :type idx_cat: (N3,) integers
         :param r200: R_200 radii of the parent halos in Mpc/h
         :type r200: (N1,) floats
         :param obj_size: indicates how many particles are in each object
@@ -70,9 +71,9 @@ cdef class DensProfsBase(CosmicBase):
     def getIdxCat(self): # Public Method
         """ Fetch catalogue
         
-        :return idx_cat: each row contains indices of particles belonging to an object,
+        :return idx_cat: contains indices of particles belonging to an object,
             obj_size: number of particles in each object
-        :rtype: (N1, N3) integers and (N1,) integers"""
+        :rtype: (N3) integers and (N1,) integers"""
         if rank == 0:
             return self.idx_cat.base, self.obj_size.base
         else:
@@ -86,8 +87,8 @@ cdef class DensProfsBase(CosmicBase):
         :rtype: (N2,3) floats, (N2,) floats"""
         if rank == 0:
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
-            return self.xyz.base*l_curr_over_target, self.masses.base*self.MASS_UNIT*m_curr_over_target
+            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            return self.xyz.base*l_curr_over_target, self.masses.base*m_curr_over_target
         else:
             return None, None
             
@@ -108,8 +109,8 @@ cdef class DensProfsBase(CosmicBase):
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             centers, ms = self._getMassesCentersBase(self.xyz.base, self.masses.base, subset_idx_cat, self.obj_size.base[obj_numbers])
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
-            return centers*l_curr_over_target, ms*self.MASS_UNIT*m_curr_over_target
+            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            return centers*l_curr_over_target, ms*m_curr_over_target
         else:
             return None, None
     
@@ -246,7 +247,7 @@ cdef class DensProfs(DensProfsBase):
     
     Its public methods are the same as those of ``DensProfsBase``: ``getR200()``, ``getIdxCat()``,
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
-    ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``."""
+    ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``."""
     
     def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST):
         """
@@ -296,29 +297,27 @@ cdef class DensProfs(DensProfsBase):
         
 ############################################################################################################################
         
-################################## User provides Gadget HDF5 snapshot ######################################################
+################################## User provides Gadget I, II or HDF5 snapshot #############################################
         
 ############################################################################################################################
-cdef class DensProfsHDF5(DensProfsBase):
+cdef class DensProfsGadget(DensProfsBase):
     """ Class for density profile calculations for Gadget-style HDF5 data
     
     Its public methods are ``getXYZMasses()``, ``_getXYZMasses()``, ``getVelXYZ()``, 
-    ``_getVelXYZ()`` and those of ``DensProfsBase``: ``getR200()``, ``getIdxCat()``,  ``getMassesCenters()``, 
+    ``_getVelXYZ()``, ``getObjInfoGadget()``, ``getHeader()`` and those of ``DensProfsBase``: ``getR200()``, ``getIdxCat()``,  ``getMassesCenters()``, 
     ``_getMassesCenters()``, ``estDensProfs()``, ``fitDensProfs()``, ``estConcentrations()``,
-    ``plotDensProfs()``."""
+    ``plotDensProfs()``, ``getObjInfo()``."""
     
-    def __init__(self, str HDF5_SNAP_DEST, str HDF5_GROUP_DEST, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE, str VIZ_DEST, str CAT_DEST):
+    def __init__(self, str SNAP_DEST, str GROUP_DEST, str SNAP, int MIN_NUMBER_PTCS, str CENTER, str RVIR_OR_R200, str OBJ_TYPE, str VIZ_DEST, str CAT_DEST):
         """
-        :param HDF5_SNAP_DEST: where we can find the snapshot
-        :type HDF5_SNAP_DEST: string
-        :param HDF5_GROUP_DEST: where we can find the group files
-        :type HDF5_GROUP_DEST: string
+        :param SNAP_DEST: where we can find the snapshot
+        :type SNAP_DEST: string
+        :param GROUP_DEST: where we can find the group files
+        :type GROUP_DEST: string
         :param SNAP: e.g. '024'
         :type SNAP: string
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
-        :param L_BOX: simulation box side length in config.InUnitLength_in_cm
-        :type L_BOX: float
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
@@ -333,17 +332,17 @@ cdef class DensProfsHDF5(DensProfsBase):
         :type VIZ_DEST: string
         :param CAT_DEST: catalogue destination
         :type CAT_DEST: string"""
-        self.HDF5_SNAP_DEST = HDF5_SNAP_DEST
-        self.HDF5_GROUP_DEST = HDF5_GROUP_DEST
+        self.SNAP_DEST = SNAP_DEST
+        self.GROUP_DEST = GROUP_DEST
         self.RVIR_OR_R200 = RVIR_OR_R200
         self.OBJ_TYPE = OBJ_TYPE
         SUFFIX = '_{}_'.format(OBJ_TYPE)
         l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
-        # Import hdf5 halo data
-        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, getPartType(OBJ_TYPE))
+        # Import HDF5 Fof halo data
+        nb_shs, sh_len, fof_sizes, group_r200 = getFoFSHData(self.GROUP_DEST, self.RVIR_OR_R200, getPartType(OBJ_TYPE))
         # Import particle data
-        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, getPartType(OBJ_TYPE))
-        del velxyz
+        xyz = readgadget.read_block(self.SNAP_DEST,"POS ",ptype=[getPartType(self.OBJ_TYPE)]) # Should be in 3.085678e24 cm units
+        masses = readgadget.read_block(self.SNAP_DEST,"MASS",ptype=[getPartType(self.OBJ_TYPE)])
         # Raise Error message if empty
         if len(nb_shs) == 0:
             raise ValueError("No subhalos found in HDF5 files.")
@@ -358,6 +357,9 @@ cdef class DensProfsHDF5(DensProfsBase):
             obj_size = None
             xyz = None
             masses = None
+        # Find L_BOX
+        head = readgadget.header(self.SNAP_DEST)
+        L_BOX = np.float32(head.boxsize)
         super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float32(l_curr_over_target), MIN_NUMBER_PTCS, CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
         
     def getXYZMasses(self): # Public Method
@@ -366,12 +368,12 @@ cdef class DensProfsHDF5(DensProfsBase):
         :return xyz, masses: positions in config.OutUnitLength_in_cm and masses 
             in config.OutUnitMass_in_g
         :rtype: (N2,3) floats, (N2,) floats"""
-        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, getPartType(self.OBJ_TYPE))
-        del velxyz
+        xyz = readgadget.read_block(self.SNAP_DEST,"POS ",ptype=[getPartType(self.OBJ_TYPE)])
+        masses = readgadget.read_block(self.SNAP_DEST,"MASS",ptype=[getPartType(self.OBJ_TYPE)])
         if rank == 0:
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
-            return xyz*l_curr_over_target, masses*self.MASS_UNIT*m_curr_over_target
+            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            return xyz*l_curr_over_target, masses*m_curr_over_target
         else:
             del xyz; del masses
             return None, None
@@ -381,8 +383,8 @@ cdef class DensProfsHDF5(DensProfsBase):
         
         :return xyz, masses: positions in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3
         :rtype: (N2,3) floats, (N2,) floats"""
-        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, getPartType(self.OBJ_TYPE))
-        del velxyz
+        xyz = readgadget.read_block(self.SNAP_DEST,"POS ",ptype=[getPartType(self.OBJ_TYPE)])
+        masses = readgadget.read_block(self.SNAP_DEST,"MASS",ptype=[getPartType(self.OBJ_TYPE)])
         if rank == 0:
             return xyz, masses
         else:
@@ -394,8 +396,7 @@ cdef class DensProfsHDF5(DensProfsBase):
         
         :return velxyz: velocity array in config.OutUnitVelocity_in_cm_per_s
         :rtype: (N2,3) floats"""
-        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, getPartType(self.OBJ_TYPE))
-        del masses; del xyz
+        velxyz = readgadget.read_block(self.SNAP_DEST,"VEL ",ptype=[getPartType(self.OBJ_TYPE)])
         if rank == 0:
             v_curr_over_target = 1e5/config.OutUnitVelocity_in_cm_per_s
             return velxyz*v_curr_over_target
@@ -408,8 +409,7 @@ cdef class DensProfsHDF5(DensProfsBase):
         
         :return velxyz: velocity array in km/s
         :rtype: (N2,3) floats"""
-        xyz, masses, velxyz = getHDF5ObjData(self.HDF5_SNAP_DEST, getPartType(self.OBJ_TYPE))
-        del masses; del xyz
+        velxyz = readgadget.read_block(self.SNAP_DEST,"VEL ",ptype=[getPartType(self.OBJ_TYPE)])
         if rank == 0:
             return velxyz
         else:
@@ -423,7 +423,7 @@ cdef class DensProfsHDF5(DensProfsBase):
         :rtype: (N1,) floats"""
         
         # Import hdf5 data
-        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, getPartType(self.OBJ_TYPE))
+        nb_shs, sh_len, fof_sizes, group_r200 = getFoFSHData(self.GROUP_DEST, self.RVIR_OR_R200, getPartType(self.OBJ_TYPE))
         # Raise Error message if empty
         if len(nb_shs) == 0:
             raise ValueError("No subhalos found in HDF5 files.")
@@ -441,12 +441,12 @@ cdef class DensProfsHDF5(DensProfsBase):
     def getIdxCat(self): # Public Method
         """ Fetch catalogue
         
-        :return idx_cat: each row contains indices of particles belonging to an object,
+        :return idx_cat: contains indices of particles belonging to an object,
             obj_size: number of particles in each object
-        :rtype: (N1, N3) integers and (N1,) integers"""
+        :rtype: (N3) integers and (N1,) integers"""
         
         # Import hdf5 data
-        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, getPartType(self.OBJ_TYPE))
+        nb_shs, sh_len, fof_sizes, group_r200 = getFoFSHData(self.GROUP_DEST, self.RVIR_OR_R200, getPartType(self.OBJ_TYPE))
         # Raise Error message if empty
         if len(nb_shs) == 0:
             raise ValueError("No subhalos found in HDF5 files.")
@@ -460,12 +460,12 @@ cdef class DensProfsHDF5(DensProfsBase):
             del nb_shs; del sh_len; del fof_sizes; del group_r200
             return None, None
         
-    def getObjInfoHDF5(self): # Public Method
+    def getObjInfoGadget(self): # Public Method
         """ Print basic info about the objects"""
         print_status(rank,self.start_time,'Starting getObjInfoLocal() with snap {0}'.format(self.SNAP))
         
         self._getObjInfoBase(self.idx_cat.base, self.obj_size.base, self.OBJ_TYPE)
-        nb_shs, sh_len, fof_sizes, group_r200 = getHDF5SHData(self.HDF5_GROUP_DEST, self.RVIR_OR_R200, getPartType(self.OBJ_TYPE))
+        nb_shs, sh_len, fof_sizes, group_r200 = getFoFSHData(self.GROUP_DEST, self.RVIR_OR_R200, getPartType(self.OBJ_TYPE))
         # Raise Error message if empty
         if len(nb_shs) == 0:
             raise ValueError("No subhalos found in HDF5 files.")
@@ -475,3 +475,10 @@ cdef class DensProfsHDF5(DensProfsBase):
         print_status(rank, self.start_time, "The number of objects that have no SH is {0}".format(nb_shs[nb_shs == 0].shape[0]))
         print_status(rank, self.start_time, "The total number of objects (central subhalos) that have sufficient resolution is {0}".format(len([x for x in self.idx_cat.base if x != []])))
         del nb_shs; del sh_len; del fof_sizes; del group_r200
+        
+    def getHeader(self): # Header
+        """ Get header of first file in snapshot"""
+        print_status(rank,self.start_time,'Starting getHeader() with snap {0}'.format(self.SNAP))
+        
+        header = readgadget.header(self.SNAP_DEST)
+        return header

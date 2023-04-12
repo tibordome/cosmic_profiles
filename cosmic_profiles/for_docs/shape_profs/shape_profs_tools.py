@@ -11,8 +11,8 @@ def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
     
     It is obtained from the shape tensor = centred (wrt mode) second mass moment tensor
     
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param xyz: coordinates of particles of type 1 or type 4
@@ -171,8 +171,8 @@ def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SN
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, in 10^10*M_sun/h
     :type masses: (N^3x1) floats
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
@@ -189,7 +189,7 @@ def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SN
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""
     return
-        
+
 def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
     """ Plot ellipticity histogram
     
@@ -199,8 +199,8 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DES
     :type masses: (N^3x1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length

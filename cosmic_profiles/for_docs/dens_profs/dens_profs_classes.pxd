@@ -4,14 +4,14 @@
 
 from common.cosmic_base_class cimport CosmicBase
 
-cdef class DensProfs(CosmicBase):
+cdef class DensProfsBase(CosmicBase):
     
     cdef float[:,:] xyz
     cdef float[:] masses
-    cdef object idx_cat
+    cdef int[:] idx_cat
     cdef int[:] obj_size
     
-cdef class DensProfsHDF5(CosmicBase):
+cdef class DensProfsGadget(DensProfsBase):
     
     cdef str HDF5_SNAP_DEST
     cdef str HDF5_GROUP_DEST

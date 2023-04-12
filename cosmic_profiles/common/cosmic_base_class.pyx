@@ -52,13 +52,13 @@ cdef class CosmicBase:
         :type SUFFIX: string"""
         self.SNAP = SNAP
         l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
-        self.L_BOX = L_BOX*l_curr_over_target # self.L_BOX will be in Mpc/h
+        self.L_BOX = L_BOX # self.L_BOX must be in units of 3.085678e24 cm (Mpc/h)
         self.CENTER = CENTER
         self.VIZ_DEST = VIZ_DEST
         self.CAT_DEST = CAT_DEST
         self.MIN_NUMBER_PTCS = MIN_NUMBER_PTCS
         self.start_time = time.time()
-        self.SAFE = 6
+        self.SAFE = 6 # in units of 3.085678e24 cm
         self.MASS_UNIT = 1e10
         self.r200 = None
         self.SUFFIX = SUFFIX
@@ -70,7 +70,7 @@ cdef class CosmicBase:
         :type xyz: (N2,3) floats, N2 >> N1
         :param masses: masses of all simulation particles in 10^10*M_sun/h
         :type masses: (N2,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -88,7 +88,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -131,10 +131,10 @@ cdef class CosmicBase:
                 obj_centers = np.loadtxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
                 l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
-                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
+                obj_masses = obj_masses/m_curr_over_target
                 if d.shape[0] != 0 and d.ndim == 2:
                     minor = minor.reshape(minor.shape[0], -1, 3)
                     inter = inter.reshape(inter.shape[0], -1, 3)
@@ -168,7 +168,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -203,24 +203,28 @@ cdef class CosmicBase:
                 obj_centers = np.loadtxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
                 l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
-                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
-                if d.shape[0] != 0 and d.ndim == 2:
+                obj_masses = obj_masses/m_curr_over_target
+                if len(d.shape) != 0 and d.shape[0] != 0 and d.ndim == 1:
                     minor = minor.reshape(minor.shape[0], -1, 3)
                     inter = inter.reshape(inter.shape[0], -1, 3)
                     major = major.reshape(major.shape[0], -1, 3)
-                elif d.ndim == 1:
+                    d = d.reshape(-1, 1)
+                    q = q.reshape(-1, 1)
+                    s = s.reshape(-1, 1)
+                elif d.ndim == 0: # 1 object. Even in case of 0 objects, ndim will be 1
                     minor = minor.reshape(1, -1, 3)
                     inter = inter.reshape(1, -1, 3)
                     major = major.reshape(1, -1, 3)
                     obj_masses = np.array([obj_masses])
                     obj_centers = obj_centers.reshape(1, 3)
-                    d = d.reshape(1, -1)
-                    q = q.reshape(1, -1)
-                    s = s.reshape(1, -1)
+                    d = d.reshape(1, 1)
+                    q = q.reshape(1, 1)
+                    s = s.reshape(1, 1)
                 else:
+                    assert d.size == 0
                     minor = np.array([])
                     inter = np.array([])
                     major = np.array([])
@@ -255,7 +259,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -298,10 +302,10 @@ cdef class CosmicBase:
                 obj_centers = np.loadtxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
                 l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
-                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
+                obj_masses = obj_masses/m_curr_over_target
                 if d.shape[0] != 0 and d.ndim == 2:
                     minor = minor.reshape(minor.shape[0], -1, 3)
                     inter = inter.reshape(inter.shape[0], -1, 3)
@@ -338,7 +342,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -373,24 +377,28 @@ cdef class CosmicBase:
                 obj_centers = np.loadtxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
                 l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
-                obj_masses = obj_masses/self.MASS_UNIT/m_curr_over_target
-                if d.shape[0] != 0 and d.ndim == 2:
+                obj_masses = obj_masses/m_curr_over_target
+                if len(d.shape) != 0 and d.shape[0] != 0 and d.ndim == 1:
                     minor = minor.reshape(minor.shape[0], -1, 3)
                     inter = inter.reshape(inter.shape[0], -1, 3)
                     major = major.reshape(major.shape[0], -1, 3)
-                elif d.ndim == 1:
+                    d = d.reshape(-1, 1)
+                    q = q.reshape(-1, 1)
+                    s = s.reshape(-1, 1)
+                elif d.ndim == 0: # 1 object. Even in case of 0 objects, ndim will be 1
                     minor = minor.reshape(1, -1, 3)
                     inter = inter.reshape(1, -1, 3)
                     major = major.reshape(1, -1, 3)
                     obj_masses = np.array([obj_masses])
                     obj_centers = obj_centers.reshape(1, 3)
-                    d = d.reshape(1, -1)
-                    q = q.reshape(1, -1)
-                    s = s.reshape(1, -1)
+                    d = d.reshape(1, 1)
+                    q = q.reshape(1, 1)
+                    s = s.reshape(1, 1)
                 else:
+                    assert d.size == 0
                     minor = np.array([])
                     inter = np.array([])
                     major = np.array([])
@@ -423,7 +431,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -452,10 +460,10 @@ cdef class CosmicBase:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
             del idx_cat
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
-            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
+            obj_masses = obj_masses*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)
@@ -486,7 +494,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -505,10 +513,10 @@ cdef class CosmicBase:
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced, suffix)
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
-            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
+            obj_masses = obj_masses*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)
@@ -541,7 +549,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -569,10 +577,10 @@ cdef class CosmicBase:
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
-            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
+            obj_masses = obj_masses*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)
@@ -605,7 +613,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -632,10 +640,10 @@ cdef class CosmicBase:
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced, suffix)
             l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
-            obj_masses = obj_masses*self.MASS_UNIT*m_curr_over_target
+            obj_masses = obj_masses*m_curr_over_target
             if d.shape[0] != 0:
                 minor = minor.reshape(minor.shape[0], -1)
                 inter = inter.reshape(inter.shape[0], -1)
@@ -666,7 +674,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -708,7 +716,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -752,7 +760,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -825,7 +833,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -849,7 +857,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -887,7 +895,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -911,7 +919,7 @@ cdef class CosmicBase:
         :type masses: (N2,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h
         :type r200: (N1,) floats
-        :param idx_cat: each row contains indices of particles belonging to an object
+        :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
@@ -985,7 +993,8 @@ cdef class CosmicBase:
         :param reduced: whether or not reduced shape tensor (1/r^2 factor) should be used,
             ignored if ``direct_binning`` = False
         :type reduced: boolean
-        
+        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
+        :type shell_based: boolean
         :return: density profiles in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :rtype: (N2, r_res) floats"""
         print_status(rank,self.start_time,'Starting {} estDensProfs() with snap {}'.format('direct binning' if direct_binning == True else 'kernel based', self.SNAP))
@@ -1120,14 +1129,14 @@ cdef class CosmicBase:
             obj_numbers = np.int32(obj_numbers)
         l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
         m_curr_over_target = config.OutUnitMass_in_g/1.989e33
-        dens_profs = dens_profs*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
-        dens_profs_fit = dens_profs_fit*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
+        dens_profs_ = dens_profs.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
+        dens_profs_fit_ = dens_profs_fit.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
         obj_centers, obj_masses = self._getMassesCenters(obj_numbers) # In units of Mpc/h and 10^10*M_sun*h^2/(Mpc)**3
         
         if rank == 0:
             idx_cat_len = len(obj_size)
             isValidSelection(obj_numbers, idx_cat_len)
-            drawDensProfs(self.VIZ_DEST, self.SNAP, r200.base[obj_numbers], dens_profs_fit.base, ROverR200_fit.base, dens_profs.base, ROverR200.base, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            drawDensProfs(self.VIZ_DEST, self.SNAP, r200.base[obj_numbers], dens_profs_fit_, ROverR200_fit.base, dens_profs_, ROverR200.base, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
             del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
         else:
             del obj_centers; del obj_masses
@@ -1137,6 +1146,8 @@ cdef class CosmicBase:
         
         :param idx_cat: each entry of the list is a list containing indices of particles belonging to an object
         :type idx_cat: list of length N1
+        :param obj_size: indicates how many particles are in each object
+        :type obj_size: (N1,) integers
         :param obj_type: either 'dm', 'gx' or 'unspecified', depending on what catalogue we are looking at
         :type obj_type: string"""
         print_status(rank,self.start_time,'Basic Info. Object type: {0}'.format(obj_type))

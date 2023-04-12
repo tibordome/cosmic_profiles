@@ -50,8 +50,8 @@ setup(
 )
 
 extension2 = [Extension(
-                "cosmic_profiles.gadget_hdf5.gen_catalogues",
-                sources=['cosmic_profiles/gadget_hdf5/gen_catalogues.pyx'],
+                "cosmic_profiles.gadget.gen_catalogues",
+                sources=['cosmic_profiles/gadget/gen_catalogues.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']

@@ -50,8 +50,8 @@ setup(
 )
 
 extension2 = [Extension(
-                "gadget_hdf5.gen_catalogues",
-                sources=['gadget_hdf5/gen_catalogues.pyx'],
+                "gadget.gen_catalogues",
+                sources=['gadget/gen_catalogues.pyx'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']

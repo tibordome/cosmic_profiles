@@ -14,15 +14,14 @@ import inspect
 import numpy as np
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import DensShapeProfsHDF5, updateInUnitSystem, updateOutUnitSystem
+from cosmic_profiles import DensShapeProfsGadget, updateInUnitSystem, updateOutUnitSystem
 
 # Parameters
 updateInUnitSystem(in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
 updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
-L_BOX = np.float32(10000) # kpc/h
 CAT_DEST = "./cat"
-HDF5_GROUP_DEST = "./ex_data/LLGas256b20/groups_035"
-HDF5_SNAP_DEST = "./ex_data/LLGas256b20/snapdir_035"
+GROUP_DEST = "./ex_data/LLGas256b20/groups_035"
+SNAP_DEST = "./ex_data/LLGas256b20/snapdir_035/snap_035"
 VIZ_DEST = "./viz"
 D_LOGSTART = -2
 D_LOGEND = 0.5
@@ -41,8 +40,8 @@ frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf
 
 def HDF5Ex():
     
-    # Define DensShapeProfsHDF5 object
-    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE, VIZ_DEST, CAT_DEST)
+    # Define DensShapeProfsGadget object
+    cprofiles = DensShapeProfsGadget(SNAP_DEST, GROUP_DEST, SNAP, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE, VIZ_DEST, CAT_DEST)
     
     idx_cat = cprofiles.getIdxCat()[0] # Only rank == 0 content is of interest
     if rank == 0:
@@ -50,7 +49,7 @@ def HDF5Ex():
     else:
         h_idx_cat_len = None
     h_idx_cat_len = comm.bcast(h_idx_cat_len, root = 0)
-    obj_numbers = [0, 1, 2, 3, 4, 5]
+    obj_numbers = [0,1,2,3,4,5]
     
     ########################## Calculating Morphological Properties ###############################
     # Create halo shape catalogue

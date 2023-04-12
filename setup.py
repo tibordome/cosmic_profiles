@@ -42,8 +42,8 @@ ext_modules=[Extension(
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']
             ), Extension(
-                "cosmic_profiles.gadget_hdf5.gen_catalogues",
-                sources=['cosmic_profiles/gadget_hdf5/gen_catalogues.c'],
+                "cosmic_profiles.gadget.gen_catalogues",
+                sources=['cosmic_profiles/gadget/gen_catalogues.c'],
                 extra_compile_args=["-fopenmp"],
                 extra_link_args=["-fopenmp"],
                 include_dirs=[np.get_include(), '.']

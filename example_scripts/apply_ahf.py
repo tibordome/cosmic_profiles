@@ -77,7 +77,7 @@ h = 0.6774
 UNIT_MASS = 10**10 # in M_sun
 SNAP = '025'
 D_LOGSTART = -2
-D_LOGEND = 1
+D_LOGEND = 0
 D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
 IT_TOL = np.float32(1e-2)
 IT_WALL = 100
@@ -188,22 +188,20 @@ def AHFEx():
     #############################################################################################################
     
     ############## Run cosmic_profiles: define DensShapeProfs object ############################################
-    r_vir = np.float32([0.1, 0.1, 0.1, 0.1, 0.1])
     cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST)
     if rank == 0:
         h_idx_cat_len = len(cprofiles.getIdxCat()[1])
     else:
         h_idx_cat_len = None
     h_idx_cat_len = comm.bcast(h_idx_cat_len, root = 0)
-    obj_numbers = [0, h_idx_cat_len//2]
-    print(r_vir)
+    obj_numbers = np.arange(h_idx_cat_len//2)
         
     ############## Create local halo shape catalogue ############################################################
-    cprofiles.dumpShapeCatLocal(obj_numbers, reduced = True, shell_based = True)
+    cprofiles.dumpShapeCatLocal(obj_numbers, reduced = True, shell_based = False)
     #############################################################################################################
     
     ############## Viz first halo ###############################################################################
-    cprofiles.vizLocalShapes(obj_numbers = [0], reduced = True, shell_based = True)
+    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, reduced = True, shell_based = False)
     #############################################################################################################
     
 AHFEx()

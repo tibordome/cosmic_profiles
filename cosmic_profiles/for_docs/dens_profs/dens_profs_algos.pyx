@@ -6,16 +6,15 @@ import numpy as np
 cimport cython
 
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
     """ Calculate total mass and centers of objects
     
     :param xyz: positions of all simulation particles
     :type xyz: (N2,3) floats, N2 >> N1
     :param masses: masses of all simulation particles
     :type masses: (N2,) floats
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: box size
@@ -26,10 +25,9 @@ def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:,:] idx_cat, int[:] 
     :return centers, m: centers and masses
     :rtype: (N,3) and (N,) floats"""
     return
-
+   
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
     """ Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`    
     
     Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForce()`` instead of ``CythonHelpers.calcDensProfBruteForce()``
@@ -43,8 +41,8 @@ def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     :param ROverR200: radii at which the density profiles should be calculated,
         normalized by R200
     :type ROverR200: (r_res,) float array
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: box size
@@ -55,10 +53,9 @@ def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     :return: density profiles defined at ROverR200
     :rtype: (N1, r_res) float array"""
     return
-
+   
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
     """ Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`    
     
     Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForceEll()`` instead of ``CythonHelpers.calcDensProfBruteForceEll()``
@@ -72,8 +69,8 @@ def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     :param ROverR200: radii at which the density profiles should be calculated,
         normalized by R200
     :type ROverR200: (r_res,) float array
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: box size
@@ -96,10 +93,9 @@ def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     :return: density profiles defined at ROverR200
     :rtype: (N1, r_res) float array"""
     return
-
+  
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
     """ Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`
     
     Note: For background on this kernel-based method consult Reed et al. 2003, https://arxiv.org/abs/astro-ph/0312544.
@@ -113,8 +109,8 @@ def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, fl
     :param ROverR200: radii at which the density profiles should be calculated,
         normalized by R200
     :type ROverR200: (r_res,) float array
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: box size
