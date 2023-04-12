@@ -19,6 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          $CONDA/bin/conda install conda=23.1.0
           $CONDA/bin/conda install -c conda-forge mpi4py
           $CONDA/bin/conda install scipy
           $CONDA/bin/conda install -c anaconda cython
