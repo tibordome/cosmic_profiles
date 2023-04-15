@@ -9,6 +9,8 @@ import numpy as np
 import os
 import subprocess
 import sys
+import itertools
+import pytest
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -22,7 +24,8 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def test_shapes():
+@pytest.mark.parametrize('method, reduced, shell_based', [p for p in itertools.product(*[['einasto', 'nfw', 'hernquist', 'alpha_beta_gamma'], [False, True], [False, True]])])
+def test_shapes(method, reduced, shell_based):
     #################################### Parameters ################################################
     updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
     updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
@@ -41,6 +44,9 @@ def test_shapes():
     HIST_NB_BINS = 11 # Number of bins used for e.g. ellipticity histogram
     frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf. plotLocalTHist())
     N = 10 # Number of halos used for test
+    # For (ellipsoidal shell-based) density profiles
+    r_over_rvir = np.logspace(-2,0,50)
+    nb_model_pars = {'einasto': 3, 'nfw': 2, 'hernquist': 2, 'alpha_beta_gamma': 5}
     
     #################################### Generate N mock halos ####################################
     r_s = 0.5 # Units are Mpc/h
@@ -87,7 +93,7 @@ def test_shapes():
     
     ######################### Calculating Local Morphological Properties #############################
     # Create halo shape catalogue
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(obj_numbers, reduced = False, shell_based = False)
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(obj_numbers, reduced = reduced, shell_based = shell_based)
     
     if rank == 0:
         nb_suff_res = len(obj_numbers)
@@ -110,17 +116,17 @@ def test_shapes():
         assert major.shape[2] == 3
     
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.plotShapeProfs(nb_bins = 2, obj_numbers = obj_numbers, reduced = True, shell_based = True)
+    cprofiles.plotShapeProfs(nb_bins = 2, obj_numbers = obj_numbers, reduced = reduced, shell_based = shell_based)
     
     # Viz first few halos' shapes
-    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, reduced = reduced, shell_based = shell_based)
     
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHist(HIST_NB_BINS, frac_r200, obj_numbers = obj_numbers, reduced = False, shell_based = False)
+    cprofiles.plotLocalTHist(HIST_NB_BINS, frac_r200, obj_numbers = obj_numbers, reduced = reduced, shell_based = shell_based)
     
     ######################### Calculating Global Morphological Properties ############################
     obj_numbers = np.arange(N)
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(obj_numbers = obj_numbers, reduced = False)
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(obj_numbers = obj_numbers, reduced = reduced)
     
     if rank == 0:
         nb_suff_res = len(obj_numbers)
@@ -146,4 +152,28 @@ def test_shapes():
     cprofiles.plotGlobalEpsHist(HIST_NB_BINS, obj_numbers = obj_numbers)
     
     # Viz first few halos' shapes
-    cprofiles.vizGlobalShapes(obj_numbers = [0,1,2], reduced = False)
+    cprofiles.vizGlobalShapes(obj_numbers = obj_numbers, reduced = reduced)
+    
+    ######################### Calculating Ellipsoidal Density Profiles ######################################################
+    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True, reduced = reduced, shell_based = shell_based) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = False) # These estimates will be kernel-based
+    if rank == 0:
+        nb_suff_res = len(obj_numbers)
+        assert dens_profs_db.shape[0] == nb_suff_res
+        assert dens_profs_db.shape[1] == r_over_rvir.shape[0]
+        assert dens_profs_kb.shape[0] == nb_suff_res
+        assert dens_profs_kb.shape[1] == r_over_rvir.shape[0]
+    else:
+        dens_profs_db = np.zeros((nb_suff_res, r_over_rvir.shape[0]), dtype = np.float32)
+    comm.Bcast(dens_profs_db, root = 0)
+    
+    ############################## Fit Ellipsoidal Density Profile ##########################################################
+    r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
+    dens_profs_db_fit = dens_profs_db[:,10:]
+    best_fits = cprofiles.fitDensProfs(dens_profs_db_fit, r_over_rvir_fit, method = method, obj_numbers = obj_numbers)
+    if rank == 0:
+        assert best_fits.shape[0] == nb_suff_res
+        assert best_fits.shape[1] == nb_model_pars[method]
+        
+    # Draw ellipsoidal halo density profiles (overall and mass-decomposed ones). The results from fitDensProfs() got cached.
+    cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db[:,25:], r_over_rvir[25:], method = 'nfw', nb_bins = 2, obj_numbers = obj_numbers)

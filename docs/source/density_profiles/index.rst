@@ -16,7 +16,7 @@ We have added density profile estimation capabilities. We contend ourselves with
 
 where :math:`(x,y,z)` are the coordinates of a point cloud particle in some coordinate system centered on either the center of mass or the mode of the cloud. The density profile describes the radial mass distribution of the points in the cloud, e.g. in units of :math:`M_{\odot}h^2/(\mathrm{Mpc})^3` in the above plot. 
 
-To estimate density profiles with CosmicProfiles, we first instantiate a ``DensProfs`` object called ``cprofiles`` via::
+To estimate density profiles with CosmicProfiles, we first instantiate a ``DensProfsGadget`` object called ``cprofiles`` via::
 
     from cosmic_profiles import DensProfsGadget, updateInUnitSystem, updateOutUnitSystem
     
@@ -40,13 +40,13 @@ with arguments identical to those we saw in the :ref:`Data Structures section<Da
 
     dens_profs_db = cprofiles.estDensProfs(r_over_r200, obj_numbers = np.arange(10), direct_binning = True, spherical = True),
 
-where the float array ``dens_profs_db`` of shape :math:`(N_{\text{pass}}, N_r)` contains the estimated density profiles. The ``obj_numbers`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. As in the :ref:`Shape Estimation section<Shape Estimation>`, :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``obj_numbers`` argument and in addition are sufficiently resolved. This assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice, e.g. ``r_over_r200 = np.logspace(-1.5,0,70)``.
+where the float array ``dens_profs_db`` of shape :math:`(N_{\text{pass}}, N_r)` contains the estimated density profiles. The ``obj_numbers`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered, i.e. :math:`N_{\text{pass}}=10`, also see :ref:`Shape Estimation section<Shape Estimation>`. :math:`(N_{\text{pass}}, N_r)` further assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated, has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice, e.g. ``r_over_r200 = np.logspace(-1.5,0,70)``.
 
-As the naming suggests, with ``direct_binning = True`` we estimate density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. The user also has the liberty to invoke an ellipsoidal shell-based density profile estimation algorithm by setting the boolean ``spherical = False``. Note, however, that this necessitates that ``cprofiles`` is an object of the class ``DensShapeProfs`` or ``DensShapeProfsGadget``, providing access to shape profiling capabilities.
+As the naming suggests, with ``direct_binning = True`` we estimate density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. The user also has the liberty to invoke an ellipsoidal shell-based density profile estimation algorithm by setting the boolean ``spherical = False``. See `Gonzalez et al. 2022 <https://arxiv.org/abs/2205.06827>`_ for an application of the ellipsoidal shell-based density profile estimation technique.
 
-.. note:: If ``spherical = False``, the user also has the discretion to set 2 keyword arguments, namely the booleans ``reduced`` and ``shell_based`` that are explained in the :ref:`Shape Estimation section<Shape Estimation>`.
+.. note:: If ``spherical = False``, ``cprofiles`` needs to be an object of the class ``DensShapeProfs`` or ``DensShapeProfsGadget``, providing access to shape profiling capabilities. The user then also has the discretion to set 2 keyword arguments, namely the booleans ``reduced`` and ``shell_based`` that are explained in the :ref:`Shape Estimation section<Shape Estimation>`.
 
-See `Gonzalez et al. 2022 <https://arxiv.org/abs/2205.06827>`_ for an application of the ellipsoidal shell-based density profile estimation technique. On the other hand, with ``direct_binning = False`` we perform a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise.
+On the other hand, with ``direct_binning = False``, we perform a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise.
 
 .. _Density Profile Fitting:
 
