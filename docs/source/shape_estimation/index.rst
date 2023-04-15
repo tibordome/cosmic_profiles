@@ -43,13 +43,13 @@ Since the second weighting scheme with :math:`w_k = \frac{1}{r_k^2}` has recentl
 
 After instantiating an object ``cprofiles`` as outlined in :ref:`Data Structures section<Data Structures>`, one can calculate and retrieve the local (i.e. as a function of :math:`r_{\text{ell}}`) halo shape catalogue by::
 
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(select = [0, 9], reduced = False, shell_based = False).
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False).
 
-The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter`` and ``major`` represents the shape profiles while ``obj_centers`` and ``obj_masses`` refer to object centers and total masses, respectively. The ``select`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. 
+The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter`` and ``major`` represents the shape profiles while ``obj_centers`` and ``obj_masses`` refer to object centers and total masses, respectively. The ``obj_numbers`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. 
 
 .. warning:: The arrays ``d``, ``q``, ``s``, ``minor``, ``inter`` and ``major`` will contain NaNs whenever the shape determination does not converge. We consider the shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``IT_TOL`` and the maximum number of iterations ``IT_WALL`` is not yet achieved.
 
-If :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``select`` argument and in addition are sufficiently resolved, then the 1D and 2D shape profile arrays will have the following format:
+If :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``obj_numbers`` argument and in addition are sufficiently resolved, then the 1D and 2D shape profile arrays will have the following format:
 
 * ``d`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): ellipsoidal radii
 * ``q`` of shape (:math:`N_{\text{pass}}`, ``D_BINS`` + 1): q shape parameter
@@ -60,11 +60,11 @@ If :math:`N_{\text{pass}}` stands for the number of objects that have been selec
 * ``obj_centers`` of shape (:math:`N_{\text{pass}}`,3): centers of objects 
 * ``obj_masses`` of shape (:math:`N_{\text{pass}}`,): masses of objects.
 
-For post-processing purposes, one can dump the shape profiles in a destination ``CAT_DEST`` of choice via::
+For post-processing purposes, one can dump the shape profiles via::
     
-    cprofiles.dumpShapeCatLocal(CAT_DEST, select = [0, 9], reduced = False, shell_based = False),
+    cprofiles.dumpShapeCatLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False),
 
-where ``CAT_DEST`` is a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. '/path/to/cat'.
+which will save the shape profiles in a destination of choice ``self.CAT_DEST`` (a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. ``/path/to/cat``, will be created if missing) that has been provided during object instantiation.
 
 .. dropdown:: Shape Profiles, Dumped Files
 
@@ -77,7 +77,7 @@ where ``CAT_DEST`` is a string describing the absolute (or relative with respect
     * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
     * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-.. note:: In case of a Gadget-style HDF5 snapshot output, specify ``OBJ_TYPE = 'dm'`` to calculate local dark matter halo shapes (only the dark matter component of halos), ``OBJ_TYPE = 'gas'`` to calculate the local shapes of gas particles inside halos and ``OBJ_TYPE = 'stars'`` to calculate the local shapes of star particles inside halos. The suffix of the output files will be modified accordingly to e.g. ``d_local_gas_x.txt``.
+.. note:: In case of a Gadget-style I, II or HDF5 snapshot output, specify ``OBJ_TYPE = 'dm'`` to calculate local dark matter halo shapes (only the dark matter component of halos), ``OBJ_TYPE = 'gas'`` to calculate the local shapes of gas particles inside halos and ``OBJ_TYPE = 'stars'`` to calculate the local shapes of star particles inside halos. The suffix of the output files will be modified accordingly to e.g. ``d_local_gas_x.txt``.
 
 ***************
 Global Shapes
@@ -85,11 +85,11 @@ Global Shapes
 
 Instead of shape profiles one might also be interested in obtaining the shape parameters and principal axes of the point clouds as a whole. This information can be obtained by calling::
 
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(select = [0, 9], reduced = False).
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(obj_numbers = np.arange(10), reduced = False).
 
-If a global shape calculations does not converge (which is rare), the corresponding entry in ``q`` etc. will feature a NaN. As with shape profiles, we can dump the global shape catalogue in a destination ``CAT_DEST`` of choice via::
+If a global shape calculations does not converge (which is rare), the corresponding entry in ``q`` etc. will feature a NaN. As with shape profiles, we can dump the global shape catalogue in a destination ``self.CAT_DEST`` of choice via::
 
-    cprofiles.dumpShapeCatGlobal(CAT_DEST, reduced = False),
+    cprofiles.dumpShapeCatGlobal(reduced = False),
 
 which will some files to the destination folder.
 
@@ -104,17 +104,17 @@ which will some files to the destination folder.
     * ``m_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
     * ``centers_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-.. note:: As previously, :math:`N_{\text{pass}}` denotes the number of halos that have been selected with the ``select`` argument *and* pass the ``MIN_NUMBER_PTCS``-threshold. If the global shape determination for a sufficiently resolved object does not converge, it will appear as NaNs in the output.
+.. note:: As previously, :math:`N_{\text{pass}}` denotes the number of halos that have been selected with the ``obj_numbers`` argument *and* pass the ``MIN_NUMBER_PTCS``-threshold. If the global shape determination for a sufficiently resolved object does not converge, it will appear as NaNs in the output.
 
 *************************************
 Velocity Dispersion Tensor Eigenaxes
 *************************************
 
-For Gadget-style HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling::
+For Gadget-style I, II, or HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling::
 
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatVelLocal(select = [0, 9], reduced = False, shell_based = False)
+    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatVelLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False)
 
-for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(select = [0, 9], reduced = False)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(CAT_DEST, select = [0, 9], reduced = False)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``CAT_DEST``.
+for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(obj_numbers = np.arange(10), reduced = False)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(obj_numbers = np.arange(10), reduced = False)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``self.CAT_DEST``.
 
 .. dropdown:: Velocity Shapes, Dumped Files
 
@@ -127,7 +127,7 @@ for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(select = [0, 9], r
     * ``m_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
     * ``centers_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-The ``cprofiles.dumpShapeCatVelLocal(CAT_DEST, select = [0, 9], reduced = False)`` command will dump files named ``d_local_vdm_x.txt`` etc.
+The ``cprofiles.dumpShapeCatVelLocal(obj_numbers = np.arange(10), reduced = False)`` command will dump files named ``d_local_vdm_x.txt`` etc.
 
 *************************************
 Visualizations
@@ -135,10 +135,10 @@ Visualizations
 
 Shape profiles can be visualized using::
 
-    cprofiles.plotShapeProfs(nb_bins = 2, VIZ_DEST = VIZ_DEST, select = [0, 9], reduced = False, shell_based = False)
+    cprofiles.plotShapeProfs(nb_bins = 2, obj_numbers = np.arange(10), reduced = False, shell_based = False)
 
 which draws median shape profiles and also mass bin-decomposed ones. ``nb_bins`` stand for the number of mass bins to plot density profiles for. 3D visualizations of individual halos can be accomplished using::
  
-    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], reduced = False, shell_based = False)
 
-which for instance would visualize the 3D distribution of particles as well as the eigenaxes at two different ellipsoidal radii in the first three objects that have sufficient resolution.
+which for instance would visualize the 3D distribution of particles as well as the eigenaxes at two different ellipsoidal radii in the first three objects that have sufficient resolution. The shape visualizations will be saved to the object's attribute ``self.VIZ_DEST`` (string describing the absolute (or relative with respect to Python working diretory) path to the visualization folder, e.g. ``/path/to/viz``, will be created if missing) that has been provided during object instantiation.

@@ -31,10 +31,10 @@ from .mock_tools.mock_halo_gen import (
 
 from .dens_profs.dens_profs_classes import (
     DensProfs,
-    DensProfsHDF5
+    DensProfsGadget
 )
 
 from .shape_profs.shape_profs_classes import (
     DensShapeProfs,
-    DensShapeProfsHDF5
+    DensShapeProfsGadget
 )

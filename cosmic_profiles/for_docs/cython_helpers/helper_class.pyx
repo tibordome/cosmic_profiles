@@ -90,9 +90,8 @@ cdef class CythonHelpers:
         
         :param xyz: coordinates of particles of type 1 or type 4
         :type xyz: (N^3x3) floats
-        :param ref: reference particle, which does not matter in the case of
-            halo morphology analysis
-        :type ref: int
+        :param L_BOX: periodicity of box (0.0 if non-periodic)
+        :type L_BOX: float
         :return: updated coordinates of particles of type 1 or type 4
         :rtype: (N^3x3) floats"""
         

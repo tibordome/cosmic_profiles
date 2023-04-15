@@ -6,6 +6,10 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode, print_status, eTo10, getCatWithinFracR200
 from cosmic_profiles.common.cosmo_tools import M_split, getMeanOrMedianAndError
+import inspect
+import subprocess
+import os
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -16,8 +20,8 @@ def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
     
     It is obtained from the shape tensor = centred (wrt mode) second mass moment tensor
     
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param xyz: coordinates of particles of type 1 or type 4
@@ -37,22 +41,21 @@ def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
     if rank == 0:
         eps = []
         rot_matrix = R.from_rotvec(angle * np.array([0, 0, 1])).as_matrix()
-        for p, obj in enumerate(idx_cat):
-            if obj != []:
-                xyz_ = respectPBCNoRef(xyz[obj[:obj_size[p]]], L_BOX)
-                if CENTER == 'mode':
-                    center = calcMode(xyz_, masses[obj[:obj_size[p]]], max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
-                else:
-                    center = calcCoM(xyz_, masses[obj[:obj_size[p]]])
-                masses_ = masses[obj[:obj_size[p]]]
-                xyz_new = np.zeros((xyz_.shape[0],3))
-                for i in range(xyz_new.shape[0]):
-                    xyz_new[i] = np.dot(rot_matrix, xyz_[i]-center)
-                shape_tensor = np.sum((masses_)[:,np.newaxis,np.newaxis]*(np.matmul(xyz_new[:,:,np.newaxis],xyz_new[:,np.newaxis,:])),axis=0)/np.sum(masses_)
-                qxx = shape_tensor[0,0]
-                qyy = shape_tensor[1,1]
-                qxy = shape_tensor[0,1]
-                eps.append((qxx-qyy)/(qxx+qyy) + complex(0,1)*2*qxy/(qxx+qyy))
+        for p in range(len(obj_size)):
+            xyz_ = respectPBCNoRef(xyz[idx_cat[np.sum(obj_size[:p]):np.sum(obj_size[:p+1])]], L_BOX)
+            masses_ = masses[idx_cat[np.sum(obj_size[:p]):np.sum(obj_size[:p+1])]]
+            if CENTER == 'mode':
+                center = calcMode(xyz_, masses_, max((max(xyz_[:,0])-min(xyz_[:,0]), max(xyz_[:,1])-min(xyz_[:,1]), max(xyz_[:,2])-min(xyz_[:,2]))))
+            else:
+                center = calcCoM(xyz_, masses_)
+            xyz_new = np.zeros((xyz_.shape[0],3))
+            for i in range(xyz_new.shape[0]):
+                xyz_new[i] = np.dot(rot_matrix, xyz_[i]-center)
+            shape_tensor = np.sum((masses_)[:,np.newaxis,np.newaxis]*(np.matmul(xyz_new[:,:,np.newaxis],xyz_new[:,np.newaxis,:])),axis=0)/np.sum(masses_)
+            qxx = shape_tensor[0,0]
+            qyy = shape_tensor[1,1]
+            qxy = shape_tensor[0,1]
+            eps.append((qxx-qyy)/(qxx+qyy) + complex(0,1)*2*qxy/(qxx+qyy))
         eps = np.array(eps)
         return eps
     else:
@@ -151,6 +154,9 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         # Ellipsoidal radii
         Rs = np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1)
         ERROR_METHOD = "median_quantile"
+        
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
         
         # Q
         plt.figure()
@@ -280,6 +286,9 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
             t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
         t = np.nan_to_num(t)
         
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
         # T counting
         plt.figure()
         t[t == 0.] = np.nan
@@ -332,6 +341,9 @@ def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s,
             t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
         t = np.nan_to_num(t)
         
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
         # T counting
         plt.figure()
         t[t == 0.] = np.nan
@@ -356,8 +368,8 @@ def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SN
     :type xyz: (N^3x3) floats
     :param masses: masses of particles of type 1 or type 4, in 10^10*M_sun/h
     :type masses: (N^3x1) floats
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
@@ -375,6 +387,9 @@ def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SN
     :type HIST_NB_BINS: int"""
     
     if rank == 0:
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
         eps = getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER)
         plt.figure()
         n, bins, patches = plt.hist(x=abs(eps), bins = np.linspace(0, 1, HIST_NB_BINS), alpha=0.7, density=True)
@@ -393,8 +408,8 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DES
     :type masses: (N^3x1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
@@ -416,6 +431,9 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DES
     if rank == 0:
         # Update h_cat so that only particles within r200 are considered
         idx_cat_new, obj_size_new = getCatWithinFracR200(idx_cat, obj_size, xyz, L_BOX, CENTER, r200, frac_r200)
+        
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
         
         # Direct fitting result prep, needed for both D and A
         eps = getEpsilon(idx_cat_new, obj_size_new, xyz, masses, L_BOX, CENTER)

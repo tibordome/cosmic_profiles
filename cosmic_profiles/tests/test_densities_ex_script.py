@@ -33,7 +33,8 @@ def test_densities_ex_script():
     updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
     L_BOX = np.float32(10) # cMpc/h
     VIZ_DEST = "./cosmic_profiles/tests/viz"
-    SNAP = '015'
+    CAT_DEST = "./cosmic_profiles/tests/cat"
+    SNAP = '017'
     MIN_NUMBER_DM_PTCS = 200
     CENTER = 'com'
     
@@ -64,13 +65,13 @@ def test_densities_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensProfs object ########################################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, VIZ_DEST, CAT_DEST)
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!
-    halos_select = [0, 0]
-    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
-    dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, select = halos_select, direct_binning = False)
+    obj_numbers = [0]
+    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = False)
     
     if rank == 0:
         dens_profs_db = dens_profs_db[0]
@@ -92,7 +93,7 @@ def test_densities_ex_script():
     ############################## Fit Density Profile #########################################################
     r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db_fit = dens_profs_db[10:]
-    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', select = halos_select)
+    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', obj_numbers = obj_numbers)
     
     if rank == 0:
         plt.figure()

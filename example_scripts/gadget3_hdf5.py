@@ -14,15 +14,14 @@ import inspect
 import numpy as np
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 sys.path.append(os.path.join(currentdir, '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import DensShapeProfsHDF5, updateInUnitSystem, updateOutUnitSystem
+from cosmic_profiles import DensShapeProfsGadget, updateInUnitSystem, updateOutUnitSystem
 
 # Parameters
 updateInUnitSystem(in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
 updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
-L_BOX = np.float32(10000) # kpc/h
 CAT_DEST = "./cat"
-HDF5_GROUP_DEST = "../../code_git/example_snapshot/LLGas256b20/groups_035"
-HDF5_SNAP_DEST = "../../code_git/example_snapshot/LLGas256b20/snapdir_035"
+GROUP_DEST = "./ex_data/LLGas256b20/groups_035"
+SNAP_DEST = "./ex_data/LLGas256b20/snapdir_035/snap_035"
 VIZ_DEST = "./viz"
 D_LOGSTART = -2
 D_LOGEND = 0.5
@@ -41,8 +40,8 @@ frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf
 
 def HDF5Ex():
     
-    # Define DensShapeProfsHDF5 object
-    cprofiles = DensShapeProfsHDF5(HDF5_SNAP_DEST, HDF5_GROUP_DEST, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE)
+    # Define DensShapeProfsGadget object
+    cprofiles = DensShapeProfsGadget(SNAP_DEST, GROUP_DEST, SNAP, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE, VIZ_DEST, CAT_DEST)
     
     idx_cat = cprofiles.getIdxCat()[0] # Only rank == 0 content is of interest
     if rank == 0:
@@ -50,40 +49,40 @@ def HDF5Ex():
     else:
         h_idx_cat_len = None
     h_idx_cat_len = comm.bcast(h_idx_cat_len, root = 0)
-    halos_select = [0, h_idx_cat_len//2]
+    obj_numbers = [0,1,2,3,4,5]
     
     ########################## Calculating Morphological Properties ###############################
     # Create halo shape catalogue
-    cprofiles.dumpShapeCatLocal(CAT_DEST, select = halos_select, reduced = False, shell_based = False)
+    cprofiles.dumpShapeCatLocal(obj_numbers, reduced = False, shell_based = False)
 
     # Create global halo shape catalogue
-    cprofiles.dumpShapeCatGlobal(CAT_DEST, select = halos_select, reduced = False)
+    cprofiles.dumpShapeCatGlobal(obj_numbers, reduced = False)
 
     ######################################## Visualizations #######################################
     # Viz first few halos' shapes
-    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], VIZ_DEST = VIZ_DEST, reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, reduced = False, shell_based = False)
     
     # Plot halo ellipticity histogram
-    cprofiles.plotGlobalEpsHist(HIST_NB_BINS, VIZ_DEST, select = halos_select)
+    cprofiles.plotGlobalEpsHist(HIST_NB_BINS, obj_numbers)
 
     # Plot halo triaxiality histogram
-    cprofiles.plotLocalTHist(HIST_NB_BINS, VIZ_DEST, frac_r200, halos_select, reduced = False, shell_based = False)
+    cprofiles.plotLocalTHist(HIST_NB_BINS, frac_r200, obj_numbers, reduced = False, shell_based = False)
 
     # Draw halo shape profiles (overall and mass-decomposed ones)
-    cprofiles.plotShapeProfs(nb_bins = 2, VIZ_DEST = VIZ_DEST, select = halos_select, reduced = False, shell_based = False)
+    cprofiles.plotShapeProfs(nb_bins = 2, obj_numbers = obj_numbers, reduced = False, shell_based = False)
 
     ########################## Calculating and Visualizing Density Profs ##########################
     # Create local halo density catalogue
-    dens_profs = cprofiles.estDensProfs(ROverR200, select = halos_select, direct_binning = True)
+    dens_profs = cprofiles.estDensProfs(ROverR200, obj_numbers, direct_binning = True)
 
     if rank != 0:
-        dens_profs = np.zeros((halos_select[1]-halos_select[0]+1, len(ROverR200)), dtype = np.float32)
+        dens_profs = np.zeros((len(obj_numbers), len(ROverR200)), dtype = np.float32)
     comm.Bcast(dens_profs, root = 0)
     
     # Fit density profiles
-    best_fits = cprofiles.fitDensProfs(dens_profs[:,25:], ROverR200[25:], method = 'nfw', select = halos_select)
+    best_fits = cprofiles.fitDensProfs(dens_profs[:,25:], ROverR200[25:], 'nfw', obj_numbers)
 
     # Draw halo density profiles (overall and mass-decomposed ones). The results from getDensProfsBestFits() got cached.
-    cprofiles.plotDensProfs(dens_profs, ROverR200, dens_profs[:,25:], ROverR200[25:], method = 'nfw', nb_bins = 2, VIZ_DEST = VIZ_DEST, select = halos_select)
+    cprofiles.plotDensProfs(dens_profs, ROverR200, dens_profs[:,25:], ROverR200[25:], method = 'nfw', nb_bins = 2, obj_numbers = obj_numbers)
 
 HDF5Ex()

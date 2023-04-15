@@ -4,7 +4,7 @@ Density Profiling
 Classes for Density Profiling
 ******************************
 
-The ``dens_profs_classes`` module defines the ``DensProfs`` and ``DensProfsHDF5`` classes that provide density profiling capabilities. They inherit from the ``CosmicBase`` class.
+The ``dens_profs_classes`` module defines the ``DensProfs`` and ``DensProfsGadget`` classes that provide density profiling capabilities. They inherit from the ``DensProfsBase`` class (not relevant for the user).
 
 .. automodule:: dens_profs.dens_profs_classes
    :members:

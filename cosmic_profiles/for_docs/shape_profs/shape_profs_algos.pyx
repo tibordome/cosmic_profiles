@@ -8,7 +8,7 @@ cimport cython
 from libc.math cimport sqrt
 
 @cython.embedsignature(True)
-def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+cdef runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -61,7 +61,7 @@ def runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, floa
     return
 
 @cython.embedsignature(True)
-def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+cdef runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -107,7 +107,7 @@ def runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[
     return
 
 @cython.embedsignature(True)
-def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+cdef runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -157,7 +157,7 @@ def runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[
     return
 
 @cython.embedsignature(True)
-def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
+cdef runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced):
     """ Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -209,8 +209,7 @@ def runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, floa
     return
 
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local shape catalogue
     
     Calls ``calcObjMorphLocal()`` in a parallelized manner.\n
@@ -222,8 +221,8 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_
     :type masses: (N2 x 1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
@@ -253,10 +252,9 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_
     :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed
     """
     return
-
+    
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
     """ Calculates the overall shape catalogue
     
     Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n
@@ -268,8 +266,8 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx
     :type masses: (N2 x 1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param idx_cat: each row contains indices of particles belonging to an object
-    :type idx_cat: (N1, N3) integers
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
@@ -294,10 +292,9 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:,:] idx
     :rtype: (N3,) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses)
     """
     return
-
+    
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local velocity dispersion shape catalogue
     
     Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n
@@ -311,8 +308,10 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     :type masses: (N2 x 1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N1
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -341,10 +340,9 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     :rtype: (N3, ``D_BINS`` + 1) floats (for d, q, s, eigframe (x3)), (N3, 3) floats (for centers), (N3,) floats (for masses), N3-list of ints for l_succeed
     """
     return
-
+    
 @cython.embedsignature(True)
-@cython.binding(True)
-def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:,:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
     """ Calculates the global velocity dipsersion shape catalogue
     
     Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n
@@ -358,8 +356,10 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     :type masses: (N2 x 1) floats
     :param r200: R_200 radii of the parent halos
     :type r200: (N1,) floats
-    :param cat: each entry of the list is a list containing indices of particles belonging to an object
-    :type cat: list of length N1
+    :param idx_cat: contains indices of particles belonging to an object
+    :type idx_cat: (N3,) integers
+    :param obj_size: indicates how many particles are in each object
+    :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
@@ -386,7 +386,7 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     return
 
 @cython.embedsignature(True)
-def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+cdef calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
     """ Calculates the local axis ratios
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -436,7 +436,7 @@ def calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:
     return
 
 @cython.embedsignature(True)
-def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
+cdef calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
     """ Calculates the global axis ratios and eigenframe of the point cloud
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -481,7 +481,7 @@ def calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,
     return
 
 @cython.embedsignature(True)
-def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+cdef calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
     """ Calculates the local axis ratios of the velocity dispersion tensor 
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -535,7 +535,7 @@ def calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, 
     return
 
 @cython.embedsignature(True)
-def calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
+cdef calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,

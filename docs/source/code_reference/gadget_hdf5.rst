@@ -7,7 +7,7 @@ CSH and galaxy catalogue generation
 
 The module ``gen_catalogues`` contains Cython functions to generate central subhalo (CSH) and galaxy catalogues from an HDF5 Gadget-type snapshot.
 
-.. automodule:: gadget_hdf5.gen_catalogues
+.. automodule:: gadget.gen_catalogues
    :members:
    :undoc-members:
    :show-inheritance:
@@ -16,9 +16,9 @@ The module ``gen_catalogues`` contains Cython functions to generate central subh
 HDF5 data extraction
 ***************************************
 
-The module ``get_hdf5`` provides parallelized functions to extract the most important data from an HDF5 Gadget-type snapshot.
+The module ``read_fof`` provides parallelized functions to extract the most important data from an HDF5 FoF halo catalogue.
 
-.. automodule:: gadget_hdf5.get_hdf5
+.. automodule:: gadget.read_fof
    :members:
    :undoc-members:
    :show-inheritance:

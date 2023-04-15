@@ -237,5 +237,4 @@ def M_split(m, center, start_time, v = None, NB_BINS = 2):
         v_groups (v average in each bin), idx_groups (indices of all objects in each bin)
     :rtype: (N,) floats, (N-1,) floats, (N-1,) floats, (N-1,) floats, list of lists (for each bin) of ints
     """
-    
     return

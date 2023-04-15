@@ -83,7 +83,12 @@ def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r2
                     idx_sum = idx_sum+nb_shs[q]
                     start_idx = start_idx+fof_sizes[q]
                 obj_cat[idxs_compr[p]] = calcCSHIdxs(obj_cat[idxs_compr[p]], start_idx, nb_shs[p], sh_len[idx_sum], MIN_NUMBER_PTCS)
-        return obj_cat.base, h_r200.base[obj_pass.base.nonzero()[0]], obj_size.base[obj_pass.base.nonzero()[0]]
+        # Creating 1D index cat here is not very efficient
+        obj_cat_out = np.empty(0, np.int32)
+        for p in range(len(obj_cat)):
+            obj_cat_out = np.hstack((obj_cat_out, obj_cat.base[p, :obj_size.base[obj_pass.base.nonzero()[0]][p]]))
+        del obj_cat
+        return obj_cat_out, h_r200.base[obj_pass.base.nonzero()[0]], obj_size.base[obj_pass.base.nonzero()[0]]
     if(not hasattr(calcObjCat, "inner")):
         calcObjCat.inner = np_cache_factory(4,0)(inner)
     calcObjCat.inner(nb_shs.base, sh_len.base, fof_sizes.base, group_r200.base, MIN_NUMBER_PTCS)
