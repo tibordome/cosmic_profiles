@@ -23,7 +23,7 @@ CosmicProfiles provides shape and density profile analysis tools for cosmologica
     
   - 'direct' datasets (i.e. index catalogue provided by user) and
   - FoF / SUBFIND halo catalogues
-  - GADGET-style I, II or HDF5 snapshot files
+  - GADGET-style I, II and HDF5 snapshot files
 
     - all functionalities available for dark matter halos, gas particle halos and star particle halos
     - in addition, allows for velocity dispersion tensor eigenaxes determination
