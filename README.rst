@@ -66,7 +66,7 @@ License
 
 |License|
 
-Copyright 2020-2022 Tibor Dome.
+Copyright 2020-2023 Tibor Dome.
 
 CosmicProfiles is free software made available under the MIT License.
 
