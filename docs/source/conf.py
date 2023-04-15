@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../../example_scripts'))
 # -- Project information -----------------------------------------------------
 
 project = 'cosmic_profiles'
-copyright = '2022, Tibor Dome'
+copyright = '2023, Tibor Dome'
 author = 'Tibor Dome'
 
 # The full version, including alpha/beta/rc tags
