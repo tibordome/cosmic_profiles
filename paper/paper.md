@@ -65,6 +65,9 @@ by students and experts alike.
 
 # Acknowledgements
 
-It is a pleasure to thank my PhD supervisor Anastasia Fialkov for the patient guidance, encouragement and advice during the genesis of this project. This work received support from STFC under grant number ST/V50659X/1.
+It is a pleasure to thank my PhD supervisor Anastasia Fialkov for the patient guidance, encouragement 
+and advice during the genesis of this project. The Gadget I, II and HDF5 snapshot reading functionalities 
+are based on the `readgadget` module of Francisco Villaescusa-Navarro's open-source `Pylians` [@Pylians_2018] 
+Python package. This work received support from STFC under grant number ST/V50659X/1.
 
 # References
