@@ -79,9 +79,10 @@ def read_field(snapshot, block, ptype):
     Masses            = head.massarr      # In units of config.InUnitMass_in_g               
     Npart             = head.npart        # Number of particles in the subfile
 
-    l_target_over_curr = 3.085678e24/config.InUnitLength_in_cm
-    m_target_over_curr = 1.989e43/config.InUnitMass_in_g
-    v_target_over_curr = 1e5/config.InUnitVelocity_in_cm_per_s
+    l_internal, m_internal, vel_internal = config.getLMVInternal()
+    l_target_over_curr = l_internal/config.InUnitLength_in_cm
+    m_target_over_curr = m_internal/config.InUnitMass_in_g
+    v_target_over_curr = vel_internal/config.InUnitVelocity_in_cm_per_s
 
     if block=="POS ":  
         suffix = "Coordinates"
@@ -136,9 +137,10 @@ def read_block(snapshot, block, ptype, verbose=False):
     for i in ptype:
         Ntotal += Nall[i]
     
-    l_target_over_curr = 3.085678e24/config.InUnitLength_in_cm
-    m_target_over_curr = 1.989e43/config.InUnitMass_in_g
-    v_target_over_curr = 1e5/config.InUnitVelocity_in_cm_per_s
+    l_internal, m_internal, vel_internal = config.getLMVInternal()
+    l_target_over_curr = l_internal/config.InUnitLength_in_cm
+    m_target_over_curr = m_internal/config.InUnitMass_in_g
+    v_target_over_curr = vel_internal/config.InUnitVelocity_in_cm_per_s
 
     if block=="POS ":  
         unit_fac = l_target_over_curr

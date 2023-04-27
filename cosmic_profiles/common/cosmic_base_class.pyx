@@ -51,14 +51,15 @@ cdef class CosmicBase:
         :param SUFFIX: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
         :type SUFFIX: string"""
         self.SNAP = SNAP
-        l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        l_curr_over_target = config.InUnitLength_in_cm/l_internal
         self.L_BOX = L_BOX # self.L_BOX must be in units of 3.085678e24 cm (Mpc/h)
         self.CENTER = CENTER
         self.VIZ_DEST = VIZ_DEST
         self.CAT_DEST = CAT_DEST
         self.MIN_NUMBER_PTCS = MIN_NUMBER_PTCS
         self.start_time = time.time()
-        self.SAFE = 6 # in units of 3.085678e24 cm
+        self.SAFE = 6 # in units of l_internal
         self.MASS_UNIT = 1e10
         self.r200 = None
         self.SUFFIX = SUFFIX
@@ -130,8 +131,9 @@ cdef class CosmicBase:
                 obj_masses = np.loadtxt('{0}/m_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 obj_centers = np.loadtxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
-                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+                l_internal, m_internal, vel_internal = config.getLMVInternal()
+                l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+                m_curr_over_target = m_internal/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
                 obj_masses = obj_masses/m_curr_over_target
@@ -202,8 +204,9 @@ cdef class CosmicBase:
                 obj_masses = np.loadtxt('{0}/m_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 obj_centers = np.loadtxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
-                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+                l_internal, m_internal, vel_internal = config.getLMVInternal()
+                l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+                m_curr_over_target = m_internal/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
                 obj_masses = obj_masses/m_curr_over_target
@@ -301,8 +304,9 @@ cdef class CosmicBase:
                 obj_masses = np.loadtxt('{0}/m_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 obj_centers = np.loadtxt('{0}/centers_local{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
-                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+                l_internal, m_internal, vel_internal = config.getLMVInternal()
+                l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+                m_curr_over_target = m_internal/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
                 obj_masses = obj_masses/m_curr_over_target
@@ -376,8 +380,9 @@ cdef class CosmicBase:
                 obj_masses = np.loadtxt('{0}/m_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 obj_centers = np.loadtxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP))
                 
-                l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-                m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+                l_internal, m_internal, vel_internal = config.getLMVInternal()
+                l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+                m_curr_over_target = m_internal/config.OutUnitMass_in_g
                 d = d/l_curr_over_target
                 obj_centers = obj_centers/l_curr_over_target
                 obj_masses = obj_masses/m_curr_over_target
@@ -459,8 +464,9 @@ cdef class CosmicBase:
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
             del idx_cat
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
             obj_masses = obj_masses*m_curr_over_target
@@ -512,8 +518,9 @@ cdef class CosmicBase:
         :type reduced: boolean"""
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced, suffix)
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
             obj_masses = obj_masses*m_curr_over_target
@@ -576,8 +583,9 @@ cdef class CosmicBase:
         """
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
             obj_masses = obj_masses*m_curr_over_target
@@ -639,8 +647,9 @@ cdef class CosmicBase:
         
         if rank == 0:
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, IT_TOL, IT_WALL, IT_MIN, reduced, suffix)
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
             d = d*l_curr_over_target
             obj_centers = obj_centers*l_curr_over_target
             obj_masses = obj_masses*m_curr_over_target
@@ -971,8 +980,10 @@ cdef class CosmicBase:
                     dens_profs = self._getDensProfsSphDirectBinningBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base)
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base)
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            m_curr = m_internal/self.MASS_UNIT
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+            m_curr_over_target = m_curr/config.OutUnitMass_in_g
             return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
         else:
             return None
@@ -1013,8 +1024,10 @@ cdef class CosmicBase:
                     dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200))
             else:
                 dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float32(ROverR200))
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            m_curr = m_internal/self.MASS_UNIT
+            m_curr_over_target = m_curr/config.OutUnitMass_in_g
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             return dens_profs*m_curr_over_target*l_curr_over_target**(-3)
         else:
             return None
@@ -1041,16 +1054,20 @@ cdef class CosmicBase:
             raise ValueError("The `obj_numbers` argument is inconsistent with the `dens_profs` handed over to the `fitDensProfs()` function. Please double-check and use the same `obj_numbers` as used for the density profile estimation!")
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
-        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
-        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        m_target = m_internal/self.MASS_UNIT
+        l_curr_over_target = config.OutUnitLength_in_cm/l_internal
+        m_curr_over_target = config.OutUnitMass_in_g/m_target
         dens_profs = dens_profs.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
         if rank == 0:
             idx_cat_len = len(obj_size)
             isValidSelection(obj_numbers, idx_cat_len)
             best_fits = self._getDensProfsBestFitsBase(dens_profs, ROverR200.base, r200.base[obj_numbers], method)
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e33/config.OutUnitMass_in_g
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+            m_curr_over_target = m_target/config.OutUnitMass_in_g
+            print("best fits internal, _fitsDens", best_fits)
             best_fits[:,0] = best_fits[:,0]*m_curr_over_target*l_curr_over_target**(-3)
+            print("best fits internal, _fitsDens, out units", best_fits)
             if method == 'einasto':
                 idx = 2
             elif method == 'alpha_beta_gamma':
@@ -1085,8 +1102,10 @@ cdef class CosmicBase:
             raise ValueError("The `obj_numbers` argument is inconsistent with the `dens_profs` handed over to the `estConcentrations()` function. Please double-check and use the same `obj_numbers` as used for the density profile estimation!")
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
-        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
-        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        m_target = m_internal/self.MASS_UNIT
+        l_curr_over_target = config.OutUnitLength_in_cm/l_internal
+        m_curr_over_target = config.OutUnitMass_in_g/m_target
         dens_profs = dens_profs.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
         if rank == 0:
             idx_cat_len = len(obj_size)
@@ -1127,8 +1146,10 @@ cdef class CosmicBase:
             raise ValueError("The `obj_numbers` argument is inconsistent with the `dens_profs` handed over to the `plotDensProfs()` function. Please double-check and use the same `obj_numbers` as used for the density profile estimation!")
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
-        l_curr_over_target = config.OutUnitLength_in_cm/3.085678e24
-        m_curr_over_target = config.OutUnitMass_in_g/1.989e33
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        m_target = m_internal/self.MASS_UNIT
+        l_curr_over_target = config.OutUnitLength_in_cm/l_internal
+        m_curr_over_target = config.OutUnitMass_in_g/m_target
         dens_profs_ = dens_profs.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs is in M_sun*h^2/(Mpc)**3
         dens_profs_fit_ = dens_profs_fit.base*m_curr_over_target*l_curr_over_target**(-3) # So that dens_profs_fit is in M_sun*h^2/(Mpc)**3
         obj_centers, obj_masses = self._getMassesCenters(obj_numbers) # In units of Mpc/h and 10^10*M_sun*h^2/(Mpc)**3

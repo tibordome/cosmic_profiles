@@ -10,44 +10,44 @@ To estimate and fit shape and / or density profiles with CosmicProfiles, at the 
     from cosmic_profiles import DensShapeProfsGadget, updateInUnitSystem, updateOutUnitSystem
     
     # Parameters
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
-    GROUP_DEST = "/path/to/groups_035"
+    updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'E+10Msun', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     SNAP_DEST = "/path/to/snapdir_035/snap_035"
+    GROUP_DEST = "/path/to/groups_035"
+    OBJ_TYPE = 'dm'
+    SNAP = '035'
     VIZ_DEST = "./viz"  # folder will be created if not present
     CAT_DEST = "./cat"
-    D_LOGSTART = -2
-    D_LOGEND = 1
+    RVIR_OR_R200 = 'R200'
+    MIN_NUMBER_PTCS = 200
+    D_LOGSTART = -2.0
+    D_LOGEND = 1.0
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-    IT_TOL = np.float32(1e-2)
+    IT_TOL = 1e-2
     IT_WALL = 100
     IT_MIN = 10
-    SNAP = '035'
     CENTER = 'mode'
-    MIN_NUMBER_PTCS = 200
-    RVIR_OR_R200 = 'R200'
-    OBJ_TYPE = 'dm'
     
     # Instantiate object
-    cprofiles = DensShapeProfsGadget(SNAP_DEST, GROUP_DEST, SNAP, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, RVIR_OR_R200, OBJ_TYPE, VIZ_DEST, CAT_DEST)
+    cprofiles = DensShapeProfsGadget(SNAP_DEST, GROUP_DEST, OBJ_TYPE, SNAP, VIZ_DEST, CAT_DEST, RVIR_OR_R200 = RVIR_OR_R200, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
 
 with arguments and public methods explained in detail in :ref:`the code reference<Cosmic Profiles Code Reference>` but summarized here for completeness.
 
 .. dropdown:: User Parameters for DensShapeProfsGadget
 
   * ``GROUP_DEST`` and ``SNAP_DEST``: path to simulation snapshot (string, e.g. ``path/to/folder/snapdir_x``)
-  * ``VIZ_DEST`` and ``GROUP_DEST``: path to folder where to save visualizations (e.g. ``/path/to/viz``) and catalogues
-  * ``SNAP``: snapshot identifier, used when dumping files etc.
-  * ``MIN_NUMBER_PTCS``: minimum number of particles for objects to qualify for analyses (e.g. shape analysis)
-  * ``D_LOGSTART`` and ``D_LOGEND``: logarithm of minimum and maximum ellipsoidal radius of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo
-  * ``D_BINS``: number of bins to consider for shape profiling 
-  * ``IT_TOL``: convergence tolerance in shape estimation algorithm, eigenvalue fractions must differ by less than ``IT_TOL`` for algorithm to halt
-  * ``IT_WALL``: maximum permissible number of iterations in shape estimation algorithm
-  * ``IT_MIN``: minimum number of particles (DM, gas or star particles depending on ``OBJ_TYPE``) in any iteration, if undercut, shape is unclassified
-  * ``CENTER``: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density) or 'com' (center of mass) of each object (= DM halo, gas halo or star particle halo)
-  * ``RVIR_OR_R200``: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
   * ``OBJ_TYPE``: which simulation particles to consider, 'dm', 'gas' or 'stars'
-
+  * ``SNAP``: snapshot identifier, used when dumping files etc.
+  * ``VIZ_DEST`` and ``GROUP_DEST``: path to folder where to save visualizations (e.g. ``/path/to/viz``) and catalogues
+  * ``RVIR_OR_R200``: (default: 'Rvir'), 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
+  * ``MIN_NUMBER_PTCS``: (default: 200), minimum number of particles for objects to qualify for analyses (e.g. shape analysis)
+  * ``D_LOGSTART`` and ``D_LOGEND``: (default: -2.0, 0.0), logarithm of minimum and maximum ellipsoidal radius of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo
+  * ``D_BINS``: (default: 20), number of bins to consider for shape profiling 
+  * ``IT_TOL``: (default: 1e-2), convergence tolerance in shape estimation algorithm, eigenvalue fractions must differ by less than ``IT_TOL`` for algorithm to halt
+  * ``IT_WALL``: (default: 100), maximum permissible number of iterations in shape estimation algorithm
+  * ``IT_MIN``: (default: 10), minimum number of particles (DM, gas or star particles depending on ``OBJ_TYPE``) in any iteration, if undercut, shape is unclassified
+  * ``CENTER``: (default: 'mode'), shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density) or 'com' (center of mass) of each object (= DM halo, gas halo or star particle halo)
+  
 .. dropdown:: Public Methods of DensShapeProfsGadget
 
   In the following, 'object' refers to either a DM halo, a gas halo or a star particle halo, depending on ``OBJ_TYPE``. The generic public methods are
@@ -87,26 +87,27 @@ with arguments and public methods explained in detail in :ref:`the code referenc
     from cosmic_profiles import DensShapeProfs, updateInUnitSystem, updateOutUnitSystem
     
     # Parameters
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
+    updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'E+10Msun', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     xyz = ... # application-dependent
     mass_array = ... # application-dependent
     idx_cat = ... # application-dependent
     r_vir = ... # application-dependent
+    L_BOX = np.float32(10) # in_unit_length_in_cm
     SNAP = '035'
-    L_BOX = np.float32(10) # cMpc/h
+    VIZ_DEST = "./viz"  # folder will be created if not present
+    CAT_DEST = "./cat"
+    MIN_NUMBER_PTCS = 200
     D_LOGSTART = -2
     D_LOGEND = 1
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
     IT_TOL = np.float32(1e-2)
     IT_WALL = 100
     IT_MIN = 10
-    SNAP = '035'
     CENTER = 'mode'
-    MIN_NUMBER_PTCS = 200
-
+    
     # Instantiate object
-    cprofiles = DensShapeProfs(xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
+    cprofiles = DensShapeProfs(xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
 
 .. dropdown:: User Parameters for DensShapeProfs
 
@@ -114,16 +115,17 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``mass_array``: masses of all (simulation) particles in units of ``config.InUnitMass_in_g``
   * ``idx_cat``: each entry of the list is a list containing indices (to ``xyz`` and ``mass_array``, respectively) of particles belonging to an object
   * ``r_vir``: virial radii of the parent halos in units of ``config.InUnitLength_in_cm``
-  * ``SNAP``: snapshot identifier, used when dumping files etc.
   * ``L_BOX``: simulation box side length (i.e. periodicity of box) in units of ``config.InUnitLength_in_cm`` (zero if non-periodic)
-  * ``MIN_NUMBER_PTCS``: minimum number of particles for objects to qualify for analyses (e.g. shape analysis)
-  * ``D_LOGSTART`` and ``D_LOGEND``: logarithm of minimum and maximum ellipsoidal radius of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo
-  * ``D_BINS``: number of bins to consider for shape profiling 
-  * ``IT_TOL``: convergence tolerance in shape estimation algorithm, eigenvalue fractions must differ by less than ``IT_TOL`` for algorithm to halt
-  * ``IT_WALL``: maximum permissible number of iterations in shape estimation algorithm
-  * ``IT_MIN``: minimum number of particles (DM, gas or star particles depending on ``OBJ_TYPE``) in any iteration, if undercut, shape is unclassified
-  * ``CENTER``: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density) or 'com' (center of mass) of each object
-
+  * ``SNAP``: snapshot identifier, used when dumping files etc.
+  * ``VIZ_DEST`` and ``GROUP_DEST``: path to folder where to save visualizations (e.g. ``/path/to/viz``) and catalogues
+  * ``MIN_NUMBER_PTCS``: (default: 200), minimum number of particles for objects to qualify for analyses (e.g. shape analysis)
+  * ``D_LOGSTART`` and ``D_LOGEND``: (default: -2.0, 0.0), logarithm of minimum and maximum ellipsoidal radius of interest, in units of Rvir of parent halo
+  * ``D_BINS``: (default: 20), number of bins to consider for shape profiling 
+  * ``IT_TOL``: (default: 1e-2), convergence tolerance in shape estimation algorithm, eigenvalue fractions must differ by less than ``IT_TOL`` for algorithm to halt
+  * ``IT_WALL``: (default: 100), maximum permissible number of iterations in shape estimation algorithm
+  * ``IT_MIN``: (default: 10), minimum number of particles in any iteration, if undercut, shape is unclassified
+  * ``CENTER``: (default: 'mode'), shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density) or 'com' (center of mass) of each object
+  
 .. dropdown:: Public Methods of DensShapeProfs
 
   In the following, 'object' refers to the objects that are defined via the indices ``idx_cat`` provided by the user. The generic public methods are

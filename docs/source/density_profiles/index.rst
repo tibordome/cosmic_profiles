@@ -21,20 +21,20 @@ To estimate density profiles with CosmicProfiles, we first instantiate a ``DensP
     from cosmic_profiles import DensProfsGadget, updateInUnitSystem, updateOutUnitSystem
     
     # Parameters
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
-    GROUP_DEST = "/path/to/groups_035"
+    updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'E+10Msun', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     SNAP_DEST = "/path/to/snapdir_035"
+    GROUP_DEST = "/path/to/groups_035"
+    SNAP = '035'
+    OBJ_TYPE = 'dm'
     VIZ_DEST = "./viz"  # folder will be created if not present
     CAT_DEST = "./cat"
-    SNAP = '035'
-    CENTER = 'mode'
-    MIN_NUMBER_PTCS = 200
     RVIR_OR_R200 = 'R200'
-    OBJ_TYPE = 'dm'
+    MIN_NUMBER_PTCS = 200
+    CENTER = 'mode'
 
     # Instantiate object
-    cprofiles = DensProfsGadget(SNAP_DEST, GROUP_DEST, SNAP, MIN_NUMBER_PTCS, CENTER, RVIR_OR_R200, OBJ_TYPE, VIZ_DEST, CAT_DEST)
+    cprofiles = DensProfsGadget(SNAP_DEST, GROUP_DEST, SNAP, OBJ_TYPE, VIZ_DEST, CAT_DEST, RVIR_OR_R200, MIN_NUMBER_PTCS, CENTER)
 
 with arguments identical to those we saw in the :ref:`Data Structures section<Data Structures>`, except that the parameters ``D_LOGSTART``, ``D_LOGEND``, ``D_BINS``, ``IT_TOL``, ``IT_WALL`` and ``IT_MIN`` that control the behavior of the shape estimation algorithm are absent. Now we can simply invoke the command::
 

@@ -10,6 +10,7 @@ from functools import partial
 import os
 from cosmic_profiles.common.caching import np_cache_factory
 from scipy import optimize
+from cosmic_profiles.common import config
 import inspect
 import subprocess
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -151,17 +152,39 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
         y = [list(dens_profs_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
         prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
         best_fit, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200, 0)) # Fit median
+        print("best fits internal, drawDensProfs", best_fit)
         best_fit_dict = getModelParsDict(best_fit, method)
         del r200
         # Create VIZ_DEST if not available
         subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
+        # Go to outgoing unit system
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        m_current = m_internal/MASS_UNIT
+        dens_current = m_current/l_internal**3
+        dens_target = config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
+        l_current_over_target = l_internal/config.OutUnitLength_in_cm
+        dens_current_over_target = dens_current/dens_target
+        l_label, m_label, vel_lable = config.LMVLabel()
+        dens_label = r"{}/{}^3".format("({})".format(m_label) if "/h" in m_label else m_label, "({})".format(l_label) if "/h" in l_label else l_label).replace("sun", "_{\odot}")
+        length_in_cm_d, mass_in_g_d, velocity_in_cm_per_s_d = config.getAdmissibleLMV()
+        for key in list(length_in_cm_d.keys()):
+            dens_label_new = dens_label.replace("{}".format(key), "\mathrm{{ {} }}".format(key))
+            if dens_label_new != dens_label:
+                dens_label = dens_label_new
+                break
+        dens_label = dens_label.replace("E+10", "10^{10}")
+        # Best-fit parameters have dimensions too
+        best_fit_dict['rho_s'] = best_fit_dict['rho_s']*dens_current_over_target
+        print("best fits out, drawDensProfs", best_fit_dict)
+        
         # Plotting
         plt.figure()
         plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])]), best_fit_dict), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
-        plt.loglog(ROverR200, prof_median, color = 'blue')
-        plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"All objects")
+        plt.loglog(ROverR200, prof_median*dens_current_over_target, color = 'blue')
+        plt.fill_between(ROverR200, (prof_median-err_low)*dens_current_over_target, (prof_median+err_high)*dens_current_over_target, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"All objects")
         plt.xlabel(r"$r/R_{200}$")
-        plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+        plt.ylabel(r"$\rho$ [${}$]".format(dens_label))
         plt.legend(loc="upper right", fontsize="x-small")
         plt.savefig("{}/RhoProf_{}.pdf".format(VIZ_DEST, SNAP), bbox_inches="tight")
         
@@ -178,13 +201,16 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
             prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
             best_fit_m, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200_m, 0))
             best_fit_m_dict = getModelParsDict(best_fit_m, method)
+            # Best-fit parameters have dimensions too
+            best_fit_m_dict['r_s'] = best_fit_m_dict['r_s']*l_current_over_target
+            best_fit_m_dict['rho_s'] = best_fit_m_dict['rho_s']*dens_current_over_target
             # Plotting
             plt.figure()
             plt.loglog(ROverR200_fit, prof_models[method](ROverR200_fit*np.average(r200s[np.arange(r200s.shape[0])[obj_pass_m.nonzero()[0]]]), best_fit_m_dict), 'o--', color = 'r', linewidth=2, markersize=4, label=r'${}$-profile fit'.format(model_name[method]))
-            plt.loglog(ROverR200, prof_median, color = 'blue')
-            plt.fill_between(ROverR200, prof_median-err_low, prof_median+err_high, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))))
+            plt.loglog(ROverR200, prof_median*dens_current_over_target, color = 'blue')
+            plt.fill_between(ROverR200, (prof_median-err_low)*dens_current_over_target, (prof_median+err_high)*dens_current_over_target, facecolor = 'blue', edgecolor='g', alpha = 0.5, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))))
             plt.xlabel(r"$r/R_{200}$")
-            plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+            plt.ylabel(r"$\rho$ [${}$]".format(dens_label))
             plt.legend(loc="upper right", fontsize="x-small")
             plt.savefig("{}/RhoProfM{:.2f}_{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), SNAP), bbox_inches="tight")
         del y; del err_low; del err_high

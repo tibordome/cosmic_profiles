@@ -39,14 +39,14 @@ cdef class DensShapeProfsBase(DensProfsBase):
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``."""
     
-    cdef int D_LOGSTART
-    cdef int D_LOGEND
+    cdef float D_LOGSTART
+    cdef float D_LOGEND
     cdef int D_BINS
     cdef float IT_TOL
     cdef int IT_WALL
     cdef int IT_MIN
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, int[:] obj_size, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
+    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, int[:] obj_size, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
         """
         :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
         :type xyz: (N2,3) floats, N2 >> N1
@@ -117,8 +117,9 @@ cdef class DensShapeProfsBase(DensProfsBase):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, self.SUFFIX)
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
         else:
             return None, None, None, None, None, None, None, None
@@ -143,8 +144,9 @@ cdef class DensShapeProfsBase(DensProfsBase):
             isValidSelection(obj_numbers, nb_objects)
             subset_idx_cat = getSubSetIdxCat(self.idx_cat.base, self.obj_size.base, obj_numbers)
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatGlobalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, self.SUFFIX)
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
         else:
             return None, None, None, None, None, None, None, None
@@ -172,6 +174,11 @@ cdef class DensShapeProfsBase(DensProfsBase):
             # Create VIZ_DEST if not available
             subprocess.call(['mkdir', '-p', '{}'.format(self.VIZ_DEST)], cwd=os.path.join(currentdir))
             
+            # Go to outgoing unit system
+            d = config.LengthInternalToOut(d)
+            centers = config.LengthInternalToOut(centers)
+            l_label, m_label, vel_lable = config.LMVLabel()
+            
             # Viz all valid objects under 'obj_numbers'
             for idx_obj, obj_number in enumerate(obj_numbers):
                 major_obj = major[idx_obj]
@@ -186,7 +193,7 @@ cdef class DensShapeProfsBase(DensProfsBase):
                 for idx, ptc in enumerate(self.idx_cat.base[offsets[obj_number]:offsets[obj_number+1]]):
                     obj[idx] = self.xyz.base[ptc]
                     masses_obj[idx] = self.masses.base[ptc]
-                obj = respectPBCNoRef(obj, self.L_BOX)
+                obj = config.LengthInternalToOut(respectPBCNoRef(obj, self.L_BOX))
                 # Plotting
                 fig = pyplot.figure()
                 ax = Axes3D(fig, auto_add_to_figure = False)
@@ -233,9 +240,9 @@ cdef class DensShapeProfsBase(DensProfsBase):
                 fontP = FontProperties()
                 fontP.set_size('xx-small')
                 plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)        
-                plt.xlabel(r"x (Mpc/h)")
-                plt.ylabel(r"y (Mpc/h)")
-                ax.set_zlabel(r"z (Mpc/h)")
+                plt.xlabel(r"x  [{}]".format(l_label))
+                plt.ylabel(r"y  [{}]".format(l_label))
+                ax.set_zlabel(r"z  [{}]".format(l_label))
                 ax.set_box_aspect([1,1,1])
                 set_axes_equal(ax)
                 fig.savefig("{}/LocalObj{}{}{}.pdf".format(self.VIZ_DEST, obj_number, self.SUFFIX, self.SNAP), bbox_inches='tight')
@@ -261,6 +268,11 @@ cdef class DensShapeProfsBase(DensProfsBase):
             # Create VIZ_DEST if not available
             subprocess.call(['mkdir', '-p', '{}'.format(self.VIZ_DEST)], cwd=os.path.join(currentdir))
             
+            # Go to outgoing unit system
+            d = config.LengthInternalToOut(d)
+            centers = config.LengthInternalToOut(centers)
+            l_label, m_label, vel_lable = config.LMVLabel()
+            
             # Viz all valid objects under 'obj_numbers'
             for idx_obj, obj_number in enumerate(obj_numbers):
                 major_obj = major[idx_obj]
@@ -275,7 +287,7 @@ cdef class DensShapeProfsBase(DensProfsBase):
                 for idx, ptc in enumerate(self.idx_cat.base[offsets[obj_number]:offsets[obj_number+1]]):
                     obj[idx] = self.xyz.base[ptc]
                     masses_obj[idx] = self.masses.base[ptc]
-                obj = respectPBCNoRef(obj, self.L_BOX)
+                obj = config.LengthInternalToOut(respectPBCNoRef(obj, self.L_BOX))
                 # Plotting
                 fig = pyplot.figure()
                 ax = Axes3D(fig, auto_add_to_figure = False)
@@ -303,9 +315,9 @@ cdef class DensShapeProfsBase(DensProfsBase):
                 fontP = FontProperties()
                 fontP.set_size('xx-small')
                 plt.legend(bbox_to_anchor=(0.95, 1), loc='upper right', prop=fontP)  
-                plt.xlabel(r"x (Mpc/h)")
-                plt.ylabel(r"y (Mpc/h)")
-                ax.set_zlabel(r"z (Mpc/h)")
+                plt.xlabel(r"x  [{}]".format(l_label))
+                plt.ylabel(r"y  [{}]".format(l_label))
+                ax.set_zlabel(r"z  [{}]".format(l_label))
                 ax.set_box_aspect([1,1,1])
                 set_axes_equal(ax)
                 fig.savefig("{}/GlobalObj{}{}{}.pdf".format(self.VIZ_DEST, obj_number, self.SUFFIX, self.SNAP), bbox_inches='tight')
@@ -456,7 +468,7 @@ cdef class DensShapeProfs(DensShapeProfsBase):
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``"""
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST):
+    def __init__(self, xyz, masses, idx_cat, r200, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = 200, D_LOGSTART = -2.0, D_LOGEND = 0.0, D_BINS = 20, IT_TOL = 1e-2, IT_WALL = 100, IT_MIN = 10, CENTER = 'mode'):
         """
         :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
         :type xyz: (N2,3) floats, N2 >> N1
@@ -466,10 +478,14 @@ cdef class DensShapeProfs(DensShapeProfsBase):
         :type idx_cat: list of length N1
         :param r200: R_200 radii of the parent halos in config.InUnitLength_in_cm
         :type r200: (N1,) floats
-        :param SNAP: snapshot identifier, e.g. '024'
-        :type SNAP: string
         :param L_BOX: simulation box side length in config.InUnitLength_in_cm
         :type L_BOX: float
+        :param SNAP: snapshot identifier, e.g. '024'
+        :type SNAP: string
+        :param VIZ_DEST: visualization folder
+        :type VIZ_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -488,11 +504,7 @@ cdef class DensShapeProfs(DensShapeProfsBase):
         :type IT_MIN: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
-        :param CAT_DEST: catalogue destination
-        :type CAT_DEST: string"""
+        :type CENTER: str"""
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
         cdef int nb_objs = len(idx_cat)
         cdef int p
@@ -509,10 +521,11 @@ cdef class DensShapeProfs(DensShapeProfsBase):
         for p in range(nb_objs):
             if obj_pass[p] == 1:
                 cat_arr = np.hstack((cat_arr, np.int32(idx_cat[p])))
-        m_curr_over_target = config.InUnitMass_in_g/1.989e43
-        l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        m_curr_over_target = config.InUnitMass_in_g/m_internal
+        l_curr_over_target = config.InUnitLength_in_cm/l_internal
         SUFFIX = '_'
-        super().__init__(xyz.base*np.float32(l_curr_over_target), masses.base*np.float32(m_curr_over_target), cat_arr, r200.base[obj_pass.base.nonzero()[0]]*np.float32(l_curr_over_target), obj_size.base[obj_pass.base.nonzero()[0]], SNAP, L_BOX*np.float32(l_curr_over_target), MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST, SUFFIX)        
+        super().__init__(np.float32(xyz)*np.float32(l_curr_over_target), np.float32(masses)*np.float32(m_curr_over_target), cat_arr, np.float32(r200)[obj_pass.base.nonzero()[0]]*np.float32(l_curr_over_target), obj_size.base[obj_pass.base.nonzero()[0]], SNAP, np.float32(L_BOX)*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float32(D_LOGSTART), np.float32(D_LOGEND), np.int32(D_BINS), np.float32(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)        
         
 
 ############################################################################################################################
@@ -538,16 +551,23 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
     cdef str RVIR_OR_R200
     cdef str OBJ_TYPE
     
-    def __init__(self, str SNAP_DEST, str GROUP_DEST, str SNAP, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str RVIR_OR_R200, str OBJ_TYPE, str VIZ_DEST, str CAT_DEST):
+    def __init__(self, SNAP_DEST, GROUP_DEST, OBJ_TYPE, SNAP, VIZ_DEST, CAT_DEST, RVIR_OR_R200 = 'Rvir', MIN_NUMBER_PTCS = 200, D_LOGSTART = -2.0, D_LOGEND = 0.0, D_BINS = 20, IT_TOL = 1e-2, IT_WALL = 100, IT_MIN = 10, CENTER = 'mode'):
         """
         :param SNAP_DEST: where we can find the snapshot
         :type SNAP_DEST: string
         :param GROUP_DEST: where we can find the group files
         :type GROUP_DEST: string
-        :param SNAP: e.g. '024'
-        :type SNAP: string
+        :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
+        :type OBJ_TYPE: str
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
+        :param VIZ_DEST: visualization folder
+        :type VIZ_DEST: string
+        :param CAT_DEST: catalogue destination
+        :type CAT_DEST: string
+        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
+            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
+        :type RVIR_OR_R200: str
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
         :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
@@ -566,33 +586,25 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type IT_MIN: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
-        :type CENTER: str
-        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
-            with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
-        :type RVIR_OR_R200: str
-        :param OBJ_TYPE: which simulation particles to consider, 'dm', 'gas' or 'stars'
-        :type OBJ_TYPE: str
-        :param VIZ_DEST: visualization folder
-        :type VIZ_DEST: string
-        :param CAT_DEST: catalogue destination
-        :type CAT_DEST: string"""
+        :type CENTER: str"""
         self.SNAP_DEST = SNAP_DEST
         self.GROUP_DEST = GROUP_DEST
         self.RVIR_OR_R200 = RVIR_OR_R200
         self.OBJ_TYPE = OBJ_TYPE
         SUFFIX = '_{}_'.format(OBJ_TYPE)
-        l_curr_over_target = config.InUnitLength_in_cm/3.085678e24
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        l_curr_over_target = config.InUnitLength_in_cm/l_internal
         # Import hdf5 halo data
         nb_shs, sh_len, fof_sizes, group_r200 = getFoFSHData(self.GROUP_DEST, self.RVIR_OR_R200, getPartType(OBJ_TYPE))
         # Import particle data
-        xyz = readgadget.read_block(self.SNAP_DEST,"POS ",ptype=[getPartType(self.OBJ_TYPE)]) # Should be in 3.085678e24 cm units
+        xyz = readgadget.read_block(self.SNAP_DEST,"POS ",ptype=[getPartType(self.OBJ_TYPE)]) # Should be in internal length units
         masses = readgadget.read_block(self.SNAP_DEST,"MASS",ptype=[getPartType(self.OBJ_TYPE)])
         # Raise Error message if empty
         if len(nb_shs) == 0:
             raise ValueError("No subhalos found in HDF5 files.")
         if rank == 0:
             # Construct catalogue
-            obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, MIN_NUMBER_PTCS)
+            obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, np.int32(MIN_NUMBER_PTCS))
             del nb_shs; del sh_len; del fof_sizes; del group_r200
         else:
             del nb_shs; del sh_len; del fof_sizes; del group_r200; del xyz; del masses  
@@ -604,7 +616,7 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         # Find L_BOX
         head = readgadget.header(self.SNAP_DEST)
         L_BOX = np.float32(head.boxsize)
-        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float32(l_curr_over_target), MIN_NUMBER_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
+        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float32(D_LOGSTART), np.float32(D_LOGEND), np.int32(D_BINS), np.float32(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
     
     def getShapeCatVelLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Get all relevant local velocity shape data
@@ -633,8 +645,9 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             suffix = '_v{}_'.format(self.OBJ_TYPE)
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
@@ -665,8 +678,9 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             suffix = '_v{}_'.format(self.OBJ_TYPE)
             d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelGlobalBase(xyz, velxyz, masses, self.r200.base[obj_numbers], subset_idx_cat, obj_size[obj_numbers], self.IT_TOL, self.IT_WALL, self.IT_MIN, self.CENTER, self.SAFE, reduced, suffix)
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
@@ -733,8 +747,9 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         xyz = readgadget.read_block(self.SNAP_DEST,"POS ",ptype=[getPartType(self.OBJ_TYPE)])
         masses = readgadget.read_block(self.SNAP_DEST,"MASS",ptype=[getPartType(self.OBJ_TYPE)])
         if rank == 0:
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
-            m_curr_over_target = 1.989e43/config.OutUnitMass_in_g
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
+            m_curr_over_target = m_internal/config.OutUnitMass_in_g
             return xyz*l_curr_over_target, masses*m_curr_over_target
         else:
             del xyz; del masses
@@ -760,7 +775,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :rtype: (N2,3) floats"""
         velxyz = readgadget.read_block(self.SNAP_DEST,"VEL ",ptype=[getPartType(self.OBJ_TYPE)])
         if rank == 0:
-            v_curr_over_target = 1e5/config.OutUnitVelocity_in_cm_per_s
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            v_curr_over_target = vel_internal/config.OutUnitVelocity_in_cm_per_s
             return velxyz*v_curr_over_target
         else:
             del velxyz
@@ -794,7 +810,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             obj_cat, obj_r200, obj_size = calcObjCat(nb_shs, sh_len, fof_sizes, group_r200, self.MIN_NUMBER_PTCS)
             del nb_shs; del sh_len; del fof_sizes; del group_r200; del obj_cat; del obj_size
             self.r200 = obj_r200
-            l_curr_over_target = 3.085678e24/config.OutUnitLength_in_cm
+            l_internal, m_internal, vel_internal = config.getLMVInternal()
+            l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             return obj_r200*l_curr_over_target
         else:
             del nb_shs; del sh_len; del fof_sizes; del group_r200
