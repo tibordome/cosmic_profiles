@@ -152,7 +152,6 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
         y = [list(dens_profs_fit[:,i]) for i in range(ROverR200_fit.shape[0])]
         prof_median_fit = np.array([np.median(z) if z != [] else np.nan for z in y])
         best_fit, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200, 0)) # Fit median
-        print("best fits internal, drawDensProfs", best_fit)
         best_fit_dict = getModelParsDict(best_fit, method)
         del r200
         # Create VIZ_DEST if not available
@@ -176,7 +175,6 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
         dens_label = dens_label.replace("E+10", "10^{10}")
         # Best-fit parameters have dimensions too
         best_fit_dict['rho_s'] = best_fit_dict['rho_s']*dens_current_over_target
-        print("best fits out, drawDensProfs", best_fit_dict)
         
         # Plotting
         plt.figure()

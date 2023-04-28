@@ -27,15 +27,15 @@ size = comm.Get_size()
 @pytest.mark.parametrize('method, direct_binning', [p for p in itertools.product(*[['einasto', 'nfw', 'hernquist', 'alpha_beta_gamma'], [False, True]])])
 def test_densities(method, direct_binning):
     #################################### Parameters #################################################
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
-    L_BOX = np.float32(10) # Mpc/h
+    updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     SNAP = '018'
+    L_BOX = np.float32(10) # Mpc/h
+    VIZ_DEST = "./cosmic_profiles/tests/viz"
+    CAT_DEST = "./cosmic_profiles/tests/cat"
     MIN_NUMBER_DM_PTCS = 1000
     CENTER = 'mode'
     r_over_rvir = np.logspace(-2,0,50)
-    VIZ_DEST = "./cosmic_profiles/tests/viz"
-    CAT_DEST = "./cosmic_profiles/tests/cat"
     nb_model_pars = {'einasto': 3, 'nfw': 2, 'hernquist': 2, 'alpha_beta_gamma': 5}
     N = 10 # Number of halos used for test
     
@@ -74,7 +74,7 @@ def test_densities(method, direct_binning):
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define DensProfs object ##############################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, VIZ_DEST, CAT_DEST)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS = MIN_NUMBER_DM_PTCS, CENTER = CENTER)
     
     ############################## Estimate Density Profiles #########################################
     obj_numbers = np.arange(5)

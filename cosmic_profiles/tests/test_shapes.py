@@ -27,19 +27,19 @@ size = comm.Get_size()
 @pytest.mark.parametrize('method, reduced, shell_based', [p for p in itertools.product(*[['einasto', 'nfw', 'hernquist', 'alpha_beta_gamma'], [False, True], [False, True]])])
 def test_shapes(method, reduced, shell_based):
     #################################### Parameters ################################################
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
+    updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     L_BOX = np.float32(10) # Mpc/h
+    SNAP = '016'
     VIZ_DEST = "./cosmic_profiles/tests/viz"
     CAT_DEST = "./cosmic_profiles/tests/cat"
+    MIN_NUMBER_DM_PTCS = 1000
     D_LOGSTART = -2
     D_LOGEND = 0
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
     IT_TOL = np.float32(1e-2)
     IT_WALL = 100
     IT_MIN = 10
-    SNAP = '016'
-    MIN_NUMBER_DM_PTCS = 1000
     CENTER = 'mode'
     HIST_NB_BINS = 11 # Number of bins used for e.g. ellipticity histogram
     frac_r200 = 0.5 # At what depth to calculate e.g. histogram of triaxialities (cf. plotLocalTHist())
@@ -81,7 +81,7 @@ def test_shapes(method, reduced, shell_based):
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
     
     idx_cat, obj_size = cprofiles.getIdxCat()
     obj_numbers = [0, 1, 2, 3, 4, 5]
@@ -155,7 +155,7 @@ def test_shapes(method, reduced, shell_based):
     cprofiles.vizGlobalShapes(obj_numbers = obj_numbers, reduced = reduced)
     
     ######################### Calculating Ellipsoidal Density Profiles ######################################################
-    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True, reduced = reduced, shell_based = shell_based) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True, reduced = reduced, shell_based = shell_based) # dens_profs_db is in M_sun*h^2/kpc^3
     dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = False) # These estimates will be kernel-based
     if rank == 0:
         nb_suff_res = len(obj_numbers)

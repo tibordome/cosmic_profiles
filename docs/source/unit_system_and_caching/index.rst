@@ -10,12 +10,10 @@ To avoid ambiguities in the units that are provided by the user vs the units tha
     from cosmic_profiles import updateInUnitSystem, updateOutUnitSystem
     
     # Unit System
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e21, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
+    updateInUnitSystem(length_in_cm = 3.085678e21, mass_in_g = 1.989e43, velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 3.085678e24, mass_in_g = 1.989e33, velocity_in_cm_per_s = 1e5, little_h = 0.6774)
 
-Here, the combination of ``in_unit_length_in_cm``, ``in_unit_mass_in_g`` and ``in_unit_velocity_in_cm_per_s`` determines the unit system of the data provided by the user. For instance, the combination above is the unit sytem that is often used in cosmological simulations. By analogy, the combination of ``out_unit_length_in_cm``, ``out_unit_mass_in_g`` and ``out_unit_velocity_in_cm_per_s`` fully determines the unit system of the CosmicProfiles outputs (such as density profiles).
-
-.. note:: The plotting functionalities of CosmicProfiles will disregard the 'outgoing' unit system. For instance, ``plotDensProfs()`` will always plot density profiles in units of :math:`M_{\odot}h^2/\mathrm{Mpc}^3` vs normalized radius.
+Here, the combination of ``length_in_cm``, ``mass_in_g`` and ``velocity_in_cm_per_s`` determines the unit system of the data provided by the user. For instance, the combination above is the unit sytem that is often used in cosmological simulations. By analogy, the combination of ``length_in_cm``, ``mass_in_g`` and ``velocity_in_cm_per_s`` fully determines the unit system of the CosmicProfiles outputs (such as density profiles).
 
 .. warning:: When handing over density profiles as arguments to ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()``, please make sure the units are as determined by the 'outgoing' unit system. This is important when a user employs the functionalities ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()`` directly, with density profiles obtained in some other way.
 

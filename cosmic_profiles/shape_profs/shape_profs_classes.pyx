@@ -48,19 +48,19 @@ cdef class DensShapeProfsBase(DensProfsBase):
     
     def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, int[:] obj_size, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
         """
-        :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
+        :param xyz: positions of all simulation particles in Mpc/h (internal length units)
         :type xyz: (N2,3) floats, N2 >> N1
-        :param masses: masses of all simulation particles in config.InUnitMass_in_g
+        :param masses: masses of all simulation particles in 10^10*M_sun/h (internal mass units)
         :type masses: (N2,) floats
         :param idx_cat: contains indices of particles belonging to an object
         :type idx_cat: (N3,) integers
-        :param r200: R_200 radii of the parent halos in config.InUnitLength_in_cm
+        :param r200: R_200 radii of the parent halos in Mpc/h (internal length units)
         :type r200: (N1,) floats
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
         :param SNAP: snapshot identifier, e.g. '024'
         :type SNAP: string
-        :param L_BOX: simulation box side length in config.InUnitLength_in_cm
+        :param L_BOX: simulation box side length in Mpc/h (internal length units)
         :type L_BOX: float
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
@@ -758,7 +758,7 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
     def _getXYZMasses(self):
         """ Retrieve positions and masses of particles
         
-        :return xyz, masses: positions in Mpc/h and masses in 10^10*M_sun*h^2/(Mpc)**3
+        :return xyz, masses: positions in Mpc/h (internal length units) and masses in 10^10*M_sun*h^2/(Mpc)**3
         :rtype: (N2,3) floats, (N2,) floats"""
         xyz = readgadget.read_block(self.SNAP_DEST,"POS ",ptype=[getPartType(self.OBJ_TYPE)])
         masses = readgadget.read_block(self.SNAP_DEST,"MASS",ptype=[getPartType(self.OBJ_TYPE)])
