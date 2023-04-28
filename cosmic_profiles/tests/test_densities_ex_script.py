@@ -65,7 +65,7 @@ def test_densities_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensProfs object ########################################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!

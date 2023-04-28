@@ -74,7 +74,7 @@ def test_densities(method, direct_binning):
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define DensProfs object ##############################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ############################## Estimate Density Profiles #########################################
     obj_numbers = np.arange(5)
