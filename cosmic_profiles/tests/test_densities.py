@@ -33,7 +33,7 @@ def test_densities(method, direct_binning):
     L_BOX = np.float32(10) # Mpc/h
     VIZ_DEST = "./cosmic_profiles/tests/viz"
     CAT_DEST = "./cosmic_profiles/tests/cat"
-    MIN_NUMBER_DM_PTCS = 1000
+    MIN_NUMBER_PTCS = 1000
     CENTER = 'mode'
     r_over_rvir = np.logspace(-2,0,50)
     nb_model_pars = {'einasto': 3, 'nfw': 2, 'hernquist': 2, 'alpha_beta_gamma': 5}
@@ -74,7 +74,7 @@ def test_densities(method, direct_binning):
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define DensProfs object ##############################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS = MIN_NUMBER_DM_PTCS, CENTER = CENTER)
+    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ############################## Estimate Density Profiles #########################################
     obj_numbers = np.arange(5)
