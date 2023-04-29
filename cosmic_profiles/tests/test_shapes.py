@@ -33,7 +33,7 @@ def test_shapes(method, reduced, shell_based):
     SNAP = '016'
     VIZ_DEST = "./cosmic_profiles/tests/viz"
     CAT_DEST = "./cosmic_profiles/tests/cat"
-    MIN_NUMBER_DM_PTCS = 1000
+    MIN_NUMBER_PTCS = 1000
     D_LOGSTART = -2
     D_LOGEND = 0
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
@@ -81,30 +81,37 @@ def test_shapes(method, reduced, shell_based):
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define CosmicProfilesDirect object ###################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
     
     idx_cat, obj_size = cprofiles.getIdxCat()
     obj_numbers = [0, 1, 2, 3, 4, 5]
-    centers, ms = cprofiles.getMassesCenters(obj_numbers)
+    objs = cprofiles.getMassesCenters(obj_numbers)
     if rank == 0:
+        ms = objs["mass"]
+        centers = objs["centre"]
         assert len(obj_size) <= len(idx_cat_in) # Note: idx_cat only contains objects with sufficient resolution
         assert centers.shape == (len(obj_numbers),3)
         assert ms.shape == (len(obj_numbers),)
     
     ######################### Calculating Local Morphological Properties #############################
     # Create halo shape catalogue
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(obj_numbers, reduced = reduced, shell_based = shell_based)
+    shapes = cprofiles.getShapeCatLocal(obj_numbers, reduced = reduced, shell_based = shell_based)
+    
     
     if rank == 0:
-        nb_suff_res = len(obj_numbers)
-        assert obj_masses.shape[0] == nb_suff_res
-        assert obj_centers.shape[0] == nb_suff_res
-        assert d.shape[0] == nb_suff_res
-        assert q.shape[0] == nb_suff_res
-        assert s.shape[0] == nb_suff_res
-        assert minor.shape[0] == nb_suff_res
-        assert inter.shape[0] == nb_suff_res
-        assert major.shape[0] == nb_suff_res
+        nb_selected = len(obj_numbers)
+        d = shapes["d"]
+        q = shapes["q"]
+        s = shapes["s"]
+        minor = shapes["minor"]
+        inter = shapes["inter"]
+        major = shapes["major"]
+        assert d.shape[0] == nb_selected
+        assert q.shape[0] == nb_selected
+        assert s.shape[0] == nb_selected
+        assert minor.shape[0] == nb_selected
+        assert inter.shape[0] == nb_selected
+        assert major.shape[0] == nb_selected
         assert d.shape[1] == D_BINS+1
         assert q.shape[1] == D_BINS+1
         assert s.shape[1] == D_BINS+1
@@ -126,27 +133,30 @@ def test_shapes(method, reduced, shell_based):
     
     ######################### Calculating Global Morphological Properties ############################
     obj_numbers = np.arange(N)
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(obj_numbers = obj_numbers, reduced = reduced)
+    shapes = cprofiles.getShapeCatGlobal(obj_numbers = obj_numbers, reduced = reduced)
+    objs = cprofiles.getMassesCenters(obj_numbers)
     
     if rank == 0:
-        nb_suff_res = len(obj_numbers)
-        assert obj_masses.shape[0] == nb_suff_res
-        assert obj_centers.shape[0] == nb_suff_res
-        assert d.shape[0] == nb_suff_res
-        assert q.shape[0] == nb_suff_res
-        assert s.shape[0] == nb_suff_res
-        assert minor.shape[0] == nb_suff_res
-        assert inter.shape[0] == nb_suff_res
-        assert major.shape[0] == nb_suff_res
-        assert d.shape[1] == 1
-        assert q.shape[1] == 1
-        assert s.shape[1] == 1
-        assert minor.shape[1] == 1
-        assert minor.shape[2] == 3
-        assert inter.shape[1] == 1
-        assert inter.shape[2] == 3
-        assert major.shape[1] == 1
-        assert major.shape[2] == 3
+        nb_selected = len(obj_numbers)
+        d = shapes["d"]
+        q = shapes["q"]
+        s = shapes["s"]
+        minor = shapes["minor"]
+        inter = shapes["inter"]
+        major = shapes["major"]
+        obj_masses = objs["mass"]
+        obj_centers = objs["centre"]
+        assert obj_masses.shape[0] == nb_selected
+        assert obj_centers.shape[0] == nb_selected
+        assert d.shape[0] == nb_selected
+        assert q.shape[0] == nb_selected
+        assert s.shape[0] == nb_selected
+        assert minor.shape[0] == nb_selected
+        assert inter.shape[0] == nb_selected
+        assert major.shape[0] == nb_selected
+        assert minor.shape[1] == 3
+        assert inter.shape[1] == 3
+        assert major.shape[1] == 3
     
     # Plot halo ellipticity histogram
     cprofiles.plotGlobalEpsHist(HIST_NB_BINS, obj_numbers = obj_numbers)
@@ -158,13 +168,13 @@ def test_shapes(method, reduced, shell_based):
     dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True, reduced = reduced, shell_based = shell_based) # dens_profs_db is in M_sun*h^2/kpc^3
     dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = False) # These estimates will be kernel-based
     if rank == 0:
-        nb_suff_res = len(obj_numbers)
-        assert dens_profs_db.shape[0] == nb_suff_res
+        nb_selected = len(obj_numbers)
+        assert dens_profs_db.shape[0] == nb_selected
         assert dens_profs_db.shape[1] == r_over_rvir.shape[0]
-        assert dens_profs_kb.shape[0] == nb_suff_res
+        assert dens_profs_kb.shape[0] == nb_selected
         assert dens_profs_kb.shape[1] == r_over_rvir.shape[0]
     else:
-        dens_profs_db = np.zeros((nb_suff_res, r_over_rvir.shape[0]), dtype = np.float32)
+        dens_profs_db = np.zeros((nb_selected, r_over_rvir.shape[0]), dtype = np.float32)
     comm.Bcast(dens_profs_db, root = 0)
     
     ############################## Fit Ellipsoidal Density Profile ##########################################################
@@ -172,8 +182,9 @@ def test_shapes(method, reduced, shell_based):
     dens_profs_db_fit = dens_profs_db[:,10:]
     best_fits = cprofiles.fitDensProfs(dens_profs_db_fit, r_over_rvir_fit, method = method, obj_numbers = obj_numbers)
     if rank == 0:
-        assert best_fits.shape[0] == nb_suff_res
-        assert best_fits.shape[1] == nb_model_pars[method]
+        rho_s = best_fits['rho_s']
+        assert rho_s.shape[0] == nb_selected
+        assert best_fits.shape[0] == nb_selected
         
     # Draw ellipsoidal halo density profiles (overall and mass-decomposed ones). The results from fitDensProfs() got cached.
     cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db[:,25:], r_over_rvir[25:], method = 'nfw', nb_bins = 2, obj_numbers = obj_numbers)

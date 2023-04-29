@@ -26,7 +26,7 @@ def test_shapes_ex_script():
     SNAP = '015'
     CAT_DEST = "./cosmic_profiles/tests/cat"
     VIZ_DEST = "./cosmic_profiles/tests/viz"
-    MIN_NUMBER_DM_PTCS = 200
+    MIN_NUMBER_PTCS = 200
     D_LOGSTART = -2
     D_LOGEND = 0
     D_BINS = 20 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
@@ -59,7 +59,7 @@ def test_shapes_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensShapeProfs object #######################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
     
     ######################### Calculating Morphological Properties #################################
     # Create halo shape catalogue

@@ -93,4 +93,3 @@ def test_densities(method, direct_binning):
     best_fits = cprofiles.fitDensProfs(dens_profs_fit, r_over_rvir_fit, method = method, obj_numbers = obj_numbers)
     if rank == 0:
         assert best_fits.shape[0] == nb_suff_res
-        assert best_fits.shape[1] == nb_model_pars[method]

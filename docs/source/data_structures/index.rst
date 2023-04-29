@@ -31,7 +31,7 @@ To estimate and fit shape and / or density profiles with CosmicProfiles, at the 
     # Instantiate object
     cprofiles = DensShapeProfsGadget(SNAP_DEST, GROUP_DEST, OBJ_TYPE, SNAP, VIZ_DEST, CAT_DEST, RVIR_OR_R200 = RVIR_OR_R200, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
 
-with arguments and public methods explained in detail in :ref:`the code reference<Cosmic Profiles Code Reference>` but summarized here for completeness.
+All arguments and public methods are explained in detail in :ref:`the code reference<Cosmic Profiles Code Reference>` but summarized here for completeness.
 
 .. dropdown:: User Parameters for DensShapeProfsGadget
 
@@ -57,14 +57,14 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``getVelXYZMasses()``: retrieve velocities of particles in units of ``config.OutUnitVelocity_in_cm_per_s``
   * ``getR200()``: fetch R200 value of all objects (that have sufficient resolution as is implicitly assumed everywhere) in units of ``config.OutUnitLength_in_cm``
   * ``getIdxCat()``: fetch index catalogue (each row contains indices of particles belonging to an object) and object sizes (number of particles in each object)
-  * ``getMassesCenters(obj_numbers)``: calculate and return centers (in units of ``config.OutUnitLength_in_cm``) and total masses of objects (in units of ``config.OutUnitMass_in_g``)
+  * ``getMassesCenters(obj_numbers)``: returns structured numpy array, calculates and returns centers (via ``['centre']``) in units of ``config.OutUnitLength_in_cm`` and total masses of objects (via ``['mass']``) in units of ``config.OutUnitMass_in_g``
   * ``getObjInfo()``: print basic info such as number of objects with sufficient resolution, number of subhalos, number of objects (halos) that have no subhalos etc.,
   * ``getHeader()``: get header of gadget snapshot file, in order to retrieve e.g. box size (``head.boxsize``) or redshift (``head.redshift``)
 
   the density profiling-related public methods are
   
   * ``estDensProfs(ROverR200, obj_numbers, direct_binning = True, spherical = True, reduced = False, shell_based = False)``: estimate density profiles at normalized radii ``ROverR200``
-  * ``fitDensProfs(dens_profs, ROverR200, method, obj_numbers)``: get best-fit results for density profile fitting
+  * ``fitDensProfs(dens_profs, ROverR200, method, obj_numbers)``: returns structured numpy array, get best-fit results for density profile fitting via ``['rho_s']`` etc
   * ``estConcentrations(dens_profs, ROverR200, method, obj_numbers)``: get best-fit concentration values from density profile fitting
   * ``plotDensProfs(dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, method, nb_bins, obj_numbers)``: draw some simplistic density profiles and save in ``VIZ_DEST`` (string, e.g. ``/path/to/viz``)
 
@@ -133,13 +133,13 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``getXYZMasses()``: retrieve positions in units of ``config.OutUnitLength_in_cm`` and masses of particles in units of ``config.OutUnitMass_in_g``
   * ``getR200()``: fetch R200 value of all objects (that have sufficient resolution as is implicitly assumed everywhere) in units of ``config.OutUnitLength_in_cm``
   * ``getIdxCat()``: fetch index catalogue (each row contains indices of particles belonging to an object) and object sizes (number of particles in each object)
-  * ``getMassesCenters(obj_numbers)``: calculate and return centers (in units of ``config.OutUnitLength_in_cm``) and total masses of objects (in units of ``config.OutUnitMass_in_g``)
+  * ``getMassesCenters(obj_numbers)``: returns structured numpy array, calculates and returns centers (via ``['centre']``) in units of ``config.OutUnitLength_in_cm`` and total masses of objects (via ``['mass']``) in units of ``config.OutUnitMass_in_g``
   * ``getObjInfo()``: print basic info such as number of objects with sufficient resolution etc.,
 
   the density profiling-related public methods are
   
   * ``estDensProfs(ROverR200, obj_numbers, direct_binning = True, spherical = True)``: estimate density profiles at normalized radii ``ROverR200``
-  * ``fitDensProfs(dens_profs, ROverR200, method, obj_numbers)``: get best-fit results for density profile fitting
+  * ``fitDensProfs(dens_profs, ROverR200, method, obj_numbers)``: returns structured numpy array, get best-fit results for density profile fitting via ``['rho_s']`` etc
   * ``estConcentrations(dens_profs, ROverR200, method, obj_numbers)``: get best-fit concentration values from density profile fitting
   * ``plotDensProfs(dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, method, nb_bins, obj_numbers)``: draw some simplistic density profiles and save in ``VIZ_DEST``
   
@@ -156,3 +156,11 @@ with arguments and public methods explained in detail in :ref:`the code referenc
   * ``plotShapeProfs(nb_bins, obj_numbers, reduced = False, shell_based = False)``: plot shape profiles, also mass bin-decomposed ones
   * ``dumpShapeCatLocal(CAT_DEST, obj_numbers, reduced = False, shell_based = False)``: dumps all relevant local shape data into ``CAT_DEST``
   * ``dumpShapeCatGlobal(CAT_DEST, obj_numbers, reduced = False, shell_based = False)``: dumps all relevant global shape data into ``CAT_DEST``.
+  
+In both the Gadget and general point cloud case, some basic catalogue information can be retrieved via::
+
+    obj_numbers = np.arange(10) # First 10 (sufficiently resolved, according to MIN_NUMBER_PTCS) objects
+    objs = getMassesCenters(obj_numbers)``obj_centers`` and ``obj_masses`` refer to object centers and total masses, respectively.
+    centre = objs['centre'] # Object centres
+    mass = objs['mass']
+    print(getObjInfo()) # Prints basic info such as the number of objects with sufficient resolution, number of subhalos, number of objects (halos) that have no subhalos etc

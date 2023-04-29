@@ -83,7 +83,7 @@ cdef class DensProfsBase(CosmicBase):
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return centers, m: centers in config.OutUnitLength_in_cm and masses in config.OutUnitMass_in_g
-        :rtype: (N,3) and (N,) floats"""
+        :rtype: structured array, containing (N,3) and (N,) floats"""
         return
     
     def _getMassesCenters(self, obj_numbers):
@@ -130,7 +130,7 @@ cdef class DensProfsBase(CosmicBase):
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return: best-fits for each object
-        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
+        :rtype: structured array, containing (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         return
         
     def estConcentrations(self, dens_profs, ROverR200, str method, obj_numbers): # Public Method

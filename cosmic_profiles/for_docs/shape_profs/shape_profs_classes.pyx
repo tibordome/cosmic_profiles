@@ -92,9 +92,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type shell_based: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
-            (number_of_objs,3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays, 
+            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
         return
     
     def getShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
@@ -106,9 +105,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays, 
-            (number_of_objs, 3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
+            3 x (number_of_objs, 3) float arrays"""
         return
     
     def vizLocalShapes(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
@@ -388,9 +386,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type shell_based: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays,
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
-            (number_of_objs,3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays,
+            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
         return
     
     def getShapeCatVelGlobal(self, obj_numbers, bint reduced = False): # Public Method
@@ -402,9 +399,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays, 
-            (number_of_objs, 3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
+            3 x (number_of_objs, 3) float arrays´"""
         return
 
     def dumpShapeVelCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method

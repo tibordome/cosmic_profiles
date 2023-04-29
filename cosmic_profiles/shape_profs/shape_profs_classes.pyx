@@ -106,9 +106,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type shell_based: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
-            (number_of_objs,3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays, 
+            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
@@ -120,9 +119,18 @@ cdef class DensShapeProfsBase(DensProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
+            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            shapes = np.zeros((len(obj_numbers), self.D_BINS+1), dtype=SHAPE_PROF_DTYPE)
+            shapes["d"] = d*l_curr_over_target
+            shapes["q"] = q
+            shapes["s"] = s
+            shapes["minor"] = minor
+            shapes["inter"] = inter
+            shapes["major"] = major
+            shapes["is_conv"] = ~np.isnan(q)
+            return shapes
         else:
-            return None, None, None, None, None, None, None, None
+            return None
     
     def getShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Get all relevant global shape data
@@ -133,9 +141,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays, 
-            (number_of_objs, 3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
+            3 x (number_of_objs, 3) float arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
@@ -147,9 +154,18 @@ cdef class DensShapeProfsBase(DensProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
+            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            shapes = np.zeros((len(obj_numbers),), dtype=SHAPE_PROF_DTYPE)
+            shapes["d"] = d[:,0]*l_curr_over_target
+            shapes["q"] = q[:,0]
+            shapes["s"] = s[:,0]
+            shapes["minor"] = minor[:,0,:]
+            shapes["inter"] = inter[:,0,:]
+            shapes["major"] = major[:,0,:]
+            shapes["is_conv"] = ~np.isnan(q[:,0])
+            return shapes
         else:
-            return None, None, None, None, None, None, None, None
+            return None
     
     def vizLocalShapes(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Visualize local shape of objects with numbers ``obj_numbers``
@@ -629,9 +645,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type shell_based: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs, D_BINS+1) float arrays,
-            3 x (number_of_objs, D_BINS+1, 3) float arrays, 
-            (number_of_objs,3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays,
+            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatVelLocal() with snap {0}'.format(self.SNAP))
         xyz, masses = self._getXYZMasses()
         velxyz = self._getVelXYZ()
@@ -648,10 +663,19 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
+            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            shapes = np.zeros((len(obj_numbers), self.D_BINS+1), dtype=SHAPE_PROF_DTYPE)
+            shapes["d"] = d*l_curr_over_target
+            shapes["q"] = q
+            shapes["s"] = s
+            shapes["minor"] = minor
+            shapes["inter"] = inter
+            shapes["major"] = major
+            shapes["is_conv"] = ~np.isnan(q)
+            return shapes
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return None, None, None, None, None, None, None, None
+            return None
     
     def getShapeCatVelGlobal(self, obj_numbers, bint reduced = False): # Public Method
         """ Get all relevant global velocity shape data
@@ -662,9 +686,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays, 
-            (number_of_objs, 3) float array, (number_of_objs,) float array"""
+        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
+            3 x (number_of_objs, 3) float arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatVelGlobal() with snap {0}'.format(self.SNAP))
         xyz, masses = self._getXYZMasses()
         velxyz = self._getVelXYZ()
@@ -681,10 +704,19 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            return d*l_curr_over_target, q, s, minor, inter, major, obj_centers*l_curr_over_target, obj_masses*m_curr_over_target
+            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            shapes = np.zeros((len(obj_numbers),), dtype=SHAPE_PROF_DTYPE)
+            shapes["d"] = d[:,0]*l_curr_over_target
+            shapes["q"] = q[:,0]
+            shapes["s"] = s[:,0]
+            shapes["minor"] = minor[:,0,:]
+            shapes["inter"] = inter[:,0,:]
+            shapes["major"] = major[:,0,:]
+            shapes["is_conv"] = ~np.isnan(q[:,0])
+            return shapes
         else:
             del xyz; del velxyz; del masses; del idx_cat; del obj_size
-            return None, None, None, None, None, None, None, None
+            return None
 
     def dumpShapeVelCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``

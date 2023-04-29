@@ -67,8 +67,8 @@ def createLogNormUni(L_BOX, nbar, redshift, Nmesh, UNIT_MASS):
         return None, None, None, None, None, None, None, None
 
 ############## Parameters ####################################################################################
-updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e43, in_unit_velocity_in_cm_per_s = 1e5)
-updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
+updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+updateOutUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
 L_BOX = np.float32(10) # Mpc/h
 nbar = 8e+3 # If too small, e.g. 5e+3: pynbody later yields OSError: Corrupt header record. If too large, need many GBs of RAM.
 Nmesh = 256
@@ -76,13 +76,13 @@ redshift = 5.5
 h = 0.6774
 UNIT_MASS = 10**10 # in M_sun
 SNAP = '025'
-D_LOGSTART = -2
-D_LOGEND = 0
+D_LOGSTART = -2.0
+D_LOGEND = 0.0
 D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
 IT_TOL = np.float32(1e-2)
 IT_WALL = 100
 IT_MIN = 10
-MIN_NUMBER_DM_PTCS = 200
+MIN_NUMBER_PTCS = 200
 CENTER = 'mode'
 CAT_DEST = "./cat"
 VIZ_DEST = "./viz"
@@ -188,7 +188,7 @@ def AHFEx():
     #############################################################################################################
     
     ############## Run cosmic_profiles: define DensShapeProfs object ############################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
     if rank == 0:
         h_idx_cat_len = len(cprofiles.getIdxCat()[1])
     else:

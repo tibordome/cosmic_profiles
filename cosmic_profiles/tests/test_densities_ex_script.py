@@ -77,7 +77,10 @@ def test_densities_ex_script():
     r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db_fit = dens_profs_db[0,10:]
     best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', obj_numbers = obj_numbers) # best fit is in out units
-    model_pars = {'rho_s': best_fit[0,0], 'alpha': best_fit[0,1], 'r_s': best_fit[0,2]}
+    rho_s = best_fit['rho_s']
+    alpha = best_fit['alpha']
+    r_s = best_fit['r_s']
+    model_pars = {'rho_s': rho_s, 'alpha': alpha, 'r_s': r_s}
     
     cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', nb_bins = 3, obj_numbers = obj_numbers)
     
@@ -89,7 +92,7 @@ def test_densities_ex_script():
         plt.figure()
         plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='direct binning', markersize = 3)
         plt.loglog(r_over_rvir, dens_profs_kb, 'o--', label='kernel-based', markersize = 3)
-        plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0]*l_in_over_out, model_pars), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} kpc/h'.format(alpha, r_s*l_in_over_out))
+        plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0]*l_in_over_out, model_pars), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} kpc/h'.format(alpha[0], r_s[0]*l_in_over_out))
         plt.xlabel(r'r/$R_{\mathrm{vir}}$')
         plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / kpc${{}}^3$]")
         plt.legend(fontsize="small", loc='lower left')

@@ -43,11 +43,20 @@ Since the second weighting scheme with :math:`w_k = \frac{1}{r_k^2}` has recentl
 
 After instantiating an object ``cprofiles`` as outlined in :ref:`Data Structures section<Data Structures>`, one can calculate and retrieve the local (i.e. as a function of :math:`r_{\text{ell}}`) halo shape catalogue by::
 
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False).
+    shapes = cprofiles.getShapeCatLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False).
 
-The morphological information in ``d``, ``q``, ``s``, ``minor``, ``inter`` and ``major`` represents the shape profiles while ``obj_centers`` and ``obj_masses`` refer to object centers and total masses, respectively. The ``obj_numbers`` argument expects a list of two integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. 
+The morphological information in the structured numpy array ``shapes`` can be retrieved by dictionary-like semantics. ``d = shapes['d']``, ``q = shapes['q']``, ``s = shapes['s']``, ``minor = shapes['minor']``, ``inter = shapes['inter']`` and ``major = shapes['major']`` represents the shape profiles. The ``obj_numbers`` argument expects a list of integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. 
 
-.. warning:: The arrays ``d``, ``q``, ``s``, ``minor``, ``inter`` and ``major`` will contain NaNs whenever the shape determination does not converge. We consider the shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``IT_TOL`` and the maximum number of iterations ``IT_WALL`` is not yet achieved.
+.. warning:: The arrays ``d``, ``q``, ``s``, ``minor``, ``inter`` and ``major`` that can be retrieved from the structured numpy array ``shapes`` will contain NaNs whenever the shape determination does not converge. 
+
+.. note:: We consider the shape determination at a specific :math:`r_{\text{ell}}` to be converged if the fractional difference between consecutive eigenvalue fractions falls below ``IT_TOL`` and the maximum number of iterations ``IT_WALL`` is not yet achieved. 
+
+The ``shapes`` structured array contains a field ``is_conv`` which is ``True`` whenever the shape calculation converged, ``True`` otherwise. If you wanted to do some analysis on the e.g. 21st halo but wanted to remove unconverged bins, one could do something like::
+
+    shape = shapes[20]
+    is_conv = shapes[20]['is_conv']
+    shape = shape[is_conv]
+    ...
 
 If :math:`N_{\text{pass}}` stands for the number of objects that have been selected with the ``obj_numbers`` argument and in addition are sufficiently resolved, then the 1D and 2D shape profile arrays will have the following format:
 
@@ -85,13 +94,13 @@ Global Shapes
 
 Instead of shape profiles one might also be interested in obtaining the shape parameters and principal axes of the point clouds as a whole. This information can be obtained by calling::
 
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatGlobal(obj_numbers = np.arange(10), reduced = False).
+    shapes = cprofiles.getShapeCatGlobal(obj_numbers = np.arange(10), reduced = False).
 
-If a global shape calculations does not converge (which is rare), the corresponding entry in ``q`` etc. will feature a NaN. As with shape profiles, we can dump the global shape catalogue in a destination ``self.CAT_DEST`` of choice via::
+If a global shape calculations does not converge (which is rare), the corresponding entry in ``q = shapes['q']`` etc. will feature a NaN. As with shape profiles, we can dump the global shape catalogue in a destination ``self.CAT_DEST`` of choice via::
 
     cprofiles.dumpShapeCatGlobal(reduced = False),
 
-which will some files to the destination folder.
+which will save some files in the destination folder.
 
 .. dropdown:: Global Shapes, Dumped Files
 
@@ -112,7 +121,7 @@ Velocity Dispersion Tensor Eigenaxes
 
 For Gadget-style I, II, or HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling::
 
-    d, q, s, minor, inter, major, obj_centers, obj_masses = cprofiles.getShapeCatVelLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False)
+    shapes = cprofiles.getShapeCatVelLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False)
 
 for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(obj_numbers = np.arange(10), reduced = False)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(obj_numbers = np.arange(10), reduced = False)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``self.CAT_DEST``.
 

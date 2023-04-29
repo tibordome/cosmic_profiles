@@ -101,7 +101,7 @@ cdef class DensProfsBase(CosmicBase):
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return centers, m: centers in config.OutUnitLength_in_cm and masses in config.OutUnitMass_in_g
-        :rtype: (N,3) and (N,) floats"""
+        :rtype: structured array, containing (N,3) and (N,) floats"""
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
         if rank == 0:
@@ -112,7 +112,11 @@ cdef class DensProfsBase(CosmicBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
-            return centers*l_curr_over_target, ms*m_curr_over_target
+            OBJECT_PROPERTIES_DTYPE = [("centre", "f4", (3,)), ("mass", "f4")]
+            objs = np.zeros((len(obj_numbers),), dtype=OBJECT_PROPERTIES_DTYPE)
+            objs["centre"] = centers*l_curr_over_target
+            objs["mass"] = ms*m_curr_over_target
+            return objs
         else:
             return None, None
     
@@ -190,9 +194,26 @@ cdef class DensProfsBase(CosmicBase):
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return: best-fits for each object
-        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
+        :rtype: structured array, containing (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         best_fits = self._fitDensProfsBase(self.r200.base, self.obj_size.base, np.float32(dens_profs), np.float32(ROverR200), method, obj_numbers)
-        return best_fits
+        model_pars = {'einasto': [('alpha', "f4"), ('r_s', "f4")], 'nfw': [('r_s', "f4")], 'hernquist': [('r_s', "f4")], 'alpha_beta_gamma': [('alpha', "f4"), ('beta', "f4"), ('gamma', "f4"), ('r_s', "f4")]}
+        FITS_PROF_DTYPE = [("rho_s", "f4")] + [tuple_ for tuple_ in model_pars[method]]
+        FITS_PROF_DTYPE+=[("is_conv", "bool")]
+        best_fits_s = np.zeros((len(obj_numbers),), dtype=FITS_PROF_DTYPE)
+        best_fits_s["rho_s"] = best_fits[:,0]
+        if method == 'einasto':
+            best_fits_s["alpha"] = best_fits[:,1]
+            best_fits_s["r_s"] = best_fits[:,2]
+        elif method == 'nfw' or method == 'hernquist':
+            best_fits_s["r_s"] = best_fits[:,1]
+        else:
+            assert method == 'alpha_beta_gamma'
+            best_fits_s["alpha"] = best_fits[:,1]
+            best_fits_s["beta"] = best_fits[:,2]
+            best_fits_s["gamma"] = best_fits[:,3]
+            best_fits_s["r_s"] = best_fits[:,4]
+        best_fits_s["is_conv"] = ~np.isnan(best_fits[:,1])
+        return best_fits_s
         
     def estConcentrations(self, dens_profs, ROverR200, str method, obj_numbers): # Public Method
         """ Get best-fit concentration values of objects from density profile fitting
