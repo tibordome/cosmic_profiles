@@ -536,17 +536,13 @@ def calcCoM(xyz, masses):
     :type masses: (N,3) floats
     :return: com, center of mass
     :rtype: (3,) floats"""
-    com = np.zeros((3,), dtype = np.float64)
     # Average over some random particles and recentre with respect to that to avoid large numbers
     rng = default_rng(seed=0)
     choose = rng.choice(np.arange(len(xyz)), (min(50,len(xyz)),), replace = False)
     ref_xyz = np.average(xyz[choose], axis = 0)
     delta_xyz = xyz.copy()-ref_xyz
     mass_total = np.sum(masses)
-    for run in range(xyz.shape[0]):
-        com[0] += masses[run]*delta_xyz[run,0]/mass_total
-        com[1] += masses[run]*delta_xyz[run,1]/mass_total
-        com[2] += masses[run]*delta_xyz[run,2]/mass_total
+    com = np.sum(np.reshape(masses, (len(masses),1))*delta_xyz/mass_total, axis = 0)
     com = com+ref_xyz
     return com
 
