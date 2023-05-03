@@ -534,15 +534,35 @@ def calcCoM(xyz, masses):
     :return: com, center of mass
     :rtype: (3,) floats"""
     com = np.zeros((3,), dtype = np.float32)
-    mass_total = 0.0
+    # Average over some reference particles to avoid large numbers
+    ref_xyz = np.average(xyz[:30], axis = 0)
+    delta_xyz = xyz.copy()-ref_xyz
+    mass_total = np.sum(masses)
     for run in range(xyz.shape[0]):
-        mass_total += masses[run]
-    for run in range(xyz.shape[0]):
-        com[0] += masses[run]*xyz[run,0]/mass_total
-        com[1] += masses[run]*xyz[run,1]/mass_total
-        com[2] += masses[run]*xyz[run,2]/mass_total
+        com[0] += masses[run]*delta_xyz[run,0]/mass_total
+        com[1] += masses[run]*delta_xyz[run,1]/mass_total
+        com[2] += masses[run]*delta_xyz[run,2]/mass_total
+    com = com+ref_xyz
     return com
 
+def recentreObject(xyz, L_BOX):
+    """ Recentre object if fallen outside [L_BOX]^3 due to e.g. respectPBCNoRef()
+    
+    :param xyz: coordinates of particles of type 1 or type 4
+    :type xyz: (N,3) floats
+    :param L_BOX: periodicity of box (0.0 if non-periodic)
+    :type L_BOX: float
+    :return: updated coordinates of particles
+    :rtype: (N^3x3) floats"""
+    xyz_out = xyz.copy()
+    xyz_out[:,0][xyz_out[:,0] >= L_BOX] = xyz_out[:,0][xyz_out[:,0] >= L_BOX]-L_BOX
+    xyz_out[:,0][xyz_out[:,0] < 0.0] = xyz_out[:,0][xyz_out[:,0] < 0.0]+L_BOX
+    xyz_out[:,1][xyz_out[:,1] >= L_BOX] = xyz_out[:,1][xyz_out[:,1] >= L_BOX]-L_BOX
+    xyz_out[:,1][xyz_out[:,1] < 0.0] = xyz_out[:,1][xyz_out[:,1] < 0.0]+L_BOX
+    xyz_out[:,2][xyz_out[:,2] >= L_BOX] = xyz_out[:,2][xyz_out[:,2] >= L_BOX]-L_BOX
+    xyz_out[:,2][xyz_out[:,2] < 0.0] = xyz_out[:,2][xyz_out[:,2] < 0.0]+L_BOX
+    return xyz_out
+    
 def getCatWithinFracR200(cat_in, obj_size_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
     """ Cleanse index catalogue ``cat_in`` of particles beyond R200 ``r200``
     

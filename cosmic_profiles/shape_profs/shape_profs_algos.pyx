@@ -7,7 +7,7 @@ import numpy as np
 from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
 from libc.stdio cimport printf
 from cython.parallel import prange
-from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode
+from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode, recentreObject
 from cosmic_profiles.common.caching import np_cache_factory
 cimport cython
 from libc.math cimport sqrt
@@ -627,6 +627,8 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
     
 @cython.embedsignature(True)
@@ -733,6 +735,8 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_c
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
     
 @cython.embedsignature(True)
@@ -854,6 +858,8 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
     
 @cython.embedsignature(True)
@@ -968,6 +974,8 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
 
 @cython.embedsignature(True)

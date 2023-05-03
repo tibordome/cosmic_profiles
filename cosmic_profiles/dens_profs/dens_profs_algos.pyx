@@ -7,7 +7,7 @@ import numpy as np
 cimport cython
 from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
 from scipy.interpolate import interp1d
-from cosmic_profiles.common.python_routines import respectPBCNoRef, calcMode, calcCoM
+from cosmic_profiles.common.python_routines import respectPBCNoRef, calcMode, calcCoM, recentreObject
 from cython.parallel import prange
 from cosmic_profiles.common.caching import np_cache_factory
 
@@ -36,6 +36,8 @@ def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] ob
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
     cdef float[:] m = np.zeros((obj_size.shape[0],), dtype = np.float32)
     cdef float[:,:] centers = np.zeros((obj_size.shape[0],3), dtype = np.float32)
+    #centre = calcCoM(xyz.base[idx_cat.base[offsets[0]:offsets[0+1]]], masses.base[idx_cat.base[offsets[0]:offsets[0+1]]])
+    #print("inside calcMassesCenters(), centre is", centre, offsets[0], offsets[0+1])
     for p in range(obj_size.shape[0]): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
         if CENTER == 'mode':
@@ -46,6 +48,8 @@ def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] ob
         for n in range(obj_size[p]):
             m[p] = m[p] + masses[idx_cat[offsets[p]+n]]
     del idx_cat; del obj_size; del masses
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return centers.base, m.base # Only rank = 0 content matters
    
 @cython.embedsignature(True)
