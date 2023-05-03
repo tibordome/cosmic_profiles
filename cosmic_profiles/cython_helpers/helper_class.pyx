@@ -16,7 +16,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef complex[::1,:] calcShapeTensor(float[:,:] nns, int[:] select, complex[::1,:] shape_tensor, float[:] masses, float[:] center, int nb_pts, bint reduced, float[:] r_ell = None) nogil:
+    cdef complex[::1,:] calcShapeTensor(double[:,:] nns, int[:] select, complex[::1,:] shape_tensor, double[:] masses, double[:] center, int nb_pts, bint reduced, double[:] r_ell = None) nogil:
         """ Calculate shape tensor for point cloud
         
         :param nns: positions of cloud particles
@@ -59,7 +59,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float calcLocalSpread(float[:,:] nns) nogil:
+    cdef float calcLocalSpread(double[:,:] nns) nogil:
         """ Calculate local spread (2nd moment) around center of volume of point cloud
         
         :param nns: positions of cloud particles
@@ -82,7 +82,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcCoM(float[:,:] nns, float[:] masses, float[:] com) nogil:
+    cdef double[:] calcCoM(double[:,:] nns, double[:] masses, double[:] com) nogil:
         """ Return center of mass (COM)
         
         :param nns: positions of cloud particles
@@ -166,7 +166,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:,:] respectPBCNoRef(float[:,:] xyz, float L_BOX) nogil:
+    cdef double[:,:] respectPBCNoRef(double[:,:] xyz, float L_BOX) nogil:
         """
         Modify xyz inplace so that it respects the box periodicity.
         
@@ -201,7 +201,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcDensProfBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] bin_edges, float[:] dens_prof, int[:] shell) nogil:
+    cdef double[:] calcDensProfBruteForceSph(double[:,:] xyz, double[:] masses, double[:] center, float r_200, double[:] bin_edges, double[:] dens_prof, int[:] shell) nogil:
         """ Calculates spherically averaged density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -243,7 +243,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcDensProfBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float r_200, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] dens_prof, int[:] shell) nogil:
+    cdef double[:] calcDensProfBruteForceEll(double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, double[:] center, float r_200, double[:] a, double[:] b, double[:] c, double[:,:] major, double[:,:] inter, double[:,:] minor, double[:] dens_prof, int[:] shell) nogil:
         """ Calculates ellipsoidal shell-based density profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -308,7 +308,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcMenclsBruteForceSph(float[:,:] xyz, float[:] masses, float[:] center, float r_200, float[:] ROverR200, float[:] Mencl, int[:] ellipsoid) nogil:
+    cdef double[:] calcMenclsBruteForceSph(double[:,:] xyz, double[:] masses, double[:] center, float r_200, double[:] ROverR200, double[:] Mencl, int[:] ellipsoid) nogil:
         """ Calculates spherically averaged enclosed mass profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles
@@ -350,7 +350,7 @@ cdef class CythonHelpers:
     @cython.boundscheck(False)
     @cython.wraparound(False) 
     @staticmethod
-    cdef float[:] calcMenclsBruteForceEll(float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, float[:] center, float[:] a, float[:] b, float[:] c, float[:,:] major, float[:,:] inter, float[:,:] minor, float[:] Mencl, int[:] ellipsoid) nogil:
+    cdef double[:] calcMenclsBruteForceEll(double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, double[:] center, double[:] a, double[:] b, double[:] c, double[:,:] major, double[:,:] inter, double[:,:] minor, double[:] Mencl, int[:] ellipsoid) nogil:
         """ Calculates ellipsoid-based mass profile for one object with coordinates `xyz` and masses `masses`
         
         :param xyz: positions of cloud particles

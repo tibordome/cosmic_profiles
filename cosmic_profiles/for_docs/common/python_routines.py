@@ -9,6 +9,7 @@ import numpy as np
 import math
 from scipy.linalg import cholesky
 from numpy.linalg import inv
+from numpy.random import default_rng
 
 def eTo10(st):
     """Replace e+{xy} by "10^{xy}" etc..
@@ -510,10 +511,12 @@ def respectPBCNoRef(xyz, L_BOX = None):
     :rtype: (N^3x3) floats"""
     if L_BOX != 0.0:
         xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
-        ref = 0 # Reference particle does not matter
-        dist_x = xyz_out[:,0]-xyz_out[ref, 0]
-        dist_y = xyz_out[:,1]-xyz_out[ref, 1]
-        dist_z = xyz_out[:,2]-xyz_out[ref, 2]
+        rng = default_rng(seed=0) # Reference particle does not matter, i.e. ref = 0 is an option, but it is better to average over some random particles
+        choose = rng.choice(np.arange(len(xyz)), (min(50,len(xyz)),), replace = False)
+        ref_xyz = np.average(xyz_out[choose], axis = 0)
+        dist_x = xyz_out[:,0]-ref_xyz[0]
+        dist_y = xyz_out[:,1]-ref_xyz[1]
+        dist_z = xyz_out[:,2]-ref_xyz[2]
         xyz_out[:,0][dist_x > L_BOX/2] = xyz_out[:,0][dist_x > L_BOX/2]-L_BOX
         xyz_out[:,0][dist_x < -L_BOX/2] = xyz_out[:,0][dist_x < -L_BOX/2]+L_BOX
         xyz_out[:,1][dist_y > L_BOX/2] = xyz_out[:,1][dist_y > L_BOX/2]-L_BOX
@@ -533,15 +536,37 @@ def calcCoM(xyz, masses):
     :type masses: (N,3) floats
     :return: com, center of mass
     :rtype: (3,) floats"""
-    com = np.zeros((3,), dtype = np.float32)
-    mass_total = 0.0
+    com = np.zeros((3,), dtype = np.float64)
+    # Average over some random particles and recentre with respect to that to avoid large numbers
+    rng = default_rng(seed=0)
+    choose = rng.choice(np.arange(len(xyz)), (min(50,len(xyz)),), replace = False)
+    ref_xyz = np.average(xyz[choose], axis = 0)
+    delta_xyz = xyz.copy()-ref_xyz
+    mass_total = np.sum(masses)
     for run in range(xyz.shape[0]):
-        mass_total += masses[run]
-    for run in range(xyz.shape[0]):
-        com[0] += masses[run]*xyz[run,0]/mass_total
-        com[1] += masses[run]*xyz[run,1]/mass_total
-        com[2] += masses[run]*xyz[run,2]/mass_total
+        com[0] += masses[run]*delta_xyz[run,0]/mass_total
+        com[1] += masses[run]*delta_xyz[run,1]/mass_total
+        com[2] += masses[run]*delta_xyz[run,2]/mass_total
+    com = com+ref_xyz
     return com
+
+def recentreObject(xyz, L_BOX):
+    """ Recentre object if fallen outside [L_BOX]^3 due to e.g. respectPBCNoRef()
+    
+    :param xyz: coordinates of particles of type 1 or type 4
+    :type xyz: (N,3) floats
+    :param L_BOX: periodicity of box (0.0 if non-periodic)
+    :type L_BOX: float
+    :return: updated coordinates of particles
+    :rtype: (N^3x3) floats"""
+    xyz_out = xyz.copy()
+    xyz_out[:,0][xyz_out[:,0] >= L_BOX] = xyz_out[:,0][xyz_out[:,0] >= L_BOX]-L_BOX
+    xyz_out[:,0][xyz_out[:,0] < 0.0] = xyz_out[:,0][xyz_out[:,0] < 0.0]+L_BOX
+    xyz_out[:,1][xyz_out[:,1] >= L_BOX] = xyz_out[:,1][xyz_out[:,1] >= L_BOX]-L_BOX
+    xyz_out[:,1][xyz_out[:,1] < 0.0] = xyz_out[:,1][xyz_out[:,1] < 0.0]+L_BOX
+    xyz_out[:,2][xyz_out[:,2] >= L_BOX] = xyz_out[:,2][xyz_out[:,2] >= L_BOX]-L_BOX
+    xyz_out[:,2][xyz_out[:,2] < 0.0] = xyz_out[:,2][xyz_out[:,2] < 0.0]+L_BOX
+    return xyz_out
 
 def getCatWithinFracR200(cat_in, obj_size_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
     """ Cleanse index catalogue ``cat_in`` of particles beyond R200 ``r200``

@@ -6,6 +6,7 @@ from scipy.spatial import cKDTree
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.random import default_rng
 import math
 from scipy.linalg import cholesky
 from numpy.linalg import inv
@@ -233,7 +234,7 @@ def getDelta(z, OMEGA_M, OMEGA_L):
     :rtype: float"""
     x = (OMEGA_M*(1+z)**3)/(OMEGA_M*(1+z)**3+OMEGA_L)-1
     DELTA = (18*np.pi**2 + 82*x - 39*x**2)/(x+1) - 1
-    return np.float32(DELTA)
+    return np.float64(DELTA)
 
 def set_axes_equal(ax: plt.Axes):
     """Set 3D plot axes to equal scale.
@@ -510,10 +511,12 @@ def respectPBCNoRef(xyz, L_BOX = None):
     :rtype: (N^3x3) floats"""
     if L_BOX != 0.0:
         xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
-        ref = 0 # Reference particle does not matter
-        dist_x = xyz_out[:,0]-xyz_out[ref, 0]
-        dist_y = xyz_out[:,1]-xyz_out[ref, 1]
-        dist_z = xyz_out[:,2]-xyz_out[ref, 2]
+        rng = default_rng(seed=0) # Reference particle does not matter, i.e. ref = 0 is an option, but it is better to average over some random particles
+        choose = rng.choice(np.arange(len(xyz)), (min(50,len(xyz)),), replace = False)
+        ref_xyz = np.average(xyz_out[choose], axis = 0)
+        dist_x = xyz_out[:,0]-ref_xyz[0]
+        dist_y = xyz_out[:,1]-ref_xyz[1]
+        dist_z = xyz_out[:,2]-ref_xyz[2]
         xyz_out[:,0][dist_x > L_BOX/2] = xyz_out[:,0][dist_x > L_BOX/2]-L_BOX
         xyz_out[:,0][dist_x < -L_BOX/2] = xyz_out[:,0][dist_x < -L_BOX/2]+L_BOX
         xyz_out[:,1][dist_y > L_BOX/2] = xyz_out[:,1][dist_y > L_BOX/2]-L_BOX
@@ -533,9 +536,11 @@ def calcCoM(xyz, masses):
     :type masses: (N,3) floats
     :return: com, center of mass
     :rtype: (3,) floats"""
-    com = np.zeros((3,), dtype = np.float32)
-    # Average over some reference particles to avoid large numbers
-    ref_xyz = np.average(xyz[:30], axis = 0)
+    com = np.zeros((3,), dtype = np.float64)
+    # Average over some random particles and recentre with respect to that to avoid large numbers
+    rng = default_rng(seed=0)
+    choose = rng.choice(np.arange(len(xyz)), (min(50,len(xyz)),), replace = False)
+    ref_xyz = np.average(xyz[choose], axis = 0)
     delta_xyz = xyz.copy()-ref_xyz
     mass_total = np.sum(masses)
     for run in range(xyz.shape[0]):
@@ -588,7 +593,7 @@ def getCatWithinFracR200(cat_in, obj_size_in, xyz, masses, L_BOX, CENTER, r200, 
     :rtype: list of length N1"""
     cat_out = np.empty(0, dtype = np.int32)
     obj_size_out = np.zeros((len(obj_size_in),), dtype = np.int32)
-    centers = np.zeros((len(obj_size_in),3), dtype = np.float32)
+    centers = np.zeros((len(obj_size_in),3), dtype = np.float64)
     for idx in range(len(obj_size_in)): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz[cat_in[np.sum(obj_size_in[:idx]):np.sum(obj_size_in[:idx+1])]], L_BOX)
         if CENTER == 'mode':

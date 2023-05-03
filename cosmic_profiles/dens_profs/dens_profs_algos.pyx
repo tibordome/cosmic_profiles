@@ -12,7 +12,7 @@ from cython.parallel import prange
 from cosmic_profiles.common.caching import np_cache_factory
 
 @cython.embedsignature(True)
-def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcMassesCenters(double[:,:] xyz, double[:] masses, int[:] idx_cat, int[:] obj_size, double L_BOX, str CENTER):
     """ Calculate total mass and centers of objects
     
     :param xyz: positions of all simulation particles
@@ -34,10 +34,8 @@ def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] ob
     cdef int p
     cdef int n
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
-    cdef float[:] m = np.zeros((obj_size.shape[0],), dtype = np.float32)
-    cdef float[:,:] centers = np.zeros((obj_size.shape[0],3), dtype = np.float32)
-    #centre = calcCoM(xyz.base[idx_cat.base[offsets[0]:offsets[0+1]]], masses.base[idx_cat.base[offsets[0]:offsets[0+1]]])
-    #print("inside calcMassesCenters(), centre is", centre, offsets[0], offsets[0+1])
+    cdef double[:] m = np.zeros((obj_size.shape[0],), dtype = np.float64)
+    cdef double[:,:] centers = np.zeros((obj_size.shape[0],3), dtype = np.float64)
     for p in range(obj_size.shape[0]): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
         if CENTER == 'mode':
@@ -53,7 +51,7 @@ def calcMassesCenters(float[:,:] xyz, float[:] masses, int[:] idx_cat, int[:] ob
     return centers.base, m.base # Only rank = 0 content matters
    
 @cython.embedsignature(True)
-def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcDensProfsSphDirectBinning(double[:,:] xyz, double[:] masses, double[:] r200s, double[:] ROverR200, int[:] idx_cat, int[:] obj_size, double L_BOX, str CENTER):
     """ Calculates spherical shell-based density profiles for objects defined by indices found in `idx_cat`    
     
     Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForce()`` instead of ``CythonHelpers.calcDensProfBruteForce()``
@@ -66,7 +64,7 @@ def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     :type r200s: (N1,) floats
     :param ROverR200: radii at which the density profiles should be calculated,
         normalized by R200
-    :type ROverR200: (r_res,) float array
+    :type ROverR200: (r_res,) double array
     :param idx_cat: contains indices of particles belonging to an object
     :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
@@ -77,24 +75,24 @@ def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
         or 'com' (center of mass) of each halo
     :type CENTER: str
     :return: density profiles defined at ROverR200
-    :rtype: (N1, r_res) float array"""
+    :rtype: (N1, r_res) double array"""
     cdef int nb_objs = obj_size.shape[0]
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
     cdef int largest_size = np.max(obj_size.base)
     # Determine endpoints of radial bins
-    cdef float[:] bin_edges = np.hstack(([np.float32(1e-8), (ROverR200.base[:-1] + ROverR200.base[1:])/2., ROverR200.base[-1]])) # Length = ROverR200.shape[0]+1
+    cdef double[:] bin_edges = np.hstack(([np.float64(1e-8), (ROverR200.base[:-1] + ROverR200.base[1:])/2., ROverR200.base[-1]])) # Length = ROverR200.shape[0]+1
     cdef int r_res = ROverR200.shape[0]
     cdef int p
     cdef int n
     if nb_objs == 0:
-        return np.zeros((0,r_res), dtype = np.float32)
+        return np.zeros((0,r_res), dtype = np.float64)
     # Define memoryviews
-    cdef float[:,:] dens_profs = np.zeros((nb_objs, r_res), dtype = np.float32)
-    cdef float[:,:] bin_edges_tiled = np.reshape(np.tile(bin_edges.base, reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), r_res+1))
+    cdef double[:,:] dens_profs = np.zeros((nb_objs, r_res), dtype = np.float64)
+    cdef double[:,:] bin_edges_tiled = np.reshape(np.tile(bin_edges.base, reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), r_res+1))
     cdef int[:,:] shell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.int32)
-    cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size, 3), dtype = np.float32)
-    cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
-    cdef float[:,:] centers = np.zeros((nb_objs,3), dtype = np.float32)
+    cdef double[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size, 3), dtype = np.float64)
+    cdef double[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
+    cdef double[:,:] centers = np.zeros((nb_objs,3), dtype = np.float64)
     for p in range(nb_objs): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
         if CENTER == 'mode':
@@ -111,7 +109,7 @@ def calcDensProfsSphDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     return dens_profs.base
    
 @cython.embedsignature(True)
-def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, float[:,:] a, float[:,:] b, float[:,:] c, float[:,:,:] major, float[:,:,:] inter, float[:,:,:] minor, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcDensProfsEllDirectBinning(double[:,:] xyz, double[:] masses, double[:] r200s, double[:] ROverR200, double[:,:] a, double[:,:] b, double[:,:] c, double[:,:,:] major, double[:,:,:] inter, double[:,:,:] minor, int[:] idx_cat, int[:] obj_size, double L_BOX, str CENTER):
     """ Calculates ellipsoidal shell-based density profiles for objects defined by indices found in `idx_cat`    
     
     Note: To calculate enclosed mass profiles, envoke ``CythonHelpers.calcMenclsBruteForceEll()`` instead of ``CythonHelpers.calcDensProfBruteForceEll()``
@@ -124,7 +122,7 @@ def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     :type r200s: (N1,) floats
     :param ROverR200: radii at which the density profiles should be calculated,
         normalized by R200
-    :type ROverR200: (r_res,) float array
+    :type ROverR200: (r_res,) double array
     :param idx_cat: contains indices of particles belonging to an object
     :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
@@ -147,30 +145,30 @@ def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     :param minor: minor axis eigenvectors
     :type minor: (N1,D_BINS+1,3) floats
     :return: density profiles defined at ROverR200
-    :rtype: (N1, r_res) float array"""
+    :rtype: (N1, r_res) double array"""
     assert a.shape[0] == b.shape[0]
     assert b.shape[0] == c.shape[0]
     cdef int nb_objs = obj_size.shape[0]
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
     cdef int largest_size = np.max(obj_size.base)
     # Determine endpoints of radial bins
-    cdef float[:] r_midpoints = (ROverR200.base[:-1] + ROverR200.base[1:])/2
-    cdef float[:] bin_edges = np.hstack(([np.float32(r_midpoints[0]*r_midpoints[0]/r_midpoints[1]), r_midpoints.base, ROverR200.base[-1]])) # Length = ROverR200.shape[0]+1
+    cdef double[:] r_midpoints = (ROverR200.base[:-1] + ROverR200.base[1:])/2
+    cdef double[:] bin_edges = np.hstack(([np.float64(r_midpoints[0]*r_midpoints[0]/r_midpoints[1]), r_midpoints.base, ROverR200.base[-1]])) # Length = ROverR200.shape[0]+1
     cdef int r_res = ROverR200.shape[0]
     cdef int p
     cdef int n
     if nb_objs == 0:
-        return np.zeros((0,r_res), dtype = np.float32)
+        return np.zeros((0,r_res), dtype = np.float64)
     # Interpolate shape information to radii of interest
-    cdef float[:,:] a_interpol = np.zeros((nb_objs,r_res+1), dtype = np.float32)
-    cdef float[:,:] b_interpol = np.zeros((nb_objs,r_res+1), dtype = np.float32)
-    cdef float[:,:] c_interpol = np.zeros((nb_objs,r_res+1), dtype = np.float32)
-    cdef float[:,:,:] major_interpol = np.zeros((nb_objs,r_res,3), dtype = np.float32)
-    cdef float[:,:,:] inter_interpol = np.zeros((nb_objs,r_res,3), dtype = np.float32)
-    cdef float[:,:,:] minor_interpol = np.zeros((nb_objs,r_res,3), dtype = np.float32)
+    cdef double[:,:] a_interpol = np.zeros((nb_objs,r_res+1), dtype = np.float64)
+    cdef double[:,:] b_interpol = np.zeros((nb_objs,r_res+1), dtype = np.float64)
+    cdef double[:,:] c_interpol = np.zeros((nb_objs,r_res+1), dtype = np.float64)
+    cdef double[:,:,:] major_interpol = np.zeros((nb_objs,r_res,3), dtype = np.float64)
+    cdef double[:,:,:] inter_interpol = np.zeros((nb_objs,r_res,3), dtype = np.float64)
+    cdef double[:,:,:] minor_interpol = np.zeros((nb_objs,r_res,3), dtype = np.float64)
     for p in range(nb_objs):
         idx_cat.base[offsets[p]:offsets[p+1]] = np.array(idx_cat[p])
-        r_vec = np.float32(a.base[p])
+        r_vec = np.float64(a.base[p])
         a_inter = interp1d(r_vec, a.base[p], bounds_error=False, fill_value='extrapolate')
         b_inter = interp1d(r_vec, b.base[p], bounds_error=False, fill_value='extrapolate')
         c_inter = interp1d(r_vec, c.base[p], bounds_error=False, fill_value='extrapolate')
@@ -196,7 +194,7 @@ def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
         minor_interpol.base[p,:,1] = minory_inter(ROverR200.base*r200s[p])
         minor_interpol.base[p,:,2] = minorz_inter(ROverR200.base*r200s[p])
     # Calculate centers of objects
-    cdef float[:,:] centers = np.zeros((nb_objs,3), dtype = np.float32)
+    cdef double[:,:] centers = np.zeros((nb_objs,3), dtype = np.float64)
     for p in range(nb_objs):
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
         if CENTER == 'mode':
@@ -204,11 +202,11 @@ def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
         else:
             centers.base[p] = calcCoM(xyz_, masses.base[idx_cat.base[offsets[p]:offsets[p+1]]])
     # Prepare density profile estimation
-    cdef float[:,:] dens_profs = np.zeros((nb_objs, r_res), dtype = np.float32)
+    cdef double[:,:] dens_profs = np.zeros((nb_objs, r_res), dtype = np.float64)
     cdef int[:,:] shell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.int32)
-    cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size, 3), dtype = np.float32)
-    cdef float[:,:,:] xyz_obj_princ = np.zeros((openmp.omp_get_max_threads(), largest_size, 3), dtype = np.float32)
-    cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
+    cdef double[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size, 3), dtype = np.float64)
+    cdef double[:,:,:] xyz_obj_princ = np.zeros((openmp.omp_get_max_threads(), largest_size, 3), dtype = np.float64)
+    cdef double[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
     for p in prange(nb_objs, schedule = 'dynamic', nogil = True):
         for n in range(obj_size[p]):
             xyz_obj[openmp.omp_get_thread_num(),n] = xyz[idx_cat[offsets[p]+n]]
@@ -220,7 +218,7 @@ def calcDensProfsEllDirectBinning(float[:,:] xyz, float[:] masses, float[:] r200
     return dens_profs.base
   
 @cython.embedsignature(True)
-def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, float[:] ROverR200, int[:] idx_cat, int[:] obj_size, float L_BOX, str CENTER):
+def calcDensProfsKernelBased(double[:,:] xyz, double[:] masses, double[:] r200s, double[:] ROverR200, int[:] idx_cat, int[:] obj_size, double L_BOX, str CENTER):
     """ Calculates kernel-based density profiles for objects defined by indices found in `idx_cat`
     
     Note: For background on this kernel-based method consult Reed et al. 2003, https://arxiv.org/abs/astro-ph/0312544.
@@ -233,7 +231,7 @@ def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, fl
     :type r200s: (N1,) floats
     :param ROverR200: radii at which the density profiles should be calculated,
         normalized by R200
-    :type ROverR200: (r_res,) float array
+    :type ROverR200: (r_res,) double array
     :param idx_cat: contains indices of particles belonging to an object
     :type idx_cat: (N3,) integers
     :param obj_size: indicates how many particles are in each object
@@ -244,7 +242,7 @@ def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, fl
         or 'com' (center of mass) of each halo
     :type CENTER: str
     :return: density profiles defined at ROverR200
-    :rtype: (N1, r_res) float array"""
+    :rtype: (N1, r_res) double array"""
     
     cdef int nb_objs = obj_size.shape[0]
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
@@ -254,15 +252,15 @@ def calcDensProfsKernelBased(float[:,:] xyz, float[:] masses, float[:] r200s, fl
     cdef int r_idx
     cdef int n
     if nb_objs == 0:
-        return np.zeros((0,r_res), dtype = np.float32)
+        return np.zeros((0,r_res), dtype = np.float64)
     # Define memoryviews
-    cdef float[:,:] dens_profs = np.zeros((nb_objs, r_res), dtype = np.float32)
+    cdef double[:,:] dens_profs = np.zeros((nb_objs, r_res), dtype = np.float64)
     cdef int[:] shell = np.zeros((largest_size), dtype = np.int32)
-    cdef float[:,:] xyz_obj = np.zeros((largest_size, 3), dtype = np.float32)
-    cdef float[:] m_obj = np.zeros((largest_size), dtype = np.float32)
-    cdef float[:,:] centers = np.zeros((nb_objs,3), dtype = np.float32)
-    cdef float[:] dists = np.zeros((largest_size,), dtype = np.float32) # Distances from center of halo
-    cdef float[:] hs = np.zeros((largest_size,), dtype = np.float32) # Kernel widths
+    cdef double[:,:] xyz_obj = np.zeros((largest_size, 3), dtype = np.float64)
+    cdef double[:] m_obj = np.zeros((largest_size), dtype = np.float64)
+    cdef double[:,:] centers = np.zeros((nb_objs,3), dtype = np.float64)
+    cdef double[:] dists = np.zeros((largest_size,), dtype = np.float64) # Distances from center of halo
+    cdef double[:] hs = np.zeros((largest_size,), dtype = np.float64) # Kernel widths
     for p in range(nb_objs): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
         if CENTER == 'mode':

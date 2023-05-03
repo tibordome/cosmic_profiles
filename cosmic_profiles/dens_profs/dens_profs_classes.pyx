@@ -22,7 +22,7 @@ cdef class DensProfsBase(CosmicBase):
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``."""
     
-    def __init__(self, float[:,:] xyz, float[:] masses, int[:] idx_cat, float[:] r200, int[:] obj_size, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
+    def __init__(self, double[:,:] xyz, double[:] masses, int[:] idx_cat, double[:] r200, int[:] obj_size, str SNAP, double L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
         """
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
         :type xyz: (N2,3) floats, N2 >> N1
@@ -112,7 +112,7 @@ cdef class DensProfsBase(CosmicBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
-            OBJECT_PROPERTIES_DTYPE = [("centre", "f4", (3,)), ("mass", "f4")]
+            OBJECT_PROPERTIES_DTYPE = [("centre", "f8", (3,)), ("mass", "f8")]
             objs = np.zeros((len(obj_numbers),), dtype=OBJECT_PROPERTIES_DTYPE)
             objs["centre"] = centers*l_curr_over_target
             objs["mass"] = ms*m_curr_over_target
@@ -162,7 +162,7 @@ cdef class DensProfsBase(CosmicBase):
         cdef int D_LOGSTART
         cdef int D_LOGEND 
         cdef int D_BINS
-        cdef float IT_TOL
+        cdef double IT_TOL
         cdef int IT_WALL
         cdef int IT_MIN
         try:
@@ -179,7 +179,7 @@ cdef class DensProfsBase(CosmicBase):
             IT_TOL = 0.0
             IT_WALL = 0
             IT_MIN = 0
-        dens_profs = self._estDensProfsBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat.base, self.obj_size.base, np.float32(ROverR200), obj_numbers, direct_binning, spherical, reduced, shell_based, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN)
+        dens_profs = self._estDensProfsBase(self.xyz.base, self.masses.base, self.r200.base, self.idx_cat.base, self.obj_size.base, np.float64(ROverR200), obj_numbers, direct_binning, spherical, reduced, shell_based, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN)
         return dens_profs
     
     def fitDensProfs(self, dens_profs, ROverR200, str method, obj_numbers): # Public Method
@@ -195,9 +195,9 @@ cdef class DensProfsBase(CosmicBase):
         :type obj_numbers: list of int
         :return: best-fits for each object
         :rtype: structured array, containing (N3, n) floats, where n is the number of free parameters in the model ``method``"""
-        best_fits = self._fitDensProfsBase(self.r200.base, self.obj_size.base, np.float32(dens_profs), np.float32(ROverR200), method, obj_numbers)
-        model_pars = {'einasto': [('alpha', "f4"), ('r_s', "f4")], 'nfw': [('r_s', "f4")], 'hernquist': [('r_s', "f4")], 'alpha_beta_gamma': [('alpha', "f4"), ('beta', "f4"), ('gamma', "f4"), ('r_s', "f4")]}
-        FITS_PROF_DTYPE = [("rho_s", "f4")] + [tuple_ for tuple_ in model_pars[method]]
+        best_fits = self._fitDensProfsBase(self.r200.base, self.obj_size.base, np.float64(dens_profs), np.float64(ROverR200), method, obj_numbers)
+        model_pars = {'einasto': [('alpha', "f8"), ('r_s', "f8")], 'nfw': [('r_s', "f8")], 'hernquist': [('r_s', "f8")], 'alpha_beta_gamma': [('alpha', "f8"), ('beta', "f8"), ('gamma', "f8"), ('r_s', "f8")]}
+        FITS_PROF_DTYPE = [("rho_s", "f8")] + [tuple_ for tuple_ in model_pars[method]]
         FITS_PROF_DTYPE+=[("is_conv", "bool")]
         best_fits_s = np.zeros((len(obj_numbers),), dtype=FITS_PROF_DTYPE)
         best_fits_s["rho_s"] = best_fits[:,0]
@@ -229,7 +229,7 @@ cdef class DensProfsBase(CosmicBase):
         :type obj_numbers: list of int
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
-        cs = self._estConcentrationsBase(self.r200.base, self.obj_size.base, np.float32(dens_profs), np.float32(ROverR200), method, obj_numbers)
+        cs = self._estConcentrationsBase(self.r200.base, self.obj_size.base, np.float64(dens_profs), np.float64(ROverR200), method, obj_numbers)
         return cs
         
     def plotDensProfs(self, dens_profs, ROverR200, dens_profs_fit, ROverR200_fit, str method, int nb_bins, obj_numbers): # Public Method
@@ -252,7 +252,7 @@ cdef class DensProfsBase(CosmicBase):
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         """
-        self._plotDensProfsBase(self.r200.base, self.obj_size.base, np.float32(dens_profs), np.float32(ROverR200), np.float32(dens_profs_fit), np.float32(ROverR200_fit), method, self.SUFFIX, nb_bins, obj_numbers)
+        self._plotDensProfsBase(self.r200.base, self.obj_size.base, np.float64(dens_profs), np.float64(ROverR200), np.float64(dens_profs_fit), np.float64(ROverR200_fit), method, self.SUFFIX, nb_bins, obj_numbers)
             
     def getObjInfo(self): # Public Method
         """ Print basic info about the objects"""
@@ -297,6 +297,11 @@ cdef class DensProfs(DensProfsBase):
         :type CENTER: str
         """
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
+        assert type(idx_cat) == list, "Please provide a list of lists (or at least one list) for idx_cat"
+        if not hasattr(r200, "__len__"): # Need right dimensions, if only scalar then
+            r200 = np.array([r200])
+        if not hasattr(idx_cat[0], "__len__"): # If list not list of lists then
+            idx_cat = [idx_cat]
         cdef int nb_objs = len(idx_cat)
         cdef int p
         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
@@ -316,7 +321,8 @@ cdef class DensProfs(DensProfsBase):
         m_curr_over_target = config.InUnitMass_in_g/m_internal
         l_curr_over_target = config.InUnitLength_in_cm/l_internal
         SUFFIX = '_'
-        super().__init__(np.float32(xyz)*np.float32(l_curr_over_target), np.float32(masses)*np.float32(m_curr_over_target), cat_arr, np.float32(r200)[obj_pass.base.nonzero()[0]]*np.float32(l_curr_over_target), obj_size.base[obj_pass.base.nonzero()[0]], SNAP, np.float32(L_BOX)*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
+        r200 = np.atleast_1d(np.float64(r200))[obj_pass.base.nonzero()[0]]*np.float64(l_curr_over_target)
+        super().__init__(np.float64(xyz)*np.float64(l_curr_over_target), np.float64(masses)*np.float64(m_curr_over_target), cat_arr, r200, obj_size.base[obj_pass.base.nonzero()[0]], SNAP, np.float64(L_BOX)*np.float64(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
         
         
         
@@ -384,8 +390,8 @@ cdef class DensProfsGadget(DensProfsBase):
             masses = None
         # Find L_BOX
         head = readgadget.header(self.SNAP_DEST)
-        L_BOX = np.float32(head.boxsize)
-        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
+        L_BOX = np.float64(head.boxsize)
+        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float64(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
         
     def getXYZMasses(self): # Public Method
         """ Retrieve positions and masses of particles

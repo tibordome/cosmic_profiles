@@ -211,7 +211,7 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"q")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{}/qM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/qM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float64(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # S: M-splitting
         for group in range(len(obj_m_groups)):
@@ -224,7 +224,7 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"s")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{}/sM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/sM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float64(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # T: M-splitting
         for group in range(len(obj_m_groups)):
@@ -238,7 +238,7 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"T")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{}/TM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/TM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float64(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
 
 def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, frac_r200, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram

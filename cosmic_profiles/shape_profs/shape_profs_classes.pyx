@@ -39,14 +39,14 @@ cdef class DensShapeProfsBase(DensProfsBase):
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``."""
     
-    cdef float D_LOGSTART
-    cdef float D_LOGEND
+    cdef double D_LOGSTART
+    cdef double D_LOGEND
     cdef int D_BINS
-    cdef float IT_TOL
+    cdef double IT_TOL
     cdef int IT_WALL
     cdef int IT_MIN
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, int[:] obj_size, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, float D_LOGSTART, float D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
+    def __init__(self, double[:,:] xyz, double[:] masses, idx_cat, double[:] r200, int[:] obj_size, str SNAP, double L_BOX, int MIN_NUMBER_PTCS, double D_LOGSTART, double D_LOGEND, int D_BINS, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
         """
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
         :type xyz: (N2,3) floats, N2 >> N1
@@ -106,8 +106,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type shell_based: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
+        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) double arrays, 
+            3 x (number_of_objs, D_BINS+1, 3) double arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatLocal() with snap {0}'.format(self.SNAP))
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
@@ -119,7 +119,7 @@ cdef class DensShapeProfsBase(DensProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            SHAPE_PROF_DTYPE = [("d", "f8"), ("s", "f8"), ("q", "f8"), ("is_conv", "bool"), ("minor", "f8", (3,)), ("inter", "f8", (3,)), ("major", "f8", (3,))]
             shapes = np.zeros((len(obj_numbers), self.D_BINS+1), dtype=SHAPE_PROF_DTYPE)
             shapes["d"] = d*l_curr_over_target
             shapes["q"] = q
@@ -141,8 +141,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays"""
+        :rtype: structured array, containing 3 x (number_of_objs,) double arrays, 
+            3 x (number_of_objs, 3) double arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatGlobal() with snap {0}'.format(self.SNAP))
         if type(obj_numbers) == list:
             obj_numbers = np.int32(obj_numbers)
@@ -154,7 +154,7 @@ cdef class DensShapeProfsBase(DensProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            SHAPE_PROF_DTYPE = [("d", "f8"), ("s", "f8"), ("q", "f8"), ("is_conv", "bool"), ("minor", "f8", (3,)), ("inter", "f8", (3,)), ("major", "f8", (3,))]
             shapes = np.zeros((len(obj_numbers),), dtype=SHAPE_PROF_DTYPE)
             shapes["d"] = d[:,0]*l_curr_over_target
             shapes["q"] = q[:,0]
@@ -204,8 +204,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
                 q_obj = q[idx_obj]
                 s_obj = s[idx_obj]
                 center = centers[idx_obj]
-                obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
-                masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
+                obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float64)
+                masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float64)
                 for idx, ptc in enumerate(self.idx_cat.base[offsets[obj_number]:offsets[obj_number+1]]):
                     obj[idx] = self.xyz.base[ptc]
                     masses_obj[idx] = self.masses.base[ptc]
@@ -298,8 +298,8 @@ cdef class DensShapeProfsBase(DensProfsBase):
                 q_obj = q[idx_obj]
                 s_obj = s[idx_obj]
                 center = centers[idx_obj]
-                obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float32)
-                masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float32)
+                obj = np.zeros((self.obj_size[obj_number],3), dtype = np.float64)
+                masses_obj = np.zeros((self.obj_size[obj_number],), dtype = np.float64)
                 for idx, ptc in enumerate(self.idx_cat.base[offsets[obj_number]:offsets[obj_number+1]]):
                     obj[idx] = self.xyz.base[ptc]
                     masses_obj[idx] = self.masses.base[ptc]
@@ -522,6 +522,11 @@ cdef class DensShapeProfs(DensShapeProfsBase):
             or 'com' (center of mass) of each halo
         :type CENTER: str"""
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
+        assert type(idx_cat) == list, "Please provide a list of lists (or at least one list) for idx_cat"
+        if not hasattr(r200, "__len__"): # Need right dimensions, if only scalar then
+            r200 = np.array([r200])
+        if not hasattr(idx_cat[0], "__len__"): # If list not list of lists then
+            idx_cat = [idx_cat]
         cdef int nb_objs = len(idx_cat)
         cdef int p
         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
@@ -541,7 +546,8 @@ cdef class DensShapeProfs(DensShapeProfsBase):
         m_curr_over_target = config.InUnitMass_in_g/m_internal
         l_curr_over_target = config.InUnitLength_in_cm/l_internal
         SUFFIX = '_'
-        super().__init__(np.float32(xyz)*np.float32(l_curr_over_target), np.float32(masses)*np.float32(m_curr_over_target), cat_arr, np.float32(r200)[obj_pass.base.nonzero()[0]]*np.float32(l_curr_over_target), obj_size.base[obj_pass.base.nonzero()[0]], SNAP, np.float32(L_BOX)*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float32(D_LOGSTART), np.float32(D_LOGEND), np.int32(D_BINS), np.float32(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)        
+        r200 = np.atleast_1d(np.float64(r200))[obj_pass.base.nonzero()[0]]*np.float64(l_curr_over_target)
+        super().__init__(np.float64(xyz)*np.float64(l_curr_over_target), np.float64(masses)*np.float64(m_curr_over_target), cat_arr, r200, obj_size.base[obj_pass.base.nonzero()[0]], SNAP, np.float64(L_BOX)*np.float64(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float64(D_LOGSTART), np.float64(D_LOGEND), np.int32(D_BINS), np.float64(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)        
         
 
 ############################################################################################################################
@@ -631,8 +637,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             masses = None
         # Find L_BOX
         head = readgadget.header(self.SNAP_DEST)
-        L_BOX = np.float32(head.boxsize)
-        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float32(D_LOGSTART), np.float32(D_LOGEND), np.int32(D_BINS), np.float32(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
+        L_BOX = np.float64(head.boxsize)
+        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float64(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float64(D_LOGSTART), np.float64(D_LOGEND), np.int32(D_BINS), np.float64(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
     
     def getShapeCatVelLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
         """ Get all relevant local velocity shape data
@@ -645,8 +651,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type shell_based: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays,
-            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
+        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) double arrays,
+            3 x (number_of_objs, D_BINS+1, 3) double arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatVelLocal() with snap {0}'.format(self.SNAP))
         xyz, masses = self._getXYZMasses()
         velxyz = self._getVelXYZ()
@@ -663,7 +669,7 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            SHAPE_PROF_DTYPE = [("d", "f8"), ("s", "f8"), ("q", "f8"), ("is_conv", "bool"), ("minor", "f8", (3,)), ("inter", "f8", (3,)), ("major", "f8", (3,))]
             shapes = np.zeros((len(obj_numbers), self.D_BINS+1), dtype=SHAPE_PROF_DTYPE)
             shapes["d"] = d*l_curr_over_target
             shapes["q"] = q
@@ -686,8 +692,8 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type reduced: boolean
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays"""
+        :rtype: structured array, containing 3 x (number_of_objs,) double arrays, 
+            3 x (number_of_objs, 3) double arrays"""
         print_status(rank,self.start_time,'Starting getShapeCatVelGlobal() with snap {0}'.format(self.SNAP))
         xyz, masses = self._getXYZMasses()
         velxyz = self._getVelXYZ()
@@ -704,7 +710,7 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
-            SHAPE_PROF_DTYPE = [("d", "f4"), ("s", "f4"), ("q", "f4"), ("is_conv", "bool"), ("minor", "f4", (3,)), ("inter", "f4", (3,)), ("major", "f4", (3,))]
+            SHAPE_PROF_DTYPE = [("d", "f8"), ("s", "f8"), ("q", "f8"), ("is_conv", "bool"), ("minor", "f8", (3,)), ("inter", "f8", (3,)), ("major", "f8", (3,))]
             shapes = np.zeros((len(obj_numbers),), dtype=SHAPE_PROF_DTYPE)
             shapes["d"] = d[:,0]*l_curr_over_target
             shapes["q"] = q[:,0]

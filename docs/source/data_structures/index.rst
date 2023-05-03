@@ -93,15 +93,15 @@ All arguments and public methods are explained in detail in :ref:`the code refer
     mass_array = ... # application-dependent
     idx_cat = ... # application-dependent
     r_vir = ... # application-dependent
-    L_BOX = np.float32(10) # in_unit_length_in_cm
+    L_BOX = 10 # in_unit_length_in_cm
     SNAP = '035'
-    VIZ_DEST = "./viz"  # folder will be created if not present
+    VIZ_DEST = "./viz" # folder will be created if not present
     CAT_DEST = "./cat"
     MIN_NUMBER_PTCS = 200
     D_LOGSTART = -2
     D_LOGEND = 1
     D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-    IT_TOL = np.float32(1e-2)
+    IT_TOL = 1e-2
     IT_WALL = 100
     IT_MIN = 10
     CENTER = 'mode'
