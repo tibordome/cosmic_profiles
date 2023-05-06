@@ -125,35 +125,8 @@ def getLocalTHist(VIZ_DEST, SNAP, r_over_r200, r200, start_time, obj_masses, obj
     :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
     """    
-    if rank == 0:
-        idx = np.zeros((d.shape[0],), dtype = np.int32)
-        for obj in range(idx.shape[0]):
-            idx[obj] = np.argmin(abs(d[obj] - r200[obj]*frac_r200))        
-        
-        t = np.zeros((d.shape[0],))
-        for obj in range(d.shape[0]):
-            t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
-        t = np.nan_to_num(t)
-        
-        # Create VIZ_DEST if not available
-        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
-        
-        # T counting
-        plt.figure()
-        t[t == 0.] = np.nan
-        n, bins, patches = plt.hist(x=t, bins = np.linspace(0, 1, HIST_NB_BINS), alpha=0.7, density=True)
-        plt.axvline(1/3, label="oblate-triaxial transition", color = "g")
-        plt.axvline(2/3, label="triaxial-prolate transition", color = "r")
-        plt.xlabel(r"T")
-        plt.ylabel('Normalized Bin Count')
-        plt.grid(axis='y', alpha=0.75)
-        plt.xlim(0.0, 1.0)
-        plt.legend(loc="upper left", fontsize="x-small")
-        plt.savefig("{0}/LocalTCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
-        
-        t = t[np.logical_not(np.isnan(t))]
-        print_status(rank, start_time, "The number of objects considered is {0}. The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
-     
+    return 
+
 def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
     
