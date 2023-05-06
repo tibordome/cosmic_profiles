@@ -18,7 +18,7 @@ subprocess.call(['python3', 'setup_compile.py', 'build_ext', '--inplace'], cwd=o
 subprocess.call(['mkdir', 'viz'], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
-from cosmic_profiles import genHalo, DensProfs, updateInUnitSystem, updateOutUnitSystem
+from cosmic_profiles import genHalo, DensShapeProfs, updateInUnitSystem, updateOutUnitSystem
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -36,7 +36,6 @@ def test_densities(method, direct_binning):
     MIN_NUMBER_PTCS = 1000
     CENTER = 'mode'
     r_over_rvir = np.logspace(-2,0,50)
-    nb_model_pars = {'einasto': 3, 'nfw': 2, 'hernquist': 2, 'alpha_beta_gamma': 5}
     N = 10 # Number of halos used for test
     
     #################################### Generate N mock halos ######################################
@@ -74,7 +73,7 @@ def test_densities(method, direct_binning):
     idx_cat_in = [np.arange(0+np.sum(nb_ptcs[:idx]),nb_ptc+np.sum(nb_ptcs[:idx]), dtype = np.int32).tolist() for idx, nb_ptc in enumerate(nb_ptcs)]
     
     ########################### Define DensProfs object ##############################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat_in, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat_in, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ############################## Estimate Density Profiles #########################################
     obj_numbers = np.arange(5)

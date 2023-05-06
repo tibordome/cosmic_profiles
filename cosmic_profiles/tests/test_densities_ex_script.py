@@ -17,7 +17,7 @@ subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import updateCachingMaxGBs
 updateCachingMaxGBs(gbs = 1)
-from cosmic_profiles import genHalo, DensProfs, getEinastoProf, updateInUnitSystem, updateOutUnitSystem
+from cosmic_profiles import genHalo, DensShapeProfs, getEinastoProf, updateInUnitSystem, updateOutUnitSystem
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
@@ -65,7 +65,7 @@ def test_densities_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensProfs object ########################################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!

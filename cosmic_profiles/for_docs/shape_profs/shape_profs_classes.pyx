@@ -6,6 +6,7 @@ import numpy as np
 from common import config
 from dens_profs.dens_profs_classes cimport DensProfsBase
 from common.cosmic_base_class cimport CosmicBase
+from common.python_routines import default_katz_config
 from gadget.read_fof import getFoFSHData, getPartType
 from gadget import readgadget
 from gadget.gen_catalogues import calcObjCat
@@ -25,14 +26,11 @@ cdef class DensShapeProfsBase(DensProfsBase):
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``."""
     
-    cdef int D_LOGSTART
-    cdef int D_LOGEND
-    cdef int D_BINS
     cdef float IT_TOL
     cdef int IT_WALL
     cdef int IT_MIN
     
-    def __init__(self, float[:,:] xyz, float[:] masses, idx_cat, float[:] r200, int[:] obj_size, str SNAP, float L_BOX, int MIN_NUMBER_PTCS, int D_LOGSTART, int D_LOGEND, int D_BINS, float IT_TOL, int IT_WALL, int IT_MIN, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
+    def __init__(self, double[:,:] xyz, double[:] masses, idx_cat, double[:] r200, int[:] obj_size, str SNAP, double L_BOX, int MIN_NUMBER_PTCS, str CENTER, str VIZ_DEST, str CAT_DEST, str SUFFIX):
         """
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
         :type xyz: (N2,3) floats, N2 >> N1
@@ -50,20 +48,6 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type L_BOX: float
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
-        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
-            for iteration to stop
-        :type IT_TOL: float
-        :param IT_WALL: maximum permissible number of iterations
-        :type IT_WALL: int
-        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
-            if undercut, shape is unclassified
-        :type IT_MIN: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
         :type CENTER: str
@@ -74,59 +58,49 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :param SUFFIX: either '_dm_' or '_gx_' or '_' (latter for CosmicProfsDirect)
         :type SUFFIX: string"""
         super().__init__(xyz.base, masses.base, idx_cat, r200.base, obj_size.base, SNAP, L_BOX, MIN_NUMBER_PTCS, CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
-        self.D_LOGSTART = D_LOGSTART
-        self.D_LOGEND = D_LOGEND
-        self.D_BINS = D_BINS
-        self.IT_TOL = IT_TOL
-        self.IT_WALL = IT_WALL
-        self.IT_MIN = IT_MIN
         
-    def getShapeCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def getShapeCatLocal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Get all relevant local shape data
         
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
-        :type shell_based: boolean
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
+        :rtype: structured array, containing 3 x (number_of_objs, r_res) double arrays, 
+            3 x (number_of_objs, r_res, 3) double arrays"""
         return
     
-    def getShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
+    def getShapeCatGlobal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Get all relevant global shape data
         
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays"""
+        :rtype: structured array, containing 3 x (number_of_objs,) double arrays, 
+            3 x (number_of_objs, 3) double arrays"""
         return
     
-    def vizLocalShapes(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def vizLocalShapes(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Visualize local shape of objects with numbers ``obj_numbers``
         
-        :param obj_numbers: list of object indices for which to visualize local shapes
+        :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
-        :type shell_based: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
         
-    def vizGlobalShapes(self, obj_numbers, bint reduced = False): # Public Method
+    def vizGlobalShapes(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Visualize global shape of objects with numbers ``obj_numbers``
         
-        :param obj_numbers: list of object indices for which to visualize global shapes
-        :type obj_numbers: list of ints
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean"""
+        :param obj_numbers: list of object indices of interest
+        :type obj_numbers: list of int
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
     
     def plotGlobalEpsHist(self, HIST_NB_BINS, obj_numbers): # Public Method
@@ -149,7 +123,7 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type obj_numbers: list of int"""
         return
     
-    def plotLocalTHist(self, HIST_NB_BINS, frac_r200, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def plotLocalTHist(self, HIST_NB_BINS, frac_r200, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Plot local triaxiality histogram at depth ``frac_r200``
         
         :param HIST_NB_BINS: number of histogram bins
@@ -158,54 +132,50 @@ cdef class DensShapeProfsBase(DensProfsBase):
         :type frac_r200: float
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
-        :type shell_based: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
     
-    def plotGlobalTHist(self, HIST_NB_BINS, obj_numbers, bint reduced = False): # Public Method
+    def plotGlobalTHist(self, HIST_NB_BINS, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Plot global triaxiality histogram
         
+        :param katz_dubinski_config: dictionary with parameters to the Katz-Dubinski algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_dubinski_config: dictionary
         :param HIST_NB_BINS: number of histogram bins
         :type HIST_NB_BINS: int
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
     
-    def plotShapeProfs(self, int nb_bins, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def plotShapeProfs(self, int nb_bins, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param nb_bins: Number of mass bins to plot density profiles for
         :type nb_bins: int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
-        :type shell_based: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
     
-    def dumpShapeCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeCatLocal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
-        :type shell_based: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
     
-    def dumpShapeCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
+    def dumpShapeCatGlobal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Dumps all relevant global shape data into ``CAT_DEST``
 
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
 
 
@@ -225,7 +195,7 @@ cdef class DensShapeProfs(DensShapeProfsBase):
     ``getXYZMasses()``, ``getMassesCenters()``, ``_getMassesCenters()``, ``estDensProfs()``, 
     ``fitDensProfs()``, ``estConcentrations()``, ``plotDensProfs()``, ``getObjInfo()``"""
     
-    def __init__(self, xyz, masses, idx_cat, r200, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = 200, D_LOGSTART = -2.0, D_LOGEND = 0.0, D_BINS = 20, IT_TOL = 1e-2, IT_WALL = 100, IT_MIN = 10, CENTER = 'mode'):
+    def __init__(self, xyz, masses, idx_cat, r200, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = 200, CENTER = 'mode'):
         """
         :param xyz: positions of all simulation particles in config.InUnitLength_in_cm
         :type xyz: (N2,3) floats, N2 >> N1
@@ -245,30 +215,21 @@ cdef class DensShapeProfs(DensShapeProfsBase):
         :type CAT_DEST: string
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
-        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
-            for iteration to stop
-        :type IT_TOL: float
-        :param IT_WALL: maximum permissible number of iterations
-        :type IT_WALL: float
-        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
-            if undercut, shape is unclassified
-        :type IT_MIN: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
         :type CENTER: str"""
         assert xyz.shape[0] == masses.shape[0], "xyz.shape[0] must be equal to masses.shape[0]"
+        assert type(idx_cat) == list, "Please provide a list of lists (or at least one list) for idx_cat"
+        if not hasattr(r200, "__len__"): # Need right dimensions, if only scalar then
+            r200 = np.array([r200])
+        if not hasattr(idx_cat[0], "__len__"): # If list not list of lists then
+            idx_cat = [idx_cat]
         cdef int nb_objs = len(idx_cat)
         cdef int p
         cdef int[:] obj_pass = np.zeros((nb_objs,), dtype = np.int32)
         cdef int[:] obj_size = np.zeros((nb_objs,), dtype = np.int32)
         for p in range(nb_objs):
-            if len(idx_cat[p]) >= MIN_NUMBER_PTCS: # Only add objects that have sufficient resolution
+            if len(idx_cat[p]) >= np.int32(MIN_NUMBER_PTCS): # Only add objects that have sufficient resolution
                 obj_pass[p] = 1      
                 obj_size[p] = len(idx_cat[p]) 
         cdef int nb_pass = np.sum(obj_pass.base)
@@ -282,7 +243,8 @@ cdef class DensShapeProfs(DensShapeProfsBase):
         m_curr_over_target = config.InUnitMass_in_g/m_internal
         l_curr_over_target = config.InUnitLength_in_cm/l_internal
         SUFFIX = '_'
-        super().__init__(np.float32(xyz)*np.float32(l_curr_over_target), np.float32(masses)*np.float32(m_curr_over_target), cat_arr, np.float32(r200)[obj_pass.base.nonzero()[0]]*np.float32(l_curr_over_target), obj_size.base[obj_pass.base.nonzero()[0]], SNAP, np.float32(L_BOX)*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float32(D_LOGSTART), np.float32(D_LOGEND), np.int32(D_BINS), np.float32(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)        
+        r200 = np.atleast_1d(np.float64(r200))[obj_pass.base.nonzero()[0]]*np.float64(l_curr_over_target)
+        super().__init__(np.float64(xyz)*np.float64(l_curr_over_target), np.float64(masses)*np.float64(m_curr_over_target), cat_arr, r200, obj_size.base[obj_pass.base.nonzero()[0]], SNAP, np.float64(L_BOX)*np.float64(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)        
         
 
 ############################################################################################################################
@@ -308,7 +270,7 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
     cdef str RVIR_OR_R200
     cdef str OBJ_TYPE
     
-    def __init__(self, SNAP_DEST, GROUP_DEST, OBJ_TYPE, SNAP, VIZ_DEST, CAT_DEST, RVIR_OR_R200 = 'Rvir', MIN_NUMBER_PTCS = 200, D_LOGSTART = -2.0, D_LOGEND = 0.0, D_BINS = 20, IT_TOL = 1e-2, IT_WALL = 100, IT_MIN = 10, CENTER = 'mode'):
+    def __init__(self, SNAP_DEST, GROUP_DEST, OBJ_TYPE, SNAP, VIZ_DEST, CAT_DEST, RVIR_OR_R200 = 'Rvir', MIN_NUMBER_PTCS = 200, CENTER = 'mode'):
         """
         :param SNAP_DEST: where we can find the snapshot
         :type SNAP_DEST: string
@@ -322,25 +284,11 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
         :type VIZ_DEST: string
         :param CAT_DEST: catalogue destination
         :type CAT_DEST: string
-        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. D_LOGSTART) to be expressed 
+        :param RVIR_OR_R200: 'Rvir' if we want quantities (e.g. r_over_r200) to be expressed 
             with respect to the virial radius R_vir, 'R200' for the overdensity radius R_200
         :type RVIR_OR_R200: str
         :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
         :type MIN_NUMBER_PTCS: int
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
-        :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
-            for iteration to stop
-        :type IT_TOL: float
-        :param IT_WALL: maximum permissible number of iterations
-        :type IT_WALL: float
-        :param IT_MIN: minimum number of particles (DM or star particle) in any iteration; 
-            if undercut, shape is unclassified
-        :type IT_MIN: int
         :param CENTER: shape quantities will be calculated with respect to CENTER = 'mode' (point of highest density)
             or 'com' (center of mass) of each halo
         :type CENTER: str"""
@@ -372,55 +320,51 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
             masses = None
         # Find L_BOX
         head = readgadget.header(self.SNAP_DEST)
-        L_BOX = np.float32(head.boxsize)
-        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float32(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), np.float32(D_LOGSTART), np.float32(D_LOGEND), np.int32(D_BINS), np.float32(IT_TOL), np.int32(IT_WALL), np.int32(IT_MIN), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
+        L_BOX = np.float64(head.boxsize)
+        super().__init__(xyz, masses, obj_cat, obj_r200, obj_size, SNAP, L_BOX*np.float64(l_curr_over_target), np.int32(MIN_NUMBER_PTCS), CENTER, VIZ_DEST, CAT_DEST, SUFFIX)
     
-    def getShapeCatVelLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def getShapeCatVelLocal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Get all relevant local velocity shape data
         
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
-        :type shell_based: boolean
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs, D_BINS+1) float arrays,
-            3 x (number_of_objs, D_BINS+1, 3) float arrays"""
+        :rtype: structured array, containing 3 x (number_of_objs, r_res) double arrays,
+            3 x (number_of_objs, r_res, 3) double arrays"""
         return
     
-    def getShapeCatVelGlobal(self, obj_numbers, bint reduced = False): # Public Method
+    def getShapeCatVelGlobal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Get all relevant global velocity shape data
         
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary
         :return: d in units of config.OutUnitLength_in_cm, q, s, minor, inter, major, obj_centers in units of config.OutUnitLength_in_cm,
             obj_masses in units of config.OutUnitMass_in_g
-        :rtype: structured array, containing 3 x (number_of_objs,) float arrays, 
-            3 x (number_of_objs, 3) float arrays´"""
+        :rtype: structured array, containing 3 x (number_of_objs,) double arrays, 
+            3 x (number_of_objs, 3) double arrays"""
         return
 
-    def dumpShapeVelCatLocal(self, obj_numbers, bint reduced = False, bint shell_based = False): # Public Method
+    def dumpShapeVelCatLocal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean
-        :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
-        :type shell_based: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
 
-    def dumpShapeVelCatGlobal(self, obj_numbers, bint reduced = False): # Public Method
+    def dumpShapeVelCatGlobal(self, obj_numbers, katz_config = default_katz_config): # Public Method
         """ Dumps all relevant global velocity shape data into ``CAT_DEST``
         
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
-        :param reduced: whether or not reduced shape tensor (1/r^2 factor)
-        :type reduced: boolean"""
+        :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+        :type katz_config: dictionary"""
         return
     
     def getXYZMasses(self): # Public Method
@@ -462,12 +406,12 @@ cdef class DensShapeProfsGadget(DensShapeProfsBase):
     def getIdxCat(self): # Public Method
         """ Fetch catalogue
         
-        :return idx_cat: each row contains indices of particles belonging to an object,
+        :return idx_cat: contains indices of particles belonging to an object,
             obj_size: number of particles in each object
-        :rtype: (N1, N3) integers and (N1,) integers"""
+        :rtype: (N3) integers and (N1,) integers"""
         return
         
-    def getObjInfoHDF5(self): # Public Method
+    def getObjInfoGadget(self): # Public Method
         """ Print basic info about the objects"""
         return
         

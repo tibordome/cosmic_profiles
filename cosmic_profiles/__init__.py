@@ -15,7 +15,8 @@ from .common.python_routines import (
     _set_axes_radius,
     fibonacci_sphere,
     fibonacci_ellipsoid,
-    drawUniformFromEllipsoid
+    drawUniformFromEllipsoid,
+    default_katz_config
 )
 
 from .dens_profs.dens_profs_tools import (
@@ -27,11 +28,6 @@ from .dens_profs.dens_profs_tools import (
 
 from .mock_tools.mock_halo_gen import (
     genHalo
-)
-
-from .dens_profs.dens_profs_classes import (
-    DensProfs,
-    DensProfsGadget
 )
 
 from .shape_profs.shape_profs_classes import (

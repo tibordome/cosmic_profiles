@@ -80,7 +80,7 @@ cdef class CosmicBase:
         centers, m = calcMassesCenters(xyz.base, masses.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
         return centers, m
     
-    def _getShapeCatLocalBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double D_LOGSTART, double D_LOGEND, int D_BINS, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, str suffix):
+    def _getShapeCatLocalBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, str suffix):
         """ Get all relevant local shape data
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -93,12 +93,8 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
+        :param r_over_r200: normalized radii at which shape profiles should be estimated
+        :type r_over_r200: (r_res,) floats
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -115,8 +111,8 @@ cdef class CosmicBase:
         :type suffix: string
         :return: d in Mpc/h (internal length units), q, s, minor, inter, major, obj_centers in units of Mpc/h (internal length units),
             obj_masses in units of 10^10*M_sun/h (internal mass units)
-        :rtype: 3 x (number_of_objs, D_BINS+1) double arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) double arrays, 
+        :rtype: 3 x (number_of_objs, r_res) double arrays, 
+            3 x (number_of_objs, r_res, 3) double arrays, 
             (number_of_objs,3) double array, (number_of_objs,) double array
         """
         if rank == 0:
@@ -156,7 +152,7 @@ cdef class CosmicBase:
                     major = np.array([])
             
             else:
-                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocal(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
+                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocal(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, r_over_r200.base, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
             return None, None, None, None, None, None, None, None
@@ -251,7 +247,7 @@ cdef class CosmicBase:
         else:
             return None, None, None, None, None, None, None, None
         
-    def _getShapeCatVelLocalBase(self, double[:,:] xyz, double[:,:] velxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double D_LOGSTART, double D_LOGEND, int D_BINS, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, str suffix):
+    def _getShapeCatVelLocalBase(self, double[:,:] xyz, double[:,:] velxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, str suffix):
         """ Get all relevant local velocity shape data
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -266,12 +262,8 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
+        :param r_over_r200: normalized radii at which shape profiles should be estimated
+        :type r_over_r200: (r_res,) floats
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -288,8 +280,8 @@ cdef class CosmicBase:
         :type suffix: string
         :return: d in Mpc/h (internal length units), q, s, minor, inter, major, obj_centers in units of Mpc/h (internal length units),
             obj_masses in units of 10^10*M_sun/h (internal mass units)
-        :rtype: 3 x (number_of_objs, D_BINS+1) double arrays, 
-            3 x (number_of_objs, D_BINS+1, 3) double arrays, 
+        :rtype: 3 x (number_of_objs, r_res) double arrays, 
+            3 x (number_of_objs, r_res, 3) double arrays, 
             (number_of_objs,3) double array, (number_of_objs,) double array
         """
         if rank == 0:
@@ -329,7 +321,7 @@ cdef class CosmicBase:
                     major = np.array([])
             
             else:
-                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
+                d, q, s, minor, inter, major, obj_centers, obj_masses = calcMorphLocalVelDisp(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, self.L_BOX, r_over_r200.base, IT_TOL, IT_WALL, IT_MIN, self.CENTER, reduced, shell_based)
                 print_status(rank, self.start_time, "Finished calcMorphLocalVelDisp()")
             return d, q, s, minor, inter, major, obj_centers, obj_masses
         else:
@@ -427,7 +419,7 @@ cdef class CosmicBase:
         else:
             return None, None, None, None, None, None, None, None
     
-    def _dumpShapeCatLocalBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double D_LOGSTART, double D_LOGEND, int D_BINS, double IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced, bint shell_based):
+    def _dumpShapeCatLocalBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -440,12 +432,8 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
+        :param r_over_r200: normalized radii at which shape profiles should be estimated
+        :type r_over_r200: (r_res,) floats
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -462,7 +450,7 @@ cdef class CosmicBase:
         :type shell_based: boolean
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, r_over_r200.base, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
             del idx_cat
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
@@ -545,7 +533,7 @@ cdef class CosmicBase:
             np.savetxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _dumpShapeVelCatLocalBase(self, double[:,:] xyz, double[:,:] velxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double D_LOGSTART, double D_LOGEND, int D_BINS, double IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced, bint shell_based):
+    def _dumpShapeVelCatLocalBase(self, double[:,:] xyz, double[:,:] velxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, str suffix, bint reduced, bint shell_based):
         """ Dumps all relevant local velocity shape data into ``CAT_DEST``
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -560,12 +548,8 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
+        :param r_over_r200: normalized radii at which shape profiles should be estimated
+        :type r_over_r200: (r_res,) floats
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -582,7 +566,7 @@ cdef class CosmicBase:
         :type shell_based: boolean
         """
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatVelLocalBase(xyz.base, velxyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, r_over_r200.base, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             m_curr_over_target = m_internal/config.OutUnitMass_in_g
@@ -625,12 +609,6 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -674,7 +652,7 @@ cdef class CosmicBase:
             np.savetxt('{0}/centers_global{1}{2}.txt'.format(self.CAT_DEST, suffix, self.SNAP), obj_centers, fmt='%1.7e')
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _plotShapeProfsBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double D_LOGSTART, double D_LOGEND, int D_BINS, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, int nb_bins, str suffix = ''):
+    def _plotShapeProfsBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based, int nb_bins, str suffix = ''):
         """ Draws shape profiles, also mass bin-decomposed ones
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -687,12 +665,8 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
+        :param r_over_r200: normalized radii at which shape profiles should be estimated
+        :type r_over_r200: (r_res,) floats
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -712,11 +686,11 @@ cdef class CosmicBase:
         """
                 
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
-            getShapeProfs(self.VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, nb_bins, self.MASS_UNIT, suffix = suffix)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, r_over_r200.base, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+            getShapeProfs(self.VIZ_DEST, self.SNAP, r_over_r200.base, r200.base, self.start_time, obj_masses, obj_centers, d, q, s, major, nb_bins, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
             
-    def _plotLocalTHistBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double D_LOGSTART, double D_LOGEND, int D_BINS, double IT_TOL, int IT_WALL, int IT_MIN, int HIST_NB_BINS, double frac_r200, bint reduced, bint shell_based, str suffix = ''):
+    def _plotLocalTHistBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, int HIST_NB_BINS, double frac_r200, bint reduced, bint shell_based, str suffix = ''):
         """ Plot a local-shape triaxiality histogram at a specified ellipsoidal depth of ``frac_r200``
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -729,12 +703,8 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
+        :param r_over_r200: normalized radii at which shape profiles should be estimated
+        :type r_over_r200: (r_res,) floats
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -756,8 +726,8 @@ cdef class CosmicBase:
         """
                 
         if rank == 0:
-            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
-            getLocalTHist(self.VIZ_DEST, self.SNAP, D_LOGSTART, D_LOGEND, D_BINS, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, frac_r200, self.MASS_UNIT, suffix = suffix)
+            d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base, idx_cat.base, obj_size.base, r_over_r200.base, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+            getLocalTHist(self.VIZ_DEST, self.SNAP, r_over_r200.base, r200.base, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, frac_r200, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
     def _plotGlobalTHistBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double IT_TOL, int IT_WALL, int IT_MIN, int HIST_NB_BINS, bint reduced, str suffix = ''):
@@ -792,13 +762,13 @@ cdef class CosmicBase:
             getGlobalTHist(self.VIZ_DEST, self.SNAP, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] ROverR200, double[:] r200, str method = 'einasto'):
+    def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):
         """ Get best-fit results for density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
         :type dens_profs: (N3, r_res) floats
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
         :type r200: (N1,) floats
         :param method: string describing density profile model assumed for fitting
@@ -807,18 +777,18 @@ cdef class CosmicBase:
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         
         if rank == 0:
-            best_fits = fitDensProfHelper(dens_profs.base, ROverR200.base, r200.base, method)
+            best_fits = fitDensProfHelper(dens_profs.base, r_over_r200.base, r200.base, method)
             return best_fits
         else:
             return None
         
-    def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] ROverR200, double[:] r200, str method = 'einasto'):
+    def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
         :type dens_profs: (N3, r_res) floats
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
         :type r200: (N1,) floats
         :param method: string describing density profile model assumed for fitting
@@ -827,13 +797,13 @@ cdef class CosmicBase:
         :rtype: (N3,) floats"""
                 
         if rank == 0:
-            best_fits = fitDensProfHelper(dens_profs.base, ROverR200.base, r200.base, method)
+            best_fits = fitDensProfHelper(dens_profs.base, r_over_r200.base, r200.base, method)
             cs = r200.base/best_fits[:,-1]
             return cs
         else:
             return None
         
-    def _getDensProfsSphDirectBinningBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] ROverR200):
+    def _getDensProfsSphDirectBinningBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200):
         """ Get direct-binning-based spherically averaged density profiles
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -846,18 +816,18 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :return: density profiles in M_sun*h^2/(Mpc)**3
         :rtype: (N2, r_res) floats"""
                 
         if rank == 0:
-            dens_profs = calcDensProfsSphDirectBinning(xyz.base, masses.base, r200.base, ROverR200.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
+            dens_profs = calcDensProfsSphDirectBinning(xyz.base, masses.base, r200.base, r_over_r200.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
             return dens_profs*self.MASS_UNIT
         else:
             return None
         
-    def _getDensProfsEllDirectBinningBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] ROverR200, double[:,:] a, double[:,:] b, double[:,:] c, double[:,:,:] major, double[:,:,:] inter, double[:,:,:] minor):
+    def _getDensProfsEllDirectBinningBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, double[:,:] a, double[:,:] b, double[:,:] c, double[:,:,:] major, double[:,:,:] inter, double[:,:,:] minor):
         """ Get direct-binning-based ellipsoidal shell-based density profiles
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -870,32 +840,32 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :param a: major axis eigenvalues in Mpc/h (internal length units)
-        :type a: (N1,D_BINS+1,) floats
+        :type a: (N1,r_res,) floats
         :param b: intermediate axis eigenvalues in Mpc/h (internal length units)
-        :type b: (N1,D_BINS+1,) floats
+        :type b: (N1,r_res,) floats
         :param c: minor axis eigenvalues in Mpc/h (internal length units)
-        :type c: (N1,D_BINS+1,) floats
+        :type c: (N1,r_res,) floats
         :param major: major axis eigenvectors
-        :type major: (N1,D_BINS+1,3) floats
+        :type major: (N1,r_res,3) floats
         :param inter: inter axis eigenvectors
-        :type inter: (N1,D_BINS+1,3) floats
+        :type inter: (N1,r_res,3) floats
         :param minor: minor axis eigenvectors
-        :type minor: (N1,D_BINS+1,3) floats
+        :type minor: (N1,r_res,3) floats
         :return: density profiles in M_sun*h^2/(Mpc)**3
         :rtype: (N2, r_res) floats"""
         
         if rank == 0:
-            if ROverR200.shape[0] < 3:
-                raise ValueError("Your ROverR200 array has fewer than 3 entries. Please modify.")
-            dens_profs = calcDensProfsEllDirectBinning(xyz.base, masses.base, r200.base, ROverR200.base, a.base, b.base, c.base, major.base, inter.base, minor.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
+            if r_over_r200.shape[0] < 3:
+                raise ValueError("Your r_over_r200 array has fewer than 3 entries. Please modify.")
+            dens_profs = calcDensProfsEllDirectBinning(xyz.base, masses.base, r200.base, r_over_r200.base, a.base, b.base, c.base, major.base, inter.base, minor.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
             return dens_profs*self.MASS_UNIT
         else:
             return None
         
-    def _getDensProfsKernelBasedBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] ROverR200):
+    def _getDensProfsKernelBasedBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200):
         """ Get kernel-based density profiles
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -908,18 +878,18 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :return: density profiles in M_sun*h^2/(Mpc)**3
         :rtype: (N2, r_res) floats"""
                 
         if rank == 0:
-            dens_profs = calcDensProfsKernelBased(xyz.base, masses.base, r200.base, ROverR200.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
+            dens_profs = calcDensProfsKernelBased(xyz.base, masses.base, r200.base, r_over_r200.base, idx_cat.base, obj_size.base, self.L_BOX, self.CENTER)
             return dens_profs*self.MASS_UNIT
         else:
             return None
         
-    def _estDensProfsBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] ROverR200, obj_numbers, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False, int D_LOGSTART = 0, int D_LOGEND = 0, int D_BINS = 0, double IT_TOL = 0.0, int IT_WALL = 0, int IT_MIN = 0):
+    def _estDensProfsBase(self, double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double[:] r_over_r200, obj_numbers, bint direct_binning, bint spherical, bint reduced, bint shell_based, double[:] r_over_r200_shape, double IT_TOL, int IT_WALL, int IT_MIN):
         """ Estimate density profiles
         
         :param xyz: positions of all simulation particles in Mpc/h (internal length units)
@@ -932,8 +902,8 @@ cdef class CosmicBase:
         :type idx_cat: (N3) integers
         :param obj_size: indicates how many particles are in each object
         :type obj_size: (N1,) integers
-        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which to-be-estimated density profiles are defined
+        :type r_over_r200: (r_res,) floats
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param direct_binning: whether or not direct binning approach or
@@ -948,12 +918,8 @@ cdef class CosmicBase:
         :param shell_based: whether shell-based or ellipsoid-based algorithm should be run,
             ignored if ``direct_binning`` = False
         :type shell_based: boolean
-        :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGSTART: int
-        :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-        :type D_LOGEND: int
-        :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-        :type D_BINS: int
+        :param r_over_r200_shape: normalized radii at which shape profiles are estimated
+        :type r_over_r200_shape: (r_res,) floats
         :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
             for iteration to stop
         :type IT_TOL: float
@@ -974,12 +940,12 @@ cdef class CosmicBase:
             if direct_binning:
                 suffix = '_'
                 if spherical == False:
-                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
-                    dens_profs = self._getDensProfsEllDirectBinningBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base, d, d*q, d*s, major, inter, minor)
+                    d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], r_over_r200_shape.base, IT_TOL, IT_WALL, IT_MIN, reduced, shell_based, suffix)
+                    dens_profs = self._getDensProfsEllDirectBinningBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], r_over_r200.base, d, d*q, d*s, major, inter, minor)
                 else:
-                    dens_profs = self._getDensProfsSphDirectBinningBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base)
+                    dens_profs = self._getDensProfsSphDirectBinningBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], r_over_r200.base)
             else:
-                dens_profs = self._getDensProfsKernelBasedBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], ROverR200.base)
+                dens_profs = self._getDensProfsKernelBasedBase(xyz.base, masses.base, r200.base[obj_numbers], subset_idx_cat, obj_size.base[obj_numbers], r_over_r200.base)
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr = m_internal/self.MASS_UNIT
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
@@ -988,11 +954,11 @@ cdef class CosmicBase:
         else:
             return None
         
-    def estDensProfs(self, ROverR200, obj_numbers, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False): # Public Method
+    def estDensProfs(self, r_over_r200, obj_numbers, bint direct_binning = True, bint spherical = True, bint reduced = False, bint shell_based = False): # Public Method
         """ Estimate density profiles
         
-        :param ROverR200: normalized radii at which to-be-estimated density profiles are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which to-be-estimated density profiles are defined
+        :type r_over_r200: (r_res,) floats
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :param direct_binning: whether or not direct binning approach or
@@ -1019,11 +985,11 @@ cdef class CosmicBase:
                 suffix = '_'
                 if spherical == False:
                     d, q, s, minor, inter, major, obj_centers, obj_masses = self._getShapeCatLocalBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], self.D_LOGSTART, self.D_LOGEND, self.D_BINS, self.IT_TOL, self.IT_WALL, self.IT_MIN, reduced, shell_based, suffix)
-                    dens_profs = self._getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float64(ROverR200), d, d*q, d*s, major, inter, minor)
+                    dens_profs = self._getDensProfsEllDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float64(r_over_r200), d, d*q, d*s, major, inter, minor)
                 else:
-                    dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float64(ROverR200))
+                    dens_profs = self._getDensProfsSphDirectBinningBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float64(r_over_r200))
             else:
-                dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float64(ROverR200))
+                dens_profs = self._getDensProfsKernelBasedBase(self.xyz.base, self.masses.base, self.r200.base[obj_numbers], subset_idx_cat, self.obj_size.base[obj_numbers], np.float64(r_over_r200))
             l_internal, m_internal, vel_internal = config.getLMVInternal()
             m_curr = m_internal/self.MASS_UNIT
             m_curr_over_target = m_curr/config.OutUnitMass_in_g
@@ -1032,7 +998,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] ROverR200, str method, obj_numbers):
+    def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):
         """ Get best-fit results for density profile fitting
         
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
@@ -1041,8 +1007,8 @@ cdef class CosmicBase:
         :type obj_size: (N1,) integers
         :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :type dens_profs: (N3, r_res) floats
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param obj_numbers: list of object indices of interest
@@ -1062,7 +1028,7 @@ cdef class CosmicBase:
         if rank == 0:
             idx_cat_len = len(obj_size)
             isValidSelection(obj_numbers, idx_cat_len)
-            best_fits = self._getDensProfsBestFitsBase(dens_profs, ROverR200.base, r200.base[obj_numbers], method)
+            best_fits = self._getDensProfsBestFitsBase(dens_profs, r_over_r200.base, r200.base[obj_numbers], method)
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             m_curr_over_target = m_target/config.OutUnitMass_in_g
             best_fits[:,0] = best_fits[:,0]*m_curr_over_target*l_curr_over_target**(-3)
@@ -1077,7 +1043,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] ROverR200, str method, obj_numbers):
+    def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
@@ -1087,8 +1053,8 @@ cdef class CosmicBase:
         :param dens_profs: density profiles whose concentrations are to be determined, 
             in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :type dens_profs: (N3, r_res) floats
-        :param ROverR200: normalized radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: normalized radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param obj_numbers: list of object indices of interest
@@ -1108,12 +1074,12 @@ cdef class CosmicBase:
         if rank == 0:
             idx_cat_len = len(obj_size)
             isValidSelection(obj_numbers, idx_cat_len)
-            cs = self._getConcentrationsBase(dens_profs, ROverR200.base, r200.base[obj_numbers], method)
+            cs = self._getConcentrationsBase(dens_profs, r_over_r200.base, r200.base[obj_numbers], method)
             return cs
         else:
             return None
         
-    def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] ROverR200, double[:,:] dens_profs_fit, double[:] ROverR200_fit, str method, str suffix, int nb_bins, obj_numbers):
+    def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, str method, str suffix, int nb_bins, obj_numbers):
         """ Draws some simplistic density profiles
         
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
@@ -1123,13 +1089,13 @@ cdef class CosmicBase:
         :param dens_profs: estimated density profiles, in units of 
             config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :type dens_profs: (N2, r_res) floats
-        :param ROverR200: radii at which ``dens_profs`` are defined
-        :type ROverR200: (r_res,) floats
+        :param r_over_r200: radii at which ``dens_profs`` are defined
+        :type r_over_r200: (r_res,) floats
         :param dens_profs_fit: density profiles to be fit, in units of 
             config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :type dens_profs_fit: (N2, r_res2) floats
-        :param ROverR200_fit: radii at which best-fits shall be calculated
-        :type ROverR200_fit: (r_res2,) floats
+        :param r_over_r200_fit: radii at which best-fits shall be calculated
+        :type r_over_r200_fit: (r_res2,) floats
         :param method: string describing density profile model assumed for fitting
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
@@ -1155,8 +1121,8 @@ cdef class CosmicBase:
         if rank == 0:
             idx_cat_len = len(obj_size)
             isValidSelection(obj_numbers, idx_cat_len)
-            drawDensProfs(self.VIZ_DEST, self.SNAP, r200.base[obj_numbers], dens_profs_fit_, ROverR200_fit.base, dens_profs_, ROverR200.base, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
-            del obj_centers; del obj_masses; del ROverR200_fit; del dens_profs; del ROverR200
+            drawDensProfs(self.VIZ_DEST, self.SNAP, r200.base[obj_numbers], dens_profs_fit_, r_over_r200_fit.base, dens_profs_, r_over_r200.base, obj_masses, obj_centers, method, nb_bins, self.start_time, self.MASS_UNIT, suffix = suffix)
+            del obj_centers; del obj_masses; del r_over_r200_fit; del dens_profs; del r_over_r200
         else:
             del obj_centers; del obj_masses
         

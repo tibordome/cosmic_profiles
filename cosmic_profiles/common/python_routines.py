@@ -652,3 +652,27 @@ def getSubSetIdxCat(idx_cat, obj_size, obj_numbers):
     for p in obj_numbers:
         subset_idx_cat = np.hstack((subset_idx_cat, idx_cat[offsets[p]:offsets[p+1]]))
     return subset_idx_cat
+
+def checkKatzConfig(katz_config):
+    """ Check (for types etc) and return configuration parameters for Katz algorithm
+    
+    :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+    :type katz_config: dictionary
+    :return ROverR200, IT_TOL, IT_WALL, IT_MIN, REDUCED, SHELL_BASED: configuration parameters
+    :rtype: (r_res,) doubles, double, int, int, boolean, boolean"""
+    ROverR200 = katz_config['ROverR200']
+    IT_TOL = katz_config['IT_TOL']
+    IT_WALL = katz_config['IT_WALL']
+    IT_MIN = katz_config['IT_MIN']
+    REDUCED = katz_config['REDUCED']
+    SHELL_BASED = katz_config['SHELL_BASED']
+    assert type(SHELL_BASED) == bool, "SHELL_BASED should be boolean"
+    assert type(REDUCED) == bool, "REDUCED should be boolean"
+    assert hasattr(ROverR200, "__len__"), "ROverR200 should be a list or array with more than one element" 
+    ROverR200 = np.float64(ROverR200)
+    IT_TOL = np.float64(IT_TOL)
+    IT_WALL = np.int32(IT_WALL)
+    IT_MIN = np.int32(IT_MIN)
+    return ROverR200, IT_TOL, IT_WALL, IT_MIN, REDUCED, SHELL_BASED
+
+default_katz_config = {'ROverR200': np.logspace(-1.5,0,70), 'IT_TOL': 1e-2, 'IT_WALL': 100, 'IT_MIN': 10, 'REDUCED': False, 'SHELL_BASED': False}

@@ -31,34 +31,30 @@ def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
     """
     return
 
-def getShape(Rs, d, param_interest, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS):
+def getShape(d, param_interest, ERROR_METHOD, r_over_r200, r200):
     """ Get average profile for param_interest (which is defined at all values of d)
     at all ellipsoidal radii Rs
     
-    :param Rs: ellipsoidal radii of interest
-    :type Rs: (N,) floats
     :param d: param_interest is defined at all ellipsoidal radii d
-    :type d: (N2,) floats
+    :type d: (N1,N2) floats
     :param param_interest: the quantity of interest defined at all ellipsoidal radii d
-    :type param_interest: (N2,) floats
+    :type param_interest: (N1,N2) floats
     :param ERROR_METHOD: mean (if ERROR_METHOD == "bootstrap" or "SEM") or median
         (if ERROR_METHOD == "median_quantile") and the +- 1 sigma error attached
     :type ERROR_METHOD: string
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles are estimated
+    :type r_over_r200: (N2,) floats
+    :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
+    :type r200: (N1,) floats
     :return: mean/median, err_low, err_high
     :rtype: float, float, float"""
     return
 
-def getShapeMs(Rs, d, idx_groups, group, param_interest, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS):
+def getShapeMs(d, idx_groups, group, param_interest, ERROR_METHOD, r_over_r200, r200):
     """ Similar to getShape, but with mass-splitting"""
     return
 
-def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, nb_bins, MASS_UNIT=1e10, suffix = '_'):
+def getShapeProfs(VIZ_DEST, SNAP, r_over_r200, r200, start_time, obj_masses, obj_centers, d, q, s, major_full, nb_bins, MASS_UNIT=1e10, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -68,12 +64,10 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles are estimated
+    :type r_over_r200: (D_BINS+1,) floats
+    :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
+    :type r200: (N,) floats
     :param start_time: time of start of shape analysis
     :type start_time: float
     :param obj_masses: total mass of objects, in 10^10*M_sun/h
@@ -94,21 +88,20 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type MASS_UNIT: float
     :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string"""
+    
     return
 
-def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, frac_r200, MASS_UNIT, suffix = '_'):
+def getLocalTHist(VIZ_DEST, SNAP, r_over_r200, r200, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, frac_r200, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
     
     :param VIZ_DEST: visualisation folder destination
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles are estimated
+    :type r_over_r200: (D_BINS+1,) floats
+    :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
+    :type r200: (N,) floats
     :param start_time: time of start of shape analysis
     :type start_time: float
     :param obj_masses: masses of objects, in 10^10*M_sun/h
@@ -132,8 +125,35 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :param suffix: either '_dm_' or '_gx_' or '' (latter for DensShapeProfs)
     :type suffix: string
     """    
-    return
-
+    if rank == 0:
+        idx = np.zeros((d.shape[0],), dtype = np.int32)
+        for obj in range(idx.shape[0]):
+            idx[obj] = np.argmin(abs(d[obj] - r200[obj]*frac_r200))        
+        
+        t = np.zeros((d.shape[0],))
+        for obj in range(d.shape[0]):
+            t[obj] = (1-q[obj,idx[obj]]**2)/(1-s[obj,idx[obj]]**2) # Triaxiality
+        t = np.nan_to_num(t)
+        
+        # Create VIZ_DEST if not available
+        subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
+        
+        # T counting
+        plt.figure()
+        t[t == 0.] = np.nan
+        n, bins, patches = plt.hist(x=t, bins = np.linspace(0, 1, HIST_NB_BINS), alpha=0.7, density=True)
+        plt.axvline(1/3, label="oblate-triaxial transition", color = "g")
+        plt.axvline(2/3, label="triaxial-prolate transition", color = "r")
+        plt.xlabel(r"T")
+        plt.ylabel('Normalized Bin Count')
+        plt.grid(axis='y', alpha=0.75)
+        plt.xlim(0.0, 1.0)
+        plt.legend(loc="upper left", fontsize="x-small")
+        plt.savefig("{0}/LocalTCount{1}{2}.pdf".format(VIZ_DEST, suffix, SNAP), bbox_inches="tight")
+        
+        t = t[np.logical_not(np.isnan(t))]
+        print_status(rank, start_time, "The number of objects considered is {0}. The average T value for the objects is {1} and the standard deviation (assuming T is Gaussian distributed) is {2}".format(d.shape[0], round(np.average(t),2), round(np.std(t),2)))
+     
 def getGlobalTHist(VIZ_DEST, SNAP, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
     
@@ -188,6 +208,7 @@ def getGlobalEpsHist(xyz, masses, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SN
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""
+    
     return
 
 def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DEST, SNAP, frac_r200, suffix = '_', HIST_NB_BINS = 11):
@@ -218,4 +239,5 @@ def getLocalEpsHist(xyz, masses, r200, idx_cat, obj_size, L_BOX, CENTER, VIZ_DES
     :type suffix: string
     :param HIST_NB_BINS: Number of histogram bins
     :type HIST_NB_BINS: int"""
+    
     return

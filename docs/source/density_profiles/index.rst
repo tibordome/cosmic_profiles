@@ -18,7 +18,7 @@ where :math:`(x,y,z)` are the coordinates of a point cloud particle in some coor
 
 To estimate density profiles with CosmicProfiles, we first instantiate a ``DensProfsGadget`` object called ``cprofiles`` via::
 
-    from cosmic_profiles import DensProfsGadget, updateInUnitSystem, updateOutUnitSystem
+    from cosmic_profiles import DensShapeProfsGadget, updateInUnitSystem, updateOutUnitSystem
     
     # Parameters
     updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'E+10Msun', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
@@ -34,17 +34,17 @@ To estimate density profiles with CosmicProfiles, we first instantiate a ``DensP
     CENTER = 'mode'
 
     # Instantiate object
-    cprofiles = DensProfsGadget(SNAP_DEST, GROUP_DEST, SNAP, OBJ_TYPE, VIZ_DEST, CAT_DEST, RVIR_OR_R200, MIN_NUMBER_PTCS, CENTER)
+    cprofiles = DensShapeProfsGadget(SNAP_DEST, GROUP_DEST, OBJ_TYPE, SNAP, VIZ_DEST, CAT_DEST, RVIR_OR_R200, MIN_NUMBER_PTCS, CENTER)
 
-with arguments identical to those we saw in the :ref:`Data Structures section<Data Structures>`, except that the parameters ``D_LOGSTART``, ``D_LOGEND``, ``D_BINS``, ``IT_TOL``, ``IT_WALL`` and ``IT_MIN`` that control the behavior of the shape estimation algorithm are absent. Now we can simply invoke the command::
+with arguments explained in the :ref:`Data Structures section<Data Structures>`. Now we can simply invoke the command::
 
-    dens_profs_db = cprofiles.estDensProfs(r_over_r200, obj_numbers = np.arange(10), direct_binning = True, spherical = True),
+    dens_profs_db = cprofiles.estDensProfs(r_over_r200, obj_numbers = np.arange(10), direct_binning = True, spherical = True, katz_config = default_katz_config),
 
 where the float array ``dens_profs_db`` of shape :math:`(N_{\text{pass}}, N_r)` contains the estimated density profiles. The ``obj_numbers`` argument expects a list of integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered, i.e. :math:`N_{\text{pass}}=10`, also see :ref:`Shape Estimation section<Shape Estimation>`. :math:`(N_{\text{pass}}, N_r)` further assumes that the float array that specifies for which unitless spherical radii ``r_over_r200`` the local density should be calculated, has shape :math:`N_r`. Specifying radial bins with equal spacing in logarithmic space :math:`\log (\delta r/r_{200}) = \mathrm{const}` is common practice, e.g. ``r_over_r200 = np.logspace(-1.5,0,70)``.
 
 As the naming suggests, with ``direct_binning = True`` we estimate density profiles using a direct-binning approach, i.e. brute-force binning of particles into spherical shells and subsequent counting. The user also has the liberty to invoke an ellipsoidal shell-based density profile estimation algorithm by setting the boolean ``spherical = False``. See `Gonzalez et al. 2022 <https://arxiv.org/abs/2205.06827>`_ for an application of the ellipsoidal shell-based density profile estimation technique.
 
-.. note:: If ``spherical = False``, ``cprofiles`` needs to be an object of the class ``DensShapeProfs`` or ``DensShapeProfsGadget``, providing access to shape profiling capabilities. The user then also has the discretion to set 2 keyword arguments, namely the booleans ``reduced`` and ``shell_based`` that are explained in the :ref:`Shape Estimation section<Shape Estimation>`.
+.. note:: If ``spherical = False``, the user then also has the discretion to set the configuration parameters ``katz_config`` for the Katz algorithm, explained in the :ref:`Shape Estimation section<Shape Estimation>`.
 
 On the other hand, with ``direct_binning = False``, we perform a kernel-based density profile estimation, cf. `Reed et al. 2005 <https://academic.oup.com/mnras/article/357/1/82/1039256>`_. Kernel-based approaches allow estimation of profiles without excessive particle noise.
 

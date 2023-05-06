@@ -27,13 +27,15 @@ def test_shapes_ex_script():
     CAT_DEST = "./cosmic_profiles/tests/cat"
     VIZ_DEST = "./cosmic_profiles/tests/viz"
     MIN_NUMBER_PTCS = 200
-    D_LOGSTART = -2
-    D_LOGEND = 0
-    D_BINS = 20 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-    IT_TOL = np.float32(1e-2)
-    IT_WALL = 100
-    IT_MIN = 10
     CENTER = 'mode'   
+    katz_config = {
+        'ROverR200': np.logspace(-1.5,0,70),
+        'IT_TOL': 1e-2,
+        'IT_WALL': 100,
+        'IT_MIN': 10,
+        'REDUCED': False, 
+        'SHELL_BASED': False
+    }
     
     #################################### Generate 1 mock halo ######################################
     tot_mass = 10**(12) # M_sun/h
@@ -59,13 +61,13 @@ def test_shapes_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensShapeProfs object #######################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ######################### Calculating Morphological Properties #################################
     # Create halo shape catalogue
     obj_numbers = [0]
-    cprofiles.dumpShapeCatLocal(obj_numbers = obj_numbers, reduced = False, shell_based = False)
+    cprofiles.dumpShapeCatLocal(obj_numbers = obj_numbers, katz_config = katz_config)
     
     ######################################## Visualizations ########################################
     # Visualize halo: A sample output is shown above!
-    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, katz_config = katz_config)

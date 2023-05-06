@@ -39,13 +39,24 @@ Here, :math:`m_k` is the mass of the :math:`k`-th particle, and :math:`r_{k} = (
 * :math:`w_k = \frac{1}{r_k^2}` where :math:`r_k^2 = (x_{k})^2+(y_{k})^2+(z_{k})^2` is the distance squared of particle :math:`k` from the center of the cloud, or
 * :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` where :math:`r_{\text{ell},k}^2 = x_{\text{ell},k}^2+y_{\text{ell},k}^2+z_{\text{ell},k}^2` is the ellipsoidal radius, where :math:`(x_{\text{ell},k}, y_{\text{ell},k}, z_{\text{ell},k})` are the coordinates of particle :math:`k` in the eigenvector coordinate system of the ellipsoid. The shape tensor with :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` is also called the *reduced* shape tensor, a variant that penalizes particles at large radii.
 
-Since the second weighting scheme with :math:`w_k = \frac{1}{r_k^2}` has recently fallen out of favour, see `Zemp et al. 2011 <https://arxiv.org/abs/1107.5582>`_, the other two schemes will be available by switching the boolean ``reduced``, see below.
+Since the second weighting scheme with :math:`w_k = \frac{1}{r_k^2}` has fallen out of favour, see `Zemp et al. 2011 <https://arxiv.org/abs/1107.5582>`_, the other two schemes will be available by switching the boolean ``REDUCED``, see below.
 
 After instantiating an object ``cprofiles`` as outlined in :ref:`Data Structures section<Data Structures>`, one can calculate and retrieve the local (i.e. as a function of :math:`r_{\text{ell}}`) halo shape catalogue by::
 
-    shapes = cprofiles.getShapeCatLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False).
+    shapes = cprofiles.getShapeCatLocal(obj_numbers, katz_config = default_katz_config).
 
-The morphological information in the structured numpy array ``shapes`` can be retrieved by dictionary-like semantics. ``d = shapes['d']``, ``q = shapes['q']``, ``s = shapes['s']``, ``minor = shapes['minor']``, ``inter = shapes['inter']`` and ``major = shapes['major']`` represents the shape profiles. The ``obj_numbers`` argument expects a list of integers indicating for which objects to estimate the density profile. In the example above, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. The boolean ``reduced`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. The boolean ``shell_based`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. Note that ``shell_based = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. 
+The morphological information in the structured numpy array ``shapes`` can be retrieved by dictionary-like semantics. ``d = shapes['d']``, ``q = shapes['q']``, ``s = shapes['s']``, ``minor = shapes['minor']``, ``inter = shapes['inter']`` and ``major = shapes['major']`` represents the shape profiles. The ``obj_numbers`` argument expects a list of integers indicating for which objects to estimate the density profile. If e.g. ``obj_numbers = np.arange(10)``, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. 
+CosmicProfiles uses the iterative `Katz 1991 <https://adsabs.harvard.edu/pdf/1991ApJ...368..325K>`_ algorithm to calculate the shape profiles. The default configuration 
+parameters are::
+
+    default_katz_config = {'ROverR200': np.logspace(-1.5,0,70), 'IT_TOL': 1e-2, 'IT_WALL': 100, 'IT_MIN': 10, 'REDUCED': False, 'SHELL_BASED': False},
+
+where ``ROverR200`` contains the normalized ellipsoidal radii of interest, in units of R200 or Rvir (depending on ``RVIR_OR_R200``) of parent halo, at which the shape profiles should be calculated.
+The float ``IT_TOL`` is the convergence tolerance in the shape estimation algorithm: eigenvalue fractions must differ by less than ``IT_TOL`` for the algorithm to halt.
+The integer ``IT_WALL`` is the maximum permissible number of iterations in shape estimation algorithm. The integer ``IT_MIN`` is the minimum number of particles (DM, gas or star particles depending on ``OBJ_TYPE``) in any iteration. If undercut, the shape remains unclassified (NaNs).
+The boolean ``REDUCED`` allows to select between the reduced shape tensor with weight :math:`w_k = \frac{1}{r_{\text{ell},k}^2}` and the regular shape tensor with :math:`w_k = 1`. 
+The boolean ``SHELL_BASED`` allows to run the iterative shape identifier on ellipsoidal shells (= homoeoids) rather than ellipsoids. 
+Note that ``SHELL_BASED = True`` should only be set if the number of particles resolving the objects is :math:`> \mathcal{O}(10^5)`. The dictionary ``default_katz_config`` can be imported via ``from cosmic_profiles import default_katz_config``.
 
 .. warning:: The arrays ``d``, ``q``, ``s``, ``minor``, ``inter`` and ``major`` that can be retrieved from the structured numpy array ``shapes`` will contain NaNs whenever the shape determination does not converge. 
 
@@ -71,7 +82,7 @@ If :math:`N_{\text{pass}}` stands for the number of objects that have been selec
 
 For post-processing purposes, one can dump the shape profiles via::
     
-    cprofiles.dumpShapeCatLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False),
+    cprofiles.dumpShapeCatLocal(obj_numbers, katz_config = default_katz_config),
 
 which will save the shape profiles in a destination of choice ``self.CAT_DEST`` (a string describing the absolute (or relative with respect to Python working diretory) path to the destination folder, e.g. ``/path/to/cat``, will be created if missing) that has been provided during object instantiation.
 
@@ -94,11 +105,11 @@ Global Shapes
 
 Instead of shape profiles one might also be interested in obtaining the shape parameters and principal axes of the point clouds as a whole. This information can be obtained by calling::
 
-    shapes = cprofiles.getShapeCatGlobal(obj_numbers = np.arange(10), reduced = False).
+    shapes = cprofiles.getShapeCatGlobal(obj_numbers, katz_config = default_katz_config).
 
 If a global shape calculations does not converge (which is rare), the corresponding entry in ``q = shapes['q']`` etc. will feature a NaN. As with shape profiles, we can dump the global shape catalogue in a destination ``self.CAT_DEST`` of choice via::
 
-    cprofiles.dumpShapeCatGlobal(reduced = False),
+    cprofiles.dumpShapeCatGlobal(obj_numbers, katz_config = default_katz_config),
 
 which will save some files in the destination folder.
 
@@ -121,9 +132,9 @@ Velocity Dispersion Tensor Eigenaxes
 
 For Gadget-style I, II, or HDF5 snapshot outputs one can calculate the velocity dispersion tensor eigenaxes by calling::
 
-    shapes = cprofiles.getShapeCatVelLocal(obj_numbers = np.arange(10), reduced = False, shell_based = False)
+    shapes = cprofiles.getShapeCatVelLocal(obj_numbers, katz_config = default_katz_config)
 
-for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(obj_numbers = np.arange(10), reduced = False)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(obj_numbers = np.arange(10), reduced = False)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``self.CAT_DEST``.
+for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(obj_numbers, katz_config = default_katz_config)`` for global velocity shapes. When calling e.g. ``cprofiles.dumpShapeCatVelGlobal(obj_numbers, katz_config = default_katz_config)``, the overall halo velocity dispersion tensor shapes of the following format will be added to ``self.CAT_DEST``.
 
 .. dropdown:: Velocity Shapes, Dumped Files
 
@@ -136,7 +147,7 @@ for local velocity shapes or ``cprofiles.getShapeCatVelGlobal(obj_numbers = np.a
     * ``m_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,): masses of halos
     * ``centers_vdm_x.txt`` of shape (:math:`N_{\text{pass}}`,3): centers of halos
 
-The ``cprofiles.dumpShapeCatVelLocal(obj_numbers = np.arange(10), reduced = False)`` command will dump files named ``d_local_vdm_x.txt`` etc.
+The ``cprofiles.dumpShapeCatVelLocal(obj_numbers, katz_config = default_katz_config)`` command will dump files named ``d_local_vdm_x.txt`` etc.
 
 *************************************
 Visualizations
@@ -144,10 +155,10 @@ Visualizations
 
 Shape profiles can be visualized using::
 
-    cprofiles.plotShapeProfs(nb_bins = 2, obj_numbers = np.arange(10), reduced = False, shell_based = False)
+    cprofiles.plotShapeProfs(nb_bins = 2, obj_numbers, katz_config = default_katz_config)
 
 which draws median shape profiles and also mass bin-decomposed ones. ``nb_bins`` stand for the number of mass bins to plot density profiles for. 3D visualizations of individual halos can be accomplished using::
  
-    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = [0,1,2], katz_config = default_katz_config)
 
 which for instance would visualize the 3D distribution of particles as well as the eigenaxes at two different ellipsoidal radii in the first three objects that have sufficient resolution. The shape visualizations will be saved to the object's attribute ``self.VIZ_DEST`` (string describing the absolute (or relative with respect to Python working diretory) path to the visualization folder, e.g. ``/path/to/viz``, will be created if missing) that has been provided during object instantiation.
