@@ -762,7 +762,7 @@ cdef class CosmicBase:
             getGlobalTHist(self.VIZ_DEST, self.SNAP, self.start_time, obj_masses, obj_centers, d, q, s, major, HIST_NB_BINS, self.MASS_UNIT, suffix = suffix)
             del d; del q; del s; del minor; del inter; del major; del obj_centers; del obj_masses
     
-    def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):
+    def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, dict method):
         """ Get best-fit results for density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -771,8 +771,8 @@ cdef class CosmicBase:
         :type r_over_r200: (r_res,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
         :type r200: (N1,) floats
-        :param method: string describing density profile model assumed for fitting
-        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :return: best-fits for each object
         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         
@@ -782,7 +782,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):
+    def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, dict method):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3
@@ -791,8 +791,8 @@ cdef class CosmicBase:
         :type r_over_r200: (r_res,) floats
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
         :type r200: (N1,) floats
-        :param method: string describing density profile model assumed for fitting
-        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
                 
@@ -998,7 +998,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):
+    def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):
         """ Get best-fit results for density profile fitting
         
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
@@ -1009,12 +1009,13 @@ cdef class CosmicBase:
         :type dens_profs: (N3, r_res) floats
         :param r_over_r200: normalized radii at which ``dens_profs`` are defined
         :type r_over_r200: (r_res,) floats
-        :param method: string describing density profile model assumed for fitting
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return: best-fits for each object
-        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
+        :rtype: (N3, n) floats, where n is the number of free parameters in the profile model ``method['profile']``"""
         print_status(rank,self.start_time,'Starting fitDensProfs() with snap {0}'.format(self.SNAP))
         if len(dens_profs) != len(obj_numbers):
             raise ValueError("The `obj_numbers` argument is inconsistent with the `dens_profs` handed over to the `fitDensProfs()` function. Please double-check and use the same `obj_numbers` as used for the density profile estimation!")
@@ -1032,9 +1033,9 @@ cdef class CosmicBase:
             l_curr_over_target = l_internal/config.OutUnitLength_in_cm
             m_curr_over_target = m_target/config.OutUnitMass_in_g
             best_fits[:,0] = best_fits[:,0]*m_curr_over_target*l_curr_over_target**(-3)
-            if method == 'einasto':
+            if method['profile'] == 'einasto':
                 idx = 2
-            elif method == 'alpha_beta_gamma':
+            elif method['profile'] == 'alpha_beta_gamma':
                 idx = 4
             else:
                 idx = 1
@@ -1043,7 +1044,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):
+    def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
@@ -1055,8 +1056,8 @@ cdef class CosmicBase:
         :type dens_profs: (N3, r_res) floats
         :param r_over_r200: normalized radii at which ``dens_profs`` are defined
         :type r_over_r200: (r_res,) floats
-        :param method: string describing density profile model assumed for fitting
-        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return: best-fit concentration for each object
@@ -1079,7 +1080,7 @@ cdef class CosmicBase:
         else:
             return None
         
-    def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, str method, str suffix, int nb_bins, obj_numbers):
+    def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, dict method, str suffix, int nb_bins, obj_numbers):
         """ Draws some simplistic density profiles
         
         :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
@@ -1096,8 +1097,8 @@ cdef class CosmicBase:
         :type dens_profs_fit: (N2, r_res2) floats
         :param r_over_r200_fit: radii at which best-fits shall be calculated
         :type r_over_r200_fit: (r_res2,) floats
-        :param method: string describing density profile model assumed for fitting
-        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)
         :type suffix: string
         :param nb_bins: Number of mass bins to plot density profiles for

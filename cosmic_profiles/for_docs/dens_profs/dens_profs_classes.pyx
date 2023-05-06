@@ -115,22 +115,22 @@ cdef class DensProfsBase(CosmicBase):
         :rtype: (N2, r_res) floats"""
         return
     
-    def fitDensProfs(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method
+    def fitDensProfs(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method
         """ Get best-fit results for density profile fitting
         
         :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
         :type dens_profs: (N3, r_res) floats
         :param r_over_r200: normalized radii at which ``dens_profs`` are defined
         :type r_over_r200: (r_res,) floats
-        :param method: string describing density profile model assumed for fitting
-        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return: best-fits for each object
         :rtype: structured array, containing (N3, n) floats, where n is the number of free parameters in the model ``method``"""
         return
         
-    def estConcentrations(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method
+    def estConcentrations(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method
         """ Get best-fit concentration values of objects from density profile fitting
         
         :param dens_profs: density profiles whose concentrations are to be determined, 
@@ -138,15 +138,15 @@ cdef class DensProfsBase(CosmicBase):
         :type dens_profs: (N3, r_res) floats
         :param r_over_r200: normalized radii at which ``dens_profs`` are defined
         :type r_over_r200: (r_res,) floats
-        :param method: string describing density profile model assumed for fitting
-        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :param obj_numbers: list of object indices of interest
         :type obj_numbers: list of int
         :return: best-fit concentration for each object
         :rtype: (N3,) floats"""
         return
         
-    def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, str method, int nb_bins, obj_numbers): # Public Method
+    def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, method, nb_bins, obj_numbers): # Public Method
         """ Draws some simplistic density profiles
         
         :param dens_profs: estimated density profiles, in units of 
@@ -159,8 +159,8 @@ cdef class DensProfsBase(CosmicBase):
         :type dens_profs_fit: (N2, r_res2) floats
         :param r_over_r200_fit: radii at which best-fits shall be calculated
         :type r_over_r200_fit: (r_res2,) floats
-        :param method: string describing density profile model assumed for fitting
-        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
         :param nb_bins: Number of mass bins to plot density profiles for
         :type nb_bins: int
         :param obj_numbers: list of object indices of interest

@@ -24,8 +24,8 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-@pytest.mark.parametrize('method, direct_binning', [p for p in itertools.product(*[['einasto', 'nfw', 'hernquist', 'alpha_beta_gamma'], [False, True]])])
-def test_densities(method, direct_binning):
+@pytest.mark.parametrize('profile, direct_binning', [p for p in itertools.product(*[['einasto', 'nfw', 'hernquist', 'alpha_beta_gamma'], [False, True]])])
+def test_densities(profile, direct_binning):
     #################################### Parameters #################################################
     updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     updateOutUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
@@ -37,7 +37,8 @@ def test_densities(method, direct_binning):
     CENTER = 'mode'
     r_over_rvir = np.logspace(-2,0,50)
     N = 10 # Number of halos used for test
-    
+    method = {'profile': profile}
+        
     #################################### Generate N mock halos ######################################
     r_s = 0.5 # Units are Mpc/h
     alpha = 0.18
@@ -57,7 +58,7 @@ def test_densities(method, direct_binning):
         a = np.logspace(-1.5,0.2,100)*r_vir[-1] # Units are Mpc/h
         b = a*0.6 # Units are Mpc/h
         c = a*0.2 # Units are Mpc/h
-        halo_x, halo_y, halo_z, mass_dm, rho_s = genHalo(tot_mass, halo_res, model_pars[method], method, a, b, c)
+        halo_x, halo_y, halo_z, mass_dm, rho_s = genHalo(tot_mass, halo_res, model_pars[profile], profile, a, b, c)
         print("Number of particles in the halo is {}.".format(halo_x.shape[0]))
         halo_x += np.random.uniform(0,L_BOX/2,1)[0] # Move mock halo into the middle of the simulation box
         halo_y += np.random.uniform(0,L_BOX/2,1)[0]

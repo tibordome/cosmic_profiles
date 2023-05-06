@@ -88,8 +88,8 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
     :type obj_masses: (N,) floats
     :param obj_centers: centers of objects, each coordinate in Mpc/h
     :type obj_centers: (N,3) floats
-    :param method: string describing density profile model assumed for fitting
-    :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+    :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
     :param nb_bins: Number of mass bins to plot density profiles for
     :type nb_bins: int
     :param start_time: time of start of shape analysis
@@ -111,8 +111,8 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     :param ROverR200: normalized radii where ``median`` is defined and 
         fitting should be carried out
     :type ROverR200: (N,) floats
-    :param method: string describing density profile model assumed for fitting
-    :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+    :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
     :param median_r200_obj_nb: density profile (often a median of many profiles combined,
         in units of M_sun*h^2/(Mpc)**3), virial radius (of parent halo in units of Mpc/h) 
         and object number
@@ -132,8 +132,8 @@ def fitDensProfHelper(dens_profs, ROverR200, r200s, method):
     :type ROverR200: (r_res,) floats
     :param r200s: R200 values of parent halos in units of Mpc/h
     :type r200s: (N,) floats
-    :param method: string describing density profile model assumed for fitting
-    :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`
+    :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+    :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement
     :return best_fits: best-fit results
     :rtype: (N,n) floats"""
     return

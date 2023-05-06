@@ -37,6 +37,7 @@ def test_densities_ex_script():
     CAT_DEST = "./cosmic_profiles/tests/cat"
     MIN_NUMBER_PTCS = 200
     CENTER = 'com'
+    method = {'profile': 'einasto'}
     
     #################################### Generate 1 mock halo ##################################################
     tot_mass = 10**(12) # M_sun/h
@@ -76,13 +77,13 @@ def test_densities_ex_script():
     ############################## Fit Density Profile #########################################################
     r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db_fit = dens_profs_db[0,10:]
-    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', obj_numbers = obj_numbers) # best fit is in out units
+    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = method, obj_numbers = obj_numbers) # best fit is in out units
     rho_s = best_fit['rho_s']
     alpha = best_fit['alpha']
     r_s = best_fit['r_s']
     model_pars = {'rho_s': rho_s, 'alpha': alpha, 'r_s': r_s}
     
-    cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', nb_bins = 3, obj_numbers = obj_numbers)
+    cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = method, nb_bins = 3, obj_numbers = obj_numbers)
     
     # Some more plotting
     l_in_over_out = 1000 # Needed since in and out length units are not identical, and best_fit is in out units while r_vir is not

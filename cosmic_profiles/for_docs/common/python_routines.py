@@ -675,4 +675,22 @@ def checkKatzConfig(katz_config):
     IT_MIN = np.int32(IT_MIN)
     return ROverR200, IT_TOL, IT_WALL, IT_MIN, REDUCED, SHELL_BASED
 
+def checkDensFitMethod(method):
+    """ Check validity of density profile fitting method
+    
+    :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+    :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement"""
+    assert type(method) == dict, "Note: method must be a dictionary"
+    assert 'profile' in method, "Note: method must have at least the 'profile' field"
+    assert method['profile'] == 'einasto' or method['profile'] == 'alpha_beta_gamma' or method['profile'] == 'hernquist' or method['profile'] == 'nfw', "Note: method['profile'] must be one of `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`"
+    if method['profile'] == 'einasto':
+        allowed_fields = {'profile', 'rho_s', 'alpha', 'r_s'}
+        assert method.keys() <= allowed_fields, "Since you have chosen the Einasto profile, the only fields allowed for the method dict are 'rho_s', 'alpha', 'r_s'"
+    elif method['profile'] == 'alpha_beta_gamma':
+        allowed_fields = {'profile', 'rho_s', 'alpha', 'beta', 'gamma', 'r_s'}
+        assert method.keys() <= allowed_fields, "Since you have chosen the generalized NFW profile (aka alpha-beta-gamma profile), the only fields allowed for the method dict are 'rho_s', 'alpha', 'beta', 'gamma', 'r_s'"
+    else:
+        allowed_fields = {'profile', 'rho_s', 'r_s'}
+        assert method.keys() <= allowed_fields, "Since you have chosen the Hernquist or NFW profile, the only fields allowed for the method dict are 'rho_s', 'r_s'"
+
 default_katz_config = {'ROverR200': np.logspace(-1.5,0,70), 'IT_TOL': 1e-2, 'IT_WALL': 100, 'IT_MIN': 10, 'REDUCED': False, 'SHELL_BASED': False}
