@@ -272,7 +272,7 @@ def calcDensProfsKernelBased(double[:,:] xyz, double[:] masses, double[:] r200s,
             m_obj[n] = masses[idx_cat[offsets[p]+n]]
         xyz_obj[:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[:obj_size[p]], L_BOX)
         dists = np.linalg.norm(xyz_obj.base[:obj_size[p]]-centers.base[p], axis = 1)
-        hs = 0.005*r_over_r200[-1]*r200s[p]*(dists.base/(r_over_r200[-1]*r200s[p]))**(0.5)
+        hs = 0.005*r200s[p]*(dists.base/(0.1*r200s[p]))**(0.5)
         for r_idx in prange(r_res, schedule = 'dynamic', nogil = True):
             for n in range(obj_size[p]):
                 dens_profs[p][r_idx] += m_obj[n]*CythonHelpers.calcKTilde(r_over_r200[r_idx]*r200s[p], dists[n], hs[n])/(hs[n]**3)
