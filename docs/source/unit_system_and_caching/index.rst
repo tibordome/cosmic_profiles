@@ -21,7 +21,8 @@ Here, the combination of ``length_in_cm``, ``mass_in_g`` and ``velocity_in_cm_pe
 Caching
 **************************
 
-As explained in the :ref:`Caching Routines section<Caching Routines>` in more detail, caching for various internal functions is implemented by CosmicProfiles to avoid recalculating / reloading repeatedly. The cache will be considered full if there are fewer than ``use_memory_up_to`` bytes of memory available. The user can update ``use_memory_up_to`` by calling ``updateCachingMaxGBs()``::
+As explained in the :ref:`Caching Routines section<Caching Routines>` in more detail, caching for various internal functions is implemented by CosmicProfiles to avoid recalculating / reloading repeatedly. The cache will be considered full if there are fewer than ``use_memory_up_to`` bytes of RAM available. 
+In other words, it's the minimum size of free RAM (i.e. not occupied by cached objects). The user can update ``use_memory_up_to`` by calling ``updateCachingMaxGBs()``::
 
     from cosmic_profiles import updateCachingMaxGBs
     
@@ -29,7 +30,7 @@ As explained in the :ref:`Caching Routines section<Caching Routines>` in more de
     use_memory_up_to = 2 # In GBs
     updateCachingMaxGBs(use_memory_up_to)
 
-On systems with a small RAM, the user can increase ``use_memory_up_to`` to make CosmicProfiles consume less RAM. In case the user sets ``use_memory_up_to`` to ``False``, the ``maxsize`` argument will take effect, which can be updated by calling ``updateCachingMaxSize()``::
+On systems with a small RAM, CosmicProfiles will cache fewer objects, and calculations will be repeated more often. In case the user sets ``use_memory_up_to`` to ``False``, the ``maxsize`` argument will take effect, which can be updated by calling ``updateCachingMaxSize()``::
 
     from cosmic_profiles import updateCachingMaxSize
     
@@ -37,4 +38,6 @@ On systems with a small RAM, the user can increase ``use_memory_up_to`` to make 
     maxsize = 128 # New maximum cache size
     updateCachingMaxSize(maxsize)
 
-This will result in regular, memory-agnostic LRU-caching as implemented with the ``lru_cache`` decorator.
+This will result in standard, memory-agnostic LRU-caching as implemented with the ``lru_cache`` decorator. ``maxsize`` specifies the maximum number of items that can be stored in the cache. 
+When the cache reaches its maximum size, the least recently used (LRU) item is evicted to make room for a new item. ``maxsize`` is set to 128 by default, but it can be set to any non-negative integer or ``None`` to indicate an unbounded cache size.
+Setting ``use_memory_up_to`` to ``False`` and ``maxsize`` to zero might make sense if you want to ensure CosmicProfiles uses the least amount of RAM possible (i.e. this disables caching altogether).
