@@ -24,8 +24,8 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-@pytest.mark.parametrize('method, reduced, shell_based', [p for p in itertools.product(*[['einasto', 'nfw', 'hernquist', 'alpha_beta_gamma'], [False, True], [False, True]])])
-def test_shapes(method, reduced, shell_based):
+@pytest.mark.parametrize('profile, reduced, shell_based', [p for p in itertools.product(*[['einasto', 'nfw', 'hernquist', 'alpha_beta_gamma'], [False, True], [False, True]])])
+def test_shapes(profile, reduced, shell_based):
     #################################### Parameters ################################################
     updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     updateOutUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
@@ -181,6 +181,7 @@ def test_shapes(method, reduced, shell_based):
     ############################## Fit Ellipsoidal Density Profile ##########################################################
     r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
     dens_profs_db_fit = dens_profs_db[:,10:]
+    method = {'profile': profile}
     best_fits = cprofiles.fitDensProfs(dens_profs_db_fit, r_over_rvir_fit, method = method, obj_numbers = obj_numbers)
     if rank == 0:
         rho_s = best_fits['rho_s']
@@ -188,4 +189,4 @@ def test_shapes(method, reduced, shell_based):
         assert best_fits.shape[0] == nb_selected
         
     # Draw ellipsoidal halo density profiles (overall and mass-decomposed ones). The results from fitDensProfs() got cached.
-    cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db[:,25:], r_over_rvir[25:], method = 'nfw', nb_bins = 2, obj_numbers = obj_numbers)
+    cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db[:,25:], r_over_rvir[25:], method = method, nb_bins = 2, obj_numbers = obj_numbers)
