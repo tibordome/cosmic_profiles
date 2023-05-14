@@ -6,11 +6,11 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def genHalo(tot_mass, res, model_pars, method, a, b, c):
+def genHalo(tot_mass, res, model_pars, profile, a, b, c):
     """ Mock halo generator
     
     Create mock halo of mass ``tot_mass`` consisting of approximately ``res`` particles. The ``model_pars``
-    array contains the parameters for the profile model given in ``method``. 
+    array contains the parameters for the profile model given in ``profile``. 
     
     :param tot_mass: total target mass of halo, in units of M_sun*h^2/Mpc^3
     :type tot_mass: float

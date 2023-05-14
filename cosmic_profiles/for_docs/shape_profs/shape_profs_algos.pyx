@@ -209,11 +209,11 @@ cdef runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, flo
     return
 
 @cython.embedsignature(True)
-def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocal(double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local shape catalogue
     
     Calls ``calcObjMorphLocal()`` in a parallelized manner.\n
-    Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the centers, for each object.
+    Calculates the axis ratios for the range [ ``r200`` x r_over_r200[0], ``r200`` x r_over_r200[-1]] from the centers, for each object.
     
     :param xyz: positions of all (DM or star) particles in simulation box
     :type xyz: (N2 x 3) floats
@@ -227,12 +227,8 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles should be estimated
+    :type r_over_r200: (r_res,) floats
     :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
     :type IT_TOL: float
@@ -254,7 +250,7 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
     return
     
 @cython.embedsignature(True)
-def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobal(double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, double SAFE, bint reduced):
     """ Calculates the overall shape catalogue
     
     Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n
@@ -294,7 +290,7 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_c
     return
     
 @cython.embedsignature(True)
-def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocalVelDisp(double[:,:] xyz, double[:,:] vxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local velocity dispersion shape catalogue
     
     Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n
@@ -316,11 +312,8 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
     :type MIN_NUMBER_PTCS: int
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest mi
+    :param r_over_r200: normalized radii at which shape profiles should be estimated
+    :type r_over_r200: (r_res,) floats
     :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
     :type IT_TOL: float
@@ -342,7 +335,7 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     return
     
 @cython.embedsignature(True)
-def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobalVelDisp(double[:,:] xyz, double[:,:] vxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, double SAFE, bint reduced):
     """ Calculates the global velocity dipsersion shape catalogue
     
     Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n
@@ -386,7 +379,7 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     return
 
 @cython.embedsignature(True)
-cdef calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+cdef calcObjMorphLocal(double[:,:] morph_info, double r200, double[:] log_d, double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, int[:] shell, double[:] r_ell, double[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
     """ Calculates the local axis ratios
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -432,11 +425,11 @@ cdef calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[
     :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
     :type shell_based: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius
-    :rtype: (12,N) float array"""
+    :rtype: (12,N) double array"""
     return
 
 @cython.embedsignature(True)
-cdef calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
+cdef calcObjMorphGlobal(double[:] morph_info, double r200, double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, int[:] ellipsoid, double[:] r_ell, double[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, double SAFE, bint reduced):
     """ Calculates the global axis ratios and eigenframe of the point cloud
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -477,11 +470,11 @@ cdef calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     return
 
 @cython.embedsignature(True)
-cdef calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
+cdef calcObjMorphLocalVelDisp(double[:,:] morph_info, double r200, double[:] log_d, double[:,:] xyz, double[:,:] vxyz, double[:,:] xyz_princ, double[:] masses, int[:] shell, double[:] r_ell, double[:] center, double[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based):
     """ Calculates the local axis ratios of the velocity dispersion tensor 
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -531,11 +524,11 @@ cdef calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d,
     :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
     :type shell_based: boolean
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
-    :rtype: (12,N) float array"""
+    :rtype: (12,N) double array"""
     return
 
 @cython.embedsignature(True)
-cdef calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced):
+cdef calcObjMorphGlobalVelDisp(double[:] morph_info, double r200, double[:,:] xyz, double[:,:] vxyz, double[:,:] xyz_princ, double[:] masses, int[:] ellipsoid, double[:] r_ell, double[:] center, double[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, double SAFE, bint reduced):
     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -584,5 +577,5 @@ cdef calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, 
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     return

@@ -8,13 +8,13 @@ cimport cython
 cdef class CosmicBase:
     
     cdef str SNAP
-    cdef float L_BOX
+    cdef double L_BOX
     cdef double start_time
-    cdef float[:] r200
+    cdef double[:] r200
     cdef str CENTER
     cdef str VIZ_DEST
     cdef str CAT_DEST
-    cdef float SAFE # Units: Mpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
-    cdef float MASS_UNIT
+    cdef double SAFE # Units: Mpc/h. Ellipsoidal radius will be maxdist(COM,point)+SAFE where point is any point in the point cloud. The larger the better.
+    cdef double MASS_UNIT
     cdef int MIN_NUMBER_PTCS
     cdef str SUFFIX

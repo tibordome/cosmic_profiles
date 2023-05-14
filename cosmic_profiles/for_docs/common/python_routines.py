@@ -9,6 +9,7 @@ import numpy as np
 import math
 from scipy.linalg import cholesky
 from numpy.linalg import inv
+from numpy.random import default_rng
 
 def eTo10(st):
     """Replace e+{xy} by "10^{xy}" etc..
@@ -510,10 +511,12 @@ def respectPBCNoRef(xyz, L_BOX = None):
     :rtype: (N^3x3) floats"""
     if L_BOX != 0.0:
         xyz_out = xyz.copy() # Otherwise changes would be reflected in outer scope (np.array is mutable).
-        ref = 0 # Reference particle does not matter
-        dist_x = xyz_out[:,0]-xyz_out[ref, 0]
-        dist_y = xyz_out[:,1]-xyz_out[ref, 1]
-        dist_z = xyz_out[:,2]-xyz_out[ref, 2]
+        rng = default_rng(seed=0) # Reference particle does not matter, i.e. ref = 0 is an option, but it is better to average over some random particles
+        choose = rng.choice(np.arange(len(xyz)), (min(50,len(xyz)),), replace = False)
+        ref_xyz = np.average(xyz_out[choose], axis = 0)
+        dist_x = xyz_out[:,0]-ref_xyz[0]
+        dist_y = xyz_out[:,1]-ref_xyz[1]
+        dist_z = xyz_out[:,2]-ref_xyz[2]
         xyz_out[:,0][dist_x > L_BOX/2] = xyz_out[:,0][dist_x > L_BOX/2]-L_BOX
         xyz_out[:,0][dist_x < -L_BOX/2] = xyz_out[:,0][dist_x < -L_BOX/2]+L_BOX
         xyz_out[:,1][dist_y > L_BOX/2] = xyz_out[:,1][dist_y > L_BOX/2]-L_BOX
@@ -533,15 +536,33 @@ def calcCoM(xyz, masses):
     :type masses: (N,3) floats
     :return: com, center of mass
     :rtype: (3,) floats"""
-    com = np.zeros((3,), dtype = np.float32)
-    mass_total = 0.0
-    for run in range(xyz.shape[0]):
-        mass_total += masses[run]
-    for run in range(xyz.shape[0]):
-        com[0] += masses[run]*xyz[run,0]/mass_total
-        com[1] += masses[run]*xyz[run,1]/mass_total
-        com[2] += masses[run]*xyz[run,2]/mass_total
+    # Average over some random particles and recentre with respect to that to avoid large numbers
+    rng = default_rng(seed=0)
+    choose = rng.choice(np.arange(len(xyz)), (min(50,len(xyz)),), replace = False)
+    ref_xyz = np.average(xyz[choose], axis = 0)
+    delta_xyz = xyz.copy()-ref_xyz
+    mass_total = np.sum(masses)
+    com = np.sum(np.reshape(masses, (len(masses),1))*delta_xyz/mass_total, axis = 0)
+    com = com+ref_xyz
     return com
+
+def recentreObject(xyz, L_BOX):
+    """ Recentre object if fallen outside [L_BOX]^3 due to e.g. respectPBCNoRef()
+    
+    :param xyz: coordinates of particles of type 1 or type 4
+    :type xyz: (N,3) floats
+    :param L_BOX: periodicity of box (0.0 if non-periodic)
+    :type L_BOX: float
+    :return: updated coordinates of particles
+    :rtype: (N^3x3) floats"""
+    xyz_out = xyz.copy()
+    xyz_out[:,0][xyz_out[:,0] >= L_BOX] = xyz_out[:,0][xyz_out[:,0] >= L_BOX]-L_BOX
+    xyz_out[:,0][xyz_out[:,0] < 0.0] = xyz_out[:,0][xyz_out[:,0] < 0.0]+L_BOX
+    xyz_out[:,1][xyz_out[:,1] >= L_BOX] = xyz_out[:,1][xyz_out[:,1] >= L_BOX]-L_BOX
+    xyz_out[:,1][xyz_out[:,1] < 0.0] = xyz_out[:,1][xyz_out[:,1] < 0.0]+L_BOX
+    xyz_out[:,2][xyz_out[:,2] >= L_BOX] = xyz_out[:,2][xyz_out[:,2] >= L_BOX]-L_BOX
+    xyz_out[:,2][xyz_out[:,2] < 0.0] = xyz_out[:,2][xyz_out[:,2] < 0.0]+L_BOX
+    return xyz_out
 
 def getCatWithinFracR200(cat_in, obj_size_in, xyz, masses, L_BOX, CENTER, r200, frac_r200):
     """ Cleanse index catalogue ``cat_in`` of particles beyond R200 ``r200``
@@ -631,3 +652,47 @@ def getSubSetIdxCat(idx_cat, obj_size, obj_numbers):
     for p in obj_numbers:
         subset_idx_cat = np.hstack((subset_idx_cat, idx_cat[offsets[p]:offsets[p+1]]))
     return subset_idx_cat
+
+def checkKatzConfig(katz_config):
+    """ Check (for types etc) and return configuration parameters for Katz algorithm
+    
+    :param katz_config: dictionary with parameters to the Katz algorithm, with fields 'ROverR200', 'IT_TOL', 'IT_WALL', 'IT_MIN', 'REDUCED', 'SHELL_BASED'
+    :type katz_config: dictionary
+    :return ROverR200, IT_TOL, IT_WALL, IT_MIN, REDUCED, SHELL_BASED: configuration parameters
+    :rtype: (r_res,) doubles, double, int, int, boolean, boolean"""
+    ROverR200 = katz_config['ROverR200']
+    IT_TOL = katz_config['IT_TOL']
+    IT_WALL = katz_config['IT_WALL']
+    IT_MIN = katz_config['IT_MIN']
+    REDUCED = katz_config['REDUCED']
+    SHELL_BASED = katz_config['SHELL_BASED']
+    assert type(SHELL_BASED) == bool, "SHELL_BASED should be boolean"
+    assert type(REDUCED) == bool, "REDUCED should be boolean"
+    assert hasattr(ROverR200, "__len__"), "ROverR200 should be a list or array with more than one element" 
+    ROverR200 = np.float64(ROverR200)
+    IT_TOL = np.float64(IT_TOL)
+    IT_WALL = np.int32(IT_WALL)
+    IT_MIN = np.int32(IT_MIN)
+    return ROverR200, IT_TOL, IT_WALL, IT_MIN, REDUCED, SHELL_BASED
+
+def checkDensFitMethod(method):
+    """ Check validity of density profile fitting method
+    
+    :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18
+    :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement"""
+    assert type(method) == dict, "Note: method must be a dictionary"
+    assert 'profile' in method, "Note: method must have at least the 'profile' field"
+    assert method['profile'] == 'einasto' or method['profile'] == 'alpha_beta_gamma' or method['profile'] == 'hernquist' or method['profile'] == 'nfw', "Note: method['profile'] must be one of `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`"
+    if method['profile'] == 'einasto':
+        allowed_fields = {'profile', 'rho_s', 'alpha', 'r_s', 'min_method'}
+        assert method.keys() <= allowed_fields, "Since you have chosen the Einasto profile, the only fields allowed for the method dict are 'rho_s', 'alpha', 'r_s'"
+    elif method['profile'] == 'alpha_beta_gamma':
+        allowed_fields = {'profile', 'rho_s', 'alpha', 'beta', 'gamma', 'r_s', 'min_method'}
+        assert method.keys() <= allowed_fields, "Since you have chosen the generalized NFW profile (aka alpha-beta-gamma profile), the only fields allowed for the method dict are 'rho_s', 'alpha', 'beta', 'gamma', 'r_s'"
+    else:
+        allowed_fields = {'profile', 'rho_s', 'r_s', 'min_method'}
+        assert method.keys() <= allowed_fields, "Since you have chosen the Hernquist or NFW profile, the only fields allowed for the method dict are 'rho_s', 'r_s'"
+    if 'min_method' in method:
+        assert method['min_method'] == 'Nelder-Mead' or method['min_method'] == 'L-BFGS-B' or method['min_method'] == 'TNC' or method['min_method'] == 'SLSQP' or method['min_method'] == 'Powell' or method['min_method'] == 'trust-constr', "Note: method['min_method'] must be one of `Nelder-Mead`, `L-BFGS-B`, `TNC`, `SLSQP`, `Powell`, and `trust-constr` methods"
+
+default_katz_config = {'ROverR200': np.logspace(-1.5,0,70), 'IT_TOL': 1e-2, 'IT_WALL': 100, 'IT_MIN': 10, 'REDUCED': False, 'SHELL_BASED': False}

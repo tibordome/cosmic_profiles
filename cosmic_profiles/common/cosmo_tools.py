@@ -186,8 +186,8 @@ def getMeanOrMedianAndError(y, ERROR_METHOD, N_REAL=10):
     if ERROR_METHOD == "bootstrap":
         mean_median = np.array([np.average(z) if z != [] else np.nan for z in y])
         mean_l = [[] for i in range(len(y))]
-        err_low = np.empty(len(y), dtype = np.float32)
-        err_high = np.empty(len(y), dtype = np.float32)
+        err_low = np.empty(len(y), dtype = np.float64)
+        err_high = np.empty(len(y), dtype = np.float64)
         for random_state in range(N_REAL):
             for d_bin in range(len(y)):
                 boot = resample(y[d_bin], replace=True, n_samples=len(y[d_bin]), random_state=random_state)
@@ -259,9 +259,9 @@ def M_split(m, center, start_time, v = None, NB_BINS = 2):
         v_groups = list(getBlocks(v[args_sort], chunk_size)) # List of arrays
     for i in range(len(m_groups)+1):
         if i == len(m_groups):
-            max_min_m.append(np.float32(m_ordered[-1]))
+            max_min_m.append(np.float64(m_ordered[-1]))
         else:
-            max_min_m.append(np.float32(m_ordered[i*chunk_size]))
+            max_min_m.append(np.float64(m_ordered[i*chunk_size]))
         
     idx_groups = [[args_sort[i] for i in np.arange(int(np.array([len(m_groups[k]) for k in range(j)]).sum()), int(np.array([len(m_groups[k]) for k in range(j)]).sum())+len(m_groups[j]))] for j in range(len(m_groups))]
     if v_groups == []:

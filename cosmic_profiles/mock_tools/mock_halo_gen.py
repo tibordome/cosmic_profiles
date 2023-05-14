@@ -13,11 +13,11 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-def genHalo(tot_mass, res, model_pars, method, a, b, c):
+def genHalo(tot_mass, res, model_pars, profile, a, b, c):
     """ Mock halo generator
     
     Create mock halo of mass ``tot_mass`` consisting of approximately ``res`` particles. The ``model_pars``
-    array contains the parameters for the profile model given in ``method``. 
+    array contains the parameters for the profile model given in ``profile``. 
     
     :param tot_mass: total target mass of halo, in units of M_sun*h^2/Mpc^3
     :type tot_mass: float
@@ -40,33 +40,33 @@ def genHalo(tot_mass, res, model_pars, method, a, b, c):
         
     if rank == 0:
         # Determine rho_s in units of M_sun*h^2/Mpc^3
-        def getMassIntegrand0(r, method, model_pars):
-            if method == 'einasto':
+        def getMassIntegrand0(r, profile, model_pars):
+            if profile == 'einasto':
                 alpha = model_pars['alpha']
                 r_s = model_pars['r_s']
                 return 4*np.pi*r**2*np.exp(-2/alpha*((r/r_s)**alpha-1))
-            if method == 'alpha_beta_gamma':
+            if profile == 'alpha_beta_gamma':
                 alpha = model_pars['alpha']
                 beta = model_pars['beta']
                 gamma = model_pars['gamma']
                 r_s = model_pars['r_s']
                 return 4*np.pi*r**2/((r/r_s)**gamma*(1+(r/r_s)**alpha)**((beta-gamma)/alpha))
-            if method == 'hernquist':
+            if profile == 'hernquist':
                 r_s = model_pars['r_s']
                 return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**3)
             else:
                 r_s = model_pars['r_s']
                 return 4*np.pi*r**2/((r/r_s)*(1+r/r_s)**2)
-        rho_s = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(method, model_pars))[0]
+        rho_s = tot_mass/quad(getMassIntegrand0, 1e-8, a[-1], args=(profile, model_pars))[0]
         model_pars['rho_s'] = rho_s
         
         # Determine number of particles in second shell (first proper shell)
         def getMassIntegrand(r, model_pars):
-            if method == 'einasto':
+            if profile == 'einasto':
                 return 4*np.pi*r**2*getEinastoProf(r, model_pars)
-            if method == 'alpha_beta_gamma':
+            if profile == 'alpha_beta_gamma':
                 return 4*np.pi*r**2*getAlphaBetaGammaProf(r, model_pars)
-            if method == 'hernquist':
+            if profile == 'hernquist':
                 return 4*np.pi*r**2*getHernquistProf(r, model_pars)
             else:
                 return 4*np.pi*r**2*getNFWProf(r, model_pars)

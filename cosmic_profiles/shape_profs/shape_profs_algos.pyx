@@ -7,13 +7,13 @@ import numpy as np
 from cosmic_profiles.cython_helpers.helper_class cimport CythonHelpers
 from libc.stdio cimport printf
 from cython.parallel import prange
-from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode
+from cosmic_profiles.common.python_routines import respectPBCNoRef, calcCoM, calcMode, recentreObject
 from cosmic_profiles.common.caching import np_cache_factory
 cimport cython
 from libc.math cimport sqrt
 
 @cython.embedsignature(True)
-cdef float[:] runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
+cdef double[:] runShellAlgo(double[:] morph_info, double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, int[:] shell, double[:] r_ell, double[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double d, double delta_d, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
     """ S1 algorithm for halos/galaxies at elliptical radius ``d`` with shell width ``delta_d``
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -21,7 +21,7 @@ cdef float[:] runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_p
     the entire particle distro, not the center of the initial spherical volume as in Katz 1991.\n
     Differential version of E1.\n
     Shells can cross (except 2nd shell with 1st), and a shell is assumed to be equally thick everywhere.\n
-    Whether we adopt the last assumption or let the thickness float (Tomassetti et al 2016) barely makes 
+    Whether we adopt the last assumption or let the thickness double (Tomassetti et al 2016) barely makes 
     any difference in terms of shapes found, but the convergence properties improve for the version with fixated thickness.
     For 1st shell: ``delta_d`` is ``d``
     
@@ -62,20 +62,20 @@ cdef float[:] runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_p
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     
     shell[:] = 0
     cdef int pts_in_shell = 0
     cdef int corr = 0
-    cdef float err = 1.0
-    cdef float q_new = 1.0
-    cdef float s_new = 1.0
-    cdef float q_old = 1.0
-    cdef float s_old = 1.0
+    cdef double err = 1.0
+    cdef double q_new = 1.0
+    cdef double s_new = 1.0
+    cdef double q_old = 1.0
+    cdef double s_old = 1.0
     cdef int iteration = 1
-    cdef float vec2_norm = 1.0
-    cdef float vec1_norm = 1.0
-    cdef float vec0_norm = 1.0
+    cdef double vec2_norm = 1.0
+    cdef double vec1_norm = 1.0
+    cdef double vec0_norm = 1.0
     cdef int i
     # Start with spherical shell
     for i in range(xyz.shape[0]):
@@ -145,7 +145,7 @@ cdef float[:] runShellAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_p
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
+cdef double[:] runEllAlgo(double[:] morph_info, double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, int[:] ellipsoid, double[:] r_ell, double[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double d, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
     """ Katz-Dubinski ellipsoid-based algorithm for halos/galaxies at elliptical radius ``d``
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -187,20 +187,20 @@ cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_pri
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     
     ellipsoid[:] = 0
     cdef int pts_in_ell = 0
     cdef int corr = 0
-    cdef float err = 1.0
-    cdef float q_new = 1.0
-    cdef float s_new = 1.0
-    cdef float q_old = 1.0
-    cdef float s_old = 1.0
+    cdef double err = 1.0
+    cdef double q_new = 1.0
+    cdef double s_new = 1.0
+    cdef double q_old = 1.0
+    cdef double s_old = 1.0
     cdef int iteration = 1
-    cdef float vec2_norm = 1.0
-    cdef float vec1_norm = 1.0
-    cdef float vec0_norm = 1.0
+    cdef double vec2_norm = 1.0
+    cdef double vec1_norm = 1.0
+    cdef double vec0_norm = 1.0
     cdef int i
     # Start with sphere
     for i in range(xyz.shape[0]):
@@ -262,7 +262,7 @@ cdef float[:] runEllAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] xyz_pri
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
+cdef double[:] runEllVDispAlgo(double[:] morph_info, double[:,:] xyz, double[:,:] vxyz, double[:,:] xyz_princ, double[:] masses, int[:] ellipsoid, double[:] r_ell, double[:] center, double[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double d, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
     """ Similar to ``runEllAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -308,20 +308,20 @@ cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vx
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     
     ellipsoid[:] = 0
     cdef int pts_in_ell = 0
     cdef int corr = 0
-    cdef float err = 1.0
-    cdef float q_new = 1.0
-    cdef float s_new = 1.0
-    cdef float q_old = 1.0
-    cdef float s_old = 1.0
+    cdef double err = 1.0
+    cdef double q_new = 1.0
+    cdef double s_new = 1.0
+    cdef double q_old = 1.0
+    cdef double s_old = 1.0
     cdef int iteration = 1
-    cdef float vec2_norm = 1.0
-    cdef float vec1_norm = 1.0
-    cdef float vec0_norm = 1.0
+    cdef double vec2_norm = 1.0
+    cdef double vec1_norm = 1.0
+    cdef double vec0_norm = 1.0
     cdef int i
     # Start with sphere
     for i in range(xyz.shape[0]):
@@ -383,7 +383,7 @@ cdef float[:] runEllVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vx
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:] runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float d, float delta_d, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
+cdef double[:] runShellVDispAlgo(double[:] morph_info, double[:,:] xyz, double[:,:] vxyz, double[:,:] xyz_princ, double[:] masses, int[:] shell, double[:] r_ell, double[:] center, double[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double d, double delta_d, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced) nogil:
     """ Similar to ``runShellAlgo`` algorithm for halos/galaxies but for velocity dispersion tensor
     
     Calculates the axis ratios at a distance ``d`` from the center of the entire particle distro.\n
@@ -431,20 +431,20 @@ cdef float[:] runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] 
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     
     shell[:] = 0
     cdef int pts_in_shell = 0
     cdef int corr = 0
-    cdef float err = 1.0
-    cdef float q_new = 1.0
-    cdef float s_new = 1.0
-    cdef float q_old = 1.0
-    cdef float s_old = 1.0
+    cdef double err = 1.0
+    cdef double q_new = 1.0
+    cdef double s_new = 1.0
+    cdef double q_old = 1.0
+    cdef double s_old = 1.0
     cdef int iteration = 1
-    cdef float vec2_norm = 1.0
-    cdef float vec1_norm = 1.0
-    cdef float vec0_norm = 1.0
+    cdef double vec2_norm = 1.0
+    cdef double vec1_norm = 1.0
+    cdef double vec0_norm = 1.0
     cdef int i
     # Start with spherical shell
     for i in range(xyz.shape[0]):
@@ -514,11 +514,11 @@ cdef float[:] runShellVDispAlgo(float[:] morph_info, float[:,:] xyz, float[:,:] 
     return morph_info
 
 @cython.embedsignature(True)
-def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocal(double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local shape catalogue
     
     Calls ``calcObjMorphLocal()`` in a parallelized manner.\n
-    Calculates the axis ratios for the range [ ``r200`` x 10**(``D_LOGSTART``), ``r200`` x 10**(``D_LOGEND``)] from the centers, for each object.
+    Calculates the axis ratios for the range [ ``r200`` x r_over_r200[0], ``r200`` x r_over_r200[-1]] from the centers, for each object.
     
     :param xyz: positions of all (DM or star) particles in simulation box
     :type xyz: (N2 x 3) floats
@@ -532,12 +532,8 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
     :type obj_size: (N1,) integers
     :param L_BOX: simulation box side length
     :type L_BOX: float, units: Mpc/h
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles should be estimated
+    :type r_over_r200: (r_res,) floats
     :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
     :type IT_TOL: float
@@ -561,32 +557,32 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
     cdef int p
     cdef int largest_size = np.max(obj_size.base)
-    cdef float[:] m = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:,:] d = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] q = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] s = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] major_x = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] major_y = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] major_z = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] inter_x = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] inter_y = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] inter_z = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] minor_x = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] minor_y = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] minor_z = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12, D_BINS+1), dtype = np.float32)
-    cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
-    cdef float[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
+    cdef double[:] m = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:,:] d = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] q = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] s = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] major_x = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] major_y = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] major_z = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] inter_x = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] inter_y = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] inter_z = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] minor_x = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] minor_y = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] minor_z = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
+    cdef double[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
     cdef int[:,:] shell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.int32)
-    cdef float[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
+    cdef double[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
     cdef complex[::1,:,:] shape_tensor = np.zeros((3, 3, openmp.omp_get_max_threads()), dtype = np.complex128, order='F')
     cdef double[::1,:] eigval = np.zeros((3, openmp.omp_get_max_threads()), dtype=np.float64, order='F')
     cdef complex[::1,:,:] eigvec = np.zeros((3,3, openmp.omp_get_max_threads()), dtype=np.complex128, order='F')
-    cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
-    cdef float[:,:] log_d_tiled = np.reshape(np.tile(np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1, dtype = np.float32), reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), D_BINS+1))
+    cdef double[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
+    cdef double[:,:] r_over_r200_tiled = np.reshape(np.tile(r_over_r200.base, reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), len(r_over_r200.base)))
     cdef int n
     cdef int r
-    cdef float[:,:] centers = np.zeros((nb_objs,3), dtype = np.float32)
+    cdef double[:,:] centers = np.zeros((nb_objs,3), dtype = np.float64)
     for p in range(nb_objs): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
         if CENTER == 'mode':
@@ -601,7 +597,7 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
             m_obj[openmp.omp_get_thread_num(),n] = masses[idx_cat[offsets[p]+n]]
             m[p] = m[p] + masses[idx_cat[offsets[p]+n]]
         xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
-        morph_info[openmp.omp_get_thread_num(),:,:] = calcObjMorphLocal(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d_tiled[openmp.omp_get_thread_num()], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], r_ell[openmp.omp_get_thread_num()], centers[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
+        morph_info[openmp.omp_get_thread_num(),:,:] = calcObjMorphLocal(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], r_over_r200_tiled[openmp.omp_get_thread_num()], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], r_ell[openmp.omp_get_thread_num()], centers[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
         d[p] = morph_info[openmp.omp_get_thread_num(),0]
         q[p] = morph_info[openmp.omp_get_thread_num(),1]
         s[p] = morph_info[openmp.omp_get_thread_num(),2]
@@ -616,7 +612,7 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
         minor_z[p] = morph_info[openmp.omp_get_thread_num(),11]
         printf("Calculating shape profile. Dealing with object number %d. The number of ptcs is %d.\n", p, obj_size[p])
         
-    del morph_info; del xyz_obj; del xyz_princ; del shell; del r_ell; del shape_tensor; del eigval; del eigvec; del m_obj; del log_d_tiled; del xyz; del masses; del r200; del idx_cat; del idx_cat
+    del morph_info; del xyz_obj; del xyz_princ; del shell; del r_ell; del shape_tensor; del eigval; del eigvec; del m_obj; del r_over_r200_tiled; del xyz; del masses; del r200; del idx_cat; del idx_cat
     minor = np.transpose(np.stack((minor_x.base,minor_y.base,minor_z.base)),(1,2,0))
     inter = np.transpose(np.stack((inter_x.base,inter_y.base,inter_z.base)),(1,2,0))
     major = np.transpose(np.stack((major_x.base,major_y.base,major_z.base)),(1,2,0))
@@ -627,10 +623,12 @@ def calcMorphLocal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_ca
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
     
 @cython.embedsignature(True)
-def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobal(double[:,:] xyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, double SAFE, bint reduced):
     """ Calculates the overall shape catalogue
     
     Calls ``calcObjMorphGlobal()`` in a parallelized manner.\n
@@ -671,29 +669,29 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_c
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
     cdef int p
     cdef int largest_size = np.max(obj_size.base)
-    cdef float[:] m = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] d = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] q = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] s = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] major_x = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] major_y = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] major_z = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] inter_x = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] inter_y = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] inter_z = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] minor_x = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] minor_y = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] minor_z = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:,:] centers = np.zeros((nb_objs,3), dtype = np.float32)
-    cdef float[:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12), dtype = np.float32)
-    cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
-    cdef float[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
+    cdef double[:] m = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] d = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] q = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] s = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] major_x = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] major_y = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] major_z = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] inter_x = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] inter_y = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] inter_z = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] minor_x = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] minor_y = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] minor_z = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:,:] centers = np.zeros((nb_objs,3), dtype = np.float64)
+    cdef double[:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12), dtype = np.float64)
+    cdef double[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
+    cdef double[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
     cdef int[:,:] ellipsoid = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.int32)
-    cdef float[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
+    cdef double[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
     cdef complex[::1,:,:] shape_tensor = np.zeros((3, 3, openmp.omp_get_max_threads()), dtype = np.complex128, order='F')
     cdef double[::1,:] eigval = np.zeros((3, openmp.omp_get_max_threads()), dtype=np.float64, order='F')
     cdef complex[::1,:,:] eigvec = np.zeros((3,3, openmp.omp_get_max_threads()), dtype=np.complex128, order='F')
-    cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
+    cdef double[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
     cdef int n
     for p in range(nb_objs): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
@@ -733,10 +731,12 @@ def calcMorphGlobal(float[:,:] xyz, float[:] masses, float[:] r200, int[:] idx_c
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
     
 @cython.embedsignature(True)
-def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int D_LOGSTART, int D_LOGEND, int D_BINS, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
+def calcMorphLocalVelDisp(double[:,:] xyz, double[:,:] vxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double[:] r_over_r200, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, bint reduced, bint shell_based):
     """ Calculates the local velocity dispersion shape catalogue
     
     Calls ``calcObjMorphLocalVelDisp()`` in a parallelized manner.\n
@@ -758,11 +758,8 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     :type L_BOX: float, units: Mpc/h
     :param MIN_NUMBER_PTCS: minimum number of particles for object to qualify for morphology calculation
     :type MIN_NUMBER_PTCS: int
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest mi
+    :param r_over_r200: normalized radii at which shape profiles should be estimated
+    :type r_over_r200: (r_res,) floats
     :param IT_TOL: convergence tolerance, eigenvalue fractions must differ by less than ``IT_TOL``
         for iteration to stop
     :type IT_TOL: float
@@ -785,32 +782,32 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
     cdef int p
     cdef int largest_size = np.max(obj_size.base)
-    cdef float[:] m = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:,:] d = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] q = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] s = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] major_x = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] major_y = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] major_z = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] inter_x = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] inter_y = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] inter_z = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] minor_x = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] minor_y = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] minor_z = np.zeros((nb_objs, D_BINS+1), dtype = np.float32)
-    cdef float[:,:] centers = np.zeros((nb_objs,3), dtype = np.float32)
-    cdef float[:,:] vcenters = np.zeros((nb_objs,3), dtype = np.float32)
-    cdef float[:,:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12, D_BINS+1), dtype = np.float32)
-    cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
-    cdef float[:,:,:] vxyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
-    cdef float[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
+    cdef double[:] m = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:,:] d = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] q = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] s = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] major_x = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] major_y = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] major_z = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] inter_x = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] inter_y = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] inter_z = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] minor_x = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] minor_y = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] minor_z = np.zeros((nb_objs, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:] centers = np.zeros((nb_objs,3), dtype = np.float64)
+    cdef double[:,:] vcenters = np.zeros((nb_objs,3), dtype = np.float64)
+    cdef double[:,:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12, len(r_over_r200.base)), dtype = np.float64)
+    cdef double[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
+    cdef double[:,:,:] vxyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
+    cdef double[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
     cdef int[:,:] shell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.int32)
-    cdef float[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
+    cdef double[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
     cdef complex[::1,:,:] shape_tensor = np.zeros((3, 3, openmp.omp_get_max_threads()), dtype = np.complex128, order='F')
     cdef double[::1,:] eigval = np.zeros((3, openmp.omp_get_max_threads()), dtype=np.float64, order='F')
     cdef complex[::1,:,:] eigvec = np.zeros((3,3, openmp.omp_get_max_threads()), dtype=np.complex128, order='F')
-    cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
-    cdef float[:,:] log_d_tiled = np.reshape(np.tile(np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1, dtype = np.float32), reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), D_BINS+1))
+    cdef double[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
+    cdef double[:,:] r_over_r200_tiled = np.reshape(np.tile(r_over_r200.base, reps = openmp.omp_get_max_threads()), (openmp.omp_get_max_threads(), len(r_over_r200.base)))
     cdef int n
     cdef int r
     for p in range(nb_objs): # Calculate centers of objects
@@ -828,7 +825,7 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
             m[p] = m[p] + masses[idx_cat[offsets[p]+n]]
         xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]] = CythonHelpers.respectPBCNoRef(xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], L_BOX)
         vcenters[p] = CythonHelpers.calcCoM(vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], vcenters[p])
-        morph_info[openmp.omp_get_thread_num(),:,:] = calcObjMorphLocalVelDisp(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], log_d_tiled[openmp.omp_get_thread_num()], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], r_ell[openmp.omp_get_thread_num()], centers[p], vcenters[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
+        morph_info[openmp.omp_get_thread_num(),:,:] = calcObjMorphLocalVelDisp(morph_info[openmp.omp_get_thread_num(),:,:], r200[p], r_over_r200_tiled[openmp.omp_get_thread_num()], xyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], vxyz_obj[openmp.omp_get_thread_num(),:obj_size[p]], xyz_princ[openmp.omp_get_thread_num(),:obj_size[p]], m_obj[openmp.omp_get_thread_num(),:obj_size[p]], shell[openmp.omp_get_thread_num()], r_ell[openmp.omp_get_thread_num()], centers[p], vcenters[p], shape_tensor[:,:,openmp.omp_get_thread_num()], eigval[:,openmp.omp_get_thread_num()], eigvec[:,:,openmp.omp_get_thread_num()], IT_TOL, IT_WALL, IT_MIN, reduced, shell_based)
         d[p] = morph_info[openmp.omp_get_thread_num(),0]
         q[p] = morph_info[openmp.omp_get_thread_num(),1]
         s[p] = morph_info[openmp.omp_get_thread_num(),2]
@@ -843,7 +840,7 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
         minor_z[p] = morph_info[openmp.omp_get_thread_num(),11]
         printf("Calculating velocity dispersion shape profiles. Dealing with object number %d. The number of ptcs is %d.\n", p, obj_size[p])
     
-    del morph_info; del xyz_obj; del vxyz_obj; del xyz_princ; del shell; del r_ell; del shape_tensor; del eigval; del eigvec; del m_obj; del log_d_tiled; del xyz; del vxyz; del masses; del r200; del idx_cat
+    del morph_info; del xyz_obj; del vxyz_obj; del xyz_princ; del shell; del r_ell; del shape_tensor; del eigval; del eigvec; del m_obj; del r_over_r200_tiled; del xyz; del vxyz; del masses; del r200; del idx_cat
     minor = np.transpose(np.stack((minor_x.base,minor_y.base,minor_z.base)), (1,2,0))
     inter = np.transpose(np.stack((inter_x.base,inter_y.base,inter_z.base)), (1,2,0))
     major = np.transpose(np.stack((major_x.base,major_y.base,major_z.base)), (1,2,0))
@@ -854,10 +851,12 @@ def calcMorphLocalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, floa
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
     
 @cython.embedsignature(True)
-def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, float[:] r200, int[:] idx_cat, int[:] obj_size, float L_BOX, int IT_TOL, int IT_WALL, int IT_MIN, str CENTER, float SAFE, bint reduced):
+def calcMorphGlobalVelDisp(double[:,:] xyz, double[:,:] vxyz, double[:] masses, double[:] r200, int[:] idx_cat, int[:] obj_size, double L_BOX, double IT_TOL, int IT_WALL, int IT_MIN, str CENTER, double SAFE, bint reduced):
     """ Calculates the global velocity dipsersion shape catalogue
     
     Calls ``calcObjMorphGlobalVelDisp()`` in a parallelized manner.\n
@@ -902,31 +901,31 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     cdef int[:] offsets = np.int32(np.hstack((np.array([0]), np.cumsum(obj_size.base))))
     cdef int p
     cdef int largest_size = np.max(obj_size.base)
-    cdef float[:] m = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] d = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] q = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] s = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] major_x = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] major_y = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] major_z = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] inter_x = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] inter_y = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] inter_z = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] minor_x = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] minor_y = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:] minor_z = np.zeros((nb_objs,), dtype = np.float32)
-    cdef float[:,:] centers = np.zeros((nb_objs,3), dtype = np.float32)
-    cdef float[:,:] vcenters = np.zeros((nb_objs,3), dtype = np.float32)
-    cdef float[:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12), dtype = np.float32)
-    cdef float[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
-    cdef float[:,:,:] vxyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
-    cdef float[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float32)
+    cdef double[:] m = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] d = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] q = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] s = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] major_x = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] major_y = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] major_z = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] inter_x = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] inter_y = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] inter_z = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] minor_x = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] minor_y = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:] minor_z = np.zeros((nb_objs,), dtype = np.float64)
+    cdef double[:,:] centers = np.zeros((nb_objs,3), dtype = np.float64)
+    cdef double[:,:] vcenters = np.zeros((nb_objs,3), dtype = np.float64)
+    cdef double[:,:] morph_info = np.zeros((openmp.omp_get_max_threads(), 12), dtype = np.float64)
+    cdef double[:,:,:] xyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
+    cdef double[:,:,:] vxyz_obj = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
+    cdef double[:,:,:] xyz_princ = np.zeros((openmp.omp_get_max_threads(), largest_size,3), dtype = np.float64)
     cdef int[:,:] ellipsoid = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.int32)
-    cdef float[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
+    cdef double[:,:] r_ell = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
     cdef complex[::1,:,:] shape_tensor = np.zeros((3, 3, openmp.omp_get_max_threads()), dtype = np.complex128, order='F')
     cdef double[::1,:] eigval = np.zeros((3, openmp.omp_get_max_threads()), dtype=np.float64, order='F')
     cdef complex[::1,:,:] eigvec = np.zeros((3,3, openmp.omp_get_max_threads()), dtype=np.complex128, order='F')
-    cdef float[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float32)
+    cdef double[:,:] m_obj = np.zeros((openmp.omp_get_max_threads(), largest_size), dtype = np.float64)
     cdef int n
     for p in range(nb_objs): # Calculate centers of objects
         xyz_ = respectPBCNoRef(xyz.base[idx_cat.base[offsets[p]:offsets[p+1]]], L_BOX)
@@ -968,10 +967,12 @@ def calcMorphGlobalVelDisp(float[:,:] xyz, float[:,:] vxyz, float[:] masses, flo
     inter[inter==0.0] = np.nan
     major[major==0.0] = np.nan
     del major_x; del major_y; del major_z; del inter_x; del inter_y; del inter_z; del minor_x; del minor_y; del minor_z
+    # Recentre objects into box if they have fallen outside
+    centers = recentreObject(centers.base, L_BOX)
     return d.base, q.base, s.base, minor, inter, major, centers.base, m.base # Only rank = 0 content matters
 
 @cython.embedsignature(True)
-cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based) nogil:
+cdef double[:,:] calcObjMorphLocal(double[:,:] morph_info, double r200, double[:] log_d, double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, int[:] shell, double[:] r_ell, double[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based) nogil:
     """ Calculates the local axis ratios
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -1017,7 +1018,7 @@ cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] lo
     :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
     :type shell_based: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info in each column, for each ellipsoidal radius
-    :rtype: (12,N) float array"""
+    :rtype: (12,N) double array"""
     # Return if problematic
     morph_info[:,:] = 0.0
     if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -1045,7 +1046,7 @@ cdef float[:,:] calcObjMorphLocal(float[:,:] morph_info, float r200, float[:] lo
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced) nogil:
+cdef double[:] calcObjMorphGlobal(double[:] morph_info, double r200, double[:,:] xyz, double[:,:] xyz_princ, double[:] masses, int[:] ellipsoid, double[:] r_ell, double[:] center, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, double SAFE, bint reduced) nogil:
     """ Calculates the global axis ratios and eigenframe of the point cloud
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -1086,7 +1087,7 @@ cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d, q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     # Return if problematic
     morph_info[:] = 0.0
     if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -1099,7 +1100,7 @@ cdef float[:] calcObjMorphGlobal(float[:] morph_info, float r200, float[:,:] xyz
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, float[:] log_d, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] shell, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based) nogil:
+cdef double[:,:] calcObjMorphLocalVelDisp(double[:,:] morph_info, double r200, double[:] log_d, double[:,:] xyz, double[:,:] vxyz, double[:,:] xyz_princ, double[:] masses, int[:] shell, double[:] r_ell, double[:] center, double[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, bint reduced, bint shell_based) nogil:
     """ Calculates the local axis ratios of the velocity dispersion tensor 
     
     The local morphology is calculated for the ellipsoidal radius range [ ``r200`` x ``log_d`` [0], ``r200`` x ``log_d`` [-1]] 
@@ -1149,7 +1150,7 @@ cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, floa
     :param shell_based: whether shell-based or ellipsoid-based algorithm should be run
     :type shell_based: boolean
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
-    :rtype: (12,N) float array"""
+    :rtype: (12,N) double array"""
     # Return if problematic
     morph_info[:,:] = 0.0
     if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object
@@ -1177,7 +1178,7 @@ cdef float[:,:] calcObjMorphLocalVelDisp(float[:,:] morph_info, float r200, floa
     return morph_info
 
 @cython.embedsignature(True)
-cdef float[:] calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:,:] xyz, float[:,:] vxyz, float[:,:] xyz_princ, float[:] masses, int[:] ellipsoid, float[:] r_ell, float[:] center, float[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, float IT_TOL, int IT_WALL, int IT_MIN, float SAFE, bint reduced) nogil:
+cdef double[:] calcObjMorphGlobalVelDisp(double[:] morph_info, double r200, double[:,:] xyz, double[:,:] vxyz, double[:,:] xyz_princ, double[:] masses, int[:] ellipsoid, double[:] r_ell, double[:] center, double[:] vcenter, complex[::1,:] shape_tensor, double[::1] eigval, complex[::1,:] eigvec, double IT_TOL, int IT_WALL, int IT_MIN, double SAFE, bint reduced) nogil:
     """ Calculates the global axis ratios and eigenframe of the velocity dispersion tensor
     
     :param morph_info: Array to be filled with morphological info. 1st entry: d,
@@ -1226,7 +1227,7 @@ cdef float[:] calcObjMorphGlobalVelDisp(float[:] morph_info, float r200, float[:
     :param reduced: whether or not reduced shape tensor (1/r^2 factor)
     :type reduced: boolean
     :return: ``morph_info`` containing d (= ``r200``), q, s, eigframe info
-    :rtype: (12,) float array"""
+    :rtype: (12,) double array"""
     # Return if problematic
     morph_info[:] = 0.0
     if CythonHelpers.calcLocalSpread(xyz) == 0.0: # Too low resolution = no points in this object

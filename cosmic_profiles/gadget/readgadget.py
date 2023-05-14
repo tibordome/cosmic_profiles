@@ -79,9 +79,10 @@ def read_field(snapshot, block, ptype):
     Masses            = head.massarr      # In units of config.InUnitMass_in_g               
     Npart             = head.npart        # Number of particles in the subfile
 
-    l_target_over_curr = 3.085678e24/config.InUnitLength_in_cm
-    m_target_over_curr = 1.989e43/config.InUnitMass_in_g
-    v_target_over_curr = 1e5/config.InUnitVelocity_in_cm_per_s
+    l_internal, m_internal, vel_internal = config.getLMVInternal()
+    l_target_over_curr = l_internal/config.InUnitLength_in_cm
+    m_target_over_curr = m_internal/config.InUnitMass_in_g
+    v_target_over_curr = vel_internal/config.InUnitVelocity_in_cm_per_s
 
     if block=="POS ":  
         suffix = "Coordinates"
@@ -107,7 +108,7 @@ def read_field(snapshot, block, ptype):
         
         if '%s%s'%(prefix,suffix) not in f:
             if Masses[ptype] != 0.0:
-                array = np.ones(Npart[ptype], np.float32)*Masses[ptype]/unit_fac
+                array = np.ones(Npart[ptype], np.float64)*Masses[ptype]/unit_fac
             else:
                 raise Exception('Problem reading the block %s'%block)
         else:
@@ -116,7 +117,7 @@ def read_field(snapshot, block, ptype):
 
         if block=="VEL ":  array *= np.sqrt(head.time) # To make sure we move from UnitVelocity a**0.5 to UnitVelocity
         if block=="POS " and array.dtype==np.float64:
-            array = array.astype(np.float32)
+            array = array.astype(np.float64)
 
         return array
 
@@ -136,22 +137,23 @@ def read_block(snapshot, block, ptype, verbose=False):
     for i in ptype:
         Ntotal += Nall[i]
     
-    l_target_over_curr = 3.085678e24/config.InUnitLength_in_cm
-    m_target_over_curr = 1.989e43/config.InUnitMass_in_g
-    v_target_over_curr = 1e5/config.InUnitVelocity_in_cm_per_s
+    l_internal, m_internal, vel_internal = config.getLMVInternal()
+    l_target_over_curr = l_internal/config.InUnitLength_in_cm
+    m_target_over_curr = m_internal/config.InUnitMass_in_g
+    v_target_over_curr = vel_internal/config.InUnitVelocity_in_cm_per_s
 
     if block=="POS ":  
         unit_fac = l_target_over_curr
-        dtype=np.dtype((np.float32,3))
+        dtype=np.dtype((np.float64,3))
     elif block=="MASS":  
         unit_fac = m_target_over_curr
-        dtype=np.float32
+        dtype=np.float64
     elif block=="ID  ":  
         unit_fac = 1
         dtype=read_field(filename, block, ptype[0]).dtype
     elif block=="VEL ":  
         unit_fac = v_target_over_curr
-        dtype=np.dtype((np.float32,3))
+        dtype=np.dtype((np.float64,3))
     else: 
         raise Exception('block not implemented in readgadget!')
 

@@ -17,7 +17,7 @@ subprocess.call(['mkdir', 'cat'], cwd=os.path.join(currentdir))
 sys.path.append(os.path.join(currentdir, '..', '..')) # Only needed if cosmic_profiles is not installed
 from cosmic_profiles import updateCachingMaxGBs
 updateCachingMaxGBs(gbs = 1)
-from cosmic_profiles import genHalo, DensProfs, getEinastoProf, updateInUnitSystem, updateOutUnitSystem
+from cosmic_profiles import genHalo, DensShapeProfs, getEinastoProf, updateInUnitSystem, updateOutUnitSystem
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.rcParams.update({'font.size': 13})
@@ -29,14 +29,15 @@ size = comm.Get_size()
 def test_densities_ex_script():
     
     #################################### Parameters ############################################################
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
-    L_BOX = np.float32(10) # cMpc/h
+    updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    SNAP = '017'
+    L_BOX = np.float32(10) # in_unit_length_in_cm
     VIZ_DEST = "./cosmic_profiles/tests/viz"
     CAT_DEST = "./cosmic_profiles/tests/cat"
-    SNAP = '017'
-    MIN_NUMBER_DM_PTCS = 200
+    MIN_NUMBER_PTCS = 200
     CENTER = 'com'
+    method = {'profile': 'einasto'}
     
     #################################### Generate 1 mock halo ##################################################
     tot_mass = 10**(12) # M_sun/h
@@ -65,23 +66,36 @@ def test_densities_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensProfs object ########################################################
-    cprofiles = DensProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, CENTER, VIZ_DEST, CAT_DEST)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ############################## Estimate Density Profile ####################################################
     # Visualize density profile: A sample output is shown above!
     obj_numbers = [0]
-    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True) # dens_profs_db is in M_sun*h^2/Mpc^3
+    dens_profs_db = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = True) # dens_profs_db is in M_sun*h^2/kpc^3
     dens_profs_kb = cprofiles.estDensProfs(r_over_rvir, obj_numbers = obj_numbers, direct_binning = False)
     
+    ############################## Fit Density Profile #########################################################
+    r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
+    dens_profs_db_fit = dens_profs_db[0,10:]
+    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = method, obj_numbers = obj_numbers) # best fit is in out units
+    rho_s = best_fit['rho_s']
+    alpha = best_fit['alpha']
+    r_s = best_fit['r_s']
+    model_pars = {'rho_s': rho_s, 'alpha': alpha, 'r_s': r_s}
+    
+    cprofiles.plotDensProfs(dens_profs_db, r_over_rvir, dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = method, nb_bins = 3, obj_numbers = obj_numbers)
+    
+    # Some more plotting
+    l_in_over_out = 1000 # Needed since in and out length units are not identical, and best_fit is in out units while r_vir is not
     if rank == 0:
         dens_profs_db = dens_profs_db[0]
         dens_profs_kb = dens_profs_kb[0]
         plt.figure()
         plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='direct binning', markersize = 3)
         plt.loglog(r_over_rvir, dens_profs_kb, 'o--', label='kernel-based', markersize = 3)
-        plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0], model_pars), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} cMpc/h'.format(alpha, r_s))
+        plt.loglog(r_over_rvir, getEinastoProf(r_over_rvir*r_vir[0]*l_in_over_out, model_pars), lw = 1.0, label=r'Einasto-target: $\alpha$ = {:.2f}, $r_s$ = {:.2f} kpc/h'.format(alpha[0], r_s[0]*l_in_over_out))
         plt.xlabel(r'r/$R_{\mathrm{vir}}$')
-        plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+        plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / kpc${{}}^3$]")
         plt.legend(fontsize="small", loc='lower left')
         plt.savefig('{}/RhoProfObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')
     else:
@@ -90,17 +104,11 @@ def test_densities_ex_script():
     comm.Bcast(dens_profs_db, root = 0)
     comm.Bcast(dens_profs_kb, root = 0)
     
-    ############################## Fit Density Profile #########################################################
-    r_over_rvir_fit = r_over_rvir[10:] # Do not fit innermost region since not reliable in practice. Use gravitational softening scale and / or relaxation timescale to estimate inner convergence radius.
-    dens_profs_db_fit = dens_profs_db[10:]
-    best_fit = cprofiles.fitDensProfs(dens_profs_db_fit.reshape((1,dens_profs_db_fit.shape[0])), r_over_rvir_fit, method = 'einasto', obj_numbers = obj_numbers)
-    
     if rank == 0:
         plt.figure()
         plt.loglog(r_over_rvir, dens_profs_db, 'o--', label='density profile', markersize = 4)
-        model_pars = {'rho_s': best_fit[0,0], 'alpha': best_fit[0,1], 'r_s': best_fit[0,2]}
-        plt.loglog(r_over_rvir_fit, getEinastoProf(r_over_rvir_fit*r_vir[0], model_pars), '--', color = 'r', label=r'Einasto-fit')
+        plt.loglog(r_over_rvir_fit, getEinastoProf(r_over_rvir_fit*r_vir[0]*l_in_over_out, model_pars), '--', color = 'r', label=r'Einasto-fit')
         plt.xlabel(r'r/$R_{\mathrm{vir}}$')
-        plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / Mpc${{}}^3$]")
+        plt.ylabel(r"$\rho$ [$h^2M_{{\odot}}$ / kpc${{}}^3$]")
         plt.legend(fontsize="small", bbox_to_anchor=(0.95, 1), loc='upper right')
         plt.savefig('{}/RhoProfFitObj0_{}.pdf'.format(VIZ_DEST, SNAP), bbox_inches='tight')

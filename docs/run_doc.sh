@@ -14,7 +14,7 @@ rm helper_class.c
 rm helper_class.so
 rm -r __pycache__
 rm -r build
-cd ../gadget_hdf5
+cd ../gadget
 rm gen_catalogues.c
 rm gen_catalogues.so
 rm -r __pycache__

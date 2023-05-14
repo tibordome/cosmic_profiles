@@ -5,7 +5,9 @@ Installation and Support
 *CosmicProfiles* makes use of the following packages:
 
 * numpy>=1.19.2
-* scipy
+* scipy>=1.10.1
+
+  - for lower versions conda conflicts might be non-resolvable; pip is less sensitive and there should be neither install nor runtime issues down to version 1.6.1
 * cython
 * scikit-learn
 * mpi4py
@@ -24,6 +26,7 @@ Binary installation with conda
 This is the recommended installation path for Anaconda and Miniconda users. Conda Forge provides a `conda channel <https://anaconda.org/conda-forge/cosmic_profiles>`_ with a pre-compiled version of *CosmicProfiles* for linux 64bit and MAC OS X platforms. You can install it in Anaconda with::
 
     conda config --add channels conda-forge
+    conda install -c conda-forge mpi4py
     conda install cosmic_profiles
 
 .. note:: Running *CosmicProfiles* relies on a functioning MPI implementation. For macOS and Linux, MPICH can be installed in the command line using ``brew install mpich`` or ``sudo apt install mpich``, respectively.
@@ -35,6 +38,7 @@ Installing *CosmicProfiles* from the Python Package Index using `pip <https://py
 
 To install the latest version of *CosmicProfiles* with pip, simply run::
     
+    pip install mpi4py
     pip install --user cosmic-profiles
 
 If you have installed with pip, you can keep your installation up to date by upgrading from time to time::

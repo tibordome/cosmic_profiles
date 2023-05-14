@@ -61,52 +61,48 @@ def getEpsilon(idx_cat, obj_size, xyz, masses, L_BOX, CENTER, angle=0.0):
     else:
         return None
 
-def getShape(Rs, d, param_interest, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS):
+def getShape(d, param_interest, ERROR_METHOD, r_over_r200, r200):
     """ Get average profile for param_interest (which is defined at all values of d)
     at all ellipsoidal radii Rs
     
-    :param Rs: ellipsoidal radii of interest
-    :type Rs: (N,) floats
     :param d: param_interest is defined at all ellipsoidal radii d
-    :type d: (N2,) floats
+    :type d: (N1,N2) floats
     :param param_interest: the quantity of interest defined at all ellipsoidal radii d
-    :type param_interest: (N2,) floats
+    :type param_interest: (N1,N2) floats
     :param ERROR_METHOD: mean (if ERROR_METHOD == "bootstrap" or "SEM") or median
         (if ERROR_METHOD == "median_quantile") and the +- 1 sigma error attached
     :type ERROR_METHOD: string
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles are estimated
+    :type r_over_r200: (N2,) floats
+    :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
+    :type r200: (N1,) floats
     :return: mean/median, err_low, err_high
     :rtype: float, float, float"""
-    y = [[] for i in range(D_BINS+1)]
+    y = [[] for i in range(len(r_over_r200))]
     for obj in range(param_interest.shape[0]):
-        for rad in range(D_BINS+1):
-            closest_idx = (np.abs(Rs - d[obj,rad]/d[obj,-int(D_LOGEND/((D_LOGEND-D_LOGSTART)/D_BINS))-1])).argmin() # Determine which point in Rs is closest
-            if np.isnan(param_interest[obj][rad]) or np.log10(d[obj][rad]/d[obj,-int(D_LOGEND/((D_LOGEND-D_LOGSTART)/D_BINS))-1]) > D_LOGEND:
+        for rad in range(len(r_over_r200)):
+            closest_idx = (np.abs(r_over_r200 - d[obj,rad]/r200[obj])).argmin() # Determine which point in Rs is closest
+            if np.isnan(param_interest[obj][rad]):
                 continue
             else:
                 y[closest_idx].append(param_interest[obj][rad])
     mean, err_low, err_high = getMeanOrMedianAndError(y, ERROR_METHOD)
     return mean, err_low, err_high
 
-def getShapeMs(Rs, d, idx_groups, group, param_interest, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS):
+def getShapeMs(d, idx_groups, group, param_interest, ERROR_METHOD, r_over_r200, r200):
     """ Similar to getShape, but with mass-splitting"""
-    y = [[] for i in range(D_BINS+1)]
+    y = [[] for i in range(len(r_over_r200))]
     for obj in idx_groups[group]:
-        for rad in range(D_BINS+1):
-            closest_idx = (np.abs(Rs - d[obj,rad]/d[obj,-int(D_LOGEND/((D_LOGEND-D_LOGSTART)/D_BINS))-1])).argmin() # Determine which point in Rs is closest
-            if np.isnan(param_interest[obj][rad]) or np.log10(d[obj][rad]/d[obj,-int(D_LOGEND/((D_LOGEND-D_LOGSTART)/D_BINS))-1]) > D_LOGEND:
+        for rad in range(len(r_over_r200)):
+            closest_idx = (np.abs(r_over_r200 - d[obj,rad]/r200[obj])).argmin() # Determine which point in Rs is closest
+            if np.isnan(param_interest[obj][rad]):
                 continue
             else:
                 y[closest_idx].append(param_interest[obj][rad])
     mean, err_low, err_high = getMeanOrMedianAndError(y, "median_quantile")
     return mean, err_low, err_high
 
-def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, nb_bins, MASS_UNIT=1e10, suffix = '_'):
+def getShapeProfs(VIZ_DEST, SNAP, r_over_r200, r200, start_time, obj_masses, obj_centers, d, q, s, major_full, nb_bins, MASS_UNIT=1e10, suffix = '_'):
     """
     Create a series of plots to analyze object shapes
     
@@ -116,12 +112,10 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles are estimated
+    :type r_over_r200: (D_BINS+1,) floats
+    :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
+    :type r200: (N,) floats
     :param start_time: time of start of shape analysis
     :type start_time: float
     :param obj_masses: total mass of objects, in 10^10*M_sun/h
@@ -152,7 +146,6 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         print_status(rank, start_time, "The number of mass bins is {0}".format(len(obj_m_groups)))
         
         # Ellipsoidal radii
-        Rs = np.logspace(D_LOGSTART,D_LOGEND,D_BINS+1)
         ERROR_METHOD = "median_quantile"
         
         # Create VIZ_DEST if not available
@@ -160,9 +153,9 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         
         # Q
         plt.figure()
-        mean_median, err_low, err_high = getShape(Rs, d, q, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
-        plt.semilogx(Rs, mean_median)
-        plt.fill_between(Rs, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
+        mean_median, err_low, err_high = getShape(d, q, ERROR_METHOD, r_over_r200, r200)
+        plt.semilogx(r_over_r200, mean_median)
+        plt.fill_between(r_over_r200, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
         # Formatting
         plt.xlabel(r"$r/R_{200}$")
         plt.ylabel(r"q")
@@ -171,9 +164,9 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         
         # S
         plt.figure()
-        mean_median, err_low, err_high = getShape(Rs, d, s, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
-        plt.semilogx(Rs, mean_median)
-        plt.fill_between(Rs, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
+        mean_median, err_low, err_high = getShape(d, s, ERROR_METHOD, r_over_r200, r200)
+        plt.semilogx(r_over_r200, mean_median)
+        plt.fill_between(r_over_r200, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
         # Formatting
         plt.xlabel(r"$r/R_{200}$")
         plt.ylabel(r"s")
@@ -188,9 +181,9 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
                 T[obj] = (1-q[obj]**2)/(1-s[obj]**2) # Triaxiality
         else:
             T = np.empty(0)
-        mean_median, err_low, err_high = getShape(Rs, d, T, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
-        plt.semilogx(Rs, mean_median)
-        plt.fill_between(Rs, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
+        mean_median, err_low, err_high = getShape(d, T, ERROR_METHOD, r_over_r200, r200)
+        plt.semilogx(r_over_r200, mean_median)
+        plt.fill_between(r_over_r200, mean_median-err_low, mean_median+err_high, edgecolor='g', alpha = 0.5, label = 'All objects')
         
         # Formatting
         plt.xlabel(r"$r/R_{200}$")
@@ -203,56 +196,54 @@ def getShapeProfs(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
         # Q: M-splitting
         for group in range(len(obj_m_groups)):
             plt.figure()
-            mean_median, err_low, err_high = getShapeMs(Rs, d, idx_groups, group, q, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
+            mean_median, err_low, err_high = getShapeMs(d, idx_groups, group, q, ERROR_METHOD, r_over_r200, r200)
             if len(idx_groups[group]) != 0:
-                plt.semilogx(Rs, mean_median)
-                plt.fill_between(Rs, mean_median-err_low, mean_median+err_high, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))), alpha = 0.5)
+                plt.semilogx(r_over_r200, mean_median)
+                plt.fill_between(r_over_r200, mean_median-err_low, mean_median+err_high, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))), alpha = 0.5)
             plt.legend(loc="upper right", fontsize="x-small")
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"q")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{}/qM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/qM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float64(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # S: M-splitting
         for group in range(len(obj_m_groups)):
             plt.figure()
-            mean_median, err_low, err_high = getShapeMs(Rs, d, idx_groups, group, s, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
+            mean_median, err_low, err_high = getShapeMs(d, idx_groups, group, s, ERROR_METHOD,r_over_r200, r200)
             if len(idx_groups[group]) != 0:
-                plt.semilogx(Rs, mean_median)
-                plt.fill_between(Rs, mean_median-err_low, mean_median+err_high, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))), alpha = 0.5)
+                plt.semilogx(r_over_r200, mean_median)
+                plt.fill_between(r_over_r200, mean_median-err_low, mean_median+err_high, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))), alpha = 0.5)
             plt.legend(loc="upper right", fontsize="x-small")
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"s")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{}/sM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/sM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float64(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
         
         # T: M-splitting
         for group in range(len(obj_m_groups)):
             plt.figure()
-            mean_median, err_low, err_high = getShapeMs(Rs, d, idx_groups, group, T, ERROR_METHOD, D_LOGSTART, D_LOGEND, D_BINS)
+            mean_median, err_low, err_high = getShapeMs(d, idx_groups, group, T, ERROR_METHOD, r_over_r200, r200)
             if len(idx_groups[group]) != 0:
-                plt.semilogx(Rs, mean_median)
-                plt.fill_between(Rs, mean_median-err_low, mean_median+err_high, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))), alpha = 0.5)
+                plt.semilogx(r_over_r200, mean_median)
+                plt.fill_between(r_over_r200, mean_median-err_low, mean_median+err_high, label = r"$M: {0} - {1} \ M_{{\odot}}/h$".format(eTo10("{:.2E}".format(max_min_m[group])), eTo10("{:.2E}".format(max_min_m[group+1]))), alpha = 0.5)
             plt.axhline(2/3, label=r"$T$ > 2/3: prolate", linestyle='--', color = "y")
             plt.legend(loc="upper right", fontsize="x-small")            
             plt.xlabel(r"$r/R_{200}$")
             plt.ylabel(r"T")
             plt.ylim(0.0, 1.0)
-            plt.savefig("{}/TM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float32(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
+            plt.savefig("{}/TM{:.2f}{}{}.pdf".format(VIZ_DEST, np.float64(np.log10(max_min_m[group])), suffix, SNAP), bbox_inches="tight")
 
-def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, frac_r200, MASS_UNIT, suffix = '_'):
+def getLocalTHist(VIZ_DEST, SNAP, r_over_r200, r200, start_time, obj_masses, obj_centers, d, q, s, major_full, HIST_NB_BINS, frac_r200, MASS_UNIT, suffix = '_'):
     """ Plot triaxiality T histogram
     
     :param VIZ_DEST: visualisation folder destination
     :type VIZ_DEST: string
     :param SNAP: e.g. '024'
     :type SNAP: string
-    :param D_LOGSTART: logarithm of minimum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGSTART: int
-    :param D_LOGEND: logarithm of maximum ellipsoidal radius of interest, in units of R200 of parent halo
-    :type D_LOGEND: int
-    :param D_BINS: number of ellipsoidal radii of interest minus 1 (i.e. number of bins)
-    :type D_BINS: int
+    :param r_over_r200: normalized radii at which shape profiles are estimated
+    :type r_over_r200: (D_BINS+1,) floats
+    :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)
+    :type r200: (N,) floats
     :param start_time: time of start of shape analysis
     :type start_time: float
     :param obj_masses: masses of objects, in 10^10*M_sun/h
@@ -279,7 +270,7 @@ def getLocalTHist(VIZ_DEST, SNAP, D_LOGSTART, D_LOGEND, D_BINS, start_time, obj_
     if rank == 0:
         idx = np.zeros((d.shape[0],), dtype = np.int32)
         for obj in range(idx.shape[0]):
-            idx[obj] = np.argmin(abs(d[obj] - d[obj,-int(D_LOGEND/((D_LOGEND-D_LOGSTART)/D_BINS))-1]*frac_r200))        
+            idx[obj] = np.argmin(abs(d[obj] - r200[obj]*frac_r200))        
         
         t = np.zeros((d.shape[0],))
         for obj in range(d.shape[0]):

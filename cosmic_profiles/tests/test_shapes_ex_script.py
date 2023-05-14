@@ -20,20 +20,22 @@ from cosmic_profiles import genHalo, DensShapeProfs, updateInUnitSystem, updateO
 def test_shapes_ex_script():
     
     #################################### Parameters ################################################
-    updateInUnitSystem(in_unit_length_in_cm = 3.085678e24, in_unit_mass_in_g = 1.989e33, in_unit_velocity_in_cm_per_s = 1e5)
-    updateOutUnitSystem(out_unit_length_in_cm = 3.085678e24, out_unit_mass_in_g = 1.989e33, out_unit_velocity_in_cm_per_s = 1e5)
+    updateInUnitSystem(length_in_cm = 'Mpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateOutUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     L_BOX = np.float32(10) # Mpc/h
+    SNAP = '015'
     CAT_DEST = "./cosmic_profiles/tests/cat"
     VIZ_DEST = "./cosmic_profiles/tests/viz"
-    D_LOGSTART = -2
-    D_LOGEND = 0
-    D_BINS = 20 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-    IT_TOL = np.float32(1e-2)
-    IT_WALL = 100
-    IT_MIN = 10
-    SNAP = '015'
-    MIN_NUMBER_DM_PTCS = 200
-    CENTER = 'mode'
+    MIN_NUMBER_PTCS = 200
+    CENTER = 'mode'   
+    katz_config = {
+        'ROverR200': np.logspace(-1.5,0,70),
+        'IT_TOL': 1e-2,
+        'IT_WALL': 100,
+        'IT_MIN': 10,
+        'REDUCED': False, 
+        'SHELL_BASED': False
+    }
     
     #################################### Generate 1 mock halo ######################################
     tot_mass = 10**(12) # M_sun/h
@@ -59,13 +61,13 @@ def test_shapes_ex_script():
     idx_cat = [np.arange(len(halo_x), dtype = np.int32).tolist()]
     
     ########################### Define DensShapeProfs object #######################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, SNAP, L_BOX, MIN_NUMBER_DM_PTCS, D_LOGSTART, D_LOGEND, D_BINS, IT_TOL, IT_WALL, IT_MIN, CENTER, VIZ_DEST, CAT_DEST)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, idx_cat, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     
     ######################### Calculating Morphological Properties #################################
     # Create halo shape catalogue
     obj_numbers = [0]
-    cprofiles.dumpShapeCatLocal(obj_numbers = obj_numbers, reduced = False, shell_based = False)
+    cprofiles.dumpShapeCatLocal(obj_numbers = obj_numbers, katz_config = katz_config)
     
     ######################################## Visualizations ########################################
     # Visualize halo: A sample output is shown above!
-    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, reduced = False, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, katz_config = katz_config)

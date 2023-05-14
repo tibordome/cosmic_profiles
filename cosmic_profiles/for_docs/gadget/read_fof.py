@@ -39,5 +39,5 @@ def getFoFSHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
     :return: nb_shs (# subhalos in each FoF-halo), sh_len (size of each SH), 
         fof_sizes (size of each FoF-halo), group_r200 (R200 radius of each FoF-halo
         in units of cMpc/h)
-    :rtype: float and int arrays"""
+    :rtype: double and int arrays"""
     return

@@ -70,7 +70,7 @@ class snapshot_header:
       f.seek(16, os.SEEK_CUR)
     
     self.npart = np.fromfile(f,dtype=np.int32,count=6)
-    self.massarr = np.fromfile(f,dtype=np.float64,count=6)
+    self.massarr = np.fromfile(f,dtype=np.double64,count=6)
     self.time = (np.fromfile(f,dtype=np.float64,count=1))[0]
     self.redshift = (np.fromfile(f,dtype=np.float64,count=1))[0]
     self.sfr = (np.fromfile(f,dtype=np.int32,count=1))[0]
@@ -217,14 +217,14 @@ def read_block(filename, block, parttype=-1, physical_velocities=True,
   # Add or change blocks as needed for your Gadget version
   data_for_type = np.zeros(6,bool) # Should be set to "True" below for the species for which data is stored in the data block 
   # By doing this, the default value is False data_for_type=[False,False,False,False,False,False]
-  dt = np.float32 # Data type of the data in the block
+  dt = np.float64 # Data type of the data in the block
   if block=="POS ":
     data_for_type[:] = True
-    dt = np.dtype((np.float32,3))
+    dt = np.dtype((np.float64,3))
     block_num = 2
   elif block=="VEL ":
     data_for_type[:] = True
-    dt = np.dtype((np.float32,3))
+    dt = np.dtype((np.float64,3))
     block_num = 3
   elif block=="ID  ":
     data_for_type[:] = True
@@ -233,7 +233,7 @@ def read_block(filename, block, parttype=-1, physical_velocities=True,
   # Only used for format I, when file structure is HEAD,POS,VEL,ID,ACCE
   elif block=="ACCE":              # This is only for the PIETRONI project
     data_for_type[:] = True        # This is only for the PIETRONI project
-    dt = np.dtype((np.float32,3))  # This is only for the PIETRONI project
+    dt = np.dtype((np.float64,3))  # This is only for the PIETRONI project
     block_num = 5                  # This is only for the PIETRONI project
   elif block=="MASS":
     data_for_type[np.where(massarr==0)] = True
@@ -256,7 +256,7 @@ def read_block(filename, block, parttype=-1, physical_velocities=True,
     block_num = 8-blocksub 
   elif block=="CMCE":
     data_for_type[0] = True
-    dt = np.dtype((np.float32,3))
+    dt = np.dtype((np.float64,3))
     block_num = 9-blocksub 
   elif block=="AREA":
     data_for_type[0] = True

@@ -6,8 +6,8 @@ from cosmic_profiles.common.cosmic_base_class cimport CosmicBase
 
 cdef class DensProfsBase(CosmicBase):
     
-    cdef float[:,:] xyz
-    cdef float[:] masses
+    cdef double[:,:] xyz
+    cdef double[:] masses
     cdef int[:] idx_cat
     cdef int[:] obj_size    
         
