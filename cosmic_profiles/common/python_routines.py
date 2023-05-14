@@ -684,13 +684,15 @@ def checkDensFitMethod(method):
     assert 'profile' in method, "Note: method must have at least the 'profile' field"
     assert method['profile'] == 'einasto' or method['profile'] == 'alpha_beta_gamma' or method['profile'] == 'hernquist' or method['profile'] == 'nfw', "Note: method['profile'] must be one of `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`"
     if method['profile'] == 'einasto':
-        allowed_fields = {'profile', 'rho_s', 'alpha', 'r_s'}
+        allowed_fields = {'profile', 'rho_s', 'alpha', 'r_s', 'min_method'}
         assert method.keys() <= allowed_fields, "Since you have chosen the Einasto profile, the only fields allowed for the method dict are 'rho_s', 'alpha', 'r_s'"
     elif method['profile'] == 'alpha_beta_gamma':
-        allowed_fields = {'profile', 'rho_s', 'alpha', 'beta', 'gamma', 'r_s'}
+        allowed_fields = {'profile', 'rho_s', 'alpha', 'beta', 'gamma', 'r_s', 'min_method'}
         assert method.keys() <= allowed_fields, "Since you have chosen the generalized NFW profile (aka alpha-beta-gamma profile), the only fields allowed for the method dict are 'rho_s', 'alpha', 'beta', 'gamma', 'r_s'"
     else:
-        allowed_fields = {'profile', 'rho_s', 'r_s'}
+        allowed_fields = {'profile', 'rho_s', 'r_s', 'min_method'}
         assert method.keys() <= allowed_fields, "Since you have chosen the Hernquist or NFW profile, the only fields allowed for the method dict are 'rho_s', 'r_s'"
-
+    if 'min_method' in method:
+        assert method['min_method'] == 'Nelder-Mead' or method['min_method'] == 'L-BFGS-B' or method['min_method'] == 'TNC' or method['min_method'] == 'SLSQP' or method['min_method'] == 'Powell' or method['min_method'] == 'trust-constr', "Note: method['min_method'] must be one of `Nelder-Mead`, `L-BFGS-B`, `TNC`, `SLSQP`, `Powell`, and `trust-constr` methods"
+    
 default_katz_config = {'ROverR200': np.logspace(-1.5,0,70), 'IT_TOL': 1e-2, 'IT_WALL': 100, 'IT_MIN': 10, 'REDUCED': False, 'SHELL_BASED': False}

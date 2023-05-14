@@ -10,10 +10,13 @@ To avoid ambiguities in the units that are provided by the user vs the units tha
     from cosmic_profiles import updateInUnitSystem, updateOutUnitSystem
     
     # Unit System
-    updateInUnitSystem(length_in_cm = 3.085678e21, mass_in_g = 1.989e43, velocity_in_cm_per_s = 1e5, little_h = 0.6774)
+    updateInUnitSystem(length_in_cm = 'kpc/h', mass_in_g = 'E+10Msun/h', velocity_in_cm_per_s = 1e5, little_h = 0.6774)
     updateOutUnitSystem(length_in_cm = 3.085678e24, mass_in_g = 1.989e33, velocity_in_cm_per_s = 1e5, little_h = 0.6774)
 
-Here, the combination of ``length_in_cm``, ``mass_in_g`` and ``velocity_in_cm_per_s`` determines the unit system of the data provided by the user. For instance, the combination above is the unit sytem that is often used in cosmological simulations. By analogy, the combination of ``length_in_cm``, ``mass_in_g`` and ``velocity_in_cm_per_s`` fully determines the unit system of the CosmicProfiles outputs (such as density profiles).
+Here, the combination of ``length_in_cm``, ``mass_in_g``, ``velocity_in_cm_per_s`` and ``little_h`` supplied to ``updateInUnitSystem()`` determines the unit system of the data provided by the user. For instance, the combination above is the unit sytem that is often used in cosmological simulations. 
+By analogy, the values supplied to ``updateOutUnitSystem()`` fully determine the unit system of the CosmicProfiles outputs (such as density profiles).
+Instead of specifying common units via the convenience feature 'kpc/h' etc., the user can specify less common ones by providing the length in cm, the mass in grams or the velocity in km/s explicitly. 
+For example, ``length_in_cm = 3.085678e21`` is identical to specifying ``length_in_cm = 'kpc'``, and ``mass_in_g = 'Msun'`` is identical to ``mass_in_g = 1.989e33``.
 
 .. warning:: When handing over density profiles as arguments to ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()``, please make sure the units are as determined by the 'outgoing' unit system. This is important when a user employs the functionalities ``fitDensProfs()``, ``estConcentrations()`` or ``plotDensProfs()`` directly, with density profiles obtained in some other way.
 

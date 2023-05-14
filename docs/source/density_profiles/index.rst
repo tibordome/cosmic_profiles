@@ -77,10 +77,11 @@ Finally, the :math:`\alpha \beta \gamma` density profile (`Zhao 1996 <https://ui
 
 To fit density profiles according to model ``method``, a dictionary whose ``profile`` field can be either ``nfw``, ``hernquist``, ``einasto`` or ``alpha_beta_gamma``, invoke the method::
 
-    method = {'profile': 'einasto', 'alpha': 0.18}
+    method = {'profile': 'einasto', 'alpha': 0.18, 'min_method': 'Powell'}
     best_fits = cprofiles.fitDensProfs(dens_profs, r_over_r200, method, obj_numbers = np.arange(10)).
 
-This will fit the density profiles using a truncated Newton (TNC) algorithm. The first argument ``dens_profs`` is an array of shape :math:`(N_{\text{pass}}, N_r)` containing the density profile estimates defined at normalized radii ``r_over_r200``. The last argument ``method = {'profile': 'einasto', 'alpha': 0.18}`` is a dictionary. The ``profile`` field is 1 of 4 possible strings corresponding to the density profile model, i.e. either ``nfw``, ``hernquist``, ``einasto`` or ``alpha_beta_gamma``.
+This will fit the density profiles using a modified Powell algorithm (default). To switch to either 'Nelder-Mead', 'L-BFGS-B', 'TNC', 'SLSQP', 'Powell' or the 'trust-constr' minimization method, the ``min_method`` field needs to be specified accordingly.
+The first argument ``dens_profs`` to ``fitDensProfs()`` is an array of shape :math:`(N_{\text{pass}}, N_r)` containing the density profile estimates defined at normalized radii ``r_over_r200``. The last argument ``method = {'profile': 'einasto', 'alpha': 0.18, 'min_method': 'Powell'}`` is a dictionary. The ``profile`` field is 1 of 4 possible strings corresponding to the density profile model, i.e. either ``nfw``, ``hernquist``, ``einasto`` or ``alpha_beta_gamma``.
 If a parameter should be kept fixed during the fitting procedure, it needs to be supplied in the ``method`` dict. In the example above, the ``alpha`` parameter of the Einasto profile is fixed to ``0.18`` (giving approximately an NFW-profile).
 The returned structured numpy array ``best_fits`` will store the best-fit results and its fields can be accessed by dictionary-like semantics, e.g. ``rho_s = best_fits['rho_s']`` (of shape :math:`(N_{\text{pass}},)`) will contain the density normalization of the best-fit profiles, ``r_s = best_fits['r_s']`` the scale radius etc. If ``method = 'alpha_beta_gamma'``, then ``alpha = best_fits['alpha']`` will contain the best-fit values for ``alpha`` etc.
 
@@ -99,4 +100,4 @@ The density profiles, for instance ``dens_profs_db``, and their fits can be visu
     cprofiles.plotDensProfs(dens_profs_db, r_over_r200, dens_profs_fit, r_over_r200_fit, method, nb_bins = 2, obj_numbers = np.arange(10))
 
 where ``dens_profs_fit`` and ``r_over_r200_fit`` refer to those estimated density profile values that the user would like the fitting operation to be carried out over, e.g. ``dens_profs_fit = dens_profs_db[:,25:]`` and ``r_over_r200_fit = r_over_r200[25:]`` to discard the values that correspond to deep layers of halos/galaxies/objects. Typically, the gravitational softening scale times some factor and / or information from the local relaxation timescale is used to estimate the inner convergence radius. 
-For guidance on choosing the inner convergence radius see e.g. `Navarro et al 2010 <https://academic.oup.com/mnras/article/402/1/21/1028856>`_ or `Ludlow et al 2019 <https://ui.adsabs.harvard.edu/abs/2019MNRAS.488.3663L/abstract`_.
+For guidance on choosing the inner convergence radius see e.g. `Navarro et al 2010 <https://academic.oup.com/mnras/article/402/1/21/1028856>`_ or `Ludlow et al 2019 <https://ui.adsabs.harvard.edu/abs/2019MNRAS.488.3663L/abstract>`_.

@@ -45,7 +45,8 @@ After instantiating an object ``cprofiles`` as outlined in :ref:`Data Structures
 
     shapes = cprofiles.getShapeCatLocal(obj_numbers, katz_config = default_katz_config).
 
-The morphological information in the structured numpy array ``shapes`` can be retrieved by dictionary-like semantics. ``d = shapes['d']``, ``q = shapes['q']``, ``s = shapes['s']``, ``minor = shapes['minor']``, ``inter = shapes['inter']`` and ``major = shapes['major']`` represents the shape profiles. The ``obj_numbers`` argument expects a list of integers indicating for which objects to estimate the density profile. If e.g. ``obj_numbers = np.arange(10)``, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. 
+The morphological information in the structured numpy array ``shapes`` can be retrieved by dictionary-like semantics. ``d = shapes['d']``, ``q = shapes['q']``, ``s = shapes['s']``, ``minor = shapes['minor']``, ``inter = shapes['inter']`` and ``major = shapes['major']`` represents the shape profiles. The ``obj_numbers`` argument expects a list of integers indicating for which objects to estimate the density profile. 
+If e.g. ``obj_numbers = np.arange(10)``, only the first 10 objects that have sufficient resolution will be considered. Typically, the ordering of objects internally is such that this will select the 10 most massive objects. 
 CosmicProfiles uses the iterative `Katz 1991 <https://adsabs.harvard.edu/pdf/1991ApJ...368..325K>`_ algorithm to calculate the shape profiles. The default configuration 
 parameters are::
 

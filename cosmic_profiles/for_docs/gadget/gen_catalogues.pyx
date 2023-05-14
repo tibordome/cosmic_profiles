@@ -27,7 +27,7 @@ def calcCSHIdxs(int[:] obj_idxs, int start_idx, int nb_shs, int csh_size, int MI
 
 @cython.embedsignature(True)
 @cython.binding(True)
-def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r200, int MIN_NUMBER_PTCS):
+def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, double[:] group_r200, int MIN_NUMBER_PTCS):
     """ Construct central subhalo (CSH) catalogue from FoF/SH info
     
     Note that the indices returned in each CSH are 'true index + 1'
@@ -39,10 +39,10 @@ def calcObjCat(int[:] nb_shs, int[:] sh_len, int[:] fof_sizes, float[:] group_r2
     :param fof_sizes: number of particles in the FoF-halos
     :type fof_sizes: (N1,) ints
     :param group_r200: R200-radius of FoF-halos
-    :type group_r200: (N1,) floats
+    :type group_r200: (N1,) doubles
     :param MIN_NUMBER_PTCS: minimum number of particles for CSH to be valid
     :type MIN_NUMBER_PTCS: int
     :return: obj_cat: indices,
         obj_r200: R200-radii, obj_size: number of particles in each object
-    :rtype: int array, float array, int array"""
+    :rtype: int array, double array, int array"""
     return

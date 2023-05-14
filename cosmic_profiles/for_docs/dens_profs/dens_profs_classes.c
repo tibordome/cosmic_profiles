@@ -10,7 +10,7 @@
             "-fopenmp"
         ],
         "include_dirs": [
-            "/home/tibor/.local/lib/python3.9/site-packages/numpy/core/include",
+            "/home/tibor/anaconda3/envs/fdm_baryons/lib/python3.8/site-packages/numpy/core/include",
             "."
         ],
         "name": "dens_profs.dens_profs_classes",
@@ -2303,7 +2303,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_10_g
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_12estDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers, CYTHON_UNUSED int __pyx_v_direct_binning, CYTHON_UNUSED int __pyx_v_spherical, CYTHON_UNUSED PyObject *__pyx_v_katz_config); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_14fitDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_16estConcentrations(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers); /* proto */
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_18plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers); /* proto */
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_18plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_20getObjInfo(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_22__reduce_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_24__setstate_cython__(struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
@@ -3240,7 +3240,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_12es
  *         :rtype: (N2, r_res) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def fitDensProfs(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method
+ *     def fitDensProfs(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -3264,14 +3264,14 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_12es
 /* "dens_profs/dens_profs_classes.pyx":118
  *         return
  * 
- *     def fitDensProfs(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
+ *     def fitDensProfs(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
  *         """ Get best-fit results for density profile fitting
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_15fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsBase_14fitDensProfs[] = " Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fits for each object\n        :rtype: structured array, containing (N3, n) floats, where n is the number of free parameters in the model ``method``";
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsBase_14fitDensProfs[] = " Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fits for each object\n        :rtype: structured array, containing (N3, n) floats, where n is the number of free parameters in the model ``method``";
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_15fitDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_r_over_r200 = 0;
@@ -3338,7 +3338,7 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_15fi
     }
     __pyx_v_dens_profs = values[0];
     __pyx_v_r_over_r200 = values[1];
-    __pyx_v_method = ((PyObject*)values[2]);
+    __pyx_v_method = values[2];
     __pyx_v_obj_numbers = values[3];
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -3349,14 +3349,9 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_15fi
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 118, __pyx_L1_error)
   __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_14fitDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_method, __pyx_v_obj_numbers);
 
   /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3371,7 +3366,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_14fi
  *         :rtype: structured array, containing (N3, n) floats, where n is the number of free parameters in the model ``method``"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def estConcentrations(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method
+ *     def estConcentrations(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -3380,7 +3375,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_14fi
   /* "dens_profs/dens_profs_classes.pyx":118
  *         return
  * 
- *     def fitDensProfs(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
+ *     def fitDensProfs(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
  *         """ Get best-fit results for density profile fitting
  * 
  */
@@ -3395,14 +3390,14 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_14fi
 /* "dens_profs/dens_profs_classes.pyx":133
  *         return
  * 
- *     def estConcentrations(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
+ *     def estConcentrations(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
  *         """ Get best-fit concentration values of objects from density profile fitting
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_17estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsBase_16estConcentrations[] = " Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles whose concentrations are to be determined, \n            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsBase_16estConcentrations[] = " Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles whose concentrations are to be determined, \n            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_17estConcentrations(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_r_over_r200 = 0;
@@ -3469,7 +3464,7 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_17es
     }
     __pyx_v_dens_profs = values[0];
     __pyx_v_r_over_r200 = values[1];
-    __pyx_v_method = ((PyObject*)values[2]);
+    __pyx_v_method = values[2];
     __pyx_v_obj_numbers = values[3];
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -3480,14 +3475,9 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_17es
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 133, __pyx_L1_error)
   __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_16estConcentrations(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_method, __pyx_v_obj_numbers);
 
   /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3502,7 +3492,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_16es
  *         :rtype: (N3,) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, str method, int nb_bins, obj_numbers): # Public Method
+ *     def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, method, nb_bins, obj_numbers): # Public Method
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -3511,7 +3501,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_16es
   /* "dens_profs/dens_profs_classes.pyx":133
  *         return
  * 
- *     def estConcentrations(self, dens_profs, r_over_r200, str method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
+ *     def estConcentrations(self, dens_profs, r_over_r200, method, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
  *         """ Get best-fit concentration values of objects from density profile fitting
  * 
  */
@@ -3526,21 +3516,21 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_16es
 /* "dens_profs/dens_profs_classes.pyx":149
  *         return
  * 
- *     def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, str method, int nb_bins, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
+ *     def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, method, nb_bins, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
  *         """ Draws some simplistic density profiles
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_19plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsBase_18plotDensProfs[] = " Draws some simplistic density profiles\n        \n        :param dens_profs: estimated density profiles, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N2, r_res) floats\n        :param r_over_r200: radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param r_over_r200_fit: radii at which best-fits shall be calculated\n        :type r_over_r200_fit: (r_res2,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        ";
+static char __pyx_doc_10dens_profs_18dens_profs_classes_13DensProfsBase_18plotDensProfs[] = " Draws some simplistic density profiles\n        \n        :param dens_profs: estimated density profiles, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N2, r_res) floats\n        :param r_over_r200: radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param r_over_r200_fit: radii at which best-fits shall be calculated\n        :type r_over_r200_fit: (r_res2,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        ";
 static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_19plotDensProfs(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs = 0;
   CYTHON_UNUSED PyObject *__pyx_v_r_over_r200 = 0;
   CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit = 0;
   CYTHON_UNUSED PyObject *__pyx_v_r_over_r200_fit = 0;
   CYTHON_UNUSED PyObject *__pyx_v_method = 0;
-  CYTHON_UNUSED int __pyx_v_nb_bins;
+  CYTHON_UNUSED PyObject *__pyx_v_nb_bins = 0;
   CYTHON_UNUSED PyObject *__pyx_v_obj_numbers = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -3632,8 +3622,8 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_19pl
     __pyx_v_r_over_r200 = values[1];
     __pyx_v_dens_profs_fit = values[2];
     __pyx_v_r_over_r200_fit = values[3];
-    __pyx_v_method = ((PyObject*)values[4]);
-    __pyx_v_nb_bins = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_nb_bins == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 149, __pyx_L3_error)
+    __pyx_v_method = values[4];
+    __pyx_v_nb_bins = values[5];
     __pyx_v_obj_numbers = values[6];
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -3644,19 +3634,14 @@ static PyObject *__pyx_pw_10dens_profs_18dens_profs_classes_13DensProfsBase_19pl
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 149, __pyx_L1_error)
   __pyx_r = __pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_18plotDensProfs(((struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_dens_profs_fit, __pyx_v_r_over_r200_fit, __pyx_v_method, __pyx_v_nb_bins, __pyx_v_obj_numbers);
 
   /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_18plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED int __pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers) {
+static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_18plotDensProfs(CYTHON_UNUSED struct __pyx_obj_10dens_profs_18dens_profs_classes_DensProfsBase *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_dens_profs, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200, CYTHON_UNUSED PyObject *__pyx_v_dens_profs_fit, CYTHON_UNUSED PyObject *__pyx_v_r_over_r200_fit, CYTHON_UNUSED PyObject *__pyx_v_method, CYTHON_UNUSED PyObject *__pyx_v_nb_bins, CYTHON_UNUSED PyObject *__pyx_v_obj_numbers) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plotDensProfs", 0);
@@ -3675,7 +3660,7 @@ static PyObject *__pyx_pf_10dens_profs_18dens_profs_classes_13DensProfsBase_18pl
   /* "dens_profs/dens_profs_classes.pyx":149
  *         return
  * 
- *     def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, str method, int nb_bins, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
+ *     def plotDensProfs(self, dens_profs, r_over_r200, dens_profs_fit, r_over_r200_fit, method, nb_bins, obj_numbers): # Public Method             # <<<<<<<<<<<<<<
  *         """ Draws some simplistic density profiles
  * 
  */

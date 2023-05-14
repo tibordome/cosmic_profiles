@@ -76,16 +76,18 @@ redshift = 5.5
 h = 0.6774
 UNIT_MASS = 10**10 # in M_sun
 SNAP = '025'
-D_LOGSTART = -2.0
-D_LOGEND = 0.0
-D_BINS = 30 # If D_LOGSTART == -2 D_LOGEND == 1, 60 corresponds to shell width of 0.05 dex
-IT_TOL = np.float32(1e-2)
-IT_WALL = 100
-IT_MIN = 10
 MIN_NUMBER_PTCS = 200
 CENTER = 'mode'
 CAT_DEST = "./cat"
 VIZ_DEST = "./viz"
+katz_config = {
+    'ROverR200': np.logspace(-1.5,0,70),
+    'IT_TOL': 1e-2,
+    'IT_WALL': 100,
+    'IT_MIN': 10,
+    'REDUCED': False, 
+    'SHELL_BASED': False
+}
 # Create CAT_DEST and VIZ_DEST if not available
 subprocess.call(['mkdir', '-p', '{}'.format(CAT_DEST)], cwd=os.path.join(currentdir))
 subprocess.call(['mkdir', '-p', '{}'.format(VIZ_DEST)], cwd=os.path.join(currentdir))
@@ -188,7 +190,7 @@ def AHFEx():
     #############################################################################################################
     
     ############## Run cosmic_profiles: define DensShapeProfs object ############################################
-    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, SNAP, L_BOX, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, D_LOGSTART = D_LOGSTART, D_LOGEND = D_LOGEND, D_BINS = D_BINS, IT_TOL = IT_TOL, IT_WALL = IT_WALL, IT_MIN = IT_MIN, CENTER = CENTER)
+    cprofiles = DensShapeProfs(dm_xyz, mass_array, h_indices, r_vir, L_BOX, SNAP, VIZ_DEST, CAT_DEST, MIN_NUMBER_PTCS = MIN_NUMBER_PTCS, CENTER = CENTER)
     if rank == 0:
         h_idx_cat_len = len(cprofiles.getIdxCat()[1])
     else:
@@ -197,11 +199,11 @@ def AHFEx():
     obj_numbers = np.arange(h_idx_cat_len//2)
         
     ############## Create local halo shape catalogue ############################################################
-    cprofiles.dumpShapeCatLocal(obj_numbers, reduced = True, shell_based = False)
+    cprofiles.dumpShapeCatLocal(obj_numbers, katz_config)
     #############################################################################################################
     
     ############## Viz first halo ###############################################################################
-    cprofiles.vizLocalShapes(obj_numbers = obj_numbers, reduced = True, shell_based = False)
+    cprofiles.vizLocalShapes(obj_numbers, katz_config)
     #############################################################################################################
     
 AHFEx()

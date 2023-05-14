@@ -32,6 +32,6 @@ The function ``genHalo(tot_mass, res, model_pars, method, a, b, c)`` will sample
 
     halo_x, halo_y, halo_z, mass_ptc, rho_0 = genHalo(tot_mass, res, model_pars, method, a, b, c)
 
-.. warning:: ``genHalo()`` expects ``tot_mass`` to be in units of :math:`M_{\odot}/h` while ``a``, ``b`` and ``c`` is expected to be in units of Mpc/:math:`h`.
+.. warning:: ``genHalo()`` expects ``tot_mass`` to be in units of :math:`M_{\odot}/h` while ``a``, ``b`` and ``c`` is expected to be in units of Mpc/:math:`h`. The output of ``genHalo()`` has the same units.
 
 .. note:: The profile parameter ``rho_s`` will be calculated on the fly within ``genHalo(tot_mass, res, model_pars, method, a, b, c)`` from ``tot_mass`` and the other model parameters, so there is no need to provide that in ``model_pars``.

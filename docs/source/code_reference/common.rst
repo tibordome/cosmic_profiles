@@ -54,11 +54,10 @@ The user has the liberty to update ``use_memory_up_to`` and ``maxsize`` by calli
    :undoc-members:
    :show-inheritance:
 
-The default caching parameters are
+The default caching parameters are::
 
-.. literalinclude :: ../../../cosmic_profiles/common/config.py
-   :language: python
-   :lines: 47
+    CACHE_MAXSIZE = 128
+    GBs = 2
 
 To disable caching, use::
 

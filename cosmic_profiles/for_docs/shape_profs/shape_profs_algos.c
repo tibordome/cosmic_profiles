@@ -11,7 +11,7 @@
             "-fopenmp"
         ],
         "include_dirs": [
-            "/home/tibor/.local/lib/python3.9/site-packages/numpy/core/include",
+            "/home/tibor/anaconda3/envs/fdm_baryons/lib/python3.8/site-packages/numpy/core/include",
             "."
         ],
         "name": "shape_profs.shape_profs_algos",

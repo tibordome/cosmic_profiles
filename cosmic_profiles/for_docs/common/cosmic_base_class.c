@@ -10,7 +10,7 @@
             "-fopenmp"
         ],
         "include_dirs": [
-            "/home/tibor/.local/lib/python3.9/site-packages/numpy/core/include",
+            "/home/tibor/anaconda3/envs/fdm_baryons/lib/python3.8/site-packages/numpy/core/include",
             "."
         ],
         "name": "common.cosmic_base_class",
@@ -2032,7 +2032,6 @@ static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
 static const char __pyx_k_velxyz[] = "velxyz";
 static const char __pyx_k_IT_WALL[] = "IT_WALL";
-static const char __pyx_k_einasto[] = "einasto";
 static const char __pyx_k_fortran[] = "fortran";
 static const char __pyx_k_idx_cat[] = "idx_cat";
 static const char __pyx_k_memview[] = "memview";
@@ -2174,7 +2173,6 @@ static PyObject *__pyx_n_s_dens_profs_fit;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_direct_binning;
 static PyObject *__pyx_n_s_dtype_is_object;
-static PyObject *__pyx_n_u_einasto;
 static PyObject *__pyx_n_s_encode;
 static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_error;
@@ -5375,7 +5373,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_24_plotGlobal
  *         """
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):
+ *     def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, dict method):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -5404,14 +5402,14 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_24_plotGlobal
 /* "common/cosmic_base_class.pyx":434
  *         return
  * 
- *     def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):             # <<<<<<<<<<<<<<
+ *     def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, dict method):             # <<<<<<<<<<<<<<
  *         """ Get best-fit results for density profile fitting
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_27_getDensProfsBestFitsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_26_getDensProfsBestFitsBase[] = "CosmicBase._getDensProfsBestFitsBase(self, double[:, :] dens_profs, double[:] r_over_r200, double[:] r200, unicode method=u'einasto')\n Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
+static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_26_getDensProfsBestFitsBase[] = "CosmicBase._getDensProfsBestFitsBase(self, double[:, :] dens_profs, double[:] r_over_r200, double[:] r200, dict method)\n Get best-fit results for density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_27_getDensProfsBestFitsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_dens_profs = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_over_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5426,7 +5424,6 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_27_getDensPro
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_dens_profs,&__pyx_n_s_r_over_r200,&__pyx_n_s_r200,&__pyx_n_s_method,0};
     PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_einasto);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -5451,34 +5448,31 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_27_getDensPro
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_over_r200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_getDensProfsBestFitsBase", 0, 3, 4, 1); __PYX_ERR(0, 434, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_getDensProfsBestFitsBase", 1, 4, 4, 1); __PYX_ERR(0, 434, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_getDensProfsBestFitsBase", 0, 3, 4, 2); __PYX_ERR(0, 434, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_getDensProfsBestFitsBase", 1, 4, 4, 2); __PYX_ERR(0, 434, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method);
-          if (value) { values[3] = value; kw_args--; }
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("_getDensProfsBestFitsBase", 1, 4, 4, 3); __PYX_ERR(0, 434, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_getDensProfsBestFitsBase") < 0)) __PYX_ERR(0, 434, __pyx_L3_error)
       }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
     } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        break;
-        default: goto __pyx_L5_argtuple_error;
-      }
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
     __pyx_v_dens_profs = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_dens_profs.memview)) __PYX_ERR(0, 434, __pyx_L3_error)
     __pyx_v_r_over_r200 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_over_r200.memview)) __PYX_ERR(0, 434, __pyx_L3_error)
@@ -5487,13 +5481,13 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_27_getDensPro
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_getDensProfsBestFitsBase", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 434, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_getDensProfsBestFitsBase", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 434, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("common.cosmic_base_class.CosmicBase._getDensProfsBestFitsBase", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 434, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyDict_Type), 1, "method", 1))) __PYX_ERR(0, 434, __pyx_L1_error)
   __pyx_r = __pyx_pf_6common_17cosmic_base_class_10CosmicBase_26_getDensProfsBestFitsBase(((struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_r200, __pyx_v_method);
 
   /* function exit code */
@@ -5515,7 +5509,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_26_getDensPro
  *         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):
+ *     def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, method):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -5524,7 +5518,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_26_getDensPro
   /* "common/cosmic_base_class.pyx":434
  *         return
  * 
- *     def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):             # <<<<<<<<<<<<<<
+ *     def _getDensProfsBestFitsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, dict method):             # <<<<<<<<<<<<<<
  *         """ Get best-fit results for density profile fitting
  * 
  */
@@ -5542,14 +5536,14 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_26_getDensPro
 /* "common/cosmic_base_class.pyx":449
  *         return
  * 
- *     def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):             # <<<<<<<<<<<<<<
+ *     def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, method):             # <<<<<<<<<<<<<<
  *         """ Get best-fit concentration values of objects from density profile fitting
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_29_getConcentrationsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_28_getConcentrationsBase[] = "CosmicBase._getConcentrationsBase(self, double[:, :] dens_profs, double[:] r_over_r200, double[:] r200, unicode method=u'einasto')\n Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
+static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_28_getConcentrationsBase[] = "CosmicBase._getConcentrationsBase(self, double[:, :] dens_profs, double[:] r_over_r200, double[:] r200, method)\n Get best-fit concentration values of objects from density profile fitting\n        \n        :param dens_profs: density profiles to be fit, in units of M_sun*h^2/(Mpc)**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_29_getConcentrationsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_dens_profs = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r_over_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5564,7 +5558,6 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_29_getConcent
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_dens_profs,&__pyx_n_s_r_over_r200,&__pyx_n_s_r200,&__pyx_n_s_method,0};
     PyObject* values[4] = {0,0,0,0};
-    values[3] = ((PyObject*)__pyx_n_u_einasto);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -5589,56 +5582,48 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_29_getConcent
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r_over_r200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_getConcentrationsBase", 0, 3, 4, 1); __PYX_ERR(0, 449, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_getConcentrationsBase", 1, 4, 4, 1); __PYX_ERR(0, 449, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_r200)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_getConcentrationsBase", 0, 3, 4, 2); __PYX_ERR(0, 449, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_getConcentrationsBase", 1, 4, 4, 2); __PYX_ERR(0, 449, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method);
-          if (value) { values[3] = value; kw_args--; }
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_method)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("_getConcentrationsBase", 1, 4, 4, 3); __PYX_ERR(0, 449, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_getConcentrationsBase") < 0)) __PYX_ERR(0, 449, __pyx_L3_error)
       }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
     } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        break;
-        default: goto __pyx_L5_argtuple_error;
-      }
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
     __pyx_v_dens_profs = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_dens_profs.memview)) __PYX_ERR(0, 449, __pyx_L3_error)
     __pyx_v_r_over_r200 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r_over_r200.memview)) __PYX_ERR(0, 449, __pyx_L3_error)
     __pyx_v_r200 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_r200.memview)) __PYX_ERR(0, 449, __pyx_L3_error)
-    __pyx_v_method = ((PyObject*)values[3]);
+    __pyx_v_method = values[3];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_getConcentrationsBase", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 449, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_getConcentrationsBase", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 449, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("common.cosmic_base_class.CosmicBase._getConcentrationsBase", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 449, __pyx_L1_error)
   __pyx_r = __pyx_pf_6common_17cosmic_base_class_10CosmicBase_28_getConcentrationsBase(((struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *)__pyx_v_self), __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_r200, __pyx_v_method);
 
   /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -5662,7 +5647,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_28_getConcent
   /* "common/cosmic_base_class.pyx":449
  *         return
  * 
- *     def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, str method = 'einasto'):             # <<<<<<<<<<<<<<
+ *     def _getConcentrationsBase(self, double[:,:] dens_profs, double[:] r_over_r200, double[:] r200, method):             # <<<<<<<<<<<<<<
  *         """ Get best-fit concentration values of objects from density profile fitting
  * 
  */
@@ -6614,7 +6599,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_38estDensProf
  *         :rtype: (N2, r_res) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):
+ *     def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -6638,14 +6623,14 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_38estDensProf
 /* "common/cosmic_base_class.pyx":598
  *         return
  * 
- *     def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):             # <<<<<<<<<<<<<<
+ *     def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):             # <<<<<<<<<<<<<<
  *         """ Get best-fit results for density profile fitting
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_41_fitDensProfsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_40_fitDensProfsBase[] = "CosmicBase._fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:, :] dens_profs, double[:] r_over_r200, unicode method, obj_numbers)\n Get best-fit results for density profile fitting\n        \n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
+static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_40_fitDensProfsBase[] = "CosmicBase._fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:, :] dens_profs, double[:] r_over_r200, dict method, obj_numbers)\n Get best-fit results for density profile fitting\n        \n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param dens_profs: density profiles to be fit, in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fits for each object\n        :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``";
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_41_fitDensProfsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -6745,7 +6730,7 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_41_fitDensPro
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 598, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyDict_Type), 1, "method", 1))) __PYX_ERR(0, 598, __pyx_L1_error)
   __pyx_r = __pyx_pf_6common_17cosmic_base_class_10CosmicBase_40_fitDensProfsBase(((struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *)__pyx_v_self), __pyx_v_r200, __pyx_v_obj_size, __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_method, __pyx_v_obj_numbers);
 
   /* function exit code */
@@ -6767,7 +6752,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_40_fitDensPro
  *         :rtype: (N3, n) floats, where n is the number of free parameters in the model ``method``"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):
+ *     def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -6776,7 +6761,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_40_fitDensPro
   /* "common/cosmic_base_class.pyx":598
  *         return
  * 
- *     def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):             # <<<<<<<<<<<<<<
+ *     def _fitDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):             # <<<<<<<<<<<<<<
  *         """ Get best-fit results for density profile fitting
  * 
  */
@@ -6795,14 +6780,14 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_40_fitDensPro
 /* "common/cosmic_base_class.pyx":617
  *         return
  * 
- *     def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):             # <<<<<<<<<<<<<<
+ *     def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):             # <<<<<<<<<<<<<<
  *         """ Get best-fit concentration values of objects from density profile fitting
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_43_estConcentrationsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_42_estConcentrationsBase[] = "CosmicBase._estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:, :] dens_profs, double[:] r_over_r200, unicode method, obj_numbers)\n Get best-fit concentration values of objects from density profile fitting\n        \n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param dens_profs: density profiles whose concentrations are to be determined, \n            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
+static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_42_estConcentrationsBase[] = "CosmicBase._estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:, :] dens_profs, double[:] r_over_r200, dict method, obj_numbers)\n Get best-fit concentration values of objects from density profile fitting\n        \n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param dens_profs: density profiles whose concentrations are to be determined, \n            in units of config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N3, r_res) floats\n        :param r_over_r200: normalized radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        :return: best-fit concentration for each object\n        :rtype: (N3,) floats";
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_43_estConcentrationsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -6902,7 +6887,7 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_43_estConcent
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 617, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyDict_Type), 1, "method", 1))) __PYX_ERR(0, 617, __pyx_L1_error)
   __pyx_r = __pyx_pf_6common_17cosmic_base_class_10CosmicBase_42_estConcentrationsBase(((struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *)__pyx_v_self), __pyx_v_r200, __pyx_v_obj_size, __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_method, __pyx_v_obj_numbers);
 
   /* function exit code */
@@ -6924,7 +6909,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_42_estConcent
  *         :rtype: (N3,) floats"""
  *         return             # <<<<<<<<<<<<<<
  * 
- *     def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, str method, str suffix, int nb_bins, obj_numbers):
+ *     def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, dict method, str suffix, int nb_bins, obj_numbers):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -6933,7 +6918,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_42_estConcent
   /* "common/cosmic_base_class.pyx":617
  *         return
  * 
- *     def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, str method, obj_numbers):             # <<<<<<<<<<<<<<
+ *     def _estConcentrationsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, dict method, obj_numbers):             # <<<<<<<<<<<<<<
  *         """ Get best-fit concentration values of objects from density profile fitting
  * 
  */
@@ -6952,14 +6937,14 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_42_estConcent
 /* "common/cosmic_base_class.pyx":637
  *         return
  * 
- *     def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, str method, str suffix, int nb_bins, obj_numbers):             # <<<<<<<<<<<<<<
+ *     def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, dict method, str suffix, int nb_bins, obj_numbers):             # <<<<<<<<<<<<<<
  *         """ Draws some simplistic density profiles
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_45_plotDensProfsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_44_plotDensProfsBase[] = "CosmicBase._plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:, :] dens_profs, double[:] r_over_r200, double[:, :] dens_profs_fit, double[:] r_over_r200_fit, unicode method, unicode suffix, int nb_bins, obj_numbers)\n Draws some simplistic density profiles\n        \n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param dens_profs: estimated density profiles, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N2, r_res) floats\n        :param r_over_r200: radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param r_over_r200_fit: radii at which best-fits shall be calculated\n        :type r_over_r200_fit: (r_res2,) floats\n        :param method: string describing density profile model assumed for fitting\n        :type method: string, either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`\n        :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)\n        :type suffix: string\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        ";
+static char __pyx_doc_6common_17cosmic_base_class_10CosmicBase_44_plotDensProfsBase[] = "CosmicBase._plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:, :] dens_profs, double[:] r_over_r200, double[:, :] dens_profs_fit, double[:] r_over_r200_fit, dict method, unicode suffix, int nb_bins, obj_numbers)\n Draws some simplistic density profiles\n        \n        :param r200: each entry gives the R_200 radius of the parent halo in Mpc/h (internal length units)\n        :type r200: (N1,) floats\n        :param obj_size: indicates how many particles are in each object\n        :type obj_size: (N1,) integers\n        :param dens_profs: estimated density profiles, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs: (N2, r_res) floats\n        :param r_over_r200: radii at which ``dens_profs`` are defined\n        :type r_over_r200: (r_res,) floats\n        :param dens_profs_fit: density profiles to be fit, in units of \n            config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3\n        :type dens_profs_fit: (N2, r_res2) floats\n        :param r_over_r200_fit: radii at which best-fits shall be calculated\n        :type r_over_r200_fit: (r_res2,) floats\n        :param method: describes density profile model assumed for fitting, if parameter should be kept fixed during fitting then it needs to be provided, e.g. method['alpha'] = 0.18\n        :type method: dictionary, method['profile'] is either `einasto`, `alpha_beta_gamma`, `hernquist`, `nfw`, minimum requirement\n        :param suffix: either '_dm_' or '_gx_' or '' (latter for CosmicProfsDirect)\n        :type suffix: string\n        :param nb_bins: Number of mass bins to plot density profiles for\n        :type nb_bins: int\n        :param obj_numbers: list of object indices of interest\n        :type obj_numbers: list of int\n        ";
 static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_45_plotDensProfsBase(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_r200 = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED __Pyx_memviewslice __pyx_v_obj_size = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -7103,7 +7088,7 @@ static PyObject *__pyx_pw_6common_17cosmic_base_class_10CosmicBase_45_plotDensPr
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyUnicode_Type), 1, "method", 1))) __PYX_ERR(0, 637, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_method), (&PyDict_Type), 1, "method", 1))) __PYX_ERR(0, 637, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_suffix), (&PyUnicode_Type), 1, "suffix", 1))) __PYX_ERR(0, 637, __pyx_L1_error)
   __pyx_r = __pyx_pf_6common_17cosmic_base_class_10CosmicBase_44_plotDensProfsBase(((struct __pyx_obj_6common_17cosmic_base_class_CosmicBase *)__pyx_v_self), __pyx_v_r200, __pyx_v_obj_size, __pyx_v_dens_profs, __pyx_v_r_over_r200, __pyx_v_dens_profs_fit, __pyx_v_r_over_r200_fit, __pyx_v_method, __pyx_v_suffix, __pyx_v_nb_bins, __pyx_v_obj_numbers);
 
@@ -7135,7 +7120,7 @@ static PyObject *__pyx_pf_6common_17cosmic_base_class_10CosmicBase_44_plotDensPr
   /* "common/cosmic_base_class.pyx":637
  *         return
  * 
- *     def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, str method, str suffix, int nb_bins, obj_numbers):             # <<<<<<<<<<<<<<
+ *     def _plotDensProfsBase(self, double[:] r200, int[:] obj_size, double[:,:] dens_profs, double[:] r_over_r200, double[:,:] dens_profs_fit, double[:] r_over_r200_fit, dict method, str suffix, int nb_bins, obj_numbers):             # <<<<<<<<<<<<<<
  *         """ Draws some simplistic density profiles
  * 
  */
@@ -22175,7 +22160,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_direct_binning, __pyx_k_direct_binning, sizeof(__pyx_k_direct_binning), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
-  {&__pyx_n_u_einasto, __pyx_k_einasto, sizeof(__pyx_k_einasto), 0, 1, 0, 1},
   {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},

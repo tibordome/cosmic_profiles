@@ -162,7 +162,6 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
         m_current = m_internal/MASS_UNIT
         dens_current = m_current/l_internal**3
         dens_target = config.OutUnitMass_in_g/config.OutUnitLength_in_cm**3
-        l_current_over_target = l_internal/config.OutUnitLength_in_cm
         dens_current_over_target = dens_current/dens_target
         l_label, m_label, vel_lable = config.LMVLabel()
         dens_label = r"{}/{}^3".format("({})".format(m_label) if "/h" in m_label else m_label, "({})".format(l_label) if "/h" in l_label else l_label).replace("sun", "_{\odot}")
@@ -200,7 +199,6 @@ def drawDensProfs(VIZ_DEST, SNAP, r200s, dens_profs_fit, ROverR200_fit, dens_pro
             best_fit_m, obj_nb = fitDensProf(ROverR200_fit, method, (prof_median_fit, r200_m, 0))
             best_fit_m_dict = getModelParsDict(best_fit_m, method['profile'])
             # Best-fit parameters have dimensions too
-            best_fit_m_dict['r_s'] = best_fit_m_dict['r_s']*l_current_over_target
             best_fit_m_dict['rho_s'] = best_fit_m_dict['rho_s']*dens_current_over_target
             # Plotting
             plt.figure()
@@ -253,6 +251,12 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
     
     median, r200, obj_nb = median_r200_obj_nb
     
+    # Choose user's minimization method if available
+    if 'min_method' in method:
+        min_method = method['min_method']
+    else:
+        min_method = 'Powell'
+    
     R_to_min = ROverR200*r200 # Mpc/h
     # Discard nan values in median
     R_to_min = R_to_min[~np.isnan(median)] # Note: np.isnan returns a boolean
@@ -264,7 +268,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
                 alpha_lbound = method['alpha']
                 alpha_rbound = alpha_lbound
             else:
-                alpha_lbound = -np.inf
+                alpha_lbound = 1e-10 # Negative would mean density profile bends upwards in log-log plot
                 alpha_rbound = np.inf
             if 'r_s' in method:
                 r_s_lbound = method['r_s']
@@ -273,7 +277,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
                 r_s_lbound = 1e-5
                 r_s_rbound = np.inf
             iguess = np.array([0.1, 0.18, r200/5]) # Note: alpha = 0.18 gives ~ NFW
-            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method['profile']), bounds = [(1e-7, np.inf), (alpha_lbound, alpha_rbound), (r_s_lbound, r_s_rbound)]) # Only hand over rescaled median!
+            res = optimize.minimize(toMinimize, iguess, method = min_method, args = (median/np.average(median), R_to_min, method['profile']), bounds = [(1e-7, np.inf), (alpha_lbound, alpha_rbound), (r_s_lbound, r_s_rbound)]) # Only hand over rescaled median!
             best_fit = res.x
         elif method['profile'] == 'alpha_beta_gamma':
             if 'alpha' in method:
@@ -301,7 +305,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
                 r_s_lbound = 1e-5
                 r_s_rbound = np.inf
             iguess = np.array([0.1, 1.0, 1.0, 1.0, r200/5])
-            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method['profile']), bounds = [(1e-7, np.inf), (alpha_lbound, alpha_rbound), (beta_lbound, beta_rbound), (gamma_lbound, gamma_rbound), (r_s_lbound, r_s_rbound)]) # Only hand over rescaled median!
+            res = optimize.minimize(toMinimize, iguess, method = min_method, args = (median/np.average(median), R_to_min, method['profile']), bounds = [(1e-7, np.inf), (alpha_lbound, alpha_rbound), (beta_lbound, beta_rbound), (gamma_lbound, gamma_rbound), (r_s_lbound, r_s_rbound)]) # Only hand over rescaled median!
             best_fit = res.x
         else:
             if 'r_s' in method:
@@ -311,7 +315,7 @@ def fitDensProf(ROverR200, method, median_r200_obj_nb):
                 r_s_lbound = 1e-5
                 r_s_rbound = np.inf
             iguess = np.array([0.1, r200/5])
-            res = optimize.minimize(toMinimize, iguess, method = 'TNC', args = (median/np.average(median), R_to_min, method['profile']), bounds = [(1e-7, np.inf), (r_s_lbound, r_s_rbound)]) # Only hand over rescaled median!
+            res = optimize.minimize(toMinimize, iguess, method = min_method, args = (median/np.average(median), R_to_min, method['profile']), bounds = [(1e-7, np.inf), (r_s_lbound, r_s_rbound)]) # Only hand over rescaled median!
             best_fit = res.x
         best_fit[0] *= np.average(median)
     except ValueError: # For poor density profiles one might encounter "ValueError: `x0` violates bound constraints."

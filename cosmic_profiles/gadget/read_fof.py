@@ -41,7 +41,7 @@ def getFoFSHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
     :return: nb_shs (# subhalos in each FoF-halo), sh_len (size of each SH), 
         fof_sizes (size of each FoF-halo), group_r200 (R200 radius of each FoF-halo
         in units of cMpc/h)
-    :rtype: float and int arrays"""
+    :rtype: double and int arrays"""
     def inner(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
         fof_sizes = np.empty(0, dtype = np.int32)
         nb_shs = np.empty(0, dtype = np.int32)
@@ -62,15 +62,16 @@ def getFoFSHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
             last = rank == nb_jobs_to_do - 1
         count_fof = 0
         count_sh = 0
-        l_target_over_curr = 3.085678e24/config.InUnitLength_in_cm
+        l_internal, m_internal, vel_internal = config.getLMVInternal()
+        l_curr_over_target = config.InUnitLength_in_cm/l_internal
         for snap_run in range(rank*perrank, rank*perrank+do_sth*(perrank+last*(nb_jobs_to_do-(rank+1)*perrank))):
             g = h5py.File(r'{}'.format(hdf5GroupFilenamesList[snap_run]), 'r')
             if 'Group/GroupLenType' in g:
                 fof_sizes = np.hstack((fof_sizes, np.int32([np.int32(g['Group/GroupLenType'][i,PART_TYPE]) for i in range(g['Group/GroupLenType'].shape[0])])))
                 if RVIR_OR_R200 == 'Rvir':
-                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_TopHat200'][:]/l_target_over_curr)))
+                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_TopHat200'][:]*l_curr_over_target)))
                 elif RVIR_OR_R200 == 'R200':
-                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_Mean200'][:]/l_target_over_curr)))
+                    group_r200 = np.hstack((group_r200, np.float32(g['Group/Group_R_Mean200'][:]*l_curr_over_target)))
                 else:
                     raise ValueError("RVIR_OR_R200 should be either 'Rvir' or 'R200'. Please modify the provided RVIR_OR_R200 variable.")
                 nb_shs = np.hstack((nb_shs, np.int32([np.int32(g['Group/GroupNsubs'][i]) for i in range(g['Group/GroupNsubs'].shape[0])])))
@@ -130,7 +131,7 @@ def getFoFSHData(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE):
             comm.Bcast(to_bcast, root=0)
             sh_len = np.hstack((sh_len, to_bcast))
         
-        return nb_shs, sh_len, fof_sizes, group_r200
+        return nb_shs, sh_len, fof_sizes, np.float64(group_r200)
     if(not hasattr(getFoFSHData, "inner")):
         getFoFSHData.inner = np_cache_factory(0,0)(inner)
     getFoFSHData.inner(HDF5_GROUP_DEST, RVIR_OR_R200, PART_TYPE)
