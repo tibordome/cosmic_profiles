@@ -2,7 +2,7 @@
 
 CosmicProfiles is a Cython package for Point Cloud Profiling
 
-|Build Status| |Platforms| |Zenodo|
+|Build Status| |Platforms| |Zenodo| |JOSS|
 
 The CosmicProfiles project
 ****************************
@@ -82,6 +82,8 @@ Contributions are welcome. Please raise an issue or open a PR.
    :target: https://cosmic-profiles.readthedocs.io/en/latest/?badge=latest
 .. |Zenodo| image:: https://zenodo.org/badge/475501515.svg
    :target: https://zenodo.org/badge/latestdoi/475501515
+.. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.05008/status.svg
+   :target: https://doi.org/10.21105/joss.05008
 .. |Build status| image:: https://app.travis-ci.com/tibordome/cosmic_profiles.svg?branch=master
    :target: https://app.travis-ci.com/tibordome/cosmic_profiles
 .. |Name| image:: https://img.shields.io/badge/recipe-cosmic_profiles-green.svg
